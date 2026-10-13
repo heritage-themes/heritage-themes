@@ -9,6 +9,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
 VERSION = "1.0.0"
 CHANGE_NOTES = "Initial release with Wuxing Night and Wuxing Day."
+VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 PLUGIN_ICONS = ("pluginIcon.svg", "pluginIcon_dark.svg")
 
 
@@ -33,7 +34,7 @@ def plugin_xml(families, themes):
   <id>heritage.themes</id>
   <name>Heritage Themes</name>
   <version>{VERSION}</version>
-  <vendor>Heritage Themes</vendor>
+  <vendor url="{VENDOR_URL}">Heritage Themes</vendor>
   <description><![CDATA[
     <p>Colour themes drawn from the colour traditions of different cultures.</p>
     <ul>
