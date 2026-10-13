@@ -5,6 +5,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | Folder | Themes |
 | --- | --- |
 | [`danqing/`](danqing/) | Danqing Ink, Danqing Paper |
+| [`shuimo/`](shuimo/) | Shuimo Day, Shuimo Night |
 | [`wuxing/`](wuxing/) | Wuxing Day, Wuxing Night |
 
 ## Build
