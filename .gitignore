@@ -8,3 +8,6 @@ build/
 .vscode/
 .DS_Store
 __pycache__/
+
+# Local reference material, not part of the repository
+wuxing/docs/
