@@ -1,8 +1,4 @@
-import json, os, re, html, zipfile, shutil
-
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "build")
-shutil.rmtree(OUT, ignore_errors=True)
-os.makedirs(f"{OUT}/plugin/META-INF"); os.makedirs(f"{OUT}/plugin/themes")
+import json, os, re, html
 
 # ---------------------------------------------------------------- palettes
 # Five Elements: Fire=red (keywords), Wood=qing/green (strings), Earth=yellow (types),
@@ -261,43 +257,20 @@ def theme(p, slug):
         "colors": c, "ui": ui,
     }
 
-for p, slug in [(NIGHT, "WuxingNight"), (DAY, "WuxingDay")]:
-    xml = scheme(p)
-    open(f"{OUT}/plugin/themes/{slug}.xml", "w").write(xml)
-    open(f"{OUT}/{p['name']}.icls", "w").write(xml)
-    json.dump(theme(p, slug), open(f"{OUT}/plugin/themes/{slug}.theme.json", "w"), indent=2)
+# ---------------------------------------------------------------- bundle contract
+# build.py in the repository root imports FAMILY, BLURB and generate() from every theme folder.
+FAMILY = "Wuxing"
+BLURB = ("Chinese colour symbolism and the Five Elements: vermilion keywords (Fire), jade strings (Wood), "
+         "imperial-yellow types (Earth), and a rice-paper or indigo-ink canvas in place of stark white and "
+         "black (Metal and Water).")
+THEMES = [
+    dict(slug="WuxingNight", id="93584a5e-9007-4988-b46f-2262fc35943a", palette=NIGHT),
+    dict(slug="WuxingDay", id="4b15b1a7-f789-4a43-851a-8b3f5bb0a4cf", palette=DAY),
+]
 
-open(f"{OUT}/plugin/META-INF/plugin.xml", "w").write("""<idea-plugin>
-  <id>wuxing.themes</id>
-  <name>Wuxing Themes</name>
-  <version>1.0.0</version>
-  <vendor>Heritage Themes</vendor>
-  <description><![CDATA[
-    Dark and light themes built on Chinese colour symbolism and the Five Elements (Wuxing):
-    vermilion keywords (Fire), jade strings (Wood), imperial-yellow types (Earth), a rice-paper or
-    indigo-ink canvas in place of stark white and black (Metal and Water), gold for prosperity,
-    Forbidden City purple for fields and turquoise for annotations.
-  ]]></description>
-  <change-notes><![CDATA[
-    <b>1.0.0</b>: Initial release with Wuxing Night and Wuxing Day.
-  ]]></change-notes>
-  <idea-version since-build="233"/>
-  <depends>com.intellij.modules.platform</depends>
-  <extensions defaultExtensionNs="com.intellij">
-    <themeProvider id="93584a5e-9007-4988-b46f-2262fc35943a" path="/themes/WuxingNight.theme.json"/>
-    <themeProvider id="4b15b1a7-f789-4a43-851a-8b3f5bb0a4cf" path="/themes/WuxingDay.theme.json"/>
-  </extensions>
-</idea-plugin>
-""")
-
-for icon in ("pluginIcon.svg", "pluginIcon_dark.svg"):
-    shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", icon), f"{OUT}/plugin/META-INF/{icon}")
-
-with zipfile.ZipFile(f"{OUT}/wuxing-themes-1.0.0.jar", "w", zipfile.ZIP_DEFLATED) as z:
-    for root, _, files in os.walk(f"{OUT}/plugin"):
-        for f in files:
-            full = os.path.join(root, f)
-            z.write(full, os.path.relpath(full, f"{OUT}/plugin"))
+def generate():
+    return [dict(slug=t["slug"], id=t["id"], name=t["palette"]["name"],
+                 scheme=scheme(t["palette"]), theme=theme(t["palette"], t["slug"])) for t in THEMES]
 
 # ---------------------------------------------------------------- preview
 JAVA = '''/** Handles orders. @since 1.0 */
@@ -400,7 +373,8 @@ def pane(p, cls):
   <div class="tabs"><span class="tab">OrderControllerSpec.groovy</span></div>{code(GROOVY, 6)}</div></div>
 </section>'''
 
-page = f"""<!doctype html><html><head><meta charset="utf-8"><title>Wuxing Themes Preview</title>
+def preview():
+    return f"""<!doctype html><html><head><meta charset="utf-8"><title>Wuxing Preview</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"><style>
 body{{margin:0;padding:16px;background:#888;font-family:system-ui,sans-serif}}
 .ide{{border:1px solid;border-radius:10px;overflow:hidden;margin:0 auto 20px;max-width:900px}}
@@ -414,5 +388,9 @@ pre div{{padding:0 12px;white-space:pre}}
 @media (max-width:640px){{.side{{display:none}}}}
 {css(NIGHT, '.night')}{css(DAY, '.day')}
 </style></head><body>{pane(NIGHT, 'night')}{pane(DAY, 'day')}</body></html>"""
-open(f"{OUT}/preview.html", "w").write(page)
-print("ok")
+
+if __name__ == "__main__":
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "build")
+    os.makedirs(out, exist_ok=True)
+    open(os.path.join(out, "preview.html"), "w").write(preview())
+    print("ok")
