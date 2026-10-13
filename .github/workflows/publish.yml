@@ -1,0 +1,130 @@
+name: Publish
+
+# Fires only when a version tag (for example `v1.0.0`) is pushed, so the tag push is the release
+# gate. scripts/release.sh pushes the tag after Build has passed on the commit it points at.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+env:
+  # JetBrains marketplace-zip-signer CLI, pinned with the SHA-256 of the jar from Maven Central.
+  SIGNER_VERSION: 0.1.43
+  SIGNER_SHA256: 2958a0f42221d6062b50f22754e413ae5cc42f60c441467202c6700df2e22f44
+  PLUGIN_XML_ID: heritage.themes
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub release
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Check the tag
+        shell: bash
+        run: |
+          version=$(sed -n 's/^VERSION = "\(.*\)"/\1/p' build.py)
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match VERSION $version in build.py"
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/master; then
+            echo "::error::$GITHUB_REF_NAME does not point at a commit on master"
+            exit 1
+          fi
+          if ! grep -q "^## \[$version\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no [$version] section"
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      # The signer exits successfully on an empty certificate or key and the upload would then
+      # carry an unsigned archive. Fail before either runs.
+      - name: Check release secrets
+        shell: bash
+        env:
+          CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
+          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+        run: |
+          missing=0
+          for name in CERTIFICATE_CHAIN PRIVATE_KEY PRIVATE_KEY_PASSWORD PUBLISH_TOKEN; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Repository secret $name is empty or not set"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - run: python3 build.py
+
+      - name: Sign the plugin
+        shell: bash
+        env:
+          CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
+        run: |
+          signer="$RUNNER_TEMP/marketplace-zip-signer-cli.jar"
+          curl --fail --silent --show-error --location --output "$signer" \
+            "https://repo1.maven.org/maven2/org/jetbrains/marketplace-zip-signer/$SIGNER_VERSION/marketplace-zip-signer-$SIGNER_VERSION-cli.jar"
+          echo "$SIGNER_SHA256  $signer" | sha256sum --check -
+          umask 077
+          printf '%s\n' "$CERTIFICATE_CHAIN" > "$RUNNER_TEMP/chain.crt"
+          printf '%s\n' "$PRIVATE_KEY" > "$RUNNER_TEMP/private.pem"
+          java -jar "$signer" sign \
+            -in "build/heritage-themes-$VERSION.zip" \
+            -out "build/heritage-themes-$VERSION-signed.zip" \
+            -cert-file "$RUNNER_TEMP/chain.crt" \
+            -key-file "$RUNNER_TEMP/private.pem" \
+            -key-pass "$PRIVATE_KEY_PASSWORD"
+          java -jar "$signer" verify \
+            -in "build/heritage-themes-$VERSION-signed.zip" \
+            -cert "$RUNNER_TEMP/chain.crt"
+          rm -f "$RUNNER_TEMP/chain.crt" "$RUNNER_TEMP/private.pem"
+
+      # Uploads a new version of a plugin that already exists on the Marketplace. The first
+      # version is uploaded by hand (docs/releasing.md).
+      - name: Publish to JetBrains Marketplace
+        shell: bash
+        env:
+          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --header "Authorization: Bearer $PUBLISH_TOKEN" \
+            --form "xmlId=$PLUGIN_XML_ID" \
+            --form "file=@build/heritage-themes-$VERSION-signed.zip" \
+            https://plugins.jetbrains.com/plugin/uploadPlugin
+
+      - name: Create the GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" {on = 1; next}
+            /^## \[/ {on = 0}
+            on' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            "build/heritage-themes-$VERSION-signed.zip" \
+            build/schemes/*.icls

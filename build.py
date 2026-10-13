@@ -3,12 +3,13 @@
 A theme folder is any top-level directory containing a gen.py that provides FAMILY, BLURB and
 generate(). Run `python3 build.py`; output goes to build/.
 """
-import importlib.util, json, os, shutil, zipfile
+import html, importlib.util, json, os, re, shutil, zipfile
+import xml.etree.ElementTree as ET
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
+CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
 VERSION = "1.0.0"
-CHANGE_NOTES = "Initial release with Wuxing Night and Wuxing Day."
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 PLUGIN_ICONS = ("pluginIcon.svg", "pluginIcon_dark.svg")
 
@@ -24,6 +25,38 @@ def load_families():
         spec.loader.exec_module(module)
         families.append(module)
     return families
+
+
+def change_notes():
+    """HTML for the plugin's change notes: the CHANGELOG.md section for VERSION, else [Unreleased]."""
+    with open(CHANGELOG) as f:
+        text = f.read()
+    for heading in (f"[{VERSION}]", "[Unreleased]"):
+        match = re.search(rf"^## {re.escape(heading)}[^\n]*\n(.*?)(?=^## \[|\Z)", text, re.M | re.S)
+        if match and match.group(1).strip():
+            return changelog_html(match.group(1))
+    raise SystemExit(f"CHANGELOG.md has no entries under [{VERSION}] or [Unreleased]")
+
+
+def changelog_html(section):
+    out, in_list = [], False
+    for line in section.strip().splitlines():
+        if line.startswith("- "):
+            if not in_list:
+                out.append("<ul>")
+                in_list = True
+            out.append(f"<li>{html.escape(line[2:].strip())}</li>")
+        elif line.startswith("  ") and in_list and line.strip():
+            out[-1] = out[-1][:-5] + " " + html.escape(line.strip()) + "</li>"
+        else:
+            if in_list:
+                out.append("</ul>")
+                in_list = False
+            if line.startswith("### "):
+                out.append(f"<b>{html.escape(line[4:].strip())}</b>")
+    if in_list:
+        out.append("</ul>")
+    return "\n".join(out)
 
 
 def plugin_xml(families, themes):
@@ -42,7 +75,8 @@ def plugin_xml(families, themes):
     </ul>
   ]]></description>
   <change-notes><![CDATA[
-    <b>{VERSION}</b>: {CHANGE_NOTES}
+    <b>{VERSION}</b>
+{change_notes()}
   ]]></change-notes>
   <idea-version since-build="233"/>
   <depends>com.intellij.modules.platform</depends>
@@ -51,6 +85,29 @@ def plugin_xml(families, themes):
   </extensions>
 </idea-plugin>
 """
+
+
+def validate(jar, themes):
+    """Fails the build when the jar's descriptor, icons or theme files are malformed or missing."""
+    with zipfile.ZipFile(jar) as z:
+        names = set(z.namelist())
+        descriptor = ET.fromstring(z.read("META-INF/plugin.xml"))
+        for tag in ("id", "name", "version", "vendor", "description", "change-notes"):
+            element = descriptor.find(tag)
+            if element is None or not "".join(element.itertext()).strip():
+                raise SystemExit(f"plugin.xml: <{tag}> is missing or empty")
+        providers = descriptor.findall("extensions/themeProvider")
+        if len(providers) != len(themes):
+            raise SystemExit(f"plugin.xml: {len(providers)} themeProviders for {len(themes)} themes")
+        for provider in providers:
+            path = provider.get("path").lstrip("/")
+            if path not in names:
+                raise SystemExit(f"plugin.xml: themeProvider path {path} is not in the jar")
+            json.loads(z.read(path))
+        for t in themes:
+            ET.fromstring(z.read(f"themes/{t['slug']}.xml"))
+        for icon in PLUGIN_ICONS:
+            ET.fromstring(z.read(f"META-INF/{icon}"))
 
 
 def main():
@@ -73,7 +130,11 @@ def main():
             z.writestr(f"themes/{t['slug']}.theme.json", json.dumps(t["theme"], indent=2))
             with open(os.path.join(OUT, "schemes", f"{t['name']}.icls"), "w") as f:
                 f.write(t["scheme"])
-    print(f"{jar}: {len(themes)} themes")
+    validate(jar, themes)
+    archive = os.path.join(OUT, f"heritage-themes-{VERSION}.zip")
+    with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
+        z.write(jar, f"heritage-themes/lib/{os.path.basename(jar)}")
+    print(f"{archive}: {len(themes)} themes")
 
 
 if __name__ == "__main__":
