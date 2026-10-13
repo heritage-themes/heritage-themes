@@ -9,5 +9,5 @@ build/
 .DS_Store
 __pycache__/
 
-# Local reference material, not part of the repository
-wuxing/docs/
+# Local reference material in each theme folder, not part of the repository
+*/docs/
