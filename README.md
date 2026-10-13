@@ -1,6 +1,6 @@
-# Themes for JetBrains
+# Heritage Themes
 
-Colour themes for IntelliJ-based IDEs. Each top-level folder is one theme family, built as its own IDE plugin.
+Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradition. Each top-level folder is one theme family, built as its own IDE plugin.
 
 | Folder | Themes |
 | --- | --- |

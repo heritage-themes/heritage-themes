@@ -255,7 +255,7 @@ def theme(p, slug):
         "DragAndDrop.areaBackground": "selInactive", "DragAndDrop.borderColor": "gold",
     }
     return {
-        "name": p["name"], "dark": p["dark"], "author": "Wuxing Themes",
+        "name": p["name"], "dark": p["dark"], "author": "Heritage Themes",
         "parentTheme": p["parentTheme"],
         "editorScheme": f"/themes/{slug}.xml",
         "colors": c, "ui": ui,
@@ -271,7 +271,7 @@ open(f"{OUT}/plugin/META-INF/plugin.xml", "w").write("""<idea-plugin>
   <id>wuxing.themes</id>
   <name>Wuxing Themes</name>
   <version>1.0.0</version>
-  <vendor>Wuxing Themes</vendor>
+  <vendor>Heritage Themes</vendor>
   <description><![CDATA[
     Dark and light themes built on Chinese colour symbolism and the Five Elements (Wuxing):
     vermilion keywords (Fire), jade strings (Wood), imperial-yellow types (Earth), a rice-paper or
