@@ -23,10 +23,4 @@ Danqing Ink uses the dark tone of ink on an inkstone as its ground. Danqing Pape
 
 ## Develop
 
-Palettes and all colour mappings are in `gen.py`. The root `build.py` includes the themes in the Heritage Themes plugin; see the [root README](../README.md) for build and install steps.
-
-Generate a palette preview at `danqing/build/preview.html`:
-
-```bash
-python3 danqing/gen.py
-```
+The palettes are in `theme.py`. The colour mappings and the preview are shared by every theme family and live in [`heritage/`](../heritage/). See the [root README](../README.md) for build, preview and install steps.

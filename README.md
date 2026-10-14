@@ -35,19 +35,36 @@ Output in `build/`:
 
 Install the jar or an `.icls` file as described under [Install](#install).
 
+## Preview
+
+```bash
+python3 preview.py              # every theme: <theme>/build/preview.html
+python3 preview.py shuimo       # one theme
+python3 preview.py --png        # also render <theme>/preview.png
+```
+
+The page shows each theme as an IDE window with a code sample per language, coloured from the generated editor scheme. It downloads JetBrains Mono once into `~/.cache/heritage-themes`. `--png` needs Google Chrome or Chromium (or the `CHROME` environment variable) and ImageMagick.
+
 ## Layout
 
 ```text
 build.py        builds the plugin from every theme folder; holds the plugin version
+preview.py      writes theme previews and renders the README images
+heritage/       code shared by every theme family
+  __init__.py   finds theme folders; the theme.py contract
+  scheme.py     editor colour scheme: palette roles to text attributes
+  ui.py         UI theme: palette roles to UI keys
+  preview.py    preview page
+  samples.py    code samples shown in the preview
 CHANGELOG.md    release notes; the plugin's change notes come from it
 assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
-scripts/        release.sh
-docs/           releasing.md
+scripts/        release.sh, parent_overrides.py
+docs/           releasing.md, adding-a-theme.md
 .github/        Build and Publish workflows
 <theme>/
-  gen.py        palettes and colour mappings; exposes FAMILY, BLURB and generate()
+  theme.py      palettes; defines FAMILY, BLURB and THEMES
   README.md     what the theme is
-  preview.png   screenshot used by the README
+  preview.png   README image, rendered by preview.py --png
 build/          generated, not tracked
 ```
 
@@ -56,16 +73,13 @@ Only sources are tracked. Jars, zips and `.icls` files are build output; the Pub
 ## Git workflow
 
 - Work on `dev`. `master` receives commits only when `scripts/release.sh` cuts a release.
-- Commit subjects start with the theme folder: `wuxing: soften comment contrast`. Use `repo:` for changes outside any theme.
-- Keep a commit within one theme.
+- Commit subjects follow [Conventional Commits](https://www.conventionalcommits.org/), with the theme folder as the scope for a change to one theme: `fix(wuxing): soften comment contrast`. Changes outside the theme folders use a scope such as `heritage`, `build` or `ci`, or none.
+- Keep a commit within one theme folder.
 - `scripts/release.sh` tags each release `v<version>`, which publishes it. The version matches `VERSION` in `build.py`. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
 
 ## Add a theme
 
-1. Create `<theme>/` with a `gen.py` that defines `FAMILY`, `BLURB` and `generate()`. `generate()` returns one dict per theme with `slug`, `id` (a new UUID), `name`, `scheme` (editor scheme XML) and `theme` (theme JSON as a dict). `slug`, `id` and `name` must be unique across all themes.
-2. Add `README.md` and `preview.png` to the folder.
-3. Add a row to the table above.
-4. Describe the theme under `[Unreleased]` in `CHANGELOG.md`.
+See [docs/adding-a-theme.md](docs/adding-a-theme.md).
 
 ## Licence
 

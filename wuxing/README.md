@@ -24,10 +24,4 @@ The palette draws on the Five Elements (五行) scheme of colour associations an
 
 ## Develop
 
-Palettes and all colour mappings are in `gen.py`. The root `build.py` includes the themes in the Heritage Themes plugin; see the [root README](../README.md) for build and install steps.
-
-Generate a palette preview at `wuxing/build/preview.html`:
-
-```bash
-python3 wuxing/gen.py
-```
+The palettes are in `theme.py`. The colour mappings and the preview are shared by every theme family and live in [`heritage/`](../heritage/). See the [root README](../README.md) for build, preview and install steps.
