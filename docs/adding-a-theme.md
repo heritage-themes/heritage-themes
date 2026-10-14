@@ -79,7 +79,7 @@ python3 build.py                # prints build/heritage-themes-<version>.zip: <n
 python3 preview.py <theme>      # writes <theme>/build/preview.html
 ```
 
-Open the preview in a browser. It shows each theme as an IDE window with a sample in Java, Groovy (Spock), Python, TypeScript, Go, Rust, C++, C, C#, SQL, HTML and CSS. Code colours come from the generated scheme, so the preview shows what the scheme sets. Check that:
+Open the preview in a browser. It shows each theme as an IDE window with a sample in Java, Kotlin, Groovy (Spock), Python, TypeScript, React (TSX), Vue, HTML, CSS, SQL, Go, Rust, C++, C, C#, shell, YAML, JSON, TOML and Markdown. Code colours come from the generated scheme, so the preview shows what the scheme sets. Check that:
 
 - every syntax role is distinguishable and readable against `bg`
 - the caret row, caret and Spock labels are visible

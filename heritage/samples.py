@@ -3,6 +3,9 @@
 Markup: «key:text» highlights text with a text attribute key or an alias from heritage.preview.ALIASES.
 Unmarked words use TEXT and unmarked punctuation uses DEFAULT_OPERATION_SIGN. Each sample is
 (file name, line with the caret or None, code).
+
+Samples use a language's own keys where its plugin is bundled with IntelliJ IDEA, PyCharm or WebStorm.
+Go, C, C++ and C# use the DEFAULT_* keys their highlighting falls back to.
 """
 
 JAVA = ("OrderController.java", 9, """\
@@ -160,4 +163,110 @@ CSS = ("order.css", None, """\
   «CSS.PROPERTY_NAME:display»«CSS.COLON::» «CSS.PROPERTY_VALUE:grid» «CSS.IMPORTANT:!important»;
 }""")
 
-SAMPLES = [JAVA, GROOVY, PYTHON, TYPESCRIPT, GO, RUST, CPP, C, CSHARP, SQL, HTML, CSS]
+KOTLIN = ("Order.kt", None, """\
+«kw:data class» «ty:Order»(«kw:val» «fd:id»: «ty:Long», «kw:val» «fd:quantity»: «ty:Int»)
+
+«kw:fun» «ty:List»<«ty:Order»>.«fn:total»(«pa:price»: «ty:Double»): «ty:Double» =
+    «KOTLIN_EXTENSION_FUNCTION_CALL:sumOf» «KOTLIN_FUNCTION_LITERAL_BRACES_AND_ARROW:{» «KOTLIN_CLOSURE_DEFAULT_PARAMETER:it».«fd:quantity» * «pa:price» «KOTLIN_FUNCTION_LITERAL_BRACES_AND_ARROW:}»
+
+«kw:fun» «fn:main»() {
+    «kw:var» «KOTLIN_MUTABLE_VARIABLE:count» = «nu:0»
+    «kw:val» orders = «KOTLIN_PACKAGE_FUNCTION_CALL:listOf»(«ty:Order»(«nu:7», «KOTLIN_NAMED_ARGUMENT:quantity» = «nu:3»))
+    orders.«KOTLIN_EXTENSION_FUNCTION_CALL:forEach» «KOTLIN_FUNCTION_LITERAL_BRACES_AND_ARROW:{» «KOTLIN_MUTABLE_VARIABLE:count»++ «KOTLIN_FUNCTION_LITERAL_BRACES_AND_ARROW:}»
+    «KOTLIN_PACKAGE_FUNCTION_CALL:println»(orders.«ca:total»(«nu:9.5»))
+}""")
+
+TSX = ("OrderList.tsx", None, """\
+«kw:import» { useState } «kw:from» «st:"react"»;
+
+«kw:export function» «JS.GLOBAL_FUNCTION:OrderList»({ «pa:orders» }: «it:Props») {
+  «kw:const» [«JS.LOCAL_VARIABLE:open», «JS.LOCAL_VARIABLE:setOpen»] = «ca:useState»(«kw:false»);
+  «kw:return» (
+    «XML_TAG:<»«XML_TAG_NAME:ul» «XML_ATTRIBUTE_NAME:hidden»«XML_TAG:=»{«JS.LOCAL_VARIABLE:open»}«XML_TAG:>»
+      {«pa:orders».«ca:map»((«pa:o») => (
+        «XML_TAG:<»«XML_TAG_NAME:OrderRow» «XML_ATTRIBUTE_NAME:key»«XML_TAG:=»{«pa:o».«fd:id»} «XML_TAG:/>»
+      ))}
+    «XML_TAG:</»«XML_TAG_NAME:ul»«XML_TAG:>»
+  );
+}""")
+
+VUE = ("OrderCard.vue", None, """\
+«ht:<»«hn:template»«ht:>»
+  «ht:<»«hn:ul»«ht:>»
+    «ht:<»«hn:li» «ha:v-for»«ht:=»«hv:"»«pa:o» «kw:in» «fd:orders»«hv:"» «ha::key»«ht:=»«hv:"»«pa:o».«fd:id»«hv:"»«ht:>»
+      «op:{{» «pa:o».«fd:name» «op:}}»
+    «ht:</»«hn:li»«ht:>»
+  «ht:</»«hn:ul»«ht:>»
+«ht:</»«hn:template»«ht:>»
+
+«ht:<»«hn:script» «ha:setup» «ha:lang»«ht:=»«hv:"ts"»«ht:>»
+«ca:defineProps»<{ «fd:orders»: «it:Order»[] }>();
+«ht:</»«hn:script»«ht:>»""")
+
+SHELL = ("deploy.sh", None, """\
+«BASH.SHEBANG:#!/usr/bin/env bash»
+«BASH.INTERNAL_COMMAND:set» «txt:-euo pipefail»
+
+«BASH.FUNCTION_DEF_NAME:deploy»() {
+  «BASH.INTERNAL_COMMAND:local» «BASH.VAR_DEF:target»=«st:"»«BASH.VAR_USE:$1»«st:"»
+  «kw:if» [[ «txt:-z» «st:"»«BASH.VAR_USE:$target»«st:"» ]]; «kw:then»
+    «BASH.INTERNAL_COMMAND:echo» «st:"no target"» >&«nu:2»; «BASH.INTERNAL_COMMAND:exit» «nu:1»
+  «kw:fi»
+  «BASH.EXTERNAL_COMMAND:rsync» «txt:-a build/» «st:"deploy@»«BASH.VAR_USE:$target»«st::/srv/orders"»
+}
+
+«BASH.FUNCTION_CALL:deploy» «st:"»«BASH.VAR_USE:$@»«st:"»""")
+
+YAML = ("application.yml", None, """\
+«YAML_COMMENT:# Micronaut configuration»
+«YAML_SCALAR_KEY:micronaut»«YAML_SIGN::»
+  «YAML_SCALAR_KEY:application»«YAML_SIGN::»
+    «YAML_SCALAR_KEY:name»«YAML_SIGN::» «YAML_SCALAR_VALUE:orders»
+  «YAML_SCALAR_KEY:server»«YAML_SIGN::»
+    «YAML_SCALAR_KEY:port»«YAML_SIGN::» «YAML_SCALAR_VALUE:8080»
+«YAML_SCALAR_KEY:datasources»«YAML_SIGN::»
+  «YAML_SCALAR_KEY:default»«YAML_SIGN::» «YAML_ANCHOR:&db»
+    «YAML_SCALAR_KEY:url»«YAML_SIGN::» «YAML_SCALAR_DSTRING:"jdbc:postgresql://localhost/orders"»
+    «YAML_SCALAR_KEY:schema-generate»«YAML_SIGN::» «YAML_SCALAR_VALUE:NONE»""")
+
+JSON = ("package.json", None, """\
+{
+  «JSON.PROPERTY_KEY:"name"»: «JSON.STRING:"orders-web"»,
+  «JSON.PROPERTY_KEY:"private"»: «JSON.KEYWORD:true»,
+  «JSON.PROPERTY_KEY:"version"»: «JSON.STRING:"1.4.0"»,
+  «JSON.PROPERTY_KEY:"scripts"»: {
+    «JSON.PROPERTY_KEY:"build"»: «JSON.STRING:"vite build"»
+  },
+  «JSON.PROPERTY_KEY:"engines"»: { «JSON.PROPERTY_KEY:"node"»: «JSON.STRING:">=22"» },
+  «JSON.PROPERTY_KEY:"workspaces"»: [«JSON.STRING:"apps/*"»],
+  «JSON.PROPERTY_KEY:"port"»: «JSON.NUMBER:5173»
+}""")
+
+TOML = ("Cargo.toml", None, """\
+«cm:# Rust package manifest»
+[«kw:package»]
+«kw:name» = «st:"orders"»
+«kw:version» = «st:"0.4.0"»
+«kw:edition» = «st:"2024"»
+«kw:publish» = «ps:false»
+
+[«kw:dependencies»]
+«kw:serde» = { «kw:version» = «st:"1"», «kw:features» = [«st:"derive"»] }
+«kw:tokio» = «st:"1.45"»""")
+
+MARKDOWN = ("README.md", None, """\
+«MARKDOWN_HEADER_MARKER:#» «MARKDOWN_HEADER_LEVEL_1:Orders»
+
+«txt:Tracks »«MARKDOWN_BOLD_MARKER:**»«MARKDOWN_BOLD:customer orders»«MARKDOWN_BOLD_MARKER:**»«txt: from cart to »«MARKDOWN_ITALIC_MARKER:_»«MARKDOWN_ITALIC:delivery»«MARKDOWN_ITALIC_MARKER:_»«txt:.»
+
+«MARKDOWN_HEADER_MARKER:##» «MARKDOWN_HEADER_LEVEL_2:Run»
+
+«MARKDOWN_LIST_MARKER:-» «txt:Start the API: »«MARKDOWN_CODE_SPAN_MARKER:`»«MARKDOWN_CODE_SPAN:./gradlew run»«MARKDOWN_CODE_SPAN_MARKER:`»
+«MARKDOWN_LIST_MARKER:-» «txt:See »«MARKDOWN_LINK_TEXT:[the guide]»«txt:(»«MARKDOWN_LINK_DESTINATION:docs/guide.md»«txt:)»
+
+«MARKDOWN_CODE_FENCE_MARKER:```»«MARKDOWN_CODE_FENCE_LANGUAGE:bash»
+«MARKDOWN_CODE_FENCE:curl localhost:8080/orders»
+«MARKDOWN_CODE_FENCE_MARKER:```»""")
+
+SAMPLES = [JAVA, KOTLIN, GROOVY, PYTHON, TYPESCRIPT, TSX, VUE, HTML, CSS, SQL, GO, RUST, CPP, C, CSHARP, SHELL,
+           YAML, JSON, TOML, MARKDOWN]

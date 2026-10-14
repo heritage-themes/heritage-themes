@@ -27,8 +27,9 @@ Workflow:
 
 Language coverage:
 
-The themes must look good in the most popular languages, not only Java: Python, JavaScript, TypeScript, Java,
-C++, C, C#, Go, SQL, Rust, HTML and CSS. The generic syntax roles carry most of this, but language-specific
+The themes must look good in the most popular languages, not only Java: Java, Kotlin, Groovy, Python,
+JavaScript, TypeScript, JSX/TSX, Vue, HTML, CSS, SQL, Go, Rust, C++, C, C#, shell, and the config and docs
+formats YAML, JSON, TOML and Markdown. The generic syntax roles carry most of this, but language-specific
 highlighting (HTML tags and attributes, CSS properties and selectors, SQL keywords and functions, Python
 decorators, Rust lifetimes and macros, C/C++ preprocessor directives, TypeScript types, Go package names, and
 so on) can fall back to the parent scheme (Darcula or Default) and clash with the palette. The preview has a
