@@ -340,7 +340,6 @@ def css(p, sel):
     return f"""{sel}{{background:{h('bgUi')};color:{h('fg')};border-color:{h('border')}}}
 {sel} .bar{{background:{h('bgUi')};border-bottom:1px solid {h('border')};color:{h('muted')}}}
 {sel} .tab{{background:{h('bg')};color:{h('fg')};border-bottom:2px solid {h('red')}}}
-{sel} .btn{{background:{h('red')};color:{h('redText')};border:1px solid {h('gold')}}}
 {sel} .side{{background:{h('bgTool')};border-right:1px solid {h('border')};color:{h('muted')}}}
 {sel} .side .on{{background:{h('selection')};color:{h('fg')}}}
 {sel} pre{{background:{h('bg')}}}
@@ -367,7 +366,7 @@ def pane(p, cls):
     sw = "".join(f'<span title="{k}" style="--c:#{p[k]}"></span>' for k in
                  ["bg", "fg", "keyword", "string", "type", "number", "method", "field", "annotation", "gold", "comment"])
     return f'''<section class="ide {cls}">
-  <div class="bar"><b>{p["name"]}</b><span class="sw">{sw}</span><span class="btn">▶ Run</span></div>
+  <div class="bar"><b>{p["name"]}</b><span class="sw">{sw}</span></div>
   <div class="body"><div class="side"><div>src</div><div class="on">OrderController</div><div>OrderService</div><div>OrderControllerSpec</div></div>
   <div class="ed"><div class="tabs"><span class="tab">OrderController.java</span></div>{code(JAVA, 13)}
   <div class="tabs"><span class="tab">OrderControllerSpec.groovy</span></div>{code(GROOVY, 6)}</div></div>
@@ -379,7 +378,6 @@ def preview():
 body{{margin:0;padding:16px;background:#888;font-family:system-ui,sans-serif}}
 .ide{{border:1px solid;border-radius:10px;overflow:hidden;margin:0 auto 20px;max-width:900px}}
 .bar{{display:flex;gap:14px;align-items:center;padding:8px 12px;font-size:13px}}
-.btn{{margin-left:auto;padding:3px 12px;border-radius:5px;font-size:12px}}
 .sw span{{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:3px;vertical-align:middle;box-shadow:0 0 0 1px #0003}}
 .body{{display:flex}} .side{{width:170px;font-size:12.5px;padding:8px 0;flex-shrink:0}} .side div{{padding:3px 12px}}
 .ed{{flex:1;min-width:0}} .tabs{{padding:6px 0 0 8px}} .tab{{display:inline-block;padding:4px 10px;font-size:12px}}
