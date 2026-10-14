@@ -20,7 +20,7 @@ INK = dict(
     searchBg="4A3D18", searchBorder="E9B949", underCaret="263A3E", writeCaret="4A2622",
     braceBg="2F4A3E", todo="E9B949",
     added="6E9C5A", modified="4F93A8", deleted="A54A3E",
-    diffIns="1F2E22", diffMod="1C2C31", diffDel="352021", diffConf="352E1C",
+    diffIns="1F2E22", diffMod="1C2C31", diffDel="352021", diffConf="352E1C", fileYellow="29271C",
 )
 PAPER = dict(
     name="Danqing Paper", dark=False, parent="Default", parentTheme="ExperimentalLight",
@@ -36,7 +36,7 @@ PAPER = dict(
     searchBg="EDD58A", searchBorder="B8860B", underCaret="CFE2E6", writeCaret="F0D2CB",
     braceBg="C8E0CF", todo="7E5500",
     added="5E9A5A", modified="4F8FA8", deleted="C0574B",
-    diffIns="DDEBD6", diffMod="D7E6EA", diffDel="F2D8D2", diffConf="EFE2BF",
+    diffIns="DDEBD6", diffMod="D7E6EA", diffDel="F2D8D2", diffConf="EFE2BF", fileYellow="E8E0C6",
 )
 
 # ---------------------------------------------------------------- editor scheme
@@ -236,7 +236,7 @@ def theme(p, slug):
         "VersionControl.Log.Commit.currentBranchBackground": "caretRow",
         "VersionControl.Log.Commit.hoveredBackground": "hover",
         "VersionControl.RefLabel.backgroundBase": "gold",
-        "FileColor.Yellow": "labelBg", "FileColor.Green": "diffIns", "FileColor.Blue": "diffMod",
+        "FileColor.Yellow": "fileYellow", "FileColor.Green": "diffIns", "FileColor.Blue": "diffMod",
         "FileColor.Rose": "diffDel", "FileColor.Orange": "diffConf", "FileColor.Violet": "selInactive",
         "Banner.infoBackground": "diffMod", "Banner.warningBackground": "diffConf",
         "Banner.errorBackground": "diffDel", "Banner.successBackground": "diffIns",
