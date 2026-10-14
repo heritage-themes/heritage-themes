@@ -19,7 +19,7 @@ SHN = dict(
     searchBg="3B3524", searchBorder="C9A24E", underCaret="25313B", writeCaret="3E2422",
     braceBg="2D3A44", todo="D5584A",
     added="5F8A5A", modified="5C7F9C", deleted="9A4A40",
-    diffIns="1D291C", diffMod="1B242C", diffDel="31201E", diffConf="302A1B",
+    diffIns="1D291C", diffMod="1B242C", diffDel="31201E", diffConf="302A1B", fileYellow="24221B",
 )
 SHD = dict(
     name="Shuimo Day", dark=False, parent="Default", parentTheme="ExperimentalLight", kwBold=False,
@@ -35,7 +35,7 @@ SHD = dict(
     searchBg="E8DDB8", searchBorder="9A7420", underCaret="DCE3EA", writeCaret="F0D8D3",
     braceBg="D5DDE4", todo="B03A2E",
     added="6E9A6A", modified="6F8FAA", deleted="B8655A",
-    diffIns="E1EBDD", diffMod="DDE5EC", diffDel="F2DEDA", diffConf="EEE4C8",
+    diffIns="E1EBDD", diffMod="DDE5EC", diffDel="F2DEDA", diffConf="EEE4C8", fileYellow="EFEADA",
 )
 
 # ---------------------------------------------------------------- editor scheme
@@ -235,7 +235,7 @@ def theme(p, slug):
         "VersionControl.Log.Commit.currentBranchBackground": "caretRow",
         "VersionControl.Log.Commit.hoveredBackground": "hover",
         "VersionControl.RefLabel.backgroundBase": "gold",
-        "FileColor.Yellow": "labelBg", "FileColor.Green": "diffIns", "FileColor.Blue": "diffMod",
+        "FileColor.Yellow": "fileYellow", "FileColor.Green": "diffIns", "FileColor.Blue": "diffMod",
         "FileColor.Rose": "diffDel", "FileColor.Orange": "diffConf", "FileColor.Violet": "selInactive",
         "Banner.infoBackground": "diffMod", "Banner.warningBackground": "diffConf",
         "Banner.errorBackground": "diffDel", "Banner.successBackground": "diffIns",
