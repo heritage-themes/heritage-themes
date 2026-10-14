@@ -1,6 +1,6 @@
 # Heritage Themes
 
-Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradition. All themes ship in one plugin, `heritage.themes`.
+Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradition. All themes ship in one plugin (plugin ID `heritage.themes`).
 
 | Folder | Themes |
 | --- | --- |
@@ -8,7 +8,16 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`shuimo/`](shuimo/) | Shuimo Day, Shuimo Night |
 | [`wuxing/`](wuxing/) | Wuxing Day, Wuxing Night |
 
-## Build
+## Install
+
+Download from the [GitHub releases](https://github.com/heritage-themes/heritage-themes/releases) page:
+
+- Plugin: `heritage-themes-<version>.jar`. In the IDE choose **Settings | Plugins | ⚙ | Install Plugin from Disk…**, select the jar and restart. Then choose a theme under **Settings | Appearance & Behavior | Appearance | Theme**.
+- Editor colour scheme only: an `.icls` file. Choose **Settings | Editor | Color Scheme | ⚙ | Import Scheme…** and select the file.
+
+The themes work in IntelliJ-based IDEs, such as IntelliJ IDEA, PyCharm, WebStorm and Android Studio.
+
+## Build from source
 
 Requires Python 3.
 
@@ -24,10 +33,7 @@ Output in `build/`:
 | `heritage-themes-<version>.zip` | The jar in plugin layout, for the Marketplace |
 | `schemes/*.icls` | Standalone editor colour schemes |
 
-## Install
-
-- Plugin: **Settings | Plugins | ⚙ | Install Plugin from Disk…**, select the jar, restart the IDE, then choose a theme under **Settings | Appearance & Behavior | Appearance | Theme**.
-- Editor scheme only: **Settings | Editor | Color Scheme | ⚙ | Import Scheme…**, select an `.icls` file.
+Install the jar or an `.icls` file as described under [Install](#install).
 
 ## Layout
 
