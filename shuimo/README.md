@@ -21,10 +21,4 @@ The two washes follow the light-crimson (浅绛) style of landscape painting, wh
 
 ## Develop
 
-Palettes and all colour mappings are in `gen.py`. The root `build.py` includes the themes in the Heritage Themes plugin; see the [root README](../README.md) for build and install steps.
-
-Generate a palette preview at `shuimo/build/preview.html`:
-
-```bash
-python3 shuimo/gen.py
-```
+The palettes are in `theme.py`. The colour mappings and the preview are shared by every theme family and live in [`heritage/`](../heritage/). See the [root README](../README.md) for build, preview and install steps.

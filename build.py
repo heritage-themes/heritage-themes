@@ -1,10 +1,12 @@
 """Builds the Heritage Themes plugin from every theme folder.
 
-A theme folder is any top-level directory containing a gen.py that provides FAMILY, BLURB and
-generate(). Run `python3 build.py`; output goes to build/.
+A theme folder is any top-level directory containing a theme.py (see heritage/__init__.py).
+Run `python3 build.py`; output goes to build/.
 """
-import html, importlib.util, json, os, re, shutil, zipfile
+import html, json, os, re, shutil, zipfile
 import xml.etree.ElementTree as ET
+
+import heritage
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
@@ -12,19 +14,6 @@ CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
 VERSION = "1.0.0"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 PLUGIN_ICONS = ("pluginIcon.svg", "pluginIcon_dark.svg")
-
-
-def load_families():
-    families = []
-    for name in sorted(os.listdir(ROOT)):
-        path = os.path.join(ROOT, name, "gen.py")
-        if not os.path.isfile(path):
-            continue
-        spec = importlib.util.spec_from_file_location(f"heritage_{name}", path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        families.append(module)
-    return families
 
 
 def change_notes():
@@ -111,8 +100,8 @@ def validate(jar, themes):
 
 
 def main():
-    families = load_families()
-    themes = [t for f in families for t in f.generate()]
+    families = heritage.load_families()
+    themes = [t for f in families for t in heritage.generate(f)]
     for key in ("slug", "id", "name"):
         values = [t[key] for t in themes]
         if len(values) != len(set(values)):
