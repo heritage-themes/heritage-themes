@@ -1,8 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-  <polygon points="20,7 32.36,15.98 27.64,30.52 12.36,30.52 7.64,15.98" fill="none" stroke="#8A8577" stroke-width="1"/>
-  <circle cx="20" cy="7" r="4" fill="#E8705F"/>
-  <circle cx="32.36" cy="15.98" r="4" fill="#F0D47A"/>
-  <circle cx="27.64" cy="30.52" r="4" fill="#E6DCC8"/>
-  <circle cx="12.36" cy="30.52" r="4" fill="#171B26" stroke="#8A8577" stroke-width="1"/>
-  <circle cx="7.64" cy="15.98" r="4" fill="#8CC88E"/>
+<defs><clipPath id="globe"><circle cx="20" cy="20" r="15.5"/></clipPath></defs>
+<g clip-path="url(#globe)">
+<path d="M3.5,3.5 L36.5,3.5 L36.5,9.05 Q20,14.65 3.5,9.05 Z" fill="#E8705F"/>
+<path d="M3.5,10.55 Q20,16.15 36.5,10.55 L36.5,16.45 Q20,22.05 3.5,16.45 Z" fill="#F0D47A"/>
+<path d="M3.5,17.95 Q20,23.55 36.5,17.95 L36.5,23.85 Q20,29.45 3.5,23.85 Z" fill="#8CC88E"/>
+<path d="M3.5,25.35 Q20,30.95 36.5,25.35 L36.5,36.5 L3.5,36.5 Z" fill="#4FB3C9"/>
+</g>
 </svg>
