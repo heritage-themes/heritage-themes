@@ -16,10 +16,10 @@ The palette draws on the Five Elements (五行) scheme of colour associations an
 | Metal | Rice white (beige, not pure white) | Text and paper |
 | Water | Indigo ink (not pure black) | Night background, day text |
 | Gold | Gold | Caret, search results, Spock labels |
-| Imperial purple | Purple | Fields |
+| Imperial purple | Purple | Numbers, constants |
 | Azure | Blue | Methods |
-| Turquoise | Turquoise | Annotations |
-| Copper | Orange-brown | Numbers |
+| Turquoise | Turquoise | Fields |
+| Copper | Orange-brown | Annotations |
 | Ink-wash grey | Grey | Comments |
 
 ## Develop
