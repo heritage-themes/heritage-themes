@@ -2,27 +2,27 @@
 
 Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradition. All themes ship in one plugin (plugin ID `heritage.themes`).
 
-| Folder | Themes |
-| --- | --- |
-| [`themes/bengal/`](themes/bengal/) | Bengal Baluchari, Bengal Laal Paar |
-| [`themes/danqing/`](themes/danqing/) | Danqing Ink, Danqing Paper |
-| [`themes/gujarat/`](themes/gujarat/) | Gujarat Navratri, Gujarat Rann |
-| [`themes/holi/`](themes/holi/) | Holi Day, Holi Night |
-| [`themes/kalamkari/`](themes/kalamkari/) | Kalamkari Cotton, Kalamkari Indigo |
-| [`themes/kashubia/`](themes/kashubia/) | Kashubia Niebò, Kashubia Zemia |
-| [`themes/kerala/`](themes/kerala/) | Kerala Backwaters, Kerala Kasavu |
-| [`themes/lowicz/`](themes/lowicz/) | Łowicz Kodra, Łowicz Wycinanka |
-| [`themes/morocco/`](themes/morocco/) | Morocco Majorelle, Morocco Marrakech, Morocco Zellige |
-| [`themes/mughal/`](themes/mughal/) | Mughal Night, Mughal Wasli |
-| [`themes/peru/`](themes/peru/) | Peru Kulli, Peru Puka |
-| [`themes/podhale/`](themes/podhale/) | Podhale Kłobuk, Podhale Sukno |
-| [`themes/punjab/`](themes/punjab/) | Punjab Basant, Punjab Phulkari |
-| [`themes/rajasthan/`](themes/rajasthan/) | Rajasthan Blue City, Rajasthan Pink City |
-| [`themes/shuimo/`](themes/shuimo/) | Shuimo Day, Shuimo Night |
-| [`themes/tamil/`](themes/tamil/) | Tamil Kolam, Tamil Olai |
-| [`themes/wuxing/`](themes/wuxing/) | Wuxing Day, Wuxing Night |
-| [`themes/zalipie/`](themes/zalipie/) | Zalipie Sadza, Zalipie Wapno |
-| [`themes/zlotnica/`](themes/zlotnica/) | Złotnica Aksamit, Złotnica Płótno |
+| Folder | Themes | Country |
+| --- | --- | --- |
+| [`themes/bengal/`](themes/bengal/) | Bengal Baluchari, Bengal Laal Paar | India, Bangladesh |
+| [`themes/danqing/`](themes/danqing/) | Danqing Ink, Danqing Paper | China |
+| [`themes/gujarat/`](themes/gujarat/) | Gujarat Navratri, Gujarat Rann | India |
+| [`themes/holi/`](themes/holi/) | Holi Day, Holi Night | India |
+| [`themes/kalamkari/`](themes/kalamkari/) | Kalamkari Cotton, Kalamkari Indigo | India |
+| [`themes/kashubia/`](themes/kashubia/) | Kashubia Niebò, Kashubia Zemia | Poland |
+| [`themes/kerala/`](themes/kerala/) | Kerala Backwaters, Kerala Kasavu | India |
+| [`themes/lowicz/`](themes/lowicz/) | Łowicz Kodra, Łowicz Wycinanka | Poland |
+| [`themes/morocco/`](themes/morocco/) | Morocco Majorelle, Morocco Marrakech, Morocco Zellige | Morocco |
+| [`themes/mughal/`](themes/mughal/) | Mughal Night, Mughal Wasli | India, Pakistan |
+| [`themes/peru/`](themes/peru/) | Peru Kulli, Peru Puka | Peru |
+| [`themes/podhale/`](themes/podhale/) | Podhale Kłobuk, Podhale Sukno | Poland |
+| [`themes/punjab/`](themes/punjab/) | Punjab Basant, Punjab Phulkari | India, Pakistan |
+| [`themes/rajasthan/`](themes/rajasthan/) | Rajasthan Blue City, Rajasthan Pink City | India |
+| [`themes/shuimo/`](themes/shuimo/) | Shuimo Day, Shuimo Night | China |
+| [`themes/tamil/`](themes/tamil/) | Tamil Kolam, Tamil Olai | India |
+| [`themes/wuxing/`](themes/wuxing/) | Wuxing Day, Wuxing Night | China |
+| [`themes/zalipie/`](themes/zalipie/) | Zalipie Sadza, Zalipie Wapno | Poland |
+| [`themes/zlotnica/`](themes/zlotnica/) | Złotnica Aksamit, Złotnica Płótno | Poland |
 
 ## Install
 

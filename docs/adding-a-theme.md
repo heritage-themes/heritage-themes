@@ -115,7 +115,7 @@ Add these to the theme folder:
 
 ## Register the theme
 
-1. Add a row to the table in the root `README.md`: `` | [`themes/<theme>/`](themes/<theme>/) | <Theme A>, <Theme B> | ``.
+1. Add a row to the table in the root `README.md`: `` | [`themes/<theme>/`](themes/<theme>/) | <Theme A>, <Theme B> | <Country> | ``.
 2. Add a line under `### Added` in `[Unreleased]` in `CHANGELOG.md`: `- <Theme A> and <Theme B>, drawn from <tradition>.`
 3. Run `python3 build.py` again.
 4. Commit on `dev` as `feat(<theme>): add <Theme A> and <Theme B> themes`, limited to the theme folder, the root README row and the changelog entry. Releasing is described in [releasing.md](releasing.md).
