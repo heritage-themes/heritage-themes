@@ -28,3 +28,4 @@
 - Ndebele Nzima and Ndebele Mhlophe, drawn from the outlined wall painting of the Ndebele homestead.
 - Wixárika Haramara and Wixárika Wirikuta, drawn from the yarn paintings, beadwork and five colours of maize of the Wixárika.
 - Maya Corte and Maya Huipil, drawn from the town dress of the Guatemalan Maya and the K'iche' colours of the four roads.
+- Yolŋu Galawu and Yolŋu Gapaṉ, drawn from the ochres of Yolŋu bark painting in north-east Arnhem Land.
