@@ -3,8 +3,8 @@
 # Danqing (丹青, "cinnabar and azurite" = Chinese painting): mineral pigments, not pastels.
 # The blue-green landscape (青绿山水) leads: azurite 石青 keywords and malachite 石绿 strings,
 # with cinnabar 朱砂 method declarations and its paler top layer 朱膘 for calls,
-# gamboge 藤黄 types, ochre 赭石 numbers, lotus-root 藕荷 fields, dai 黛 constants,
-# carmine 胭脂 annotations, second-grade azurite 二青 type parameters,
+# gamboge 藤黄 types, carmine 胭脂 numbers, dai 黛 fields, lotus-root 藕荷 constants,
+# ochre 赭石 annotations, second-grade azurite 二青 type parameters,
 # ink 墨 on inkstone / aged xuan paper 宣纸, Spock labels in seal-paste red 印泥.
 INK = dict(
     name="Danqing Ink", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
@@ -12,8 +12,8 @@ INK = dict(
     border="2C302D", fg="DCD6C8", muted="868A80", disabled="575C57",
     caretRow="202421", selection="2E3F45", selInactive="283335", lineNo="4B514C", lineNoCaret="F0643F",
     guide="252926", guideSel="3B423D",
-    keyword="80C5FF", string="6FD5B0", number="CD9D73", type="E0C766", method="FFA28A", call="FFB7A0",
-    field="E9B4DC", constant="C2B1F8", annotation="EC7C99", label="FE8B7D",
+    keyword="80C5FF", string="6FD5B0", number="EC7C99", type="E0C766", method="FFA28A", call="FFB7A0",
+    field="C2B1F8", constant="E9B4DC", annotation="CD9D73", label="FE8B7D",
     comment="747B74", doc="8E9278", docTag="A9AB8A", op="A8A699", param="DCD6C8", typeParam="9BDDEE",
     gold="E9B949", red="B8382A", redText="F6EEDF", azure="4FB3C9", caret="F0643F",
     error="F25C54", warning="E6A23C", weak="8B8155",
@@ -29,8 +29,8 @@ PAPER = dict(
     border="D0C6AF", fg="26282A", muted="6F6C64", disabled="A59C88",
     caretRow="E4DCC8", selection="C9DCE0", selInactive="D8DBD2", lineNo="A19880", lineNoCaret="B32D1E",
     guide="DBD2BD", guideSel="C3B79B",
-    keyword="0568A4", string="057357", number="724313", type="766202", method="A9371B", call="9C4E36",
-    field="85527A", constant="68559B", annotation="9C284F", label="A01F1B",
+    keyword="0568A4", string="057357", number="9C284F", type="766202", method="A9371B", call="9C4E36",
+    field="68559B", constant="85527A", annotation="724313", label="A01F1B",
     comment="76736A", doc="676043", docTag="554D32", op="55534D", param="26282A", typeParam="216E7F",
     gold="B8860B", red="B32D1E", redText="F7EFE0", azure="0F6680", caret="B32D1E",
     error="C8202F", warning="A86800", weak="A8975E",
