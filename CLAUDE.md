@@ -12,7 +12,8 @@ Workflow:
 
 1. If no culture is named, pick one where colour carries real meaning. Research it with web search and prefer
    named traditional colours and concrete systems (rank colours, seasonal layers, pigments, dyes).
-2. Propose 1-4 concepts, each a Night/Day pair, and let me choose unless I said "do all".
+2. Check each concept for distinctiveness (see below), then propose 1-4 concepts, each a Night/Day pair, and let
+   me choose unless I said "do all". Drop a concept that fails the check and say why.
 3. Create each family as described in docs/adding-a-theme.md: `theme.py`, `README.md`, `preview.png`. There is
    no `build.py` registration (it discovers `theme.py` files itself); register by adding the root `README.md`
    table row and the `CHANGELOG.md` `[Unreleased]` entry.
@@ -21,9 +22,23 @@ Workflow:
    manual IDE checks; I do those. Do not send me the jar.
 5. Check before finishing: every UI colour reference resolves; text roles meet WCAG AA against `bg` (comments
    may be about 3:1); fields and method calls are clearly distinct from plain text and from each other, unless
-   the concept builds hierarchy from tone and weight rather than hue, as Shuimo does.
+   the concept builds hierarchy from tone and weight rather than hue, as Shuimo does; the finished palette is
+   still distinct from every existing family (compare the rendered previews side by side).
 6. Commit on `dev` as `feat(<theme>): ...`, limited to the new theme folder, the root README row and the
    changelog entry.
+
+Distinctiveness:
+
+Every family must look and read differently from every family already in `themes/`. Do not add look-alikes.
+
+- Before proposing a concept, compare its intended palette with each existing family: background hue, the hue
+  assigned to each syntax role (keyword, string, number, type, method, field, annotation, comment) and the
+  overall impression. Two families that give the same roles the same hues are too similar, even if the cultures
+  differ.
+- Reach distinctiveness through the culture's own colours and the way it assigns them to roles, never by
+  shifting hues arbitrarily.
+- If the concept can only be made distinct by colours that lose their connection to the culture, do not create
+  it. Tell me that the theme does not make sense, and name the existing families it collides with.
 
 Language coverage:
 
