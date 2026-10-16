@@ -18,7 +18,7 @@ FONT_SHA256 = "6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf"
 CACHE = os.path.join(os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "heritage-themes")
 CHROMES = ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser")
 # Screenshot geometry in CSS pixels. HEIGHT only has to exceed the page; the PNG is trimmed to the windows.
-WIDTH, HEIGHT, SCALE, MARGIN = 1328, 8000, 2, 24
+WIDTH, HEIGHT, SCALE, MARGIN = 1328, 12000, 2, 24
 
 
 def font_archive():
