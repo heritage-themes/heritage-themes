@@ -19,6 +19,7 @@ SHN = dict(
     braceBg="2D3A44", todo="D5584A",
     added="5F8A5A", modified="5C7F9C", deleted="9A4A40",
     diffIns="1D291C", diffMod="1B242C", diffDel="31201E", diffConf="302A1B", fileYellow="24221B",
+    ansiRed="D5584A", ansiGreen="8AA886", ansiYellow="C9A24E", ansiBlue="8FAAC2", ansiMagenta="B491B0", ansiCyan="71ABAA",
 )
 SHD = dict(
     name="Shuimo Day", dark=False, parent="Default", parentTheme="ExperimentalLight", kwBold=False,
@@ -35,6 +36,7 @@ SHD = dict(
     braceBg="D5DDE4", todo="B03A2E",
     added="6E9A6A", modified="6F8FAA", deleted="B8655A",
     diffIns="E1EBDD", diffMod="DDE5EC", diffDel="F2DEDA", diffConf="EEE4C8", fileYellow="EFEADA",
+    ansiRed="B03A2E", ansiGreen="476444", ansiYellow="7B5F1B", ansiBlue="3D5F7A", ansiMagenta="6E4E6B", ansiCyan="2C6565",
 )
 
 FAMILY = "Shuimo"
