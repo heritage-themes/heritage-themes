@@ -10,16 +10,18 @@ The palette follows the mineral and plant pigments used in traditional Chinese p
 
 | Pigment | What it is | Role |
 | --- | --- | --- |
-| Cinnabar (朱砂) | Red-orange mineral, mercury sulphide | Keywords |
-| Azurite (石青) | Deep blue copper mineral | Types |
-| Gamboge (藤黄) | Yellow tree resin | Methods |
-| Bamboo green (竹青) | Soft green named after bamboo skin | Strings |
-| Lotus-root (藕荷) | Pale mauve named after lotus root | Fields |
+| Azurite (石青) | Deep blue copper mineral | Keywords |
+| Malachite (石绿) | Green copper mineral | Strings |
+| Cinnabar (朱砂) | Red-orange mineral, mercury sulphide | Method declarations |
+| Zhubiao (朱膘) | Paler top layer of ground cinnabar | Method calls |
+| Gamboge (藤黄) | Yellow tree resin | Types |
 | Ochre (赭石) | Red-brown iron-rich earth | Numbers |
+| Lotus-root (藕荷) | Pale mauve named after lotus root | Fields |
 | Dai (黛) | Blue-black pigment | Constants |
-| Malachite (石绿) | Green copper mineral | Annotations |
+| Carmine (胭脂) | Crimson plant and insect dye | Annotations |
+| Second azurite (二青) | Lighter grade of ground azurite | Type parameters |
 
-Danqing Ink uses the dark tone of ink on an inkstone as its ground. Danqing Paper uses the warm off-white of xuan paper. Spock labels are the red of seal paste (印泥). The mapping departs from the usual green, yellow and blue syntax convention to keep the saturation of mineral pigments.
+Danqing Ink uses the dark tone of ink on an inkstone as its ground. Danqing Paper uses the warm off-white of xuan paper. Spock labels are the red of seal paste (印泥). Azurite and malachite lead the palette, as in blue-green landscape painting (青绿山水). Hex values are interpretations of the traditional pigments, adjusted for contrast against each background.
 
 ## Develop
 
