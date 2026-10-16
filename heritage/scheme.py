@@ -183,9 +183,10 @@ def colors(p):
         DELETED_LINES_COLOR=p["deleted"], WHITESPACES_MODIFIED_LINES_COLOR=p["weak"],
         IGNORED_ADDED_LINES_BORDER_COLOR=p["added"], IGNORED_MODIFIED_LINES_BORDER_COLOR=p["modified"],
         IGNORED_DELETED_LINES_BORDER_COLOR=p["deleted"], NOTIFICATION_BACKGROUND=p["surface"],
-        FILESTATUS_MODIFIED=p["method"], FILESTATUS_ADDED=p["string"], FILESTATUS_UNKNOWN=p["number"],
+        FILESTATUS_MODIFIED=p["ansiBlue"], FILESTATUS_ADDED=p["ansiGreen"], FILESTATUS_UNKNOWN=p["ansiRed"],
         FILESTATUS_DELETED=p["muted"], FILESTATUS_IDEA_FILESTATUS_IGNORED=p["disabled"],
-        FILESTATUS_MERGED=p["field"], FILESTATUS_addedOutside=p["string"], FILESTATUS_modifiedOutside=p["method"],
+        FILESTATUS_MERGED=p["ansiMagenta"], FILESTATUS_addedOutside=p["ansiGreen"],
+        FILESTATUS_modifiedOutside=p["ansiBlue"],
     )
 
 def scheme(p):

@@ -71,7 +71,7 @@ Constraints:
 
 - `fileYellow` colours folders that IntelliJ marks as excluded, such as `node_modules`. Use a faint wash close to `bg`, never a saturated colour. A solid colour draws the Project view as coloured bars.
 - `label` colours Spock labels (`given:`, `when:`, `then:`) as bold text with no background. It needs the same contrast against `bg` as the syntax roles.
-- The `ansi*` keys colour ANSI output in the console and terminal. Each must read as the hue it names, whatever the family's syntax roles are, and meet 4.5:1 against `bg`.
+- The `ansi*` keys colour ANSI output in the console and terminal, and VCS file status in the Project view: `ansiGreen` added, `ansiBlue` modified, `ansiRed` unversioned, `ansiMagenta` merged. Each must read as the hue it names, whatever the family's syntax roles are, and meet 4.5:1 against `bg`.
 - Avoid pure white and pure black for backgrounds and text, as the existing themes do.
 
 ## Check the result
