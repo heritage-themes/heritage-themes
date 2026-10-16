@@ -23,3 +23,4 @@
 - Łowicz Wycinanka and Łowicz Kodra, drawn from the striped wool and paper cut-outs of Łowicz.
 - Zalipie Sadza and Zalipie Wapno, drawn from the painted cottages of Zalipie.
 - Podhale Kłobuk and Podhale Sukno, drawn from the Highlander costume of Podhale.
+- Sardinia Orbace and Sardinia Camisa, drawn from the dyed wool, linen and silk of Sardinian traditional dress.
