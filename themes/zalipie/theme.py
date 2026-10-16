@@ -35,7 +35,7 @@ WAPNO = dict(
     field="2440B0", constant="7A5C00", annotation="0A6688", label="B01E4A",
     comment="7E7A74", doc="6A665F", docTag="4C4944", op="55534F", param="242220", typeParam="5A2C96",
     gold="8A6A00", red="2A48B8", redText="F7F8FA", azure="2A50B8", caret="242220",
-    error="C42020", warning="A86800", weak="A8955E",
+    error="C42020", warning="9A5F00", weak="A8955E",
     searchBg="F0DC8A", searchBorder="8A6A00", underCaret="D4E2F0", writeCaret="F2D4D8",
     braceBg="D2E6CC", todo="8A5A00",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
