@@ -10,6 +10,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`holi/`](holi/) | Holi Day, Holi Night |
 | [`kalamkari/`](kalamkari/) | Kalamkari Cotton, Kalamkari Indigo |
 | [`kerala/`](kerala/) | Kerala Backwaters, Kerala Kasavu |
+| [`morocco/`](morocco/) | Morocco Majorelle, Morocco Marrakech, Morocco Zellige |
 | [`mughal/`](mughal/) | Mughal Night, Mughal Wasli |
 | [`punjab/`](punjab/) | Punjab Basant, Punjab Phulkari |
 | [`rajasthan/`](rajasthan/) | Rajasthan Blue City, Rajasthan Pink City |
