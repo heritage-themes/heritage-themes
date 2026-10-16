@@ -6,18 +6,18 @@ Dark and light themes based on Holi (होली), the Indian festival of colou
 
 ## Inspiration
 
-Each syntax role takes one colour of gulal (गुलाल), the powder thrown at Holi:
+Each syntax role takes one colour of gulal (गुलाल), the powder thrown at Holi, at full strength:
 
 | Colour | Meaning | Role |
 | --- | --- | --- |
 | Gulabi (गुलाबी) | Pink | Keywords |
-| Haldi (हल्दी) | Turmeric yellow | Methods, Spock labels |
-| Hara (हरा) | Green | Strings |
-| Neela (नीला) | Blue | Types |
-| Kesari (केसरी) | Saffron | Numbers |
+| Kesari (केसरी) | Saffron | Strings |
+| Haldi (हल्दी) | Turmeric yellow | Numbers, Spock labels |
+| Hara (हरा) | Green | Types |
+| Neela (नीला) | Blue | Methods |
 | Jamuni (जामुनी) | Purple of the jamun fruit | Fields |
-| Indigo | Indigo | Constants |
-| Firozi (फ़िरोज़ी) | Turquoise | Annotations |
+| Firozi (फ़िरोज़ी) | Turquoise | Constants |
+| Lal (लाल) | Red | Annotations |
 | Ember | Holika bonfire | Caret on Holi Night |
 
 Holi Night is Holika Dahan (होलिका दहन), the bonfire eve: ash and embers. Holi Day is Rangwali Holi, the day after, when gulal is thrown over white cotton. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
