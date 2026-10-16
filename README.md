@@ -12,6 +12,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`mughal/`](mughal/) | Mughal Night, Mughal Wasli |
 | [`rajasthan/`](rajasthan/) | Rajasthan Blue City, Rajasthan Pink City |
 | [`shuimo/`](shuimo/) | Shuimo Day, Shuimo Night |
+| [`tamil/`](tamil/) | Tamil Kolam, Tamil Olai |
 | [`wuxing/`](wuxing/) | Wuxing Day, Wuxing Night |
 
 ## Install
