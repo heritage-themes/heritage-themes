@@ -15,6 +15,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`themes/lowicz/`](themes/lowicz/) | Łowicz Kodra, Łowicz Wycinanka | Poland |
 | [`themes/morocco/`](themes/morocco/) | Morocco Majorelle, Morocco Marrakech, Morocco Zellige | Morocco |
 | [`themes/mughal/`](themes/mughal/) | Mughal Night, Mughal Wasli | India, Pakistan |
+| [`themes/ndebele/`](themes/ndebele/) | Ndebele Mhlophe, Ndebele Nzima | South Africa |
 | [`themes/peru/`](themes/peru/) | Peru Kulli, Peru Puka | Peru |
 | [`themes/podhale/`](themes/podhale/) | Podhale Kłobuk, Podhale Sukno | Poland |
 | [`themes/punjab/`](themes/punjab/) | Punjab Basant, Punjab Phulkari | India, Pakistan |
