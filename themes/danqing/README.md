@@ -15,10 +15,10 @@ The palette follows the mineral and plant pigments used in traditional Chinese p
 | Cinnabar (朱砂) | Red-orange mineral, mercury sulphide | Method declarations |
 | Zhubiao (朱膘) | Paler top layer of ground cinnabar | Method calls |
 | Gamboge (藤黄) | Yellow tree resin | Types |
-| Ochre (赭石) | Red-brown iron-rich earth | Numbers |
-| Lotus-root (藕荷) | Pale mauve named after lotus root | Fields |
-| Dai (黛) | Blue-black pigment | Constants |
-| Carmine (胭脂) | Crimson plant and insect dye | Annotations |
+| Ochre (赭石) | Red-brown iron-rich earth | Annotations |
+| Lotus-root (藕荷) | Pale mauve named after lotus root | Constants |
+| Dai (黛) | Blue-black pigment | Fields |
+| Carmine (胭脂) | Crimson plant and insect dye | Numbers |
 | Second azurite (二青) | Lighter grade of ground azurite | Type parameters |
 
 Danqing Ink uses the dark tone of ink on an inkstone as its ground. Danqing Paper uses the warm off-white of xuan paper. Spock labels are the red of seal paste (印泥). Azurite and malachite lead the palette, as in blue-green landscape painting (青绿山水). Hex values are interpretations of the traditional pigments, adjusted for contrast against each background.
