@@ -18,3 +18,4 @@
 - Gujarat Navratri and Gujarat Rann, drawn from Navratri, the Rann of Kutch and patola silk.
 - Morocco Majorelle, Morocco Marrakech and Morocco Zellige, drawn from the walls of Morocco.
 - Peru Kulli and Peru Puka, drawn from the natural dyes of Andean weaving in Peru.
+- Kashubia Zemia and Kashubia Niebò, drawn from the seven colours of Kashubian embroidery.

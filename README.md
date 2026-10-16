@@ -9,6 +9,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`themes/gujarat/`](themes/gujarat/) | Gujarat Navratri, Gujarat Rann |
 | [`themes/holi/`](themes/holi/) | Holi Day, Holi Night |
 | [`themes/kalamkari/`](themes/kalamkari/) | Kalamkari Cotton, Kalamkari Indigo |
+| [`themes/kashubia/`](themes/kashubia/) | Kashubia Niebò, Kashubia Zemia |
 | [`themes/kerala/`](themes/kerala/) | Kerala Backwaters, Kerala Kasavu |
 | [`themes/morocco/`](themes/morocco/) | Morocco Majorelle, Morocco Marrakech, Morocco Zellige |
 | [`themes/mughal/`](themes/mughal/) | Mughal Night, Mughal Wasli |
