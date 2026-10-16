@@ -10,14 +10,14 @@ Peru Kulli is *kulli sara*, the purple corn (maíz morado) of chicha morada. Per
 
 | Colour | Source | Peru Kulli | Peru Puka |
 | --- | --- | --- | --- |
-| Q'olle yellow (*q'illu*) | Flowers of the q'olle shrub (*Buddleja coriacea*) | Keywords, caret, Run button | Strings |
+| Q'olle yellow (*q'illu*) | Flowers of the q'olle shrub (*Buddleja coriacea*) | Keywords, caret, Run button | Numbers |
 | Ch'illka green (*q'umir*) | Leaves of the ch'illka shrub (*Baccharis*) | Strings | Keywords, caret, Run button |
-| Ch'illka ochre | Ch'illka, which also dyes ochres | Annotations | Annotations |
-| Anqas blue | Tara pods and quinsa k'ucho leaves | Types | Types |
-| Willapi orange | Quechua word for orange | Methods | Numbers |
+| Ch'illka ochre | Ch'illka, which also dyes ochres | Annotations | Fields |
+| Anqas blue | Tara pods and quinsa k'ucho leaves | Types | Annotations |
+| Willapi orange | Quechua word for orange | Methods | Strings |
 | Cochineal pink | Cochineal shifted with lime juice | Numbers | |
 | Winikunka turquoise | Mineral bands of Rainbow Mountain | Fields, type parameters | Methods, constants |
-| Kulli violet | Purple corn | | Fields |
+| Kulli violet | Purple corn | | Types, type parameters |
 | Yuraq white | Undyed alpaca | Text, Spock labels | Text, Spock labels |
 
 No syntax colour uses the hue of its ground: no purple on Peru Kulli and no red on Peru Puka. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
