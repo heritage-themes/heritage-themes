@@ -11,13 +11,13 @@ Each syntax role takes one colour of the region:
 | Colour | Source | Role |
 | --- | --- | --- |
 | Kesariya (केसरिया) | Saffron of the Rajput turban | Keywords |
-| Golden sandstone | Jaisalmer | Methods |
-| Leheriya (लहरिया) green | Wave-pattern tie-dye | Strings |
-| Jodhpur blue | Indigo-limewashed houses | Types |
+| Rani pink | Festival cloth | Strings |
 | Bandhani (बांधनी) red | Tie-dye cloth | Numbers, Spock labels |
-| Rani pink | Festival cloth | Fields |
+| Golden sandstone | Jaisalmer | Types |
+| Blue-pottery turquoise | Jaipur blue pottery | Methods |
+| Leheriya (लहरिया) green | Wave-pattern tie-dye | Fields |
 | Dabu (दाबू) indigo | Mud-resist block print | Constants |
-| Blue-pottery turquoise | Jaipur blue pottery | Annotations |
+| Jodhpur blue | Indigo-limewashed houses | Annotations |
 | Mehendi (मेहंदी) | Henna green | Type parameters |
 | Marble white | Udaipur marble | Text on Rajasthan Blue City |
 
