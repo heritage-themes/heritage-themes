@@ -11,14 +11,14 @@ Syntax colours take the Tamil names of Kanchipuram silk shades:
 | Shade | Meaning | Role |
 | --- | --- | --- |
 | Mayil kazhuthu (மயில் கழுத்து) | Peacock neck | Keywords |
+| Mambazham (மாம்பழம்) | Mango | Strings |
+| Kili pachai (கிளிப்பச்சை) | Parrot green | Numbers |
 | Arakku (அரக்கு) | Lac red | Types |
-| Pon (பொன்) | Gold zari | Methods |
-| Kili pachai (கிளிப்பச்சை) | Parrot green | Strings |
-| Mambazham (மாம்பழம்) | Mango | Numbers |
+| Neelam (நீலம்) | Sapphire | Methods |
 | Vadamalli (வாடாமல்லி) | Globe amaranth | Fields |
 | Kathiri poo (கத்தரிப்பூ) | Brinjal flower | Constants |
-| Neelam (நீலம்) | Sapphire | Annotations |
-| Manthalir (மாந்தளிர்) | Tender mango leaf | Type parameters |
+| Maragatham (மரகதம்) | Emerald | Annotations |
+| Manthalir (மாந்தளிர்) | Tender mango leaf, copper pink | Type parameters |
 | Kungumam (குங்குமம்) | Vermilion powder | Spock labels |
 
 Tamil Kolam is rice-flour white drawn at dawn on a dark granite threshold (கோலம்). Tamil Olai is the palm leaf (ஓலைச்சுவடி) that carried Tamil literature, its incised letters blackened with lampblack. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
