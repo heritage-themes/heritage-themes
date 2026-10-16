@@ -6,19 +6,19 @@ Dark and light themes based on the colours of Punjab: phulkari (ਫੁਲਕਾ�
 
 ## Inspiration
 
-Syntax colours are the pat (ਪੱਟ) floss silks of phulkari and the fields:
+Syntax colours are the pat (ਪੱਟ) floss silks of phulkari and the fields. Golden and orange silk lead, as in bagh (ਬਾਗ਼) phulkari:
 
 | Colour | Source | Role |
 | --- | --- | --- |
 | Sunehri (ਸੁਨਹਿਰੀ) | Golden silk | Keywords, main accent |
 | Santri | Orange silk | Methods |
-| Sarson da saag | Mustard greens | Strings |
-| Neela (ਨੀਲਾ) | Blue silk | Types |
-| Lal (ਲਾਲ) | Crimson silk | Numbers |
+| Firozi | Turquoise of the paranda (ਪਰਾਂਦਾ) hair tassel | Strings |
+| Sarson da saag | Mustard greens | Types |
+| Neela (ਨੀਲਾ) | Blue silk | Numbers |
 | Gulabi (ਗੁਲਾਬੀ) | Magenta silk | Fields |
 | Jamni | Purple silk | Constants |
-| Firozi | Turquoise of the paranda (ਪਰਾਂਦਾ) hair tassel | Annotations |
-| Young wheat | Spring wheat fields | Type parameters |
+| Lal (ਲਾਲ) | Crimson silk | Annotations |
+| Asmani (ਅਸਮਾਨੀ) | Sky blue | Type parameters |
 | Paranda rose | Rose silk of the paranda | Spock labels |
 | Chitta (ਚਿੱਟਾ) | White thread | Text on Punjab Phulkari |
 
