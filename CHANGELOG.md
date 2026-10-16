@@ -20,3 +20,4 @@
 - Peru Kulli and Peru Puka, drawn from the natural dyes of Andean weaving in Peru.
 - Kashubia Zemia and Kashubia Niebò, drawn from the seven colours of Kashubian embroidery.
 - Złotnica Aksamit and Złotnica Płótno, drawn from the gold-and-silver embroidered bonnets of Kashubia.
+- Łowicz Wycinanka and Łowicz Kodra, drawn from the striped wool and paper cut-outs of Łowicz.
