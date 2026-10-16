@@ -10,6 +10,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`kalamkari/`](kalamkari/) | Kalamkari Cotton, Kalamkari Indigo |
 | [`kerala/`](kerala/) | Kerala Backwaters, Kerala Kasavu |
 | [`mughal/`](mughal/) | Mughal Night, Mughal Wasli |
+| [`punjab/`](punjab/) | Punjab Basant, Punjab Phulkari |
 | [`rajasthan/`](rajasthan/) | Rajasthan Blue City, Rajasthan Pink City |
 | [`shuimo/`](shuimo/) | Shuimo Day, Shuimo Night |
 | [`tamil/`](tamil/) | Tamil Kolam, Tamil Olai |
