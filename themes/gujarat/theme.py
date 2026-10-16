@@ -4,8 +4,8 @@
 # Navratri is the nine nights of garba, danced in mirror-worked (abhla) Kutchi cloth under the lights;
 # Rann is the salt desert of Kutch, a cool white plain under a pale sky.
 # Patola parrot-green keywords, patola red types, haldi turmeric methods, garba rani-pink strings,
-# Uttarayan kite-orange numbers, lilac fields, kite-sky blue constants, Kutch peacock turquoise
-# annotations, stepwell-sandstone type parameters. Spock labels and the Navratri caret are
+# Kutch peacock turquoise numbers, kite-sky blue fields, lilac annotations, Uttarayan kite-orange
+# constants, stepwell-sandstone type parameters. Spock labels and the Navratri caret are
 # the silver glint of abhla mirrors.
 NAVRATRI = dict(
     name="Gujarat Navratri", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
@@ -13,8 +13,8 @@ NAVRATRI = dict(
     border="2C2537", fg="F2ECE4", muted="938B9C", disabled="5E5768",
     caretRow="1E1926", selection="382E4C", selInactive="2D2639", lineNo="524A5E", lineNoCaret="E8F0F5",
     guide="221C2B", guideSel="3E3549",
-    keyword="7FDC78", string="F28AC0", number="FFA04A", type="FF7068", method="F5CF4A", call="E8D7A0",
-    field="C7A0F0", constant="6FB8F5", annotation="4FD1C9", label="BFD6EA",
+    keyword="7FDC78", string="F28AC0", number="4FD1C9", type="FF7068", method="F5CF4A", call="E8D7A0",
+    field="6FB8F5", constant="FFA04A", annotation="C7A0F0", label="BFD6EA",
     comment="8A8294", doc="A8957E", docTag="C4AD8C", op="B8B0BC", param="F2ECE4", typeParam="E3B08A",
     gold="F5CF4A", red="C0283A", redText="FFF4EE", azure="6FB8F5", caret="E8F0F5",
     error="FF5468", warning="F5A93A", weak="8C7B58",
@@ -30,8 +30,8 @@ RANN = dict(
     border="D0D9DF", fg="1E2226", muted="65707A", disabled="A2ABB2",
     caretRow="EDF1F4", selection="F7DCE8", selInactive="E6E3EA", lineNo="A3ACB4", lineNoCaret="B0202A",
     guide="E5EAEE", guideSel="C9D3DA",
-    keyword="2E7A1E", string="B0206A", number="B04A00", type="B0202A", method="7A5800", call="6B5418",
-    field="7A3AB0", constant="1A5FA8", annotation="00756E", label="3A5A78",
+    keyword="2E7A1E", string="B0206A", number="00756E", type="B0202A", method="7A5800", call="6B5418",
+    field="1A5FA8", constant="B04A00", annotation="7A3AB0", label="3A5A78",
     comment="67707A", doc="6E6248", docTag="564A2E", op="525A62", param="1E2226", typeParam="8A5530",
     gold="B08A10", red="B0202A", redText="FFF6F4", azure="1A5FA8", caret="B0202A",
     error="D01E2E", warning="A86A00", weak="A8955E",
