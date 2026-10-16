@@ -13,3 +13,4 @@
 - Rajasthan Blue City and Rajasthan Pink City, drawn from the cities and cloth of Rajasthan.
 - Kerala Backwaters and Kerala Kasavu, drawn from Kerala's backwaters, Kathakali and the kasavu loom.
 - Bengal Baluchari and Bengal Laal Paar, drawn from the looms of Bengal and Durga Puja.
+- Tamil Kolam and Tamil Olai, drawn from the kolam, palm-leaf manuscripts and Kanchipuram silk of Tamil Nadu.
