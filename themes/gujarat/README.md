@@ -14,10 +14,10 @@ Each syntax role takes one colour of the region:
 | Patola red | Double-ikat silk of Patan | Types |
 | Haldar (હળદર) | Turmeric | Methods |
 | Rani pink | Garba (ગરબા) skirts | Strings |
-| Kite orange | Uttarayan (ઉત્તરાયણ) kites | Numbers |
-| Lilac | Festival cloth | Fields |
-| Kite-sky blue | Winter sky of Uttarayan | Constants |
-| Peacock turquoise | Kutch embroidery | Annotations |
+| Kite orange | Uttarayan (ઉત્તરાયણ) kites | Constants |
+| Lilac | Festival cloth | Annotations |
+| Kite-sky blue | Winter sky of Uttarayan | Fields |
+| Peacock turquoise | Kutch embroidery | Numbers |
 | Sandstone | Stepwells (vav) | Type parameters |
 | Abhla (આભલા) silver | Small mirrors sewn into Kutchi cloth | Spock labels, caret on Navratri |
 
