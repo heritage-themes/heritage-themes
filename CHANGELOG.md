@@ -17,3 +17,4 @@
 - Punjab Phulkari and Punjab Basant, drawn from phulkari embroidery and the mustard fields of Basant.
 - Gujarat Navratri and Gujarat Rann, drawn from Navratri, the Rann of Kutch and patola silk.
 - Morocco Majorelle, Morocco Marrakech and Morocco Zellige, drawn from the walls of Morocco.
+- Peru Kulli and Peru Puka, drawn from the natural dyes of Andean weaving in Peru.
