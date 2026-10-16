@@ -12,13 +12,13 @@ Each syntax role takes one colour of the region:
 | --- | --- | --- |
 | Kesariya (केसरिया) | Saffron of the Rajput turban | Keywords |
 | Rani pink | Festival cloth | Strings |
-| Bandhani (बांधनी) red | Tie-dye cloth | Numbers, Spock labels |
+| Bandhani (बांधनी) red | Tie-dye cloth | Spock labels |
 | Golden sandstone | Jaisalmer | Types |
 | Blue-pottery turquoise | Jaipur blue pottery | Methods |
 | Leheriya (लहरिया) green | Wave-pattern tie-dye | Fields |
-| Dabu (दाबू) indigo | Mud-resist block print | Constants |
-| Jodhpur blue | Indigo-limewashed houses | Annotations |
-| Mehendi (मेहंदी) | Henna green | Type parameters |
+| Dabu (दाबू) indigo | Mud-resist block print | Annotations |
+| Jodhpur blue | Indigo-limewashed houses | Constants |
+| Mehendi (मेहंदी) | Henna green | Numbers, type parameters |
 | Marble white | Udaipur marble | Text on Rajasthan Blue City |
 
 Rajasthan Blue City is Jodhpur by night, its blue houses below the Mehrangarh fort, with a saffron accent. Rajasthan Pink City is Jaipur by day, the pink sandstone of Gulabi Nagar (गुलाबी नगर) around the Hawa Mahal, with a Jodhpur-blue accent. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
