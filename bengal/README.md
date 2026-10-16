@@ -10,14 +10,14 @@ Each syntax role takes one colour of the region:
 
 | Colour | Source | Role |
 | --- | --- | --- |
-| Sindoor (সিঁদুর) | Vermilion powder worn in the hair parting | Keywords |
-| Sorshe (সর্ষে) | Mustard flower | Methods |
-| Paddy green | Rice fields | Strings |
-| Aparajita (অপরাজিতা) | Butterfly-pea flower blue | Types |
-| Terracotta | Temple brick of Bishnupur | Numbers |
-| Baluchari magenta | Figured silk of Bishnupur | Fields |
-| Baluchari violet | Figured silk of Bishnupur | Constants |
-| Pond teal | Village ponds (pukur) | Annotations |
+| Aparajita (অপরাজিতা) | Butterfly-pea flower violet-blue | Keywords |
+| Baluchari magenta | Figured silk of Bishnupur | Strings |
+| Paddy green | Rice fields | Methods |
+| Terracotta | Temple brick of Bishnupur | Types |
+| Sorshe (সর্ষে) | Mustard flower | Fields |
+| Sindoor (সিঁদুর) | Vermilion powder worn in the hair parting | Numbers |
+| Pond teal | Village ponds (pukur) | Constants |
+| Neel (নীল) | Indigo dye of Bengal | Annotations |
 | Mangrove green | Sundarbans | Type parameters |
 | Shankha (শাঁখা) | Conch-shell bangle white | Text on Baluchari |
 | Shiuli (শিউলি) stem | Orange stem of the night jasmine | Caret on Baluchari |
