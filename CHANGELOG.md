@@ -11,3 +11,4 @@
 - Kalamkari Indigo and Kalamkari Cotton, drawn from the natural dyes of Kalamkari hand-painted cloth.
 - Mughal Night and Mughal Wasli, drawn from the pigments of Mughal miniature painting.
 - Rajasthan Blue City and Rajasthan Pink City, drawn from the cities and cloth of Rajasthan.
+- Kerala Backwaters and Kerala Kasavu, drawn from Kerala's backwaters, Kathakali and the kasavu loom.
