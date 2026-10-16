@@ -6,6 +6,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | --- | --- |
 | [`danqing/`](danqing/) | Danqing Ink, Danqing Paper |
 | [`holi/`](holi/) | Holi Day, Holi Night |
+| [`kalamkari/`](kalamkari/) | Kalamkari Cotton, Kalamkari Indigo |
 | [`shuimo/`](shuimo/) | Shuimo Day, Shuimo Night |
 | [`wuxing/`](wuxing/) | Wuxing Day, Wuxing Night |
 
