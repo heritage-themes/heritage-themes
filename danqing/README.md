@@ -19,7 +19,7 @@ The palette follows the mineral and plant pigments used in traditional Chinese p
 | Dai (黛) | Blue-black pigment | Constants |
 | Malachite (石绿) | Green copper mineral | Annotations |
 
-Danqing Ink uses the dark tone of ink on an inkstone as its ground. Danqing Paper uses the warm off-white of xuan paper. Spock labels are red seal stamps. The mapping departs from the usual green, yellow and blue syntax convention to keep the saturation of mineral pigments.
+Danqing Ink uses the dark tone of ink on an inkstone as its ground. Danqing Paper uses the warm off-white of xuan paper. Spock labels are the red of seal paste (印泥). The mapping departs from the usual green, yellow and blue syntax convention to keep the saturation of mineral pigments.
 
 ## Develop
 

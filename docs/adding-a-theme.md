@@ -42,7 +42,7 @@ A palette is a dict of six-digit uppercase hex values without `#`, plus metadata
 | Selection and caret | `caretRow`, `selection`, `selInactive` |
 | Gutter | `lineNo`, `lineNoCaret`, `guide`, `guideSel` |
 | Syntax | `keyword`, `string`, `number`, `type`, `method`, `call`, `field`, `constant`, `annotation`, `comment`, `doc`, `docTag`, `op`, `param`, `typeParam` |
-| Spock labels | `label` (text), `labelBg` |
+| Spock labels | `label` |
 | Accents | `gold`, `red`, `redText`, `azure` |
 | Diagnostics | `error`, `warning`, `weak` |
 | Highlighting | `searchBg`, `searchBorder`, `underCaret`, `writeCaret`, `braceBg`, `todo` |
@@ -69,7 +69,7 @@ Key names are roles, not colours. `gold`, `red` and `azure` are slots whose valu
 Constraints:
 
 - `fileYellow` colours folders that IntelliJ marks as excluded, such as `node_modules`. Use a faint wash close to `bg`, never a saturated colour. A solid colour draws the Project view as coloured bars.
-- `labelBg` is the Spock label background (`given:`, `when:`, `then:`). A solid colour is fine, with `label` as readable text on it.
+- `label` colours Spock labels (`given:`, `when:`, `then:`) as bold text with no background. It needs the same contrast against `bg` as the syntax roles.
 - Avoid pure white and pure black for backgrounds and text, as the existing themes do.
 
 ## Check the result
