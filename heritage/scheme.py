@@ -158,8 +158,8 @@ def attributes(p):
     s("LOG_WARNING_OUTPUT", attr(p["warning"])); s("CONSOLE_USER_INPUT", attr(p["string"], font=ITALIC))
     s("LOG_INFO_OUTPUT", attr(p["string"])); s("LOG_DEBUG_OUTPUT LOG_VERBOSE_OUTPUT", attr(p["muted"]))
     s("LOG_EXPIRED_ENTRY", attr(p["disabled"]))
-    for k, v in dict(RED="keyword", GREEN="string", YELLOW="label", BLUE="method", MAGENTA="field", CYAN="annotation").items():
-        s(f"CONSOLE_{k}_OUTPUT CONSOLE_{k}_BRIGHT_OUTPUT", attr(p[v]))
+    for k in "RED GREEN YELLOW BLUE MAGENTA CYAN".split():
+        s(f"CONSOLE_{k}_OUTPUT CONSOLE_{k}_BRIGHT_OUTPUT", attr(p["ansi" + k.title()]))
     s("CONSOLE_BLACK_OUTPUT", attr(p["disabled"])); s("CONSOLE_DARKGRAY_OUTPUT", attr(p["muted"]))
     s("CONSOLE_GRAY_OUTPUT", attr(p["op"])); s("CONSOLE_WHITE_OUTPUT", attr(p["fg"]))
     # diff

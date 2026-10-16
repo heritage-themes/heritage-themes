@@ -48,6 +48,7 @@ A palette is a dict of six-digit uppercase hex values without `#`, plus metadata
 | Highlighting | `searchBg`, `searchBorder`, `underCaret`, `writeCaret`, `braceBg`, `todo` |
 | VCS and diff | `added`, `modified`, `deleted`, `diffIns`, `diffMod`, `diffDel`, `diffConf` |
 | Project view | `fileYellow` |
+| Console | `ansiRed`, `ansiGreen`, `ansiYellow`, `ansiBlue`, `ansiMagenta`, `ansiCyan` |
 
 Metadata values:
 
@@ -70,6 +71,7 @@ Constraints:
 
 - `fileYellow` colours folders that IntelliJ marks as excluded, such as `node_modules`. Use a faint wash close to `bg`, never a saturated colour. A solid colour draws the Project view as coloured bars.
 - `label` colours Spock labels (`given:`, `when:`, `then:`) as bold text with no background. It needs the same contrast against `bg` as the syntax roles.
+- The `ansi*` keys colour ANSI output in the console and terminal. Each must read as the hue it names, whatever the family's syntax roles are, and meet 4.5:1 against `bg`.
 - Avoid pure white and pure black for backgrounds and text, as the existing themes do.
 
 ## Check the result
