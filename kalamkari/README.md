@@ -6,17 +6,18 @@ Dark and light themes based on Kalamkari (కలంకారి, "pen work"), th
 
 ## Inspiration
 
-Every colour is a dye or mordant the craft uses:
+Every colour is a dye or mordant the craft uses, kept as muted as the dyes:
 
 | Dye | What it is | Role |
 | --- | --- | --- |
-| Madder (chay root) | Root dye, red on an alum mordant | Keywords, Spock labels |
+| Madder over indigo | Indigo overdyed with madder, aubergine | Keywords |
 | Indigo (neel) | Leaf dye from the indigo vat | Types |
-| Myrobalan (harad) | Fruit of the myrobalan tree, yellow | Methods |
-| Indigo over myrobalan | Yellow overdyed with indigo, green | Strings |
-| Catechu (kattha) | Acacia extract, rust brown | Numbers |
-| Lac | Insect resin, crimson | Fields |
-| Madder over indigo | Indigo overdyed with madder, violet | Constants |
+| Madder (chay root) | Root dye, red on an alum mordant | Method declarations, Spock labels |
+| Alum madder | Madder on a light alum mordant, rose | Method calls |
+| Myrobalan (harad) | Fruit of the myrobalan tree, yellow | Strings |
+| Catechu (kattha) | Acacia extract, brown | Numbers |
+| Indigo over myrobalan | Yellow overdyed with indigo, green | Fields |
+| Iron-saddened myrobalan | Myrobalan yellow dulled with iron, olive | Constants |
 | Indigo wash | Light indigo, teal | Annotations |
 | Kasimi | Iron-black outline ink | Text on Kalamkari Cotton |
 
