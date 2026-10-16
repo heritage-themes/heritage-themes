@@ -4,18 +4,18 @@
 # Blue City is Jodhpur by night, its indigo-limewashed houses under the Mehrangarh fort;
 # Pink City is Jaipur by day, its terracotta-pink sandstone around the Hawa Mahal.
 # Each city is framed by the other: a saffron accent on the blue, a Jodhpur-blue accent on the pink.
-# Kesariya saffron keywords (the Rajput turban), rani pink strings, bandhani red numbers,
-# Jaisalmer golden-sandstone types, blue-pottery turquoise methods, leheriya green fields,
-# indigo dabu-print constants, Jodhpur blue annotations, mehendi type parameters,
-# Udaipur marble text. Spock labels are bold bandhani red.
+# Kesariya saffron keywords (the Rajput turban), rani pink strings, mehendi numbers and type
+# parameters, Jaisalmer golden-sandstone types, blue-pottery turquoise methods, leheriya green fields,
+# Jodhpur blue constants, indigo dabu-print annotations, Udaipur marble text. Spock labels are bold
+# bandhani red.
 BLUE = dict(
     name="Rajasthan Blue City", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
     bg="13273C", bgUi="102235", bgTool="122539", surface="1B3148", hover="223A54",
     border="243E56", fg="F2EADF", muted="8F9AA3", disabled="5A6F85",
     caretRow="182E45", selection="2A4458", selInactive="233D5A", lineNo="4C6984", lineNoCaret="FF9F45",
     guide="1B3148", guideSel="36506B",
-    keyword="FFA65F", string="FE99C7", number="FF958E", type="E5C68E", method="44D6D6", call="93D9D9",
-    field="86D489", constant="C3AFFE", annotation="78C7FD", label="FF958E",
+    keyword="FFA65F", string="FE99C7", number="CBDA96", type="E5C68E", method="44D6D6", call="93D9D9",
+    field="86D489", constant="78C7FD", annotation="C3AFFE", label="FF958E",
     comment="8C9194", doc="A89A80", docTag="C2B08E", op="B7B9B6", param="F2EADF", typeParam="CBDA96",
     gold="F2C75C", red="B5520F", redText="FFF4E6", azure="6CC0FF", caret="FF9F45",
     error="FF5A6A", warning="F5A93A", weak="8C7E58",
@@ -31,8 +31,8 @@ PINK = dict(
     border="DCBBAB", fg="2A2026", muted="75666A", disabled="AB9594",
     caretRow="F0DCD2", selection="CFE0F2", selInactive="E3D7D6", lineNo="AF9792", lineNoCaret="B34700",
     guide="EBD6CC", guideSel="D6B6A7",
-    keyword="944F04", string="A0346C", number="AE2D2F", type="684A01", method="067272", call="1E7272",
-    field="1A7728", constant="6A50A5", annotation="056A9D", label="A72629",
+    keyword="944F04", string="A0346C", number="5E6A20", type="684A01", method="067272", call="1E7272",
+    field="1A7728", constant="056A9D", annotation="6A50A5", label="A72629",
     comment="7D7072", doc="7A6450", docTag="5E4A38", op="5C5458", param="2A2026", typeParam="5E6A20",
     gold="C08A10", red="1D62B0", redText="FFF8F0", azure="1D62B0", caret="B34700",
     error="D01E2E", warning="A86800", weak="B0986A",
