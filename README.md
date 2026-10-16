@@ -7,6 +7,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`themes/bengal/`](themes/bengal/) | Bengal Baluchari, Bengal Laal Paar | India, Bangladesh |
 | [`themes/danqing/`](themes/danqing/) | Danqing Ink, Danqing Paper | China |
 | [`themes/gujarat/`](themes/gujarat/) | Gujarat Navratri, Gujarat Rann | India |
+| [`themes/hmong/`](themes/hmong/) | Hmong Batik, Hmong Hemp | Vietnam, Laos, Thailand, China |
 | [`themes/holi/`](themes/holi/) | Holi Day, Holi Night | India |
 | [`themes/kalamkari/`](themes/kalamkari/) | Kalamkari Cotton, Kalamkari Indigo | India |
 | [`themes/kashubia/`](themes/kashubia/) | Kashubia Niebò, Kashubia Zemia | Poland |
