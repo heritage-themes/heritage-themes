@@ -6,6 +6,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | --- | --- |
 | [`bengal/`](bengal/) | Bengal Baluchari, Bengal Laal Paar |
 | [`danqing/`](danqing/) | Danqing Ink, Danqing Paper |
+| [`gujarat/`](gujarat/) | Gujarat Navratri, Gujarat Rann |
 | [`holi/`](holi/) | Holi Day, Holi Night |
 | [`kalamkari/`](kalamkari/) | Kalamkari Cotton, Kalamkari Indigo |
 | [`kerala/`](kerala/) | Kerala Backwaters, Kerala Kasavu |

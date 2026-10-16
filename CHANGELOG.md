@@ -15,3 +15,4 @@
 - Bengal Baluchari and Bengal Laal Paar, drawn from the looms of Bengal and Durga Puja.
 - Tamil Kolam and Tamil Olai, drawn from the kolam, palm-leaf manuscripts and Kanchipuram silk of Tamil Nadu.
 - Punjab Phulkari and Punjab Basant, drawn from phulkari embroidery and the mustard fields of Basant.
+- Gujarat Navratri and Gujarat Rann, drawn from Navratri, the Rann of Kutch and patola silk.
