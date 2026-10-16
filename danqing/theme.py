@@ -4,7 +4,7 @@
 # Deliberately breaks the usual green/yellow/blue syntax convention:
 # cinnabar 朱砂 keywords, azurite 石青 types, gamboge 藤黄 methods, bamboo 竹青 strings,
 # lotus-root 藕荷 fields, ochre 赭石 numbers, dai 黛 constants, malachite 石绿 annotations,
-# ink 墨 on inkstone / xuan paper 宣纸, Spock labels as red seal stamps 印章.
+# ink 墨 on inkstone / xuan paper 宣纸, Spock labels in seal-paste red 印泥.
 INK = dict(
     name="Danqing Ink", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
     bg="1B1D1B", bgUi="151716", bgTool="181A19", surface="232624", hover="2A2E2B",
@@ -12,7 +12,7 @@ INK = dict(
     caretRow="202421", selection="2E3F45", selInactive="283335", lineNo="4B514C", lineNoCaret="F0643F",
     guide="252926", guideSel="3B423D",
     keyword="F0643F", string="A3B47E", number="C99A62", type="4FB3C9", method="E9B949", call="D9BE7E",
-    field="CFA3C0", constant="A59FD2", annotation="6FBF9E", label="F6EEDF", labelBg="B8382A",
+    field="CFA3C0", constant="A59FD2", annotation="6FBF9E", label="F2777A",
     comment="747B74", doc="8E9278", docTag="A9AB8A", op="A8A699", param="DCD6C8", typeParam="7FC4B6",
     gold="E9B949", red="B8382A", redText="F6EEDF", azure="4FB3C9", caret="F0643F",
     error="F25C54", warning="E6A23C", weak="8B8155",
@@ -28,7 +28,7 @@ PAPER = dict(
     caretRow="E6E1D4", selection="C9DCE0", selInactive="DAE0DE", lineNo="A39D8B", lineNoCaret="B32D1E",
     guide="DDD7C9", guideSel="C5BCA7",
     keyword="B32D1E", string="4A6526", number="854E24", type="0F6680", method="7E5500", call="6F5210",
-    field="7A3F6A", constant="4F4790", annotation="1A7353", label="F7EFE0", labelBg="B32D1E",
+    field="7A3F6A", constant="4F4790", annotation="1A7353", label="B8283A",
     comment="76736A", doc="676043", docTag="554D32", op="55534D", param="26282A", typeParam="0E6A62",
     gold="B8860B", red="B32D1E", redText="F7EFE0", azure="0F6680", caret="B32D1E",
     error="C8202F", warning="A86800", weak="A8975E",
