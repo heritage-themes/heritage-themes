@@ -1,6 +1,6 @@
 # Adding a theme
 
-Add a theme family (a dark and a light theme) to the Heritage Themes plugin. A family supplies only palettes; every colour mapping, the UI theme and the preview are shared code in `heritage/`.
+Add a theme family, usually a dark and a light theme, to the Heritage Themes plugin. A family supplies only palettes; every colour mapping, the UI theme and the preview are shared code in `heritage/`.
 
 ## How a family is built
 
@@ -18,7 +18,7 @@ A change in `heritage/` changes every family. After one, render all previews and
 
 ## Create the folder
 
-Create `<theme>/theme.py` in the shape of `shuimo/theme.py`: a docstring, a comment describing the colour tradition and the syntax roles it maps to, the two palettes, then `FAMILY`, `BLURB` and `THEMES`.
+Create `<theme>/theme.py` in the shape of `shuimo/theme.py`: a docstring, a comment describing the colour tradition and the syntax roles it maps to, the palettes, then `FAMILY`, `BLURB` and `THEMES`.
 
 Names follow one pattern:
 
@@ -28,7 +28,7 @@ Names follow one pattern:
 | `slug` | `ShuimoNight` |
 | Palette `name` | `Shuimo Night` |
 
-The pair is Night and Day, except Danqing, which is Ink and Paper.
+The second word of a theme name is its setting in the tradition: Night and Day for Shuimo, Ink and Paper for Danqing, Baluchari and Laal Paar for Bengal.
 
 ### Palette
 
