@@ -11,13 +11,13 @@ Syntax colours come from Kathakali (കഥകളി) make-up and the land around
 | Colour | Source | Role |
 | --- | --- | --- |
 | Kathi (കത്തി) red | Make-up of the anti-hero roles | Keywords |
-| Zari gold | Gold border of the kasavu (കസവ്) sari | Methods, Spock labels |
-| Banana-leaf green | Banana leaf | Strings |
-| Kingfisher blue | Kingfisher of the backwaters | Types |
+| Zari gold | Gold border of the kasavu (കസവ്) sari | Strings, Spock labels |
+| Pacha (പച്ച) green | Green face of the noble hero roles | Methods |
+| Backwater teal | Kayal (കായൽ), the backwaters | Types |
 | Laterite orange | Laterite stone | Numbers |
 | Lotus pink | Lotus | Fields |
-| Kakkapoovu violet | Kakkapoovu, a small Onam flower | Constants |
-| Backwater teal | Kayal (കായൽ), the backwaters | Annotations |
+| Kingfisher blue | Kingfisher of the backwaters | Constants |
+| Kakkapoovu violet | Kakkapoovu, a small Onam flower | Annotations |
 | Cardamom green | Cardamom of the Western Ghats | Type parameters |
 | Chutti (ചുട്ടി) white | Rice-paste frame of the Kathakali face | Text on Kerala Backwaters |
 
