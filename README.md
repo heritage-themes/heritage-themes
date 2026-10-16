@@ -23,6 +23,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`themes/sardinia/`](themes/sardinia/) | Sardinia Camisa, Sardinia Orbace | Italy |
 | [`themes/shuimo/`](themes/shuimo/) | Shuimo Day, Shuimo Night | China |
 | [`themes/tamil/`](themes/tamil/) | Tamil Kolam, Tamil Olai | India |
+| [`themes/wixarika/`](themes/wixarika/) | Wixárika Haramara, Wixárika Wirikuta | Mexico |
 | [`themes/wuxing/`](themes/wuxing/) | Wuxing Day, Wuxing Night | China |
 | [`themes/zalipie/`](themes/zalipie/) | Zalipie Sadza, Zalipie Wapno | Poland |
 | [`themes/zlotnica/`](themes/zlotnica/) | Złotnica Aksamit, Złotnica Płótno | Poland |
