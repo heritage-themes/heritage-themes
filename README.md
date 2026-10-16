@@ -4,20 +4,20 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 
 | Folder | Themes |
 | --- | --- |
-| [`bengal/`](bengal/) | Bengal Baluchari, Bengal Laal Paar |
-| [`danqing/`](danqing/) | Danqing Ink, Danqing Paper |
-| [`gujarat/`](gujarat/) | Gujarat Navratri, Gujarat Rann |
-| [`holi/`](holi/) | Holi Day, Holi Night |
-| [`kalamkari/`](kalamkari/) | Kalamkari Cotton, Kalamkari Indigo |
-| [`kerala/`](kerala/) | Kerala Backwaters, Kerala Kasavu |
-| [`morocco/`](morocco/) | Morocco Majorelle, Morocco Marrakech, Morocco Zellige |
-| [`mughal/`](mughal/) | Mughal Night, Mughal Wasli |
-| [`peru/`](peru/) | Peru Kulli, Peru Puka |
-| [`punjab/`](punjab/) | Punjab Basant, Punjab Phulkari |
-| [`rajasthan/`](rajasthan/) | Rajasthan Blue City, Rajasthan Pink City |
-| [`shuimo/`](shuimo/) | Shuimo Day, Shuimo Night |
-| [`tamil/`](tamil/) | Tamil Kolam, Tamil Olai |
-| [`wuxing/`](wuxing/) | Wuxing Day, Wuxing Night |
+| [`themes/bengal/`](themes/bengal/) | Bengal Baluchari, Bengal Laal Paar |
+| [`themes/danqing/`](themes/danqing/) | Danqing Ink, Danqing Paper |
+| [`themes/gujarat/`](themes/gujarat/) | Gujarat Navratri, Gujarat Rann |
+| [`themes/holi/`](themes/holi/) | Holi Day, Holi Night |
+| [`themes/kalamkari/`](themes/kalamkari/) | Kalamkari Cotton, Kalamkari Indigo |
+| [`themes/kerala/`](themes/kerala/) | Kerala Backwaters, Kerala Kasavu |
+| [`themes/morocco/`](themes/morocco/) | Morocco Majorelle, Morocco Marrakech, Morocco Zellige |
+| [`themes/mughal/`](themes/mughal/) | Mughal Night, Mughal Wasli |
+| [`themes/peru/`](themes/peru/) | Peru Kulli, Peru Puka |
+| [`themes/punjab/`](themes/punjab/) | Punjab Basant, Punjab Phulkari |
+| [`themes/rajasthan/`](themes/rajasthan/) | Rajasthan Blue City, Rajasthan Pink City |
+| [`themes/shuimo/`](themes/shuimo/) | Shuimo Day, Shuimo Night |
+| [`themes/tamil/`](themes/tamil/) | Tamil Kolam, Tamil Olai |
+| [`themes/wuxing/`](themes/wuxing/) | Wuxing Day, Wuxing Night |
 
 ## Install
 
@@ -49,9 +49,9 @@ Install the jar or an `.icls` file as described under [Install](#install).
 ## Preview
 
 ```bash
-python3 preview.py              # every theme: <theme>/build/preview.html
+python3 preview.py              # every theme: themes/<theme>/build/preview.html
 python3 preview.py shuimo       # one theme
-python3 preview.py --png        # also render <theme>/preview.png
+python3 preview.py --png        # also render themes/<theme>/preview.png
 ```
 
 The page shows each theme as an IDE window with a code sample per language, coloured from the generated editor scheme. It downloads JetBrains Mono once into `~/.cache/heritage-themes`. `--png` needs Google Chrome or Chromium (or the `CHROME` environment variable) and ImageMagick.
@@ -62,7 +62,7 @@ The page shows each theme as an IDE window with a code sample per language, colo
 build.py        builds the plugin from every theme folder; holds the plugin version
 preview.py      writes theme previews and renders the README images
 heritage/       code shared by every theme family
-  __init__.py   finds theme folders; the theme.py contract
+  __init__.py   finds the theme folders in themes/; the theme.py contract
   scheme.py     editor colour scheme: palette roles to text attributes
   ui.py         UI theme: palette roles to UI keys
   preview.py    preview page
@@ -72,7 +72,7 @@ assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
 scripts/        release.sh, parent_overrides.py
 docs/           releasing.md, adding-a-theme.md
 .github/        Build and Publish workflows
-<theme>/
+themes/<theme>/
   theme.py      palettes; defines FAMILY, BLURB and THEMES
   README.md     what the theme is
   preview.png   README image, rendered by preview.py --png

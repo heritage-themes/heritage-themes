@@ -11,4 +11,4 @@ build/
 __pycache__/
 
 # Local reference material in each theme folder, not part of the repository
-*/docs/
+themes/*/docs/

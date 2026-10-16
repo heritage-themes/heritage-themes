@@ -1,6 +1,6 @@
 """Shared generator for every Heritage Themes family.
 
-A theme family is a top-level folder with a theme.py that defines:
+A theme family is a folder in themes/ with a theme.py that defines:
 
     FAMILY  family name, shown in the plugin description
     BLURB   one sentence for the plugin description
@@ -14,13 +14,14 @@ from .scheme import scheme
 from .ui import theme
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+THEMES = os.path.join(ROOT, "themes")
 
 
 def load_families():
-    """The theme.py module of every top-level folder that has one, in folder name order."""
+    """The theme.py module of every folder in themes/ that has one, in folder name order."""
     families = []
-    for name in sorted(os.listdir(ROOT)):
-        path = os.path.join(ROOT, name, "theme.py")
+    for name in sorted(os.listdir(THEMES)):
+        path = os.path.join(THEMES, name, "theme.py")
         if not os.path.isfile(path):
             continue
         spec = importlib.util.spec_from_file_location(f"heritage_{name}", path)

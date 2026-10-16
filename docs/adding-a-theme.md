@@ -4,7 +4,7 @@ Add a theme family, usually a dark and a light theme, to the Heritage Themes plu
 
 ## How a family is built
 
-Any top-level folder with a `theme.py` is a theme family. `heritage.load_families()` finds it, so neither `build.py` nor `preview.py` needs a change for a new family. `theme.py` defines:
+Any folder in `themes/` with a `theme.py` is a theme family. `heritage.load_families()` finds it, so neither `build.py` nor `preview.py` needs a change for a new family. `theme.py` defines:
 
 | Name | Content |
 | --- | --- |
@@ -18,7 +18,7 @@ A change in `heritage/` changes every family. After one, render all previews and
 
 ## Create the folder
 
-Create `<theme>/theme.py` in the shape of `shuimo/theme.py`: a docstring, a comment describing the colour tradition and the syntax roles it maps to, the palettes, then `FAMILY`, `BLURB` and `THEMES`.
+Create `themes/<theme>/theme.py` in the shape of `themes/shuimo/theme.py`: a docstring, a comment describing the colour tradition and the syntax roles it maps to, the palettes, then `FAMILY`, `BLURB` and `THEMES`.
 
 Names follow one pattern:
 
@@ -78,7 +78,7 @@ Constraints:
 
 ```bash
 python3 build.py                # prints build/heritage-themes-<version>.zip: <n> themes
-python3 preview.py <theme>      # writes <theme>/build/preview.html
+python3 preview.py <theme>      # writes themes/<theme>/build/preview.html
 ```
 
 Open the preview in a browser. It shows each theme as an IDE window with a sample in Java, Kotlin, Groovy (Spock), Python, TypeScript, React (TSX), Vue, HTML, CSS, SQL, Go, Rust, C++, C, C#, shell, YAML, JSON, TOML and Markdown. Code colours come from the generated scheme, so the preview shows what the scheme sets. Check that:
@@ -105,17 +105,17 @@ A preview sample marks code with `«key:text»` in `heritage/samples.py`, using 
 
 Add these to the theme folder:
 
-- `README.md`, in the same shape as `shuimo/README.md`:
+- `README.md`, in the same shape as `themes/shuimo/README.md`:
   1. `# <Family>`
   2. One paragraph: dark and light themes based on the tradition, naming both UI themes and stating that each has a matching editor colour scheme
   3. `![Preview](preview.png)`
   4. `## Inspiration`: the colour tradition and a table mapping sources to syntax roles, in neutral descriptive language
-  5. `## Develop`: the same paragraph as in `shuimo/README.md`
+  5. `## Develop`: the same paragraph as in `themes/shuimo/README.md`
 - `preview.png`, rendered with `python3 preview.py --png <theme>`. It needs Google Chrome or Chromium and ImageMagick. Every image has the same width; its height grows with the number of themes in the family.
 
 ## Register the theme
 
-1. Add a row to the table in the root `README.md`: `` | [`<theme>/`](<theme>/) | <Theme A>, <Theme B> | ``.
+1. Add a row to the table in the root `README.md`: `` | [`themes/<theme>/`](themes/<theme>/) | <Theme A>, <Theme B> | ``.
 2. Add a line under `### Added` in `[Unreleased]` in `CHANGELOG.md`: `- <Theme A> and <Theme B>, drawn from <tradition>.`
 3. Run `python3 build.py` again.
 4. Commit on `dev` as `feat(<theme>): add <Theme A> and <Theme B> themes`, limited to the theme folder, the root README row and the changelog entry. Releasing is described in [releasing.md](releasing.md).
