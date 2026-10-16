@@ -12,6 +12,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`kerala/`](kerala/) | Kerala Backwaters, Kerala Kasavu |
 | [`morocco/`](morocco/) | Morocco Majorelle, Morocco Marrakech, Morocco Zellige |
 | [`mughal/`](mughal/) | Mughal Night, Mughal Wasli |
+| [`peru/`](peru/) | Peru Kulli, Peru Puka |
 | [`punjab/`](punjab/) | Punjab Basant, Punjab Phulkari |
 | [`rajasthan/`](rajasthan/) | Rajasthan Blue City, Rajasthan Pink City |
 | [`shuimo/`](shuimo/) | Shuimo Day, Shuimo Night |
