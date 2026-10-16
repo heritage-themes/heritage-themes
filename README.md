@@ -19,6 +19,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`themes/shuimo/`](themes/shuimo/) | Shuimo Day, Shuimo Night |
 | [`themes/tamil/`](themes/tamil/) | Tamil Kolam, Tamil Olai |
 | [`themes/wuxing/`](themes/wuxing/) | Wuxing Day, Wuxing Night |
+| [`themes/zlotnica/`](themes/zlotnica/) | Złotnica Aksamit, Złotnica Płótno |
 
 ## Install
 
