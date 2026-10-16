@@ -18,6 +18,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`themes/podhale/`](themes/podhale/) | Podhale Kłobuk, Podhale Sukno | Poland |
 | [`themes/punjab/`](themes/punjab/) | Punjab Basant, Punjab Phulkari | India, Pakistan |
 | [`themes/rajasthan/`](themes/rajasthan/) | Rajasthan Blue City, Rajasthan Pink City | India |
+| [`themes/sardinia/`](themes/sardinia/) | Sardinia Camisa, Sardinia Orbace | Italy |
 | [`themes/shuimo/`](themes/shuimo/) | Shuimo Day, Shuimo Night | China |
 | [`themes/tamil/`](themes/tamil/) | Tamil Kolam, Tamil Olai | India |
 | [`themes/wuxing/`](themes/wuxing/) | Wuxing Day, Wuxing Night | China |
