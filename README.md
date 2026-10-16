@@ -7,6 +7,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`danqing/`](danqing/) | Danqing Ink, Danqing Paper |
 | [`holi/`](holi/) | Holi Day, Holi Night |
 | [`kalamkari/`](kalamkari/) | Kalamkari Cotton, Kalamkari Indigo |
+| [`kerala/`](kerala/) | Kerala Backwaters, Kerala Kasavu |
 | [`mughal/`](mughal/) | Mughal Night, Mughal Wasli |
 | [`rajasthan/`](rajasthan/) | Rajasthan Blue City, Rajasthan Pink City |
 | [`shuimo/`](shuimo/) | Shuimo Day, Shuimo Night |
