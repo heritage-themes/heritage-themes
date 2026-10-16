@@ -26,3 +26,4 @@
 - Sardinia Orbace and Sardinia Camisa, drawn from the dyed wool, linen and silk of Sardinian traditional dress.
 - Hmong Batik and Hmong Hemp, drawn from the indigo batik and cross-stitch of the Hmong pleated skirt.
 - Ndebele Nzima and Ndebele Mhlophe, drawn from the outlined wall painting of the Ndebele homestead.
+- Wixárika Haramara and Wixárika Wirikuta, drawn from the yarn paintings, beadwork and five colours of maize of the Wixárika.
