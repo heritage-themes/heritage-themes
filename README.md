@@ -26,6 +26,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`themes/tamil/`](themes/tamil/) | Tamil Kolam, Tamil Olai | India |
 | [`themes/wixarika/`](themes/wixarika/) | Wixárika Haramara, Wixárika Wirikuta | Mexico |
 | [`themes/wuxing/`](themes/wuxing/) | Wuxing Day, Wuxing Night | China |
+| [`themes/yolngu/`](themes/yolngu/) | Yolŋu Galawu, Yolŋu Gapaṉ | Australia |
 | [`themes/zalipie/`](themes/zalipie/) | Zalipie Sadza, Zalipie Wapno | Poland |
 | [`themes/zlotnica/`](themes/zlotnica/) | Złotnica Aksamit, Złotnica Płótno | Poland |
 
