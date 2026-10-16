@@ -111,7 +111,7 @@ Add these to the theme folder:
   3. `![Preview](preview.png)`
   4. `## Inspiration`: the colour tradition and a table mapping sources to syntax roles, in neutral descriptive language
   5. `## Develop`: the same paragraph as in `shuimo/README.md`
-- `preview.png`, rendered with `python3 preview.py --png <theme>`. It needs Google Chrome or Chromium and ImageMagick. Every family's image has the same size, because the page layout is shared.
+- `preview.png`, rendered with `python3 preview.py --png <theme>`. It needs Google Chrome or Chromium and ImageMagick. Every image has the same width; its height grows with the number of themes in the family.
 
 ## Register the theme
 
