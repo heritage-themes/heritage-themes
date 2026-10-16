@@ -1,6 +1,6 @@
 """Builds the Heritage Themes plugin from every theme folder.
 
-A theme folder is any top-level directory containing a theme.py (see heritage/__init__.py).
+A theme folder is any directory in themes/ containing a theme.py (see heritage/__init__.py).
 Run `python3 build.py`; output goes to build/.
 """
 import html, json, os, re, shutil, zipfile

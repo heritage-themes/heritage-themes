@@ -2,9 +2,9 @@
 
 Usage: python3 preview.py [--png] [THEME ...]
   THEME  a theme folder, for example shuimo; default: every theme folder
-  --png  also render <theme>/preview.png; needs Google Chrome or Chromium, and ImageMagick
+  --png  also render themes/<theme>/preview.png; needs Google Chrome or Chromium, and ImageMagick
 
-The page goes to <theme>/build/preview.html. It uses JetBrains Mono, downloaded once from the pinned
+The page goes to themes/<theme>/build/preview.html. It uses JetBrains Mono, downloaded once from the pinned
 release below into ~/.cache/heritage-themes.
 """
 import argparse, hashlib, os, shutil, subprocess, sys, tempfile, urllib.request, zipfile
@@ -73,7 +73,7 @@ def render_png(page_path, png_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Write theme previews.")
-    parser.add_argument("--png", action="store_true", help="also render <theme>/preview.png")
+    parser.add_argument("--png", action="store_true", help="also render themes/<theme>/preview.png")
     parser.add_argument("themes", nargs="*", metavar="THEME", help="theme folders; default: all")
     args = parser.parse_args()
     families = {heritage.folder(f): f for f in heritage.load_families()}
@@ -81,14 +81,14 @@ def main():
     if unknown:
         raise SystemExit(f"preview: no theme folder named {', '.join(sorted(unknown))}")
     for name in args.themes or families:
-        out = os.path.join(ROOT, name, "build")
+        out = os.path.join(heritage.THEMES, name, "build")
         install_fonts(os.path.join(out, FONT_DIR))
         page_path = os.path.join(out, "preview.html")
         with open(page_path, "w") as f:
             f.write(page(families[name]))
         print(page_path)
         if args.png:
-            png_path = os.path.join(ROOT, name, "preview.png")
+            png_path = os.path.join(heritage.THEMES, name, "preview.png")
             render_png(page_path, png_path)
             print(png_path)
 

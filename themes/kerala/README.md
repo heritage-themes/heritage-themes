@@ -25,4 +25,4 @@ Kerala Backwaters is the palm-lined water at night, deep green under the brass l
 
 ## Develop
 
-The palettes are in `theme.py`. The colour mappings and the preview are shared by every theme family and live in [`heritage/`](../heritage/). See the [root README](../README.md) for build, preview and install steps.
+The palettes are in `theme.py`. The colour mappings and the preview are shared by every theme family and live in [`heritage/`](../../heritage/). See the [root README](../../README.md) for build, preview and install steps.

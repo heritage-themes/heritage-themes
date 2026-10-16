@@ -1,5 +1,5 @@
 Heritage Themes is one JetBrains plugin with colour themes drawn from cultures' colour traditions. Each theme
-family is a folder with a `theme.py` holding its palettes; all colour mappings, the UI theme and the preview
+family is a folder in `themes/` with a `theme.py` holding its palettes; all colour mappings, the UI theme and the preview
 are shared code in `heritage/`. `python3 build.py` builds and validates the plugin. Work on `dev`; see the
 root README for layout, previews and the git workflow.
 
