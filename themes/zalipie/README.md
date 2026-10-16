@@ -15,8 +15,8 @@ The women of Zalipie lightened soot-stained walls with lime and dabbed lime spot
 | Szarość (grey) | Soot-stained walls before whitewashing | Comments |
 | Róża (rose) | The central flower of a bouquet | Methods, Spock labels |
 | Liście (leaves) | Leaves and stems | Strings |
-| Ultramaryna (ultramarine) | Window frames and blue flowers | Types, buttons and the Run widget |
-| Fiolet (violet) | Violet flowers | Fields |
+| Ultramaryna (ultramarine) | Window frames and blue flowers | Fields, buttons and the Run widget |
+| Fiolet (violet) | Violet flowers | Types |
 | Żółty (yellow) | Yellow flowers and flower centres | Numbers, constants |
 | Błękit (sky blue) | The painted stoves | Annotations |
 
