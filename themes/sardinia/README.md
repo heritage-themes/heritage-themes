@@ -1,6 +1,6 @@
 # Sardinia
 
-Dark and light themes based on the traditional dress of Sardinia, Italy: black and scarlet orbace, white linen, saffron-dyed silk and indigo. Provides two UI themes, **Sardinia Orbace** and **Sardinia Camisa**, each with a matching editor colour scheme.
+Dark and light themes based on the traditional dress of Sardinia, Italy: black and scarlet orbace, white linen, saffron-dyed silk and indigo. Provides two UI themes, **Sardinia Orbace (Dark)** and **Sardinia Camisa (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -17,7 +17,7 @@ Village dress across the island is built from orbace, a hand-woven wool fulled i
 | Corallo (coral) | Red coral in Sardinian jewellery | Numbers, constants, annotations |
 | Lino (linen) and orbace | *Sa camisa*, the white linen shirt; black orbace | Types |
 
-Sardinia Orbace has black orbace, the cloth of cloaks and skirts, as its ground, with white linen for types. Sardinia Camisa is the white linen of *sa camisa*, with black orbace for types. Hex values are interpretations of the dyed cloth, silk and coral, adjusted for contrast against each background.
+Sardinia Orbace (Dark) has black orbace, the cloth of cloaks and skirts, as its ground, with white linen for types. Sardinia Camisa (Light) is the white linen of *sa camisa*, with black orbace for types. Hex values are interpretations of the dyed cloth, silk and coral, adjusted for contrast against each background.
 
 ## Develop
 

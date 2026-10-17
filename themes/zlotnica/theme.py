@@ -8,7 +8,7 @@
 # constants, szmaragd (emerald) annotations. Aksamit is the dark green velvet of the bonnet;
 # Płótno is the white linen of the napkins (serwety) embroidered with the bonnet patterns in gold thread.
 AKSAMIT = dict(
-    name="Złotnica Aksamit", dark=True, parent="Darcula", kwBold=False,
+    name="Złotnica Aksamit (Dark)", dark=True, parent="Darcula", kwBold=False,
     bg="10201A", bgUi="0C1A15", bgTool="0E1D17", frame="1C3127", surface="172A22", hover="1F332A",
     border="243A30", fg="C6CBC4", muted="86948C", disabled="52625A",
     caretRow="152820", selection="24403A", selInactive="22352E", lineNo="4A5E54", lineNoCaret="E8C35E",
@@ -25,7 +25,7 @@ AKSAMIT = dict(
     ansiRed="F08080", ansiGreen="8FD496", ansiYellow="E8C35E", ansiBlue="8DB4F0", ansiMagenta="DA9AD8", ansiCyan="74D0D0",
 )
 PLOTNO = dict(
-    name="Złotnica Płótno", dark=False, parent="Default", kwBold=True,
+    name="Złotnica Płótno (Light)", dark=False, parent="Default", kwBold=True,
     bg="F6F2E6", bgUi="ECE6D6", bgTool="F1ECDE", frame="DFD6C1", surface="FBF8F0", hover="E3DCC8",
     border="D9D0BA", fg="383B38", muted="6F6E68", disabled="ABA796",
     caretRow="EFEADB", selection="E5DDC0", selInactive="E6E3D8", lineNo="ABA48E", lineNoCaret="8A6400",

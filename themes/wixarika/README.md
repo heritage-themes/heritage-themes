@@ -1,6 +1,6 @@
 # Wixárika
 
-Dark and light themes based on the yarn paintings and beadwork of the Wixárika (Huichol) of western Mexico: saturated yarn and glass beads pressed into beeswax, coloured by the five colours of maize. Provides two UI themes, **Wixárika Haramara** and **Wixárika Wirikuta**, each with a matching editor colour scheme.
+Dark and light themes based on the yarn paintings and beadwork of the Wixárika (Huichol) of western Mexico: saturated yarn and glass beads pressed into beeswax, coloured by the five colours of maize. Provides two UI themes, **Wixárika Haramara (Dark)** and **Wixárika Wirikuta (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -15,9 +15,9 @@ Wixárika artists press wool or acrylic yarn into beeswax on a board to make a y
 | Purple maize, the west | *ta+lawime* | Fields, constants, numbers |
 | Red, the mother and sacred places | | Types; buttons and the Run widget |
 | Green peyote | *hikuri* | Method declarations and calls, annotations |
-| Black, the western sea | | The ground of Wixárika Haramara |
+| Black, the western sea | | The ground of Wixárika Haramara (Dark) |
 
-Wixárika Haramara takes its ground from Haramara, the sea in the west where the sun sets, linked to black. Wixárika Wirikuta takes its ground from Wirikuta, the desert in the east where the sun rises. Hex values are interpretations of the yarn and bead colours, adjusted for contrast against each background.
+Wixárika Haramara (Dark) takes its ground from Haramara, the sea in the west where the sun sets, linked to black. Wixárika Wirikuta (Light) takes its ground from Wirikuta, the desert in the east where the sun rises. Hex values are interpretations of the yarn and bead colours, adjusted for contrast against each background.
 
 ## Develop
 

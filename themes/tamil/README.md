@@ -1,6 +1,6 @@
 # Tamil
 
-Dark and light themes based on the colours of Tamil Nadu: the kolam at the threshold, the palm-leaf manuscript and the Kanchipuram loom. Provides two UI themes, **Tamil Kolam** and **Tamil Olai**, each with a matching editor colour scheme.
+Dark and light themes based on the colours of Tamil Nadu: the kolam at the threshold, the palm-leaf manuscript and the Kanchipuram loom. Provides two UI themes, **Tamil Kolam (Dark)** and **Tamil Olai (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -21,7 +21,7 @@ Syntax colours take the Tamil names of Kanchipuram silk shades:
 | Manthalir (மாந்தளிர்) | Tender mango leaf, copper pink | Type parameters |
 | Kungumam (குங்குமம்) | Vermilion powder | Spock labels |
 
-Tamil Kolam is rice-flour white drawn at dawn on a dark granite threshold (கோலம்). Tamil Olai is the palm leaf (ஓலைச்சுவடி) that carried Tamil literature, its incised letters blackened with lampblack. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
+Tamil Kolam (Dark) is rice-flour white drawn at dawn on a dark granite threshold (கோலம்). Tamil Olai (Light) is the palm leaf (ஓலைச்சுவடி) that carried Tamil literature, its incised letters blackened with lampblack. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
 
 ## Develop
 

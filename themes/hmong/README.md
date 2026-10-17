@@ -1,6 +1,6 @@
 # Hmong
 
-Dark and light themes based on the pleated hemp skirt of the Hmong of Vietnam, Laos, Thailand and southern China: indigo batik framed by bands of bright cross-stitch. Provides two UI themes, **Hmong Batik** and **Hmong Hemp**, each with a matching editor colour scheme.
+Dark and light themes based on the pleated hemp skirt of the Hmong of Vietnam, Laos, Thailand and southern China: indigo batik framed by bands of bright cross-stitch. Provides two UI themes, **Hmong Batik (Dark)** and **Hmong Hemp (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -21,7 +21,7 @@ The themes build their structure from the tones of the batik and take their colo
 | Orange | Cross-stitch | Numbers, constants |
 | Yellow | Cross-stitch | Annotations |
 
-Hmong Batik has the indigo-dyed cloth as its ground. Hmong Hemp has the undyed white hemp that the batik is drawn on. Hex values are interpretations of the dyed cloth and thread, adjusted for contrast against each background.
+Hmong Batik (Dark) has the indigo-dyed cloth as its ground. Hmong Hemp (Light) has the undyed white hemp that the batik is drawn on. Hex values are interpretations of the dyed cloth and thread, adjusted for contrast against each background.
 
 ## Develop
 

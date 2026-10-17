@@ -8,7 +8,7 @@
 # The cross-stitch adds the only colour: pink keywords, lime strings, orange numbers and constants, yellow
 # annotations. Batik is the indigo-dyed band; Hemp is the undyed white hemp it is drawn on.
 BATIK = dict(
-    name="Hmong Batik", dark=True, parent="Darcula",
+    name="Hmong Batik (Dark)", dark=True, parent="Darcula",
     bg="111522", bgUi="0D111B", bgTool="0F131F", frame="202738", surface="181D2C", hover="202638",
     border="262D42", fg="C6CAD4", muted="878FA6", disabled="525A72",
     caretRow="171C2B", selection="283454", selInactive="222A40", lineNo="4A5370", lineNoCaret="FF85C2",
@@ -25,7 +25,7 @@ BATIK = dict(
     ansiRed="F07E80", ansiGreen="98D47A", ansiYellow="F2D152", ansiBlue="86AEF5", ansiMagenta="E08ADA", ansiCyan="6DCFD8",
 )
 HEMP = dict(
-    name="Hmong Hemp", dark=False, parent="Default",
+    name="Hmong Hemp (Light)", dark=False, parent="Default",
     bg="F2F0E9", bgUi="E7E4DB", bgTool="EEEBE3", frame="DAD5CA", surface="FAF9F4", hover="DFDBD0",
     border="D3CFC3", fg="302E2B", muted="68676A", disabled="A8A7A4",
     caretRow="EAE8E0", selection="D3DCF0", selInactive="E2E2E2", lineNo="A6A69E", lineNoCaret="AD1068",

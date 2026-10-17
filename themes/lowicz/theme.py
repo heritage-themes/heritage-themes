@@ -9,7 +9,7 @@
 # annotations, szary (grey) comments. Wycinanka is the black template a cut-out is layered on;
 # Kodra is the long white paper strip the cut-out village scenes are pasted along.
 WYCINANKA = dict(
-    name="Łowicz Wycinanka", dark=True, parent="Darcula",
+    name="Łowicz Wycinanka (Dark)", dark=True, parent="Darcula",
     bg="171616", bgUi="121111", bgTool="141313", frame="292826", surface="201F1E", hover="2A2827",
     border="312E2C", fg="EEEBE4", muted="9A958C", disabled="5E5A55",
     caretRow="201E1C", selection="3A3128", selInactive="2C2926", lineNo="58544E", lineNoCaret="F49A48",
@@ -26,7 +26,7 @@ WYCINANKA = dict(
     ansiRed="F07E70", ansiGreen="95D27E", ansiYellow="EDD660", ansiBlue="7FB0F5", ansiMagenta="D795D8", ansiCyan="6DCFD8",
 )
 KODRA = dict(
-    name="Łowicz Kodra", dark=False, parent="Default",
+    name="Łowicz Kodra (Light)", dark=False, parent="Default",
     bg="F8F7F3", bgUi="EDEBE5", bgTool="F2F0EB", frame="DEDAD2", surface="FDFCFA", hover="E4E1D9",
     border="D8D4CA", fg="1E1D1B", muted="6C6862", disabled="A9A49B",
     caretRow="F0EEE8", selection="F3DDC6", selInactive="E6E3DC", lineNo="A8A398", lineNoCaret="AE4A00",

@@ -1,6 +1,6 @@
 # Gujarat
 
-Dark and light themes based on the colours of Gujarat: Navratri nights, the white Rann of Kutch, patola silk and the kites of Uttarayan. Provides two UI themes, **Gujarat Navratri** and **Gujarat Rann**, each with a matching editor colour scheme.
+Dark and light themes based on the colours of Gujarat: Navratri nights, the white Rann of Kutch, patola silk and the kites of Uttarayan. Provides two UI themes, **Gujarat Navratri (Dark)** and **Gujarat Rann (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -21,7 +21,7 @@ Each syntax role takes one colour of the region:
 | Sandstone | Stepwells (vav) | Type parameters |
 | Abhla (આભલા) silver | Small mirrors sewn into Kutchi cloth | Spock labels, caret on Navratri |
 
-Gujarat Navratri is the nine nights of garba (નવરાત્રિ), danced in mirror-worked cloth under the lights. Gujarat Rann is the salt desert of Kutch (રણ), a cool white plain under a pale sky. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
+Gujarat Navratri (Dark) is the nine nights of garba (નવરાત્રિ), danced in mirror-worked cloth under the lights. Gujarat Rann (Light) is the salt desert of Kutch (રણ), a cool white plain under a pale sky. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
 
 ## Develop
 

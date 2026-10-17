@@ -1,6 +1,6 @@
 # Punjab
 
-Dark and light themes based on the colours of Punjab: phulkari (ਫੁਲਕਾਰੀ) embroidery and the mustard fields of Basant (ਬਸੰਤ). Provides two UI themes, **Punjab Phulkari** and **Punjab Basant**, each with a matching editor colour scheme.
+Dark and light themes based on the colours of Punjab: phulkari (ਫੁਲਕਾਰੀ) embroidery and the mustard fields of Basant (ਬਸੰਤ). Provides two UI themes, **Punjab Phulkari (Dark)** and **Punjab Basant (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -20,9 +20,9 @@ Syntax colours are the pat (ਪੱਟ) floss silks of phulkari and the fields. G
 | Lal (ਲਾਲ) | Crimson silk | Annotations |
 | Asmani (ਅਸਮਾਨੀ) | Sky blue | Type parameters |
 | Paranda rose | Rose silk of the paranda | Spock labels |
-| Chitta (ਚਿੱਟਾ) | White thread | Text on Punjab Phulkari |
+| Chitta (ਚਿੱਟਾ) | White thread | Text on Punjab Phulkari (Dark) |
 
-Punjab Phulkari is floss-silk embroidery on handspun khaddar (ਖੱਦਰ) dyed a deep madder rust. Punjab Basant is the spring festival when the sarson (ਸਰ੍ਹੋਂ) fields flower: a mustard-yellow editor framed in the sage green of the stalks. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
+Punjab Phulkari (Dark) is floss-silk embroidery on handspun khaddar (ਖੱਦਰ) dyed a deep madder rust. Punjab Basant (Light) is the spring festival when the sarson (ਸਰ੍ਹੋਂ) fields flower: a mustard-yellow editor framed in the sage green of the stalks. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
 
 ## Develop
 

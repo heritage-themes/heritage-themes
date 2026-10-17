@@ -11,7 +11,7 @@
 # dress, set against greyer plain text. Qernertoq ("black") has black sealskin as its ground; Qaqortoq ("white")
 # has the white kamik.
 QERNERTOQ = dict(
-    name="Kalaallisuut Qernertoq", dark=True, parent="Darcula",
+    name="Kalaallisuut Qernertoq (Dark)", dark=True, parent="Darcula",
     bg="13171C", bgUi="0F1317", bgTool="11151A", frame="222932", surface="1A1F26", hover="222831",
     border="2A313A", fg="A3AAB3", muted="8C939C", disabled="4C545E",
     caretRow="1A1F26", selection="2C3646", selInactive="222A36", lineNo="4E5762", lineNoCaret="F0F2F4",
@@ -28,7 +28,7 @@ QERNERTOQ = dict(
     ansiRed="F07E7E", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 QAQORTOQ = dict(
-    name="Kalaallisuut Qaqortoq", dark=False, parent="Default",
+    name="Kalaallisuut Qaqortoq (Light)", dark=False, parent="Default",
     bg="F3F3F0", bgUi="E8E8E4", bgTool="EEEEEA", frame="D8D8D3", surface="FAFAF8", hover="DEDED8",
     border="D2D2CC", fg="43474E", muted="686C72", disabled="ACADA8",
     caretRow="ECECE8", selection="D4DCEA", selInactive="E2E3E2", lineNo="A8AAA6", lineNoCaret="B0222C",

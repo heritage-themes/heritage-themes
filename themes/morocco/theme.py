@@ -8,7 +8,7 @@
 # Syntax colours are lightened so they hold 4.5:1 on these vivid grounds, and none repeats the
 # background's own hue, which would vibrate or vanish. Spock labels are bold off-white, like whitewash.
 MAJORELLE = dict(
-    name="Morocco Majorelle", dark=True, parent="Darcula",
+    name="Morocco Majorelle (Dark)", dark=True, parent="Darcula",
     bg="161F66", bgUi="101757", bgTool="131B5E", frame="212C80", surface="212C80", hover="2A3796",
     border="2F3C94", fg="F4EEDD", muted="9AA4E0", disabled="6471BC",
     caretRow="1B2677", selection="2C3B92", selInactive="2D3A93", lineNo="7581CC", lineNoCaret="F6C945",
@@ -25,7 +25,7 @@ MAJORELLE = dict(
     ansiRed="FF7A8A", ansiGreen="86E0A0", ansiYellow="F6C945", ansiBlue="8FB0FF", ansiMagenta="FF8FBF", ansiCyan="4FE0D4",
 )
 MARRAKECH = dict(
-    name="Morocco Marrakech", dark=True, parent="Darcula",
+    name="Morocco Marrakech (Dark)", dark=True, parent="Darcula",
     bg="4F1D14", bgUi="3F160E", bgTool="47190F", frame="62291C", surface="63291C", hover="72321F",
     border="7A3A28", fg="F7EDDE", muted="D0A593", disabled="9A6C5A",
     caretRow="5A2218", selection="374A50", selInactive="4A4649", lineNo="B07C68", lineNoCaret="FFD84D",
@@ -42,7 +42,7 @@ MARRAKECH = dict(
     ansiRed="FFA0A0", ansiGreen="A6E6A0", ansiYellow="FFD84D", ansiBlue="8FC6FF", ansiMagenta="F5A3C0", ansiCyan="5FDDD2",
 )
 ZELLIGE = dict(
-    name="Morocco Zellige", dark=True, parent="Darcula",
+    name="Morocco Zellige (Dark)", dark=True, parent="Darcula",
     bg="0A4036", bgUi="062F25", bgTool="07372B", frame="104F42", surface="115144", hover="186050",
     border="1D6656", fg="F1F0E3", muted="97CDBE", disabled="5E9A89",
     caretRow="0F4B3E", selection="35466E", selInactive="39485D", lineNo="6AA898", lineNoCaret="FFE27A",

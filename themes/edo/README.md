@@ -1,6 +1,6 @@
 # Edo
 
-Dark and light themes based on the muted dress colours of Edo-period Japan. Every syntax role has its own hue, and every hue is subdued. Provides two UI themes, **Edo Cha** and **Edo Nezumi**, each with a matching editor colour scheme.
+Dark and light themes based on the muted dress colours of Edo-period Japan. Every syntax role has its own hue, and every hue is subdued. Provides two UI themes, **Edo Cha (Dark)** and **Edo Nezumi (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -19,7 +19,7 @@ Sumptuary laws of the Edo period (1603–1868) kept townspeople to brown (茶, *
 | 銀鼠 *gin-nezumi*, silver grey | 鼠 grey | Plain text |
 | 紅絹 *momi*, red silk | Lining | Caret, Spock labels, TODOs; buttons and the Run widget |
 
-Edo Cha has a dark tea-brown ground; Edo Nezumi a pale grey one. Hex values are interpretations of the named shades, which vary between sources, adjusted for contrast against each background.
+Edo Cha (Dark) has a dark tea-brown ground; Edo Nezumi (Light) a pale grey one. Hex values are interpretations of the named shades, which vary between sources, adjusted for contrast against each background.
 
 ## Develop
 

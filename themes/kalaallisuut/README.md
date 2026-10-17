@@ -1,6 +1,6 @@
 # Kalaallisuut
 
-Dark and light themes based on the West Greenlandic national dress, *kalaallisuut*. Provides two UI themes, **Kalaallisuut Qernertoq** and **Kalaallisuut Qaqortoq**, each with a matching editor colour scheme.
+Dark and light themes based on the West Greenlandic national dress, *kalaallisuut*. Provides two UI themes, **Kalaallisuut Qernertoq (Dark)** and **Kalaallisuut Qaqortoq (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -17,7 +17,7 @@ The colours of a woman's *kalaallisuut* show her age and marital status, a custo
 | Green, *qorsuk* | The edging of the bead collar | Method declarations and calls |
 | White, *qaqortoq*, and black, *qernertoq* | Kamiks, festive anorak, sealskin trousers | Fields, against greyer plain text |
 
-Kalaallisuut Qernertoq has black sealskin as its ground; Kalaallisuut Qaqortoq has the white kamik. The colour rules vary between regions and families. Hex values are interpretations of the dyed cloth, beads and skin, adjusted for contrast against each background.
+Kalaallisuut Qernertoq (Dark) has black sealskin as its ground; Kalaallisuut Qaqortoq (Light) has the white kamik. The colour rules vary between regions and families. Hex values are interpretations of the dyed cloth, beads and skin, adjusted for contrast against each background.
 
 ## Develop
 

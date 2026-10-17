@@ -1,6 +1,6 @@
 # Aizome
 
-Dark and light themes based on Japanese indigo dyeing (藍染, *aizome*). The whole palette is a single hue; hierarchy comes from the depth of the dye. Provides two UI themes, **Aizome Kachi** and **Aizome Kamenozoki**, each with a matching editor colour scheme.
+Dark and light themes based on Japanese indigo dyeing (藍染, *aizome*). The whole palette is a single hue; hierarchy comes from the depth of the dye. Provides two UI themes, **Aizome Kachi (Dark)** and **Aizome Kamenozoki (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -19,7 +19,7 @@ Indigo dyers speak of 藍四十八色 ("indigo has forty-eight colours"): each e
 | 藍鼠 *ainezumi*, grey indigo | Keywords, punctuation, annotations |
 | 藍 *ai*, deep indigo | Comments |
 
-Aizome Kachi has *kachi-iro* as its ground; Aizome Kamenozoki has the palest dip. Errors, warnings and diffs keep their usual colours. Hex values are interpretations of dyed cloth, adjusted for contrast against each background.
+Aizome Kachi (Dark) has *kachi-iro* as its ground; Aizome Kamenozoki (Light) has the palest dip. Errors, warnings and diffs keep their usual colours. Hex values are interpretations of dyed cloth, adjusted for contrast against each background.
 
 ## Develop
 

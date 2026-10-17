@@ -1,6 +1,6 @@
 # Mughal
 
-Dark and light themes based on Mughal miniature painting, the court art of the ateliers of Akbar, Jahangir and Shah Jahan. Provides two UI themes, **Mughal Night** and **Mughal Wasli**, each with a matching editor colour scheme.
+Dark and light themes based on Mughal miniature painting, the court art of the ateliers of Akbar, Jahangir and Shah Jahan. Provides two UI themes, **Mughal Night** and **Mughal Wasli (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -20,7 +20,7 @@ Every colour is a pigment from the painter's box, named in Persian, the language
 | Azurite | Blue copper mineral | Annotations |
 | Malachite | Green copper mineral | Type parameters |
 
-Mughal Night is a lamp-lit night scene. Mughal Wasli is burnished wasli (وصلی), the layered paper the miniatures were painted on; its chrome takes the salmon-buff of the hashiya (حاشیه) margins. The main accent is lapis ruled with gold, like the jadval (جدول) borders of an album page. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
+Mughal Night is a lamp-lit night scene. Mughal Wasli (Light) is burnished wasli (وصلی), the layered paper the miniatures were painted on; its chrome takes the salmon-buff of the hashiya (حاشیه) margins. The main accent is lapis ruled with gold, like the jadval (جدول) borders of an album page. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
 
 ## Develop
 

@@ -9,7 +9,7 @@
 # for strings, and the willow fire for numbers, constants and Spock labels. Qir has the bitumen black of the
 # tarred mashoof canoes as its ground; Qasab has the peeled reed.
 QIR = dict(
-    name="Mudhif Qir", dark=True, parent="Darcula", kwBold=True,
+    name="Mudhif Qir (Dark)", dark=True, parent="Darcula", kwBold=True,
     bg="17140E", bgUi="13100B", bgTool="15120D", frame="2B261D", surface="1F1B14", hover="28231A",
     border="2F2920", fg="C2B596", muted="958A70", disabled="554D3E",
     caretRow="1E1A13", selection="3A3220", selInactive="2C2619", lineNo="5A5140", lineNoCaret="E2B44A",
@@ -26,7 +26,7 @@ QIR = dict(
     ansiRed="F07E6E", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 QASAB = dict(
-    name="Mudhif Qasab", dark=False, parent="Default", kwBold=True,
+    name="Mudhif Qasab (Light)", dark=False, parent="Default", kwBold=True,
     bg="F4EEDC", bgUi="EAE2CC", bgTool="F0E9D5", frame="DED3B9", surface="FAF6EA", hover="E2D8BE",
     border="D6CBAE", fg="463C28", muted="6E6248", disabled="ADA180",
     caretRow="EDE5CF", selection="E2D4A8", selInactive="E8DEC2", lineNo="AA9E80", lineNoCaret="7A5600",

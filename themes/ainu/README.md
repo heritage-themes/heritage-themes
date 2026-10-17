@@ -1,6 +1,6 @@
 # Ainu
 
-Dark and light themes based on the appliqué robes of the Ainu of Hokkaido, Japan. Provides two UI themes, **Ainu Kaparamip** and **Ainu Attus**, each with a matching editor colour scheme.
+Dark and light themes based on the appliqué robes of the Ainu of Hokkaido, Japan. Provides two UI themes, **Ainu Kaparamip (Dark)** and **Ainu Attus (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -12,12 +12,12 @@ Ainu has four basic colour words, and each covers a range of colours. The themes
 
 | Word | Range | Role |
 | --- | --- | --- |
-| *Kunne* (クンネ) | Dark: black to navy | The ground of Ainu Kaparamip; keywords and types in Ainu Attus |
-| *Retar* (レタㇻ) | Light: white to pale yellow and pale blue | Keywords and types in Ainu Kaparamip |
+| *Kunne* (クンネ) | Dark: black to navy | The ground of Ainu Kaparamip (Dark); keywords and types in Ainu Attus (Light) |
+| *Retar* (レタㇻ) | Light: white to pale yellow and pale blue | Keywords and types in Ainu Kaparamip (Dark) |
 | *Hure* (フレ) | Red: pink to orange | Method declarations and calls, Spock labels, caret; buttons and the Run widget |
 | *Siwnin* (シウニン) | Green to yellow and blue-violet | Green strings, yellow fields, blue-violet numbers, constants and annotations |
 
-Keywords are the appliqué, set bold: white cotton on the indigo, indigo cotton on the elm bark. Types take another tone of it. Red marks method declarations, the openings of the code. The green of the strings is the couching thread. Ainu Kaparamip has the indigo cotton as its ground; Ainu Attus has the elm-bark cloth. Hex values are interpretations of the dyed cotton, bark fibre and thread, adjusted for contrast against each background.
+Keywords are the appliqué, set bold: white cotton on the indigo, indigo cotton on the elm bark. Types take another tone of it. Red marks method declarations, the openings of the code. The green of the strings is the couching thread. Ainu Kaparamip (Dark) has the indigo cotton as its ground; Ainu Attus (Light) has the elm-bark cloth. Hex values are interpretations of the dyed cotton, bark fibre and thread, adjusted for contrast against each background.
 
 ## Develop
 

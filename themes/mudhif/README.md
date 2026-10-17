@@ -1,6 +1,6 @@
 # Mudhif
 
-Dark and light themes based on the *mudhif* (مضيف), the reed guest house of the Marsh Arabs of southern Iraq. Hierarchy comes from the tone and weight of one reed colour, not from hue. Provides two UI themes, **Mudhif Qir** and **Mudhif Qasab**, each with a matching editor colour scheme.
+Dark and light themes based on the *mudhif* (مضيف), the reed guest house of the Marsh Arabs of southern Iraq. Hierarchy comes from the tone and weight of one reed colour, not from hue. Provides two UI themes, **Mudhif Qir (Dark)** and **Mudhif Qasab (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -19,7 +19,7 @@ A mudhif is a vault of bundled reed (*qasab*, قصب) arches covered in reed mat
 | Strings | Green of new reed shoots |
 | Numbers, constants, Spock labels | Willow fire on the hearth |
 
-Mudhif Qir has the bitumen black of the mashoof as its ground; Mudhif Qasab has the peeled reed. Hex values are interpretations of reed, bitumen and firelight, adjusted for contrast against each background.
+Mudhif Qir (Dark) has the bitumen black of the mashoof as its ground; Mudhif Qasab (Light) has the peeled reed. Hex values are interpretations of reed, bitumen and firelight, adjusted for contrast against each background.
 
 ## Develop
 

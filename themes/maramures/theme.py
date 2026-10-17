@@ -10,7 +10,7 @@
 # declarations and calls, and the waistcoat leather for fields. Zadie has the black wool of the aprons as its
 # ground; Cânepă has the white hemp of the shirt.
 ZADIE = dict(
-    name="Maramureș Zadie", dark=True, parent="Darcula",
+    name="Maramureș Zadie (Dark)", dark=True, parent="Darcula",
     bg="141312", bgUi="100F0E", bgTool="121110", frame="272622", surface="1C1B19", hover="252321",
     border="2D2A27", fg="C2BCB0", muted="958F85", disabled="56524C",
     caretRow="1C1A18", selection="38322C", selInactive="2A2622", lineNo="56514A", lineNoCaret="EE6A5E",
@@ -27,7 +27,7 @@ ZADIE = dict(
     ansiRed="F07E6E", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 CANEPA = dict(
-    name="Maramureș Cânepă", dark=False, parent="Default",
+    name="Maramureș Cânepă (Light)", dark=False, parent="Default",
     bg="F2EEE4", bgUi="E8E2D6", bgTool="EEE9DE", frame="DCD3C5", surface="F9F7F1", hover="DFD9CB",
     border="D3CCBE", fg="2E2A26", muted="68625A", disabled="ACA598",
     caretRow="EBE6DA", selection="D8DCE6", selInactive="E4E0D6", lineNo="A8A194", lineNoCaret="B0261E",
