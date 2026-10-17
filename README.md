@@ -8,6 +8,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`themes/aizome/`](themes/aizome/) | Aizome Kachi, Aizome Kamenozoki | Japan |
 | [`themes/bengal/`](themes/bengal/) | Bengal Baluchari, Bengal Laal Paar | India, Bangladesh |
 | [`themes/danqing/`](themes/danqing/) | Danqing Ink, Danqing Paper | China |
+| [`themes/edo/`](themes/edo/) | Edo Cha, Edo Nezumi | Japan |
 | [`themes/gujarat/`](themes/gujarat/) | Gujarat Navratri, Gujarat Rann | India |
 | [`themes/hmong/`](themes/hmong/) | Hmong Batik, Hmong Hemp | Vietnam, Laos, Thailand, China |
 | [`themes/holi/`](themes/holi/) | Holi Day, Holi Night | India |
