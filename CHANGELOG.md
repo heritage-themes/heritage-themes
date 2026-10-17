@@ -33,3 +33,4 @@
 - Shaker Prussian and Shaker Plaster, drawn from the paint of the Shaker villages and the Millennial Laws.
 - Kalaallisuut Qernertoq and Kalaallisuut Qaqortoq, drawn from the colours for age and marital status in the West Greenlandic national dress.
 - Mudhif Qir and Mudhif Qasab, drawn from the reed guest houses of the Marsh Arabs of southern Iraq.
+- Maramureș Zadie and Maramureș Cânepă, drawn from the striped aprons and flowered skirts of Maramureș, coloured by age.

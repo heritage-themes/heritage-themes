@@ -15,6 +15,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`themes/kashubia/`](themes/kashubia/) | Kashubia Niebò, Kashubia Zemia | Poland |
 | [`themes/kerala/`](themes/kerala/) | Kerala Backwaters, Kerala Kasavu | India |
 | [`themes/lowicz/`](themes/lowicz/) | Łowicz Kodra, Łowicz Wycinanka | Poland |
+| [`themes/maramures/`](themes/maramures/) | Maramureș Cânepă, Maramureș Zadie | Romania |
 | [`themes/maya/`](themes/maya/) | Maya Corte, Maya Huipil | Guatemala |
 | [`themes/morocco/`](themes/morocco/) | Morocco Majorelle, Morocco Marrakech, Morocco Zellige | Morocco |
 | [`themes/mudhif/`](themes/mudhif/) | Mudhif Qasab, Mudhif Qir | Iraq |
