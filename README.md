@@ -44,7 +44,7 @@ Download from the [GitHub releases](https://github.com/heritage-themes/heritage-
 - Plugin: `heritage-themes-<version>.jar`. In the IDE choose **Settings | Plugins | ⚙ | Install Plugin from Disk…**, select the jar and restart. Then choose a theme under **Settings | Appearance & Behavior | Appearance | Theme**.
 - Editor colour scheme only: an `.icls` file. Choose **Settings | Editor | Color Scheme | ⚙ | Import Scheme…** and select the file.
 
-The themes work in IntelliJ-based IDEs, such as IntelliJ IDEA, PyCharm, WebStorm and Android Studio.
+The themes work in IntelliJ-based IDEs version 2025.3 or later, such as IntelliJ IDEA, PyCharm, WebStorm and Android Studio, and use the Islands UI: the editor and tool windows sit as rounded islands on the main window.
 
 ## Build from source
 

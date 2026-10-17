@@ -6,8 +6,8 @@
 # azure/blue = trust (methods), turquoise = imperial decorative arts (fields),
 # copper = metals table (annotations), ink-wash grey = restraint (comments).
 NIGHT = dict(
-    name="Wuxing Night", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="171B26", bgUi="13161F", bgTool="151923", surface="1E2332", hover="242A3B",
+    name="Wuxing Night", dark=True, parent="Darcula",
+    bg="171B26", bgUi="13161F", bgTool="151923", frame="252B3D", surface="1E2332", hover="242A3B",
     border="262C3D", fg="E6DCC8", muted="8A8577", disabled="5C5F6B",
     caretRow="1C2130", selection="2D3754", selInactive="252C40", lineNo="4A5064", lineNoCaret="C9A24A",
     guide="232838", guideSel="3A4258",
@@ -23,8 +23,8 @@ NIGHT = dict(
     ansiRed="E8705F", ansiGreen="8CC88E", ansiYellow="E8BE52", ansiBlue="7EA8F2", ansiMagenta="C59BE3", ansiCyan="45BFC8",
 )
 DAY = dict(
-    name="Wuxing Day", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="F6F0E1", bgUi="EDE5D2", bgTool="F0E9D8", surface="FBF7EC", hover="E4DAC3",
+    name="Wuxing Day", dark=False, parent="Default",
+    bg="F6F0E1", bgUi="EDE5D2", bgTool="F0E9D8", frame="DFD3BA", surface="FBF7EC", hover="E4DAC3",
     border="D9CEB6", fg="2B3040", muted="6E6A5C", disabled="ADA694",
     caretRow="EFE6D1", selection="D3DBEE", selInactive="E0E2E6", lineNo="B3AA94", lineNoCaret="8A5F00",
     guide="E6DDC8", guideSel="CDBF9F",

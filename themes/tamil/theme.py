@@ -9,8 +9,8 @@
 # kathiri poo (brinjal flower) constants, maragatham (emerald) annotations,
 # manthalir (tender mango leaf, copper pink) type parameters. Spock labels are kumkumam vermilion.
 KOLAM = dict(
-    name="Tamil Kolam", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="181C1C", bgUi="141717", bgTool="161A1A", surface="202525", hover="283030",
+    name="Tamil Kolam", dark=True, parent="Darcula",
+    bg="181C1C", bgUi="141717", bgTool="161A1A", frame="272D2D", surface="202525", hover="283030",
     border="2A3131", fg="F2EFE6", muted="8D9592", disabled="59615F",
     caretRow="1E2323", selection="2A3E44", selInactive="253234", lineNo="4C5655", lineNoCaret="EBC35A",
     guide="202626", guideSel="3A4444",
@@ -26,8 +26,8 @@ KOLAM = dict(
     ansiRed="EE6E80", ansiGreen="9CD86A", ansiYellow="EBC35A", ansiBlue="7AA8F5", ansiMagenta="D98AE0", ansiCyan="45C6D6",
 )
 OLAI = dict(
-    name="Tamil Olai", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="F3EBD2", bgUi="E7DCBC", bgTool="EDE3C7", surface="F9F4E4", hover="DDD0AC",
+    name="Tamil Olai", dark=False, parent="Default",
+    bg="F3EBD2", bgUi="E7DCBC", bgTool="EDE3C7", frame="DCCEA8", surface="F9F4E4", hover="DDD0AC",
     border="D4C59E", fg="1F1C16", muted="6A6352", disabled="A69C80",
     caretRow="ECE2C6", selection="CFE3E2", selInactive="E0E0D4", lineNo="A79A78", lineNoCaret="0B6672",
     guide="E5DAC0", guideSel="CDBD95",

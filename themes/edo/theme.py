@@ -8,8 +8,8 @@
 # 銀鼠 gin-nezumi plain text. The red silk lining (紅絹 momi) hidden inside sober kimono (裏勝り) marks
 # the caret, Spock labels and TODOs. Cha has a tea-brown ground; Nezumi a pale grey one.
 CHA = dict(
-    name="Edo Cha", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="191410", bgUi="130E0B", bgTool="17110D", surface="221C17", hover="2A241E",
+    name="Edo Cha", dark=True, parent="Darcula",
+    bg="191410", bgUi="130E0B", bgTool="17110D", frame="2D261F", surface="221C17", hover="2A241E",
     border="2F2923", fg="C2BDB5", muted="8E8881", disabled="57514C",
     caretRow="1F1915", selection="2A3741", selInactive="202930", lineNo="564E48", lineNoCaret="E8605B",
     guide="241E1A", guideSel="3E3631",
@@ -25,8 +25,8 @@ CHA = dict(
     ansiRed="E66E68", ansiGreen="7ABA7C", ansiYellow="DCBA5C", ansiBlue="73ABDA", ansiMagenta="C88EC3", ansiCyan="6CBEC2",
 )
 NEZUMI = dict(
-    name="Edo Nezumi", dark=False, parent="Default", parentTheme="ExperimentalLight", kwBold=False,
-    bg="F2F0EC", bgUi="E9E6E1", bgTool="EEEBE6", surface="F9F6F3", hover="E0DCD6",
+    name="Edo Nezumi", dark=False, parent="Default", kwBold=False,
+    bg="F2F0EC", bgUi="E9E6E1", bgTool="EEEBE6", frame="DAD5CF", surface="F9F6F3", hover="E0DCD6",
     border="D5D0CA", fg="3A342F", muted="6E6862", disabled="A9A49E",
     caretRow="EBE7E2", selection="C9DAE7", selInactive="D9E3EA", lineNo="A39D97", lineNoCaret="BA2B2E",
     guide="E4E1DC", guideSel="C6C0B9",

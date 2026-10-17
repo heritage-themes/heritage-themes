@@ -9,8 +9,8 @@
 # (ultramarine, the blue of window frames and blue flowers) fields, żółty (yellow) numbers and constants,
 # błękit (sky blue, the painted stoves) annotations. Sadza is the soot plinth; Wapno is the lime-washed wall.
 SADZA = dict(
-    name="Zalipie Sadza", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="1C1B1A", bgUi="171615", bgTool="1A1918", surface="252321", hover="2E2C29",
+    name="Zalipie Sadza", dark=True, parent="Darcula",
+    bg="1C1B1A", bgUi="171615", bgTool="1A1918", frame="2E2B28", surface="252321", hover="2E2C29",
     border="36332F", fg="E6E2DA", muted="938D84", disabled="5E5A54",
     caretRow="242220", selection="2D3954", selInactive="2C2F36", lineNo="5C5750", lineNoCaret="D6A47C",
     guide="262422", guideSel="3E3A35",
@@ -26,8 +26,8 @@ SADZA = dict(
     ansiRed="F07E70", ansiGreen="95D27E", ansiYellow="EAD06C", ansiBlue="7FB0F5", ansiMagenta="D795D8", ansiCyan="6DCFD8",
 )
 WAPNO = dict(
-    name="Zalipie Wapno", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="F2F4F3", bgUi="E6E9E8", bgTool="EDEFEE", surface="FAFBFB", hover="DDE1E0",
+    name="Zalipie Wapno", dark=False, parent="Default",
+    bg="F2F4F3", bgUi="E6E9E8", bgTool="EDEFEE", frame="D6DAD9", surface="FAFBFB", hover="DDE1E0",
     border="D0D5D4", fg="242220", muted="6A6863", disabled="A6A8A4",
     caretRow="EAEDEC", selection="D2DCF0", selInactive="E0E3E4", lineNo="A2A6A3", lineNoCaret="8C4A22",
     guide="E2E6E5", guideSel="C6CCCA",

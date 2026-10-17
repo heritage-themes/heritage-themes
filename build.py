@@ -14,6 +14,36 @@ CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
 VERSION = "1.0.0"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 PLUGIN_ICONS = ("pluginIcon.svg", "pluginIcon_dark.svg")
+SINCE_BUILD = "253"  # 2025.3, the first release with the Islands Dark and Islands Light parent themes
+# Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
+FRAME_CONTRAST = 1.20
+
+
+def luminance(hex_colour):
+    channels = [int(hex_colour[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+    r, g, b = (c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in channels)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def check_frame(palette):
+    """Fails the build when the frame does not stand apart from the editor and tool windows as Islands needs."""
+    frame = luminance(palette["frame"])
+    for key in ("bg", "bgTool"):
+        island = luminance(palette[key])
+        ratio = (max(frame, island) + 0.05) / (min(frame, island) + 0.05)
+        if (frame > island) != palette["dark"] or ratio < FRAME_CONTRAST:
+            side = "lighter" if palette["dark"] else "darker"
+            raise SystemExit(f"{palette['name']}: frame must be {side} than {key} by {FRAME_CONTRAST:.2f}:1, "
+                             f"is {ratio:.2f}:1 {'lighter' if frame > island else 'darker'}")
+
+
+def check_references(t):
+    """Fails the build when a UI colour names a colour the theme does not define."""
+    colours = t["theme"]["colors"]
+    for key, value in t["theme"]["ui"].items():
+        for name in value.values() if isinstance(value, dict) else [value]:
+            if isinstance(name, str) and not name.startswith("#") and name not in colours:
+                raise SystemExit(f"{t['name']}: UI key {key} names undefined colour {name}")
 
 
 def change_notes():
@@ -67,7 +97,7 @@ def plugin_xml(families, themes):
     <b>{VERSION}</b>
 {change_notes()}
   ]]></change-notes>
-  <idea-version since-build="233"/>
+  <idea-version since-build="{SINCE_BUILD}"/>
   <depends>com.intellij.modules.platform</depends>
   <extensions defaultExtensionNs="com.intellij">
 {providers}
@@ -106,6 +136,11 @@ def main():
         values = [t[key] for t in themes]
         if len(values) != len(set(values)):
             raise SystemExit(f"duplicate theme {key}")
+    for f in families:
+        for t in f.THEMES:
+            check_frame(t["palette"])
+    for t in themes:
+        check_references(t)
 
     shutil.rmtree(OUT, ignore_errors=True)
     os.makedirs(os.path.join(OUT, "schemes"))

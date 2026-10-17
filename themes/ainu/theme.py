@@ -11,8 +11,8 @@
 # thread), yellow fields and blue-violet numbers, constants and annotations. Kaparamip has the indigo cotton
 # as its ground; Attus has the elm-bark cloth.
 KAPARAMIP = dict(
-    name="Ainu Kaparamip", dark=True, parent="Darcula", parentTheme="ExperimentalDark", kwBold=True,
-    bg="141A2D", bgUi="101524", bgTool="121829", surface="1B2238", hover="242C45",
+    name="Ainu Kaparamip", dark=True, parent="Darcula", kwBold=True,
+    bg="141A2D", bgUi="101524", bgTool="121829", frame="222B44", surface="1B2238", hover="242C45",
     border="2E3752", fg="B0B4C0", muted="959BB0", disabled="545B74",
     caretRow="1B2236", selection="2E3A5E", selInactive="242D48", lineNo="555D78", lineNoCaret="EE705E",
     guide="1E2539", guideSel="3A4462",
@@ -28,8 +28,8 @@ KAPARAMIP = dict(
     ansiRed="F07E6E", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 ATTUS = dict(
-    name="Ainu Attus", dark=False, parent="Default", parentTheme="ExperimentalLight", kwBold=True,
-    bg="EEE6D4", bgUi="E3DAC6", bgTool="E9E1CE", surface="F6F1E6", hover="DBD1BC",
+    name="Ainu Attus", dark=False, parent="Default", kwBold=True,
+    bg="EEE6D4", bgUi="E3DAC6", bgTool="E9E1CE", frame="D7CCB6", surface="F6F1E6", hover="DBD1BC",
     border="CFC4AC", fg="34384A", muted="5C5C62", disabled="A8A08E",
     caretRow="E6DDC9", selection="D0D5E4", selInactive="DFDACD", lineNo="9F9682", lineNoCaret="B0281C",
     guide="E0D8C4", guideSel="C6BCA4",

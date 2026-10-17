@@ -9,8 +9,8 @@
 # lotus pink fields, kingfisher blue constants, kakkapoovu violet annotations,
 # cardamom-green type parameters, chutti rice-paste white text. Spock labels are zari gold.
 BACKWATERS = dict(
-    name="Kerala Backwaters", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="0F2219", bgUi="0C1C15", bgTool="0E1F17", surface="16291F", hover="1D3327",
+    name="Kerala Backwaters", dark=True, parent="Darcula",
+    bg="0F2219", bgUi="0C1C15", bgTool="0E1F17", frame="1F3226", surface="16291F", hover="1D3327",
     border="1F362A", fg="F0EADB", muted="879488", disabled="55655B",
     caretRow="14281E", selection="26443A", selInactive="1F3830", lineNo="465A50", lineNoCaret="E3B84A",
     guide="17291F", guideSel="2F4B3D",
@@ -26,8 +26,8 @@ BACKWATERS = dict(
     ansiRed="F27560", ansiGreen="A8D67A", ansiYellow="EDCB5E", ansiBlue="6CB8F5", ansiMagenta="EC8EBA", ansiCyan="4FD1CC",
 )
 KASAVU = dict(
-    name="Kerala Kasavu", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="F9F5E8", bgUi="EFE9D6", bgTool="F4EFDE", surface="FCF9EE", hover="E7DFC6",
+    name="Kerala Kasavu", dark=False, parent="Default",
+    bg="F9F5E8", bgUi="EFE9D6", bgTool="F4EFDE", frame="E2D9BF", surface="FCF9EE", hover="E7DFC6",
     border="DACEAC", fg="1F2420", muted="6B726B", disabled="A5A797",
     caretRow="F2ECD9", selection="D4E8DA", selInactive="E2E5D8", lineNo="AAA58D", lineNoCaret="A07000",
     guide="EAE3CE", guideSel="D5C8A4",

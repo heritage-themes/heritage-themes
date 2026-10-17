@@ -8,8 +8,8 @@
 # indigo-wash teal annotations. The canvas is a vat of indigo or unbleached cotton;
 # text is kasimi, the iron-black outline ink. Spock labels are bold madder red.
 INDIGO = dict(
-    name="Kalamkari Indigo", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="141C34", bgUi="11182D", bgTool="131A30", surface="1B243F", hover="222C4B",
+    name="Kalamkari Indigo", dark=True, parent="Darcula",
+    bg="141C34", bgUi="11182D", bgTool="131A30", frame="222C49", surface="1B243F", hover="222C4B",
     border="253152", fg="EDE3CF", muted="878DA2", disabled="565F7E",
     caretRow="18213D", selection="2C3B5E", selInactive="232E50", lineNo="485477", lineNoCaret="EE7A63",
     guide="1E2742", guideSel="364267",
@@ -25,8 +25,8 @@ INDIGO = dict(
     ansiRed="EE7A63", ansiGreen="A9C47F", ansiYellow="EAC46A", ansiBlue="93AAEB", ansiMagenta="DE8FB0", ansiCyan="6EC6B6",
 )
 COTTON = dict(
-    name="Kalamkari Cotton", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="F0E6CC", bgUi="E6DABC", bgTool="EBE0C4", surface="F6EED9", hover="DDCFAE",
+    name="Kalamkari Cotton", dark=False, parent="Default",
+    bg="F0E6CC", bgUi="E6DABC", bgTool="EBE0C4", frame="DACBA9", surface="F6EED9", hover="DDCFAE",
     border="D4C5A2", fg="2A2218", muted="6C6252", disabled="A69879",
     caretRow="E8DCBE", selection="CBD5EA", selInactive="DCD8C7", lineNo="A3936F", lineNoCaret="A3301F",
     guide="DFD2B3", guideSel="C7B58E",

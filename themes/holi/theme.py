@@ -7,8 +7,8 @@
 # neela blue methods, jamuni purple fields, firozi turquoise constants, lal red annotations.
 # Ember orange marks the caret; Spock labels are turmeric.
 NIGHT = dict(
-    name="Holi Night", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="1D1C1B", bgUi="181716", bgTool="1B1A19", surface="262426", hover="2E2B2F",
+    name="Holi Night", dark=True, parent="Darcula",
+    bg="1D1C1B", bgUi="181716", bgTool="1B1A19", frame="2F2C30", surface="262426", hover="2E2B2F",
     border="302D31", fg="ECE4DA", muted="8E8792", disabled="5F5A5E",
     caretRow="232123", selection="3B2D46", selInactive="302B33", lineNo="534E53", lineNoCaret="FF8A3D",
     guide="282628", guideSel="413C44",
@@ -24,8 +24,8 @@ NIGHT = dict(
     ansiRed="FF5468", ansiGreen="93D38C", ansiYellow="F5C842", ansiBlue="72AAF6", ansiMagenta="F2669C", ansiCyan="4FD0C2",
 )
 DAY = dict(
-    name="Holi Day", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="FBF9F5", bgUi="F1EDE6", bgTool="F6F3ED", surface="FFFFFC", hover="E9E3DA",
+    name="Holi Day", dark=False, parent="Default",
+    bg="FBF9F5", bgUi="F1EDE6", bgTool="F6F3ED", frame="E3DDD2", surface="FFFFFC", hover="E9E3DA",
     border="DFD8CD", fg="2A2430", muted="736B77", disabled="ADA6B1",
     caretRow="F4EFE7", selection="F4D3E2", selInactive="EDE4EA", lineNo="B1A9B1", lineNoCaret="C2185B",
     guide="ECE6DD", guideSel="D4CABE",

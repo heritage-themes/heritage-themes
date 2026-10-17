@@ -4,6 +4,8 @@
 
 ### Added
 
+- Islands UI for every theme: each palette has a main window colour, and the editor and tool windows sit on it as islands. Needs a 2025.3 or later IDE.
+
 - Wuxing Day and Wuxing Night, drawn from Chinese colour symbolism and the Five Elements.
 - Danqing Ink and Danqing Paper, drawn from Chinese painting pigments.
 - Shuimo Night and Shuimo Day, drawn from Chinese ink-wash painting.

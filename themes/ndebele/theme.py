@@ -8,8 +8,8 @@
 # method declarations and calls, yellow strings, red fields, pink numbers, constants and annotations. Nzima has
 # the black outline paint as its ground; Mhlophe has the white lime-wash.
 NZIMA = dict(
-    name="Ndebele Nzima", dark=True, parent="Darcula", parentTheme="ExperimentalDark", kwBold=True,
-    bg="161615", bgUi="111110", bgTool="141413", surface="1E1E1C", hover="272725",
+    name="Ndebele Nzima", dark=True, parent="Darcula", kwBold=True,
+    bg="161615", bgUi="111110", bgTool="141413", frame="282824", surface="1E1E1C", hover="272725",
     border="30302D", fg="BDBBB3", muted="8A8880", disabled="565550",
     caretRow="1D1D1B", selection="2C3A4A", selInactive="262B32", lineNo="51504B", lineNoCaret="F07A68",
     guide="20201E", guideSel="3A3A36",
@@ -25,8 +25,8 @@ NZIMA = dict(
     ansiRed="F07E70", ansiGreen="8CD47E", ansiYellow="F2CF5A", ansiBlue="7CB4F2", ansiMagenta="E08ADA", ansiCyan="6DCFD8",
 )
 MHLOPHE = dict(
-    name="Ndebele Mhlophe", dark=False, parent="Default", parentTheme="ExperimentalLight", kwBold=True,
-    bg="F4F2EC", bgUi="E9E7E0", bgTool="EFEDE6", surface="FBFAF6", hover="E0DDD5",
+    name="Ndebele Mhlophe", dark=False, parent="Default", kwBold=True,
+    bg="F4F2EC", bgUi="E9E7E0", bgTool="EFEDE6", frame="D9D7CF", surface="FBFAF6", hover="E0DDD5",
     border="D4D1C8", fg="46453F", muted="6C6A64", disabled="A9A7A0",
     caretRow="ECEAE3", selection="CFDFF0", selInactive="E0E1E2", lineNo="A8A69E", lineNoCaret="B42A1E",
     guide="E4E2DA", guideSel="C9C6BD",

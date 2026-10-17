@@ -8,8 +8,8 @@
 # bands of Winikunka (Rainbow Mountain), and yuraq alpaca white for text and Spock labels.
 # None repeats the background's own hue: no purple on Kulli, no red on Puka.
 KULLI = dict(
-    name="Peru Kulli", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="480F50", bgUi="3A0842", bgTool="410C49", surface="531C5C", hover="5D2966",
+    name="Peru Kulli", dark=True, parent="Darcula",
+    bg="480F50", bgUi="3A0842", bgTool="410C49", frame="572160", surface="531C5C", hover="5D2966",
     border="5F3466", fg="F8ECE0", muted="CAABCF", disabled="916A97",
     caretRow="501959", selection="374573", selInactive="393C5F", lineNo="A17EA6", lineNoCaret="F4D660",
     guide="4E1D55", guideSel="6B3F72",
@@ -25,8 +25,8 @@ KULLI = dict(
     ansiRed="FF7E76", ansiGreen="93E195", ansiYellow="F4D660", ansiBlue="80BDFB", ansiMagenta="F19FD6", ansiCyan="73DFDF",
 )
 PUKA = dict(
-    name="Peru Puka", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="720041", bgUi="610036", bgTool="6A003C", surface="7F124C", hover="8A2656",
+    name="Peru Puka", dark=True, parent="Darcula",
+    bg="720041", bgUi="610036", bgTool="6A003C", frame="83164F", surface="7F124C", hover="8A2656",
     border="89365B", fg="F8ECE0", muted="D8A8B9", disabled="A0667D",
     caretRow="7C0D49", selection="475585", selInactive="494C70", lineNo="AF7B8E", lineNoCaret="97ED9A",
     guide="781949", guideSel="964267",

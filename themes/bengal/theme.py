@@ -9,8 +9,8 @@
 # shankha conch-white text. The caret is the orange stem of the shiuli flower, and Spock labels
 # are pola red, the colour of the coral bangle worn with the conch-shell shankha.
 BALUCHARI = dict(
-    name="Bengal Baluchari", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="2A1220", bgUi="240E1B", bgTool="27101E", surface="341A2A", hover="3D2132",
+    name="Bengal Baluchari", dark=True, parent="Darcula",
+    bg="2A1220", bgUi="240E1B", bgTool="27101E", frame="3D2233", surface="341A2A", hover="3D2132",
     border="3F2335", fg="F2E8E0", muted="958590", disabled="695262",
     caretRow="311827", selection="4A2A42", selInactive="402439", lineNo="604558", lineNoCaret="FF9A3C",
     guide="351B2B", guideSel="52344A",
@@ -26,8 +26,8 @@ BALUCHARI = dict(
     ansiRed="FF6B5E", ansiGreen="A6D17E", ansiYellow="F2C94C", ansiBlue="7EA6FF", ansiMagenta="E58AD0", ansiCyan="5CCFBE",
 )
 LAAL_PAAR = dict(
-    name="Bengal Laal Paar", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="FBFAF7", bgUi="F1EEEA", bgTool="F6F4F0", surface="FFFFFF", hover="E9E4DE",
+    name="Bengal Laal Paar", dark=False, parent="Default",
+    bg="FBFAF7", bgUi="F1EEEA", bgTool="F6F4F0", frame="E3DDD8", surface="FFFFFF", hover="E9E4DE",
     border="E2D9D2", fg="201C1E", muted="6F676B", disabled="ABA4A6",
     caretRow="F5F1EC", selection="F6D5D2", selInactive="EAE4E3", lineNo="B0A8A6", lineNoCaret="C0202A",
     guide="EDE8E2", guideSel="D7CBC2",
