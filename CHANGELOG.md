@@ -31,3 +31,4 @@
 - Yolŋu Galawu and Yolŋu Gapaṉ, drawn from the ochres of Yolŋu bark painting in north-east Arnhem Land.
 - Ainu Kaparamip and Ainu Attus, drawn from the appliqué robes and four colour words of the Ainu.
 - Shaker Prussian and Shaker Plaster, drawn from the paint of the Shaker villages and the Millennial Laws.
+- Kalaallisuut Qernertoq and Kalaallisuut Qaqortoq, drawn from the colours for age and marital status in the West Greenlandic national dress.
