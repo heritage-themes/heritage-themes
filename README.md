@@ -17,6 +17,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 | [`themes/lowicz/`](themes/lowicz/) | Łowicz Kodra, Łowicz Wycinanka | Poland |
 | [`themes/maya/`](themes/maya/) | Maya Corte, Maya Huipil | Guatemala |
 | [`themes/morocco/`](themes/morocco/) | Morocco Majorelle, Morocco Marrakech, Morocco Zellige | Morocco |
+| [`themes/mudhif/`](themes/mudhif/) | Mudhif Qasab, Mudhif Qir | Iraq |
 | [`themes/mughal/`](themes/mughal/) | Mughal Night, Mughal Wasli | India, Pakistan |
 | [`themes/ndebele/`](themes/ndebele/) | Ndebele Mhlophe, Ndebele Nzima | South Africa |
 | [`themes/peru/`](themes/peru/) | Peru Kulli, Peru Puka | Peru |
