@@ -35,3 +35,4 @@
 - Mudhif Qir and Mudhif Qasab, drawn from the reed guest houses of the Marsh Arabs of southern Iraq.
 - Maramureș Zadie and Maramureș Cânepă, drawn from the striped aprons and flowered skirts of Maramureș, coloured by age.
 - Aizome Kachi and Aizome Kamenozoki, drawn from the forty-eight shades of Japanese indigo dyeing.
+- Edo Cha and Edo Nezumi, drawn from the forty-eight browns and hundred greys of Edo-period dress.
