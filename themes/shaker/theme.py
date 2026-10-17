@@ -9,8 +9,8 @@
 # pumpkin method declarations and calls, yellow ochre fields, chrome green types and annotations, and
 # verdigris numbers and constants. Prussian has the meetinghouse woodwork as its ground; Plaster has its walls.
 PRUSSIAN = dict(
-    name="Shaker Prussian", dark=True, parent="Darcula", parentTheme="ExperimentalDark", kwBold=True,
-    bg="0F1C28", bgUi="0C1720", bgTool="0E1A25", surface="172634", hover="1F3040",
+    name="Shaker Prussian", dark=True, parent="Darcula", kwBold=True,
+    bg="0F1C28", bgUi="0C1720", bgTool="0E1A25", frame="1C2D3C", surface="172634", hover="1F3040",
     border="283A4C", fg="B8BEC2", muted="909AA2", disabled="4E5C68",
     caretRow="162432", selection="2A4258", selInactive="203446", lineNo="4E6070", lineNoCaret="EEEAE0",
     guide="1A2A38", guideSel="34485A",
@@ -26,8 +26,8 @@ PRUSSIAN = dict(
     ansiRed="F07E6E", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 PLASTER = dict(
-    name="Shaker Plaster", dark=False, parent="Default", parentTheme="ExperimentalLight", kwBold=True,
-    bg="F5F3EE", bgUi="EAE7E0", bgTool="F0EEE8", surface="FBFAF7", hover="E0DCD3",
+    name="Shaker Plaster", dark=False, parent="Default", kwBold=True,
+    bg="F5F3EE", bgUi="EAE7E0", bgTool="F0EEE8", frame="DDD8CF", surface="FBFAF7", hover="E0DCD3",
     border="D5D0C5", fg="34302C", muted="66625C", disabled="ABA69C",
     caretRow="EEEBE4", selection="D4DEEA", selInactive="E4E2DC", lineNo="A8A398", lineNoCaret="1F3F7A",
     guide="E6E3DC", guideSel="CBC6BA",

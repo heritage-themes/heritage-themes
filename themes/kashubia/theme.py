@@ -9,8 +9,8 @@
 # Zemia (earth) is the black soil waiting to be sown; Niebò (sky) is daylight on white linen
 # (białe płótno), the cloth the embroidery is worked on.
 ZEMIA = dict(
-    name="Kashubia Zemia", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="1C1814", bgUi="171410", bgTool="1A1612", surface="25201B", hover="2E2822",
+    name="Kashubia Zemia", dark=True, parent="Darcula",
+    bg="1C1814", bgUi="171410", bgTool="1A1612", frame="2F2922", surface="25201B", hover="2E2822",
     border="352E27", fg="EEE8DC", muted="9A9184", disabled="625A50",
     caretRow="231E19", selection="263A52", selInactive="2A3038", lineNo="5C5349", lineNoCaret="959FFF",
     guide="27221C", guideSel="403830",
@@ -26,8 +26,8 @@ ZEMIA = dict(
     ansiRed="F07E70", ansiGreen="95D27E", ansiYellow="E6C35C", ansiBlue="7FB0F5", ansiMagenta="D795D8", ansiCyan="6DCFD8",
 )
 NIEBO = dict(
-    name="Kashubia Niebò", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="F5F2EA", bgUi="EAE6DA", bgTool="EFEBE1", surface="FBF9F4", hover="E0DBCD",
+    name="Kashubia Niebò", dark=False, parent="Default",
+    bg="F5F2EA", bgUi="EAE6DA", bgTool="EFEBE1", frame="DBD6C5", surface="FBF9F4", hover="E0DBCD",
     border="D6D0C1", fg="1E1F24", muted="6C6860", disabled="A8A296",
     caretRow="EDE9DE", selection="D3DEEE", selInactive="E1E3E6", lineNo="A8A294", lineNoCaret="3045C4",
     guide="E5E1D5", guideSel="CBC4B3",

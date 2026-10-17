@@ -5,8 +5,8 @@
 # Only the two washes of 浅绛 landscape painting add colour: 花青 indigo (strings) and 赭石 ochre
 # (numbers, constants), plus the red seal 印章 for Spock labels, caret and TODO.
 SHN = dict(
-    name="Shuimo Night", dark=True, parent="Darcula", parentTheme="ExperimentalDark", kwBold=False,
-    bg="171716", bgUi="121211", bgTool="151514", surface="1F1F1E", hover="272725",
+    name="Shuimo Night", dark=True, parent="Darcula", kwBold=False,
+    bg="171716", bgUi="121211", bgTool="151514", frame="292928", surface="1F1F1E", hover="272725",
     border="2A2A28", fg="C8C6C0", muted="85837D", disabled="55544F",
     caretRow="1D1D1C", selection="2C333A", selInactive="262A2E", lineNo="4A4945", lineNoCaret="D5584A",
     guide="232322", guideSel="3A3A37",
@@ -22,8 +22,8 @@ SHN = dict(
     ansiRed="D5584A", ansiGreen="8AA886", ansiYellow="C9A24E", ansiBlue="8FAAC2", ansiMagenta="B491B0", ansiCyan="71ABAA",
 )
 SHD = dict(
-    name="Shuimo Day", dark=False, parent="Default", parentTheme="ExperimentalLight", kwBold=False,
-    bg="F4F3EF", bgUi="ECEBE6", bgTool="F0EFEA", surface="FAF9F6", hover="E2E0DA",
+    name="Shuimo Day", dark=False, parent="Default", kwBold=False,
+    bg="F4F3EF", bgUi="ECEBE6", bgTool="F0EFEA", frame="DBD9D2", surface="FAF9F6", hover="E2E0DA",
     border="D8D6CF", fg="2A2A28", muted="77756F", disabled="ADABA4",
     caretRow="ECEAE4", selection="D9DEE3", selInactive="E3E4E3", lineNo="AEACA5", lineNoCaret="B03A2E",
     guide="E3E1DB", guideSel="C9C6BE",

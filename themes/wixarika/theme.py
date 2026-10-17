@@ -9,8 +9,8 @@
 # hikuri method declarations, calls and annotations. Haramara is the sea in the west, linked to black, where
 # the sun sets; Wirikuta is the desert in the east, where it rises.
 HARAMARA = dict(
-    name="Wixárika Haramara", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="121113", bgUi="0E0D0F", bgTool="100F11", surface="1B1A1D", hover="252428",
+    name="Wixárika Haramara", dark=True, parent="Darcula",
+    bg="121113", bgUi="0E0D0F", bgTool="100F11", frame="252428", surface="1B1A1D", hover="252428",
     border="2E2D32", fg="C4C2C8", muted="8A8890", disabled="56545A",
     caretRow="1B1A1D", selection="263650", selInactive="25282F", lineNo="504E55", lineNoCaret="F7D23E",
     guide="1F1E21", guideSel="3A393E",
@@ -26,8 +26,8 @@ HARAMARA = dict(
     ansiRed="F07E70", ansiGreen="8CD47E", ansiYellow="F2CF5A", ansiBlue="7CB4F2", ansiMagenta="E08ADA", ansiCyan="6DCFD8",
 )
 WIRIKUTA = dict(
-    name="Wixárika Wirikuta", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="F5F1E6", bgUi="EAE5D8", bgTool="EFEBDF", surface="FBF9F3", hover="E2DDCF",
+    name="Wixárika Wirikuta", dark=False, parent="Default",
+    bg="F5F1E6", bgUi="EAE5D8", bgTool="EFEBDF", frame="DCD5C6", surface="FBF9F3", hover="E2DDCF",
     border="D5CFBF", fg="3F3D38", muted="66625A", disabled="A9A498",
     caretRow="EEEADD", selection="CFDDF2", selInactive="E2E1DC", lineNo="A8A397", lineNoCaret="B0164F",
     guide="E5E0D3", guideSel="CBC5B5",

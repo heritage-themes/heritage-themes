@@ -9,8 +9,8 @@
 # and the cloth itself for types: white linen on the dark theme, black orbace on the light one.
 # Orbace is the black wool of the cloaks and skirts; Camisa is sa camisa, the white linen shirt.
 ORBACE = dict(
-    name="Sardinia Orbace", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="1A1817", bgUi="151312", bgTool="181615", surface="23201E", hover="2C2826",
+    name="Sardinia Orbace", dark=True, parent="Darcula",
+    bg="1A1817", bgUi="151312", bgTool="181615", frame="2D2925", surface="23201E", hover="2C2826",
     border="34302C", fg="D3CCC1", muted="978E82", disabled="5E5852",
     caretRow="23201E", selection="2C3854", selInactive="2B2A2E", lineNo="5B544D", lineNoCaret="F0B23E",
     guide="252220", guideSel="3C3733",
@@ -26,8 +26,8 @@ ORBACE = dict(
     ansiRed="F07E70", ansiGreen="95D27E", ansiYellow="F0B23E", ansiBlue="7FB0F5", ansiMagenta="D795D8", ansiCyan="6DCFD8",
 )
 CAMISA = dict(
-    name="Sardinia Camisa", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="F7F4EC", bgUi="ECE8DD", bgTool="F2EEE5", surface="FCFAF5", hover="E4DED1",
+    name="Sardinia Camisa", dark=False, parent="Default",
+    bg="F7F4EC", bgUi="ECE8DD", bgTool="F2EEE5", frame="DED8CA", surface="FCFAF5", hover="E4DED1",
     border="D9D2C4", fg="2B2724", muted="6E675E", disabled="ABA498",
     caretRow="F0ECE2", selection="D6E0F2", selInactive="E6E2DA", lineNo="AAA396", lineNoCaret="8A5600",
     guide="E7E2D7", guideSel="CDC5B5",

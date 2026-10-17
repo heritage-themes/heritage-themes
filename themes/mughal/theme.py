@@ -9,8 +9,8 @@
 # of the hashiya margins. Spock labels are gold lettering, and the primary
 # accent is lapis ruled with gold, like the jadwal borders of an album page.
 NIGHT = dict(
-    name="Mughal Night", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="1D1A16", bgUi="181511", bgTool="1B1814", surface="26221C", hover="2E2922",
+    name="Mughal Night", dark=True, parent="Darcula",
+    bg="1D1A16", bgUi="181511", bgTool="1B1814", frame="302A22", surface="26221C", hover="2E2922",
     border="302A22", fg="EDE4D0", muted="8C8475", disabled="5E584D",
     caretRow="231F1A", selection="2E3352", selInactive="2A2A33", lineNo="544D42", lineNoCaret="E8C25E",
     guide="28241E", guideSel="433C31",
@@ -26,8 +26,8 @@ NIGHT = dict(
     ansiRed="F2785C", ansiGreen="7CCBA6", ansiYellow="E8C25E", ansiBlue="8E9CFA", ansiMagenta="E592B4", ansiCyan="7CC6E6",
 )
 WASLI = dict(
-    name="Mughal Wasli", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="F7F1E3", bgUi="ECDDCB", bgTool="F0E4D3", surface="FBF6EC", hover="E2D1BB",
+    name="Mughal Wasli", dark=False, parent="Default",
+    bg="F7F1E3", bgUi="ECDDCB", bgTool="F0E4D3", frame="E3CDB8", surface="FBF6EC", hover="E2D1BB",
     border="D9C6AE", fg="221F2B", muted="6F6676", disabled="A99E96",
     caretRow="F0E7D5", selection="D3D9F2", selInactive="E4E0E2", lineNo="AE9F92", lineNoCaret="2B3BA6",
     guide="EAE0CD", guideSel="D2BFA3",

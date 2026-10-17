@@ -8,8 +8,8 @@
 # (purple) method declarations and calls, añil fields, and räx sky blue for numbers, constants and annotations.
 # Corte is the indigo jaspe skirt; Huipil is the white cotton blouse.
 CORTE = dict(
-    name="Maya Corte", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="13162A", bgUi="0F1222", bgTool="111426", surface="1A1E35", hover="232842",
+    name="Maya Corte", dark=True, parent="Darcula",
+    bg="13162A", bgUi="0F1222", bgTool="111426", frame="222742", surface="1A1E35", hover="232842",
     border="2B3150", fg="C8CADA", muted="868CA8", disabled="535973",
     caretRow="1A1E34", selection="2C3760", selInactive="242A44", lineNo="4C5374", lineNoCaret="62D29B",
     guide="1B1F35", guideSel="343B5C",
@@ -25,8 +25,8 @@ CORTE = dict(
     ansiRed="F07E70", ansiGreen="8CD47E", ansiYellow="F2CF5A", ansiBlue="7CB4F2", ansiMagenta="E08ADA", ansiCyan="6DCFD8",
 )
 HUIPIL = dict(
-    name="Maya Huipil", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="F6F4EE", bgUi="EBE8E0", bgTool="F0EEE7", surface="FCFBF8", hover="E2DFD6",
+    name="Maya Huipil", dark=False, parent="Default",
+    bg="F6F4EE", bgUi="EBE8E0", bgTool="F0EEE7", frame="DDD8CE", surface="FCFBF8", hover="E2DFD6",
     border="D5D1C6", fg="403E39", muted="66635C", disabled="A9A69E",
     caretRow="EDEBE4", selection="D2DCF2", selInactive="E2E2E4", lineNo="A8A59C", lineNoCaret="0E7A4E",
     guide="E5E3DB", guideSel="CAC6BC",

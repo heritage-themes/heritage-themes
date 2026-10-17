@@ -8,8 +8,8 @@
 # constants, stepwell-sandstone type parameters. Spock labels and the Navratri caret are
 # the silver glint of abhla mirrors.
 NAVRATRI = dict(
-    name="Gujarat Navratri", dark=True, parent="Darcula", parentTheme="ExperimentalDark",
-    bg="18141F", bgUi="14101A", bgTool="16121D", surface="211B2A", hover="2A2334",
+    name="Gujarat Navratri", dark=True, parent="Darcula",
+    bg="18141F", bgUi="14101A", bgTool="16121D", frame="2C2438", surface="211B2A", hover="2A2334",
     border="2C2537", fg="F2ECE4", muted="938B9C", disabled="5E5768",
     caretRow="1E1926", selection="382E4C", selInactive="2D2639", lineNo="524A5E", lineNoCaret="E8F0F5",
     guide="221C2B", guideSel="3E3549",
@@ -25,8 +25,8 @@ NAVRATRI = dict(
     ansiRed="FF7068", ansiGreen="7FDC78", ansiYellow="F5CF4A", ansiBlue="6FB8F5", ansiMagenta="F28AC0", ansiCyan="4FD1C9",
 )
 RANN = dict(
-    name="Gujarat Rann", dark=False, parent="Default", parentTheme="ExperimentalLight",
-    bg="F5F7F8", bgUi="E6ECEF", bgTool="EDF1F3", surface="FFFFFF", hover="DAE2E7",
+    name="Gujarat Rann", dark=False, parent="Default",
+    bg="F5F7F8", bgUi="E6ECEF", bgTool="EDF1F3", frame="D1DCE2", surface="FFFFFF", hover="DAE2E7",
     border="D0D9DF", fg="1E2226", muted="65707A", disabled="A2ABB2",
     caretRow="EDF1F4", selection="F7DCE8", selInactive="E6E3EA", lineNo="A3ACB4", lineNoCaret="B0202A",
     guide="E5EAEE", guideSel="C9D3DA",

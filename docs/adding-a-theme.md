@@ -36,8 +36,8 @@ A palette is a dict of six-digit uppercase hex values without `#`, plus metadata
 
 | Group | Keys |
 | --- | --- |
-| Metadata | `name`, `dark`, `parent`, `parentTheme` |
-| Surfaces | `bg` (editor), `bgUi`, `bgTool`, `surface` (popups, fields), `hover`, `border` |
+| Metadata | `name`, `dark`, `parent` |
+| Surfaces | `bg` (editor), `bgUi`, `bgTool`, `frame`, `surface` (popups, fields), `hover`, `border` |
 | Text | `fg`, `muted`, `disabled` |
 | Selection and caret | `caretRow`, `selection`, `selInactive` |
 | Gutter | `lineNo`, `lineNoCaret`, `guide`, `guideSel` |
@@ -56,7 +56,8 @@ Metadata values:
 | --- | --- | --- |
 | `dark` | `True` | `False` |
 | `parent` | `"Darcula"` | `"Default"` |
-| `parentTheme` | `"ExperimentalDark"` | `"ExperimentalLight"` |
+
+The UI theme inherits from Islands Dark or Islands Light, chosen by `dark`.
 
 Optional keys:
 
@@ -69,6 +70,7 @@ Key names are roles, not colours. `gold`, `red` and `azure` are slots whose valu
 
 Constraints:
 
+- `frame` is the main window behind the editor and tool windows, which the Islands UI draws as rounded islands of `bg` and `bgTool`. Take it from the hue of `bg`: lighter than both `bg` and `bgTool` in a dark theme, darker in a light one, by at least 1.20:1. `build.py` fails otherwise.
 - `fileYellow` colours folders that IntelliJ marks as excluded, such as `node_modules`. Use a faint wash close to `bg`, never a saturated colour. A solid colour draws the Project view as coloured bars.
 - `label` colours Spock labels (`given:`, `when:`, `then:`) as bold text with no background. It needs the same contrast against `bg` as the syntax roles.
 - The `ansi*` keys colour ANSI output in the console and terminal, and VCS file status in the Project view: `ansiGreen` added, `ansiBlue` modified, `ansiRed` unversioned, `ansiMagenta` merged. Each must read as the hue it names, whatever the family's syntax roles are, and meet 4.5:1 against `bg`.
@@ -81,10 +83,11 @@ python3 build.py                # prints build/heritage-themes-<version>.zip: <n
 python3 preview.py <theme>      # writes themes/<theme>/build/preview.html
 ```
 
-Open the preview in a browser. It shows each theme as an IDE window with a sample in Java, Kotlin, Groovy (Spock), Python, TypeScript, React (TSX), Vue, HTML, CSS, SQL, Go, Rust, C++, C, C#, shell, YAML, JSON, TOML and Markdown. Code colours come from the generated scheme, so the preview shows what the scheme sets. Check that:
+Open the preview in a browser. It shows each theme as an Islands IDE window, with the frame, the tool window and editor islands, and a sample in Java, Kotlin, Groovy (Spock), Python, TypeScript, React (TSX), Vue, HTML, CSS, SQL, Go, Rust, C++, C, C#, shell, YAML, JSON, TOML and Markdown. Code colours come from the generated scheme, so the preview shows what the scheme sets. Check that:
 
 - every syntax role is distinguishable and readable against `bg`
 - the caret row, caret and Spock labels are visible
+- the frame sets the islands apart and stays in the family's colours
 - no language sample has colours that clash with the palette
 
 In the IDE, install `build/heritage-themes-<version>.jar` through **Settings | Plugins | ⚙ | Install Plugin from Disk…**, restart, select each theme and also check the Project view, a diff, the console and a popup.
