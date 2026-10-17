@@ -1,6 +1,6 @@
 # Maramureș
 
-Dark and light themes based on the festive dress of Maramureș, Romania. Provides two UI themes, **Maramureș Zadie** and **Maramureș Cânepă**, each with a matching editor colour scheme.
+Dark and light themes based on the festive dress of Maramureș, Romania. Provides two UI themes, **Maramureș Zadie (Dark)** and **Maramureș Cânepă (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -17,7 +17,7 @@ Women's festive dress in Maramureș is a white hemp (*cânepă*) shirt worn with
 | Rose | The flowers of the *sumnă* | Method declarations and calls |
 | Brown leather | Waistcoats | Fields |
 
-Maramureș Zadie has the black wool of the aprons as its ground; Maramureș Cânepă has the white hemp of the shirt. Stripe colours and widths differ from village to village. Hex values are interpretations of the dyed wool, cloth and leather, adjusted for contrast against each background.
+Maramureș Zadie (Dark) has the black wool of the aprons as its ground; Maramureș Cânepă (Light) has the white hemp of the shirt. Stripe colours and widths differ from village to village. Hex values are interpretations of the dyed wool, cloth and leather, adjusted for contrast against each background.
 
 ## Develop
 

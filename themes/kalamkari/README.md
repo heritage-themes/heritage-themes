@@ -1,6 +1,6 @@
 # Kalamkari
 
-Dark and light themes based on Kalamkari (కలంకారి, "pen work"), the craft of painting cotton by hand with a bamboo pen and natural dyes, as practised in Srikalahasti and Machilipatnam. Provides two UI themes, **Kalamkari Indigo** and **Kalamkari Cotton**, each with a matching editor colour scheme.
+Dark and light themes based on Kalamkari (కలంకారి, "pen work"), the craft of painting cotton by hand with a bamboo pen and natural dyes, as practised in Srikalahasti and Machilipatnam. Provides two UI themes, **Kalamkari Indigo (Dark)** and **Kalamkari Cotton (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -19,9 +19,9 @@ Every colour is a dye or mordant the craft uses, kept as muted as the dyes:
 | Indigo over myrobalan | Yellow overdyed with indigo, green | Fields |
 | Iron-saddened myrobalan | Myrobalan yellow dulled with iron, olive | Constants |
 | Indigo wash | Light indigo, teal | Annotations |
-| Kasimi | Iron-black outline ink | Text on Kalamkari Cotton |
+| Kasimi | Iron-black outline ink | Text on Kalamkari Cotton (Light) |
 
-Kalamkari Indigo sets the code on cloth from the indigo vat. Kalamkari Cotton sets it on unbleached cotton. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
+Kalamkari Indigo (Dark) sets the code on cloth from the indigo vat. Kalamkari Cotton (Light) sets it on unbleached cotton. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
 
 ## Develop
 

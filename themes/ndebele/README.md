@@ -1,6 +1,6 @@
 # Ndebele
 
-Dark and light themes based on the house painting of the Ndebele of South Africa: flat geometric fills inside heavy black outlines on a white lime-washed wall. Provides two UI themes, **Ndebele Nzima** and **Ndebele Mhlophe**, each with a matching editor colour scheme.
+Dark and light themes based on the house painting of the Ndebele of South Africa: flat geometric fills inside heavy black outlines on a white lime-washed wall. Provides two UI themes, **Ndebele Nzima (Dark)** and **Ndebele Mhlophe (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -12,8 +12,8 @@ The themes take their structure from the outline and their colour from the fills
 
 | Colour | isiNdebele | Role |
 | --- | --- | --- |
-| Black outline | *nzima* | Keywords, bold (Ndebele Mhlophe); the ground of Ndebele Nzima |
-| White lime-wash | *mhlophe* | Keywords, bold (Ndebele Nzima); the ground of Ndebele Mhlophe |
+| Black outline | *nzima* | Keywords, bold (Ndebele Mhlophe); the ground of Ndebele Nzima (Dark) |
+| White lime-wash | *mhlophe* | Keywords, bold (Ndebele Nzima); the ground of Ndebele Mhlophe (Light) |
 | Sky blue | *hlaza kwesibhakabhaka* | Types, links |
 | Green | *hlaza* | Method declarations and calls, Markdown headings |
 | Yellow to gold | *surulani* | Strings |

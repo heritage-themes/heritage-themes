@@ -1,6 +1,6 @@
 # Łowicz
 
-Dark and light themes based on the striped wool (*pasiak łowicki*) and layered paper cut-outs (*wycinanka łowicka*) of the Łowicz region in central Poland. Provides two UI themes, **Łowicz Wycinanka** and **Łowicz Kodra**, each with a matching editor colour scheme.
+Dark and light themes based on the striped wool (*pasiak łowicki*) and layered paper cut-outs (*wycinanka łowicka*) of the Łowicz region in central Poland. Provides two UI themes, **Łowicz Wycinanka (Dark)** and **Łowicz Kodra (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -19,7 +19,7 @@ The pasiak of the Księżacy, the people of the Łowicz region, alternates a wid
 | Różowy (pink) | The men's trousers | Annotations |
 | Szary (grey) | A ground of the mid-20th century | Comments |
 
-Łowicz Wycinanka (*wycinanka*, cut-out) has the black template a cut-out is layered on as its ground. Łowicz Kodra (*kodra*) is the long white paper strip along which cut-out village scenes are pasted. Stripe colours varied by parish and by decade; hex values are interpretations of the dyed wool and papers, adjusted for contrast against each background.
+Łowicz Wycinanka (Dark), from *wycinanka* (cut-out), has the black template a cut-out is layered on as its ground. Łowicz Kodra (Light) is the long white paper strip along which cut-out village scenes are pasted. Stripe colours varied by parish and by decade; hex values are interpretations of the dyed wool and papers, adjusted for contrast against each background.
 
 ## Develop
 

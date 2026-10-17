@@ -9,7 +9,7 @@
 # Jodhpur blue constants, indigo dabu-print annotations, Udaipur marble text. Spock labels are bold
 # bandhani red.
 BLUE = dict(
-    name="Rajasthan Blue City", dark=True, parent="Darcula",
+    name="Rajasthan Blue City (Dark)", dark=True, parent="Darcula",
     bg="13273C", bgUi="102235", bgTool="122539", frame="1F364D", surface="1B3148", hover="223A54",
     border="243E56", fg="F2EADF", muted="8F9AA3", disabled="5A6F85",
     caretRow="182E45", selection="2A4458", selInactive="233D5A", lineNo="4C6984", lineNoCaret="FF9F45",
@@ -26,7 +26,7 @@ BLUE = dict(
     ansiRed="F2707A", ansiGreen="8FD47A", ansiYellow="F2C75C", ansiBlue="6CC0FF", ansiMagenta="E486D9", ansiCyan="4FD6C8",
 )
 PINK = dict(
-    name="Rajasthan Pink City", dark=False, parent="Default",
+    name="Rajasthan Pink City (Light)", dark=False, parent="Default",
     bg="F6E6DF", bgUi="ECD2C6", bgTool="F0DBD1", frame="E5C4B5", surface="FAEEE8", hover="E4C6B8",
     border="DCBBAB", fg="2A2026", muted="75666A", disabled="AB9594",
     caretRow="F0DCD2", selection="CFE0F2", selInactive="E3D7D6", lineNo="AF9792", lineNoCaret="B34700",

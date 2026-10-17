@@ -1,6 +1,6 @@
 # Yolŋu
 
-Dark and light themes based on the ochres of Yolŋu bark painting from north-east Arnhem Land, Australia. Provides two UI themes, **Yolŋu Galawu** and **Yolŋu Gapaṉ**, each with a matching editor colour scheme.
+Dark and light themes based on the ochres of Yolŋu bark painting from north-east Arnhem Land, Australia. Provides two UI themes, **Yolŋu Galawu (Dark)** and **Yolŋu Gapaṉ (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -15,10 +15,10 @@ Yolŋu artists paint on *galawu*, sheets of stringybark (*gaḏayka'*), with pig
 | Yellowish-red clay | *galaŋarr'* | Types, links |
 | Reddish-brown to purple haematite | *ratjpa* | Fields |
 | Mixed ochres, pink | *guwarguwarmirri* | Numbers, constants, annotations |
-| White clay | *gapaṉ* | Method declarations and calls in Yolŋu Galawu; the ground of Yolŋu Gapaṉ |
-| Charcoal black | *gurrŋan'* | Method declarations and calls in Yolŋu Gapaṉ |
+| White clay | *gapaṉ* | Method declarations and calls in Yolŋu Galawu (Dark); the ground of Yolŋu Gapaṉ (Light) |
+| Charcoal black | *gurrŋan'* | Method declarations and calls in Yolŋu Gapaṉ (Light) |
 
-Yolŋu Galawu has the dark stringybark as its ground; Yolŋu Gapaṉ has white clay. Every syntax colour stays within the ochres. Ochres vary by site and by artist; hex values are interpretations of the pigments, adjusted for contrast against each background. Yolŋu words follow the [Yolŋu Matha dictionary](https://yolngudictionary.cdu.edu.au/) of Charles Darwin University.
+Yolŋu Galawu (Dark) has the dark stringybark as its ground; Yolŋu Gapaṉ (Light) has white clay. Every syntax colour stays within the ochres. Ochres vary by site and by artist; hex values are interpretations of the pigments, adjusted for contrast against each background. Yolŋu words follow the [Yolŋu Matha dictionary](https://yolngudictionary.cdu.edu.au/) of Charles Darwin University.
 
 ## Develop
 

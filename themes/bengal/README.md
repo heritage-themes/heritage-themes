@@ -1,6 +1,6 @@
 # Bengal
 
-Dark and light themes based on the colours of Bengal: the silk and cotton of its looms and the colours of Durga Puja (দুর্গাপূজা). Provides two UI themes, **Bengal Baluchari** and **Bengal Laal Paar**, each with a matching editor colour scheme.
+Dark and light themes based on the colours of Bengal: the silk and cotton of its looms and the colours of Durga Puja (দুর্গাপূজা). Provides two UI themes, **Bengal Baluchari (Dark)** and **Bengal Laal Paar (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -23,7 +23,7 @@ Each syntax role takes one colour of the region:
 | Shiuli (শিউলি) stem | Orange stem of the night jasmine | Caret on Baluchari |
 | Pola (পলা) | Coral bangle red, worn with the shankha | Spock labels |
 
-Bengal Baluchari is the deep wine silk of Bishnupur, woven with figured borders (বালুচরী). Bengal Laal Paar is the white cotton sari with a red border (লাল পাড়), worn for the Puja and sindoor khela. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
+Bengal Baluchari (Dark) is the deep wine silk of Bishnupur, woven with figured borders (বালুচরী). Bengal Laal Paar (Light) is the white cotton sari with a red border (লাল পাড়), worn for the Puja and sindoor khela. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
 
 ## Develop
 

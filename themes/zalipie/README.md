@@ -1,6 +1,6 @@
 # Zalipie
 
-Dark and light themes based on the painted cottages of Zalipie, a village near Tarnów in southern Poland. The early materials, lime, soot and clay, carry the text; the painted flowers carry the names. Provides two UI themes, **Zalipie Sadza** and **Zalipie Wapno**, each with a matching editor colour scheme.
+Dark and light themes based on the painted cottages of Zalipie, a village near Tarnów in southern Poland. The early materials, lime, soot and clay, carry the text; the painted flowers carry the names. Provides two UI themes, **Zalipie Sadza (Dark)** and **Zalipie Wapno (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -20,7 +20,7 @@ The women of Zalipie lightened soot-stained walls with lime and dabbed lime spot
 | Żółty (yellow) | Yellow flowers and flower centres | Numbers, constants |
 | Błękit (sky blue) | The painted stoves | Annotations |
 
-Zalipie Sadza (*sadza*, soot) has the soot-blackened plinth as its ground. Zalipie Wapno (*wapno*, lime) is the lime-washed wall the flowers are painted on. Each painter chooses her own flowers and colours; hex values are interpretations of the paints, adjusted for contrast against each background.
+Zalipie Sadza (Dark), from *sadza* (soot), has the soot-blackened plinth as its ground. Zalipie Wapno (Light), from *wapno* (lime), is the lime-washed wall the flowers are painted on. Each painter chooses her own flowers and colours; hex values are interpretations of the paints, adjusted for contrast against each background.
 
 ## Develop
 

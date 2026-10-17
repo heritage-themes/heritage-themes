@@ -1,6 +1,6 @@
 # Maya
 
-Dark and light themes based on the backstrap-woven dress of the Maya towns of highland Guatemala, read through the K'iche' colours of the four roads and the centre. Provides two UI themes, **Maya Corte** and **Maya Huipil**, each with a matching editor colour scheme.
+Dark and light themes based on the backstrap-woven dress of the Maya towns of highland Guatemala, read through the K'iche' colours of the four roads and the centre. Provides two UI themes, **Maya Corte (Dark)** and **Maya Huipil (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -16,9 +16,9 @@ In the Guatemalan highlands, a woman's *traje* identifies her town: each town ha
 | Purple | *morado* | Method declarations and calls |
 | Indigo | *añil* | Fields |
 | Sky blue | *räx* | Numbers, constants, annotations, links |
-| White, the north | *saq* | The ground of Maya Huipil |
+| White, the north | *saq* | The ground of Maya Huipil (Light) |
 
-Maya Corte has the indigo jaspe of the corte as its ground; Maya Huipil has the white cotton of the huipil. Colours vary by town and by weaver; hex values are interpretations of the dyed threads, adjusted for contrast against each background.
+Maya Corte (Dark) has the indigo jaspe of the corte as its ground; Maya Huipil (Light) has the white cotton of the huipil. Colours vary by town and by weaver; hex values are interpretations of the dyed threads, adjusted for contrast against each background.
 
 ## Develop
 

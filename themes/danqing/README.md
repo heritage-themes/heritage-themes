@@ -1,6 +1,6 @@
 # Danqing
 
-Dark and light themes based on the mineral pigments of Chinese painting (丹青, "cinnabar and azurite"). Provides two UI themes, **Danqing Ink** and **Danqing Paper**, each with a matching editor colour scheme.
+Dark and light themes based on the mineral pigments of Chinese painting (丹青, "cinnabar and azurite"). Provides two UI themes, **Danqing Ink (Dark)** and **Danqing Paper (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -21,7 +21,7 @@ The palette follows the mineral and plant pigments used in traditional Chinese p
 | Carmine (胭脂) | Crimson plant and insect dye | Numbers |
 | Second azurite (二青) | Lighter grade of ground azurite | Type parameters |
 
-Danqing Ink uses the dark tone of ink on an inkstone as its ground. Danqing Paper uses the warm off-white of xuan paper. Spock labels are the red of seal paste (印泥). Azurite and malachite lead the palette, as in blue-green landscape painting (青绿山水). Hex values are interpretations of the traditional pigments, adjusted for contrast against each background.
+Danqing Ink (Dark) uses the dark tone of ink on an inkstone as its ground. Danqing Paper (Light) uses the warm off-white of xuan paper. Spock labels are the red of seal paste (印泥). Azurite and malachite lead the palette, as in blue-green landscape painting (青绿山水). Hex values are interpretations of the traditional pigments, adjusted for contrast against each background.
 
 ## Develop
 

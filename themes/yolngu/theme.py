@@ -9,7 +9,7 @@
 # and calls in the brightest mark: gapaṉ on the dark bark, gurrŋan' on the white clay. Every hue stays within
 # the ochres. Galawu is the stringybark sheet painted on; Gapaṉ is the white clay ground.
 GALAWU = dict(
-    name="Yolŋu Galawu", dark=True, parent="Darcula",
+    name="Yolŋu Galawu (Dark)", dark=True, parent="Darcula",
     bg="1F1712", bgUi="19120E", bgTool="1C1510", frame="34271E", surface="291F18", hover="33281F",
     border="3E3127", fg="AC9F90", muted="958878", disabled="5E5348",
     caretRow="281E17", selection="4A3426", selInactive="382A20", lineNo="5E5045", lineNoCaret="E25C4A",
@@ -26,7 +26,7 @@ GALAWU = dict(
     ansiRed="F07E6E", ansiGreen="8CC878", ansiYellow="F0CC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 GAPAN = dict(
-    name="Yolŋu Gapaṉ", dark=False, parent="Default",
+    name="Yolŋu Gapaṉ (Light)", dark=False, parent="Default",
     bg="F1EDE5", bgUi="E6E1D7", bgTool="ECE8DF", frame="D9D2C6", surface="F8F6F1", hover="DDD7CB",
     border="D2CBBE", fg="66594F", muted="6E635A", disabled="ABA297",
     caretRow="E8E3D9", selection="E8D4BA", selInactive="E2DCD2", lineNo="A89E92", lineNoCaret="A8281C",

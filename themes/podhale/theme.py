@@ -9,7 +9,7 @@
 # Kłobuk is the black felt hat with its red band and white shells; Sukno is the white broadcloth
 # of the trousers and the cucha.
 KLOBUK = dict(
-    name="Podhale Kłobuk", dark=True, parent="Darcula",
+    name="Podhale Kłobuk (Dark)", dark=True, parent="Darcula",
     bg="161413", bgUi="121010", bgTool="141211", frame="2A2622", surface="1F1C1A", hover="292522",
     border="302B28", fg="ECE5D8", muted="968E82", disabled="5C5650",
     caretRow="1F1C1A", selection="3E2228", selInactive="2E2626", lineNo="58514A", lineNoCaret="F05C74",
@@ -26,7 +26,7 @@ KLOBUK = dict(
     ansiRed="F07E70", ansiGreen="95D27E", ansiYellow="E2B95E", ansiBlue="7FB0F5", ansiMagenta="D795D8", ansiCyan="6DCFD8",
 )
 SUKNO = dict(
-    name="Podhale Sukno", dark=False, parent="Default",
+    name="Podhale Sukno (Light)", dark=False, parent="Default",
     bg="F5F1E8", bgUi="EAE5D9", bgTool="F0EBE1", frame="DCD6C7", surface="FBF9F4", hover="E1DBCD",
     border="D6CFC0", fg="1C1A18", muted="6C665E", disabled="A9A296",
     caretRow="EEE9DE", selection="F0D6D6", selInactive="E5E0DA", lineNo="A8A194", lineNoCaret="B0102E",

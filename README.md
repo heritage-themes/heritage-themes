@@ -4,38 +4,38 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 
 | Folder | Themes | Country |
 | --- | --- | --- |
-| [`themes/ainu/`](themes/ainu/) | Ainu Attus, Ainu Kaparamip | Japan |
-| [`themes/aizome/`](themes/aizome/) | Aizome Kachi, Aizome Kamenozoki | Japan |
-| [`themes/bengal/`](themes/bengal/) | Bengal Baluchari, Bengal Laal Paar | India, Bangladesh |
-| [`themes/danqing/`](themes/danqing/) | Danqing Ink, Danqing Paper | China |
-| [`themes/edo/`](themes/edo/) | Edo Cha, Edo Nezumi | Japan |
-| [`themes/gujarat/`](themes/gujarat/) | Gujarat Navratri, Gujarat Rann | India |
-| [`themes/hmong/`](themes/hmong/) | Hmong Batik, Hmong Hemp | Vietnam, Laos, Thailand, China |
+| [`themes/ainu/`](themes/ainu/) | Ainu Attus (Light), Ainu Kaparamip (Dark) | Japan |
+| [`themes/aizome/`](themes/aizome/) | Aizome Kachi (Dark), Aizome Kamenozoki (Light) | Japan |
+| [`themes/bengal/`](themes/bengal/) | Bengal Baluchari (Dark), Bengal Laal Paar (Light) | India, Bangladesh |
+| [`themes/danqing/`](themes/danqing/) | Danqing Ink (Dark), Danqing Paper (Light) | China |
+| [`themes/edo/`](themes/edo/) | Edo Cha (Dark), Edo Nezumi (Light) | Japan |
+| [`themes/gujarat/`](themes/gujarat/) | Gujarat Navratri (Dark), Gujarat Rann (Light) | India |
+| [`themes/hmong/`](themes/hmong/) | Hmong Batik (Dark), Hmong Hemp (Light) | Vietnam, Laos, Thailand, China |
 | [`themes/holi/`](themes/holi/) | Holi Day, Holi Night | India |
-| [`themes/kalaallisuut/`](themes/kalaallisuut/) | Kalaallisuut Qaqortoq, Kalaallisuut Qernertoq | Greenland |
-| [`themes/kalamkari/`](themes/kalamkari/) | Kalamkari Cotton, Kalamkari Indigo | India |
-| [`themes/kashubia/`](themes/kashubia/) | Kashubia Niebò, Kashubia Zemia | Poland |
-| [`themes/kerala/`](themes/kerala/) | Kerala Backwaters, Kerala Kasavu | India |
-| [`themes/lowicz/`](themes/lowicz/) | Łowicz Kodra, Łowicz Wycinanka | Poland |
-| [`themes/maramures/`](themes/maramures/) | Maramureș Cânepă, Maramureș Zadie | Romania |
-| [`themes/maya/`](themes/maya/) | Maya Corte, Maya Huipil | Guatemala |
-| [`themes/morocco/`](themes/morocco/) | Morocco Majorelle, Morocco Marrakech, Morocco Zellige | Morocco |
-| [`themes/mudhif/`](themes/mudhif/) | Mudhif Qasab, Mudhif Qir | Iraq |
-| [`themes/mughal/`](themes/mughal/) | Mughal Night, Mughal Wasli | India, Pakistan |
-| [`themes/ndebele/`](themes/ndebele/) | Ndebele Mhlophe, Ndebele Nzima | South Africa |
-| [`themes/peru/`](themes/peru/) | Peru Kulli, Peru Puka | Peru |
-| [`themes/podhale/`](themes/podhale/) | Podhale Kłobuk, Podhale Sukno | Poland |
-| [`themes/punjab/`](themes/punjab/) | Punjab Basant, Punjab Phulkari | India, Pakistan |
-| [`themes/rajasthan/`](themes/rajasthan/) | Rajasthan Blue City, Rajasthan Pink City | India |
-| [`themes/sardinia/`](themes/sardinia/) | Sardinia Camisa, Sardinia Orbace | Italy |
-| [`themes/shaker/`](themes/shaker/) | Shaker Plaster, Shaker Prussian | United States |
+| [`themes/kalaallisuut/`](themes/kalaallisuut/) | Kalaallisuut Qaqortoq (Light), Kalaallisuut Qernertoq (Dark) | Greenland |
+| [`themes/kalamkari/`](themes/kalamkari/) | Kalamkari Cotton (Light), Kalamkari Indigo (Dark) | India |
+| [`themes/kashubia/`](themes/kashubia/) | Kashubia Niebò (Light), Kashubia Zemia (Dark) | Poland |
+| [`themes/kerala/`](themes/kerala/) | Kerala Backwaters (Dark), Kerala Kasavu (Light) | India |
+| [`themes/lowicz/`](themes/lowicz/) | Łowicz Kodra (Light), Łowicz Wycinanka (Dark) | Poland |
+| [`themes/maramures/`](themes/maramures/) | Maramureș Cânepă (Light), Maramureș Zadie (Dark) | Romania |
+| [`themes/maya/`](themes/maya/) | Maya Corte (Dark), Maya Huipil (Light) | Guatemala |
+| [`themes/morocco/`](themes/morocco/) | Morocco Majorelle (Dark), Morocco Marrakech (Dark), Morocco Zellige (Dark) | Morocco |
+| [`themes/mudhif/`](themes/mudhif/) | Mudhif Qasab (Light), Mudhif Qir (Dark) | Iraq |
+| [`themes/mughal/`](themes/mughal/) | Mughal Night, Mughal Wasli (Light) | India, Pakistan |
+| [`themes/ndebele/`](themes/ndebele/) | Ndebele Mhlophe (Light), Ndebele Nzima (Dark) | South Africa |
+| [`themes/peru/`](themes/peru/) | Peru Kulli (Dark), Peru Puka (Dark) | Peru |
+| [`themes/podhale/`](themes/podhale/) | Podhale Kłobuk (Dark), Podhale Sukno (Light) | Poland |
+| [`themes/punjab/`](themes/punjab/) | Punjab Basant (Light), Punjab Phulkari (Dark) | India, Pakistan |
+| [`themes/rajasthan/`](themes/rajasthan/) | Rajasthan Blue City (Dark), Rajasthan Pink City (Light) | India |
+| [`themes/sardinia/`](themes/sardinia/) | Sardinia Camisa (Light), Sardinia Orbace (Dark) | Italy |
+| [`themes/shaker/`](themes/shaker/) | Shaker Plaster (Light), Shaker Prussian (Dark) | United States |
 | [`themes/shuimo/`](themes/shuimo/) | Shuimo Day, Shuimo Night | China |
-| [`themes/tamil/`](themes/tamil/) | Tamil Kolam, Tamil Olai | India |
-| [`themes/wixarika/`](themes/wixarika/) | Wixárika Haramara, Wixárika Wirikuta | Mexico |
+| [`themes/tamil/`](themes/tamil/) | Tamil Kolam (Dark), Tamil Olai (Light) | India |
+| [`themes/wixarika/`](themes/wixarika/) | Wixárika Haramara (Dark), Wixárika Wirikuta (Light) | Mexico |
 | [`themes/wuxing/`](themes/wuxing/) | Wuxing Day, Wuxing Night | China |
-| [`themes/yolngu/`](themes/yolngu/) | Yolŋu Galawu, Yolŋu Gapaṉ | Australia |
-| [`themes/zalipie/`](themes/zalipie/) | Zalipie Sadza, Zalipie Wapno | Poland |
-| [`themes/zlotnica/`](themes/zlotnica/) | Złotnica Aksamit, Złotnica Płótno | Poland |
+| [`themes/yolngu/`](themes/yolngu/) | Yolŋu Galawu (Dark), Yolŋu Gapaṉ (Light) | Australia |
+| [`themes/zalipie/`](themes/zalipie/) | Zalipie Sadza (Dark), Zalipie Wapno (Light) | Poland |
+| [`themes/zlotnica/`](themes/zlotnica/) | Złotnica Aksamit (Dark), Złotnica Płótno (Light) | Poland |
 
 ## Install
 

@@ -10,7 +10,7 @@
 # chitta white-thread text. Spock labels are rose, like a paranda tassel,
 # and the primary accent is the golden thread itself.
 PHULKARI = dict(
-    name="Punjab Phulkari", dark=True, parent="Darcula",
+    name="Punjab Phulkari (Dark)", dark=True, parent="Darcula",
     bg="241612", bgUi="1E120F", bgTool="211411", frame="3A251F", surface="2E1D18", hover="37241E",
     border="3A2620", fg="F4EBDD", muted="9A8B83", disabled="64554E",
     caretRow="2B1B16", selection="4A3324", selInactive="3A2A22", lineNo="5C4840", lineNoCaret="F7C548",
@@ -27,7 +27,7 @@ PHULKARI = dict(
     ansiRed="FF7A72", ansiGreen="9ED46A", ansiYellow="F7C548", ansiBlue="7FA8F5", ansiMagenta="F08AC8", ansiCyan="4FD0C8",
 )
 BASANT = dict(
-    name="Punjab Basant", dark=False, parent="Default",
+    name="Punjab Basant (Light)", dark=False, parent="Default",
     bg="F8F1D2", bgUi="E6E9C9", bgTool="EDEDD2", frame="C9DCBB", surface="FDF8E2", hover="DBDFBA",
     border="D0D5AC", fg="22241A", muted="666A55", disabled="A1A285",
     caretRow="F1E9C5", selection="D6E4F5", selInactive="E2E2D0", lineNo="A6A281", lineNoCaret="7A5200",

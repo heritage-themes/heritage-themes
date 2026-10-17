@@ -7,7 +7,7 @@
 # ochre 赭石 annotations, second-grade azurite 二青 type parameters,
 # ink 墨 on inkstone / aged xuan paper 宣纸, Spock labels in seal-paste red 印泥.
 INK = dict(
-    name="Danqing Ink", dark=True, parent="Darcula",
+    name="Danqing Ink (Dark)", dark=True, parent="Darcula",
     bg="1B1D1B", bgUi="151716", bgTool="181A19", frame="2A2E2C", surface="232624", hover="2A2E2B",
     border="2C302D", fg="DCD6C8", muted="868A80", disabled="575C57",
     caretRow="202421", selection="2E3F45", selInactive="283335", lineNo="4B514C", lineNoCaret="F0643F",
@@ -24,7 +24,7 @@ INK = dict(
     ansiRed="F0643F", ansiGreen="A3B47E", ansiYellow="E9B949", ansiBlue="4FB3C9", ansiMagenta="CFA3C0", ansiCyan="7FC4B6",
 )
 PAPER = dict(
-    name="Danqing Paper", dark=False, parent="Default",
+    name="Danqing Paper (Light)", dark=False, parent="Default",
     bg="ECE5D4", bgUi="E3DBC8", bgTool="E7E0CE", frame="D5CBB5", surface="F3EDDE", hover="DAD1BC",
     border="D0C6AF", fg="26282A", muted="67655D", disabled="A59C88",
     caretRow="E4DCC8", selection="C9DCE0", selInactive="D8DBD2", lineNo="A19880", lineNoCaret="B32D1E",

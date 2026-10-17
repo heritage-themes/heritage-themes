@@ -30,6 +30,8 @@ Names follow one pattern:
 
 The second word of a theme name is its setting in the tradition: Night and Day for Shuimo, Ink and Paper for Danqing, Baluchari and Laal Paar for Bengal.
 
+A name that does not say Night or Day ends in ` (Dark)` or ` (Light)`, matching `dark`, so the IDE theme list shows the brightness: `Edo Cha (Dark)`, `Edo Nezumi (Light)`. The `slug` omits the suffix.
+
 ### Palette
 
 A palette is a dict of six-digit uppercase hex values without `#`, plus metadata. The shared code reads keys directly, so a missing key raises `KeyError`. Both palettes of a family have identical keys.

@@ -1,6 +1,6 @@
 # Shaker
 
-Dark and light themes based on the paint of the Shaker villages of the United States. Provides two UI themes, **Shaker Prussian** and **Shaker Plaster**, each with a matching editor colour scheme.
+Dark and light themes based on the paint of the Shaker villages of the United States. Provides two UI themes, **Shaker Prussian (Dark)** and **Shaker Plaster (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -17,7 +17,7 @@ The Shakers chose the colour of a building or a piece of furniture by what it wa
 | Chrome green | Bedsteads, window frames | Types, annotations |
 | Verdigris | Paint at Canterbury | Numbers, constants |
 
-Shaker Prussian has the meetinghouse woodwork as its ground, with keywords in plaster white. Shaker Plaster has the meetinghouse walls as its ground, with keywords in Prussian blue. Paint colours varied between villages and have darkened or been varnished over; hex values are interpretations of the restored colours, adjusted for contrast against each background.
+Shaker Prussian (Dark) has the meetinghouse woodwork as its ground, with keywords in plaster white. Shaker Plaster (Light) has the meetinghouse walls as its ground, with keywords in Prussian blue. Paint colours varied between villages and have darkened or been varnished over; hex values are interpretations of the restored colours, adjusted for contrast against each background.
 
 ## Develop
 

@@ -1,6 +1,6 @@
 # Kashubia
 
-Dark and light themes based on the seven colours of Kashubian embroidery (*haft kaszubski*) from northern Poland, as fixed by the Żukowo school. Provides two UI themes, **Kashubia Zemia** and **Kashubia Niebò**, each with a matching editor colour scheme.
+Dark and light themes based on the seven colours of Kashubian embroidery (*haft kaszubski*) from northern Poland, as fixed by the Żukowo school. Provides two UI themes, **Kashubia Zemia (Dark)** and **Kashubia Niebò (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -16,11 +16,11 @@ Dark and light themes based on the seven colours of Kashubian embroidery (*haft 
 | Żółty (yellow; Kashubian *żôłti*) | The sun and ripening grain | Strings |
 | Zielony (green; Kashubian *zelony*) | Forests and meadows | Fields (forest), type parameters (meadow) |
 | Czerwony (red) | The blood shed in defence of the land | Numbers, constants, Spock labels |
-| Czarny (black; Kashubian *czôrny*) | The earth waiting to be sown | Ground of Kashubia Zemia, text of Kashubia Niebò; comments in the brown of the same earth (Kashubian *bruny*) |
+| Czarny (black; Kashubian *czôrny*) | The earth waiting to be sown | Ground of Kashubia Zemia (Dark), text of Kashubia Niebò (Light); comments in the brown of the same earth (Kashubian *bruny*) |
 
 Annotations take amber (*bursztyn*), which the yellow also stands for, from the Baltic shore of Kashubia.
 
-Kashubia Zemia (Kashubian *zemia*, earth) has the dark soil as its ground. Kashubia Niebò (Kashubian *niebò*, sky) is daylight on white linen (*białe płótno*), the cloth the embroidery is worked on. Some sources count brown beside or in place of black as the colour of the earth; the table follows the Żukowo set. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
+Kashubia Zemia (Dark), from Kashubian *zemia* (earth), has the dark soil as its ground. Kashubia Niebò (Light), from Kashubian *niebò* (sky), is daylight on white linen (*białe płótno*), the cloth the embroidery is worked on. Some sources count brown beside or in place of black as the colour of the earth; the table follows the Żukowo set. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
 
 ## Develop
 

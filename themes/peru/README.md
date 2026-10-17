@@ -1,14 +1,14 @@
 # Peru
 
-Two dark themes based on the natural dyes of Andean weaving, as practised in Chinchero and the Sacred Valley, each painting the whole IDE in a dyed-through ground. Provides two UI themes, **Peru Kulli** and **Peru Puka**, each with a matching editor colour scheme.
+Two dark themes based on the natural dyes of Andean weaving, as practised in Chinchero and the Sacred Valley, each painting the whole IDE in a dyed-through ground. Provides two UI themes, **Peru Kulli (Dark)** and **Peru Puka (Dark)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
 ## Inspiration
 
-Peru Kulli is *kulli sara*, the purple corn (maíz morado) of chicha morada. Peru Puka (*puka*, red) is the crimson of cochineal (cochinilla), the insect dye gathered from the prickly-pear cactus. The syntax colours are the other dyes of the weavers' palette and the Quechua colour words:
+Peru Kulli (Dark) is *kulli sara*, the purple corn (maíz morado) of chicha morada. Peru Puka (Dark) takes its name from *puka*, red, and is the crimson of cochineal (cochinilla), the insect dye gathered from the prickly-pear cactus. The syntax colours are the other dyes of the weavers' palette and the Quechua colour words:
 
-| Colour | Source | Peru Kulli | Peru Puka |
+| Colour | Source | Peru Kulli (Dark) | Peru Puka (Dark) |
 | --- | --- | --- | --- |
 | Q'olle yellow (*q'illu*) | Flowers of the q'olle shrub (*Buddleja coriacea*) | Keywords, caret, Run button | Numbers |
 | Ch'illka green (*q'umir*) | Leaves of the ch'illka shrub (*Baccharis*) | Strings | Keywords, caret, Run button |
@@ -20,7 +20,7 @@ Peru Kulli is *kulli sara*, the purple corn (maíz morado) of chicha morada. Per
 | Kulli violet | Purple corn | | Types, type parameters |
 | Yuraq white | Undyed alpaca | Text, Spock labels | Text, Spock labels |
 
-No syntax colour uses the hue of its ground: no purple on Peru Kulli and no red on Peru Puka. Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
+No syntax colour uses the hue of its ground: no purple on Peru Kulli (Dark) and no red on Peru Puka (Dark). Hex values are interpretations of the traditional colours, adjusted for contrast against each background.
 
 ## Develop
 

@@ -1,6 +1,6 @@
 # Podhale
 
-Dark and light themes based on the costume of the Highlanders (*górale*) of Podhale, below the Tatra mountains in southern Poland: crimson, black and off-white, with the colours of the *parzenica*. Provides two UI themes, **Podhale Kłobuk** and **Podhale Sukno**, each with a matching editor colour scheme.
+Dark and light themes based on the costume of the Highlanders (*górale*) of Podhale, below the Tatra mountains in southern Poland: crimson, black and off-white, with the colours of the *parzenica*. Provides two UI themes, **Podhale Kłobuk (Dark)** and **Podhale Sukno (Light)**, each with a matching editor colour scheme.
 
 ![Preview](preview.png)
 
@@ -18,7 +18,7 @@ The *parzenica* on the white woollen trousers (*portki*) began as a loop of cord
 | Korale (coral) | Red coral necklaces | Numbers, constants |
 | Róż (pink) | The embroidery of the cucha | Annotations |
 
-Podhale Kłobuk (*kłobuk*, hat) has the black felt hat, with its red band and white shells, as its ground. Podhale Sukno (*sukno*, broadcloth) is the white woollen cloth of the trousers and the cucha. Hex values are interpretations of the cloth, threads and metal, adjusted for contrast against each background.
+Podhale Kłobuk (Dark), from *kłobuk* (hat), has the black felt hat, with its red band and white shells, as its ground. Podhale Sukno (Light), from *sukno* (broadcloth), is the white woollen cloth of the trousers and the cucha. Hex values are interpretations of the cloth, threads and metal, adjusted for contrast against each background.
 
 ## Develop
 
