@@ -4,6 +4,7 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 
 | Folder | Themes | Country |
 | --- | --- | --- |
+| [`themes/ainu/`](themes/ainu/) | Ainu Attus, Ainu Kaparamip | Japan |
 | [`themes/bengal/`](themes/bengal/) | Bengal Baluchari, Bengal Laal Paar | India, Bangladesh |
 | [`themes/danqing/`](themes/danqing/) | Danqing Ink, Danqing Paper | China |
 | [`themes/gujarat/`](themes/gujarat/) | Gujarat Navratri, Gujarat Rann | India |
