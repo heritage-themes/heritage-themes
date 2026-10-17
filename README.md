@@ -58,8 +58,8 @@ Output in `build/`:
 
 | Path | Content |
 | --- | --- |
-| `heritage-themes-<version>.jar` | Installable plugin containing every theme |
-| `heritage-themes-<version>.zip` | The jar in plugin layout, for the Marketplace |
+| `heritage-themes-<version>.jar` | The plugin: descriptor, every theme and the plugin icons. Install this in the IDE |
+| `heritage-themes-<version>.zip` | The same jar inside a `heritage-themes/lib/` folder, the layout the Marketplace expects for an uploaded plugin. Its themes are identical to the jar's |
 | `schemes/*.icls` | Standalone editor colour schemes |
 
 Install the jar or an `.icls` file as described under [Install](#install).
