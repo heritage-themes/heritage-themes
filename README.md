@@ -70,9 +70,12 @@ Install the jar or an `.icls` file as described under [Install](#install).
 python3 preview.py              # every theme: themes/<theme>/build/preview.html
 python3 preview.py shuimo       # one theme
 python3 preview.py --png        # also render themes/<theme>/preview.png
+python3 preview.py --vscode     # VS Code preview: themes/<theme>/build/preview-vscode.html
 ```
 
 The page shows each theme as an IDE window with a code sample per language, coloured from the generated editor scheme. It downloads JetBrains Mono once into `~/.cache/heritage-themes`. `--png` needs Google Chrome or Chromium (or the `CHROME` environment variable) and ImageMagick.
+
+`--vscode` colours the samples with VS Code's TextMate grammars and the generated VS Code theme, through Shiki pinned in `scripts/shiki/`. It needs Node.js and npm, and installs Shiki there on first use. It shows TextMate colours only: semantic highlighting needs a language server. With `--png` it writes `preview-vscode.png` next to the page.
 
 ## Layout
 
@@ -83,11 +86,12 @@ heritage/       code shared by every theme family
   __init__.py   finds the theme folders in themes/; the theme.py contract
   scheme.py     editor colour scheme: palette roles to text attributes
   ui.py         UI theme: palette roles to UI keys
+  vscode.py     VS Code colour theme: palette roles to TextMate scopes, semantic tokens and workbench keys
   preview.py    preview page
   samples.py    code samples shown in the preview
 CHANGELOG.md    release notes; the plugin's change notes come from it
 assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
-scripts/        release.sh, parent_overrides.py
+scripts/        release.sh, parent_overrides.py; shiki/ tokenises the VS Code preview
 docs/           releasing.md, adding-a-theme.md
 .github/        Build and Publish workflows
 themes/<theme>/

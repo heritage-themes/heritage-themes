@@ -1,15 +1,20 @@
 """HTML preview of a theme family: one IDE window per theme, with a code sample per language.
 
-Code colours and font styles come from heritage.scheme.attributes(), so the preview shows what the
-editor scheme sets. Keys that the scheme leaves to a fallback resolve through FALLBACKS, which follows
-the fallback chains of the bundled language plugins. The window chrome takes its colours from the
-UI theme (CHROME), laid out as the Islands UI: the editor and tool windows as islands on the frame.
+The IntelliJ page takes code colours and font styles from heritage.scheme.attributes(), so it shows what
+the editor scheme sets. Keys that the scheme leaves to a fallback resolve through FALLBACKS, which follows
+the fallback chains of the bundled language plugins. The window chrome takes its colours from the UI theme
+(CHROME), laid out as the Islands UI: the editor and tool windows as islands on the frame.
+
+The VS Code page takes code colours from tokens of VS Code's TextMate grammars, coloured by the theme from
+heritage.vscode (see scripts/shiki/tokens.mjs), and its chrome from the workbench colours (VSCODE_CHROME).
+Semantic highlighting needs a language server, so the page shows the TextMate colours only.
 """
 import html, re
 
 from .samples import SAMPLES
 from .scheme import attributes, BOLD, ITALIC, BI, UNDER, WAVE, STRIKE, BOX, DOTTED
 from .ui import theme
+from . import vscode
 
 FONT_DIR = "fonts"
 FONTS = [("Regular", 400, "normal"), ("Italic", 400, "italic"), ("Bold", 700, "normal"), ("BoldItalic", 700, "italic")]
@@ -50,6 +55,20 @@ CHROME = {
     "stripeOn": "ToolWindow.Button.selectedBackground", "stripeOnFg": "ToolWindow.Button.selectedForeground",
     "stripeFg": "ToolWindow.Button.foreground", "status": "StatusBar.background",
 }
+# CSS variable → VS Code workbench colour key.
+VSCODE_CHROME = {
+    "frame": "titleBar.activeBackground", "island": "sideBar.background",
+    "editor": "editorGroupHeader.tabsBackground", "underTabs": "editorGroupHeader.tabsBorder",
+    "tab": "tab.activeBackground", "tabBorder": "tab.activeBorder",
+    "stripeOn": "activityBar.background", "stripeOnFg": "activityBar.foreground",
+    "stripeFg": "activityBar.inactiveForeground", "stripeMark": "activityBar.activeBorder",
+    "status": "statusBar.background", "statusFg": "statusBar.foreground",
+}
+# Shiki language id by sample file extension.
+LANGS = dict(java="java", kt="kotlin", groovy="groovy", py="python", ts="typescript", tsx="tsx", vue="vue",
+             html="html", css="css", sql="sql", go="go", rs="rust", cpp="cpp", c="c", cs="csharp", sh="shellscript",
+             yml="yaml", json="json", toml="toml", md="markdown")
+SHIKI_ITALIC, SHIKI_BOLD, SHIKI_UNDERLINE = 1, 2, 4
 DECORATION = {UNDER: "underline", WAVE: "underline wavy", STRIKE: "line-through", DOTTED: "underline dotted"}
 
 MARK = re.compile(r"«([^:»]+):([^»]*)»")
@@ -92,12 +111,27 @@ def highlight(p, attrs, line):
     return "".join(out)
 
 
-def sample(p, attrs, name, caret, code):
+def token_html(text, colour, font):
+    """One Shiki token as HTML."""
+    css = [f"color:{colour}"]
+    if font & SHIKI_BOLD: css.append("font-weight:700")
+    if font & SHIKI_ITALIC: css.append("font-style:italic")
+    if font & SHIKI_UNDERLINE: css.append("text-decoration:underline")
+    return f'<span style="{";".join(css)}">{html.escape(text)}</span>'
+
+
+def plain(code):
+    """A sample's code without the «key:text» markup."""
+    return MARK.sub(r"\2", code)
+
+
+def sample(name, caret, lines):
+    """One editor island: a tab and the code, given as one HTML string per line."""
     rows = []
-    for i, line in enumerate(code.split("\n"), 1):
+    for i, line in enumerate(lines, 1):
         row = ' class="caret-row"' if i == caret else ""
         tail = '<span class="caret"></span>' if i == caret else ""
-        rows.append(f'<div{row}><span class="gutter">{i:>2}</span>{highlight(p, attrs, line)}{tail}</div>')
+        rows.append(f'<div{row}><span class="gutter">{i:>2}</span>{line}{tail}</div>')
     return (f'<article class="file"><div class="tabs"><span class="tab">{html.escape(name)}</span></div>'
             f'<pre>{"".join(rows)}</pre></article>')
 
@@ -108,27 +142,48 @@ def chrome(p):
     return ";".join(f"--{var}:{t['colors'].get(t['ui'][key], t['ui'][key])}" for var, key in CHROME.items())
 
 
-def window(p):
-    attrs = attributes(p)
+def vscode_chrome(p):
+    """CSS variables for the window chrome, resolved from the VS Code workbench colours."""
+    colours = vscode.theme(p)["colors"]
+    return ";".join(f"--{var}:{colours[key]}" for var, key in VSCODE_CHROME.items())
+
+
+def window(p, files=None):
+    """One IDE window. files holds, per sample, the lines of Shiki tokens for the VS Code page; without it the
+    window is the IntelliJ one, coloured from the editor scheme."""
     names = [name for name, _, _ in SAMPLES]
     variables = ";".join(f"--{k}:#{v}" for k, v in p.items() if isinstance(v, str) and re.fullmatch(r"[0-9A-F]{6}", v))
     swatches = "".join(f'<span title="{k}" style="background:#{p[k]}"></span>' for k in SWATCHES)
     tree = "".join(f'<div{" class=on" if i == 0 else ""}>{html.escape(n)}</div>' for i, n in enumerate(names))
-    files = "".join(sample(p, attrs, *s) for s in SAMPLES)
-    return (f'<section class="ide" style="{variables};{chrome(p)};--caret:#{p.get("caret", p["gold"])}">'
+    if files is None:
+        attrs = attributes(p)
+        editors = "".join(sample(name, caret, [highlight(p, attrs, line) for line in code.split("\n")])
+                          for name, caret, code in SAMPLES)
+        kind, colours = "intellij", chrome(p)
+    else:
+        editors = "".join(sample(name, caret, ["".join(token_html(*t) for t in line) for line in lines])
+                          for (name, caret, _), lines in zip(SAMPLES, files))
+        kind, colours = "vscode", vscode_chrome(p)
+    return (f'<section class="ide {kind}" style="{variables};{colours};--caret:#{p.get("caret", p["gold"])}">'
             f'<header class="bar"><b>{html.escape(p["name"])}</b><span class="swatches">{swatches}</span></header>'
             f'<div class="body"><div class="stripe"><i class="on"></i><i></i><i></i></div>'
             f'<nav class="side"><div class="root">orders</div>{tree}</nav>'
-            f'<div class="files">{files}</div></div>'
+            f'<div class="files">{editors}</div></div>'
             f'<footer class="status">orders › src › {html.escape(names[0])}</footer></section>')
 
 
-def page(family):
-    """The preview page for every theme in the family."""
+def vscode_samples():
+    """The input of scripts/shiki/tokens.mjs for the samples: one dict(lang, code) per sample."""
+    return [dict(lang=LANGS[name.rsplit(".", 1)[1]], code=plain(code)) for name, _, code in SAMPLES]
+
+
+def page(family, tokens=None):
+    """The preview page for every theme in the family: the IntelliJ page, or with tokens (per theme, the output
+    of scripts/shiki/tokens.mjs) the VS Code page."""
     faces = "".join(
         f'@font-face{{font-family:"JetBrains Mono";font-weight:{w};font-style:{s};'
         f'src:url("{FONT_DIR}/JetBrainsMono-{n}.woff2") format("woff2"),local("JetBrains Mono")}}' for n, w, s in FONTS)
-    windows = "".join(window(t["palette"]) for t in family.THEMES)
+    windows = "".join(window(t["palette"], tokens[i] if tokens else None) for i, t in enumerate(family.THEMES))
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title>{html.escape(family.FAMILY)} Preview</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"><style>
 {faces}
@@ -154,6 +209,9 @@ body{{margin:0;padding:24px;font-family:system-ui,sans-serif}}
 .tab{{display:inline-block;padding:3px 9px;font-size:12px;background:var(--tab);
   border:1px solid var(--tabBorder);border-radius:6px}}
 .status{{padding:5px 12px;font-size:12px;color:var(--muted);background:var(--status)}}
+.vscode .tab{{border:0;border-radius:0;border-bottom:2px solid var(--tabBorder)}}
+.vscode .stripe .on{{border-radius:0;box-shadow:inset 2px 0 var(--stripeMark)}}
+.vscode .status{{color:var(--statusFg)}}
 pre{{margin:0;padding:8px 0;font:13px/1.55 "JetBrains Mono",ui-monospace,monospace;font-variant-ligatures:none;
   overflow-x:auto;color:var(--fg)}}
 pre div{{padding:0 12px 0 0;white-space:pre}}
