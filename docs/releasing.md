@@ -61,23 +61,35 @@ version by hand.
 
 1. Run `python3 build.py`, then upload `build/heritage-themes-<version>.zip` at
    <https://plugins.jetbrains.com/plugin/add>.
-2. Generate the signing key and certificate. Keep both files in a password manager; sign every
-   release with the same key.
+2. Generate the signing key and certificate in a private directory outside the repository and
+   outside any synced folder. The first command prompts for a passphrase, which is
+   `PRIVATE_KEY_PASSWORD`. The second prompts for the passphrase and the certificate fields; only
+   the common name matters, for example `Heritage Themes`.
 
    ```bash
+   mkdir -m 700 ~/.heritage-signing && cd ~/.heritage-signing
    openssl genpkey -aes-256-cbc -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out private.pem
    openssl req -key private.pem -new -x509 -days 3650 -out chain.crt
    ```
 
 3. Create a permanent token at <https://plugins.jetbrains.com/author/me/tokens>.
-4. Store the four repository secrets:
+4. Store the four repository secrets from the same directory:
 
    ```bash
-   gh secret set CERTIFICATE_CHAIN < chain.crt
-   gh secret set PRIVATE_KEY < private.pem
-   gh secret set PRIVATE_KEY_PASSWORD
-   gh secret set PUBLISH_TOKEN
+   gh secret set CERTIFICATE_CHAIN -R heritage-themes/heritage-themes < chain.crt
+   gh secret set PRIVATE_KEY -R heritage-themes/heritage-themes < private.pem
+   gh secret set PRIVATE_KEY_PASSWORD -R heritage-themes/heritage-themes
+   gh secret set PUBLISH_TOKEN -R heritage-themes/heritage-themes
    ```
+
+   `gh secret list -R heritage-themes/heritage-themes` shows the names that are set.
+   `signPlugin` skips itself, and Gradle still reports success, when `CERTIFICATE_CHAIN` or
+   `PRIVATE_KEY` is empty. The workflow's "Check release secrets" step fails the run before
+   signing if any of the four secrets is empty.
+
+5. Save `private.pem`, `chain.crt` and the passphrase in the password manager, then delete the
+   directory: `cd ~ && rm -r ~/.heritage-signing`. Sign every release with this key; never
+   generate a new one.
 
 Publish uploads to the plugin whose descriptor `<id>` is `heritage.themes`.
 
