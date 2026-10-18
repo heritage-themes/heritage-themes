@@ -29,7 +29,7 @@ ZADIE = dict(
 CANEPA = dict(
     name="Maramureș Cânepă (Light)", dark=False, parent="Default",
     bg="F2EEE4", bgUi="E8E2D6", bgTool="EEE9DE", frame="DCD3C5", surface="F9F7F1", hover="DFD9CB",
-    border="D3CCBE", fg="2E2A26", muted="68625A", disabled="ACA598",
+    border="D3CCBE", fg="2E2A26", muted="615B53", disabled="ACA598",
     caretRow="EBE6DA", selection="D8DCE6", selInactive="E4E0D6", lineNo="A8A194", lineNoCaret="B0261E",
     guide="E4DFD4", guideSel="CBC4B6",
     keyword="B0261E", string="9A5400", number="1F55A8", type="1E6634", method="A42E6E", call="963064",

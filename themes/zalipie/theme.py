@@ -11,7 +11,7 @@
 SADZA = dict(
     name="Zalipie Sadza (Dark)", dark=True, parent="Darcula",
     bg="1C1B1A", bgUi="171615", bgTool="1A1918", frame="2E2B28", surface="252321", hover="2E2C29",
-    border="36332F", fg="E6E2DA", muted="938D84", disabled="5E5A54",
+    border="36332F", fg="E6E2DA", muted="979188", disabled="5E5A54",
     caretRow="242220", selection="2D3954", selInactive="2C2F36", lineNo="5C5750", lineNoCaret="D6A47C",
     guide="262422", guideSel="3E3A35",
     keyword="D6A47C", string="94CC7A", number="EAD06C", type="C8A2EE", method="F27F92", call="F5A9B5",
@@ -28,7 +28,7 @@ SADZA = dict(
 WAPNO = dict(
     name="Zalipie Wapno (Light)", dark=False, parent="Default",
     bg="F2F4F3", bgUi="E6E9E8", bgTool="EDEFEE", frame="D6DAD9", surface="FAFBFB", hover="DDE1E0",
-    border="D0D5D4", fg="242220", muted="6A6863", disabled="A6A8A4",
+    border="D0D5D4", fg="242220", muted="615F5A", disabled="A6A8A4",
     caretRow="EAEDEC", selection="D2DCF0", selInactive="E0E3E4", lineNo="A2A6A3", lineNoCaret="8C4A22",
     guide="E2E6E5", guideSel="C6CCCA",
     keyword="8C4A22", string="2E6E1E", number="7A5C00", type="7430A8", method="B01E4A", call="94304E",

@@ -11,7 +11,7 @@
 QIR = dict(
     name="Mudhif Qir (Dark)", dark=True, parent="Darcula", kwBold=True,
     bg="17140E", bgUi="13100B", bgTool="15120D", frame="2B261D", surface="1F1B14", hover="28231A",
-    border="2F2920", fg="C2B596", muted="958A70", disabled="554D3E",
+    border="2F2920", fg="C2B596", muted="978C72", disabled="554D3E",
     caretRow="1E1A13", selection="3A3220", selInactive="2C2619", lineNo="5A5140", lineNoCaret="E2B44A",
     guide="221E16", guideSel="3A3326",
     keyword="E2B44A", string="AAC46C", number="EC8250", type="D69A52", method="F4E8C6", call="E2D6B4",
@@ -28,7 +28,7 @@ QIR = dict(
 QASAB = dict(
     name="Mudhif Qasab (Light)", dark=False, parent="Default", kwBold=True,
     bg="F4EEDC", bgUi="EAE2CC", bgTool="F0E9D5", frame="DED3B9", surface="FAF6EA", hover="E2D8BE",
-    border="D6CBAE", fg="463C28", muted="6E6248", disabled="ADA180",
+    border="D6CBAE", fg="463C28", muted="665A40", disabled="ADA180",
     caretRow="EDE5CF", selection="E2D4A8", selInactive="E8DEC2", lineNo="AA9E80", lineNoCaret="7A5600",
     guide="E6DEC6", guideSel="CCC0A0",
     keyword="7A5600", string="3E6A12", number="B0461A", type="8A4A10", method="241A08", call="2E2614",

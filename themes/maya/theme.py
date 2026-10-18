@@ -10,7 +10,7 @@
 CORTE = dict(
     name="Maya Corte (Dark)", dark=True, parent="Darcula",
     bg="13162A", bgUi="0F1222", bgTool="111426", frame="222742", surface="1A1E35", hover="232842",
-    border="2B3150", fg="C8CADA", muted="868CA8", disabled="535973",
+    border="2B3150", fg="C8CADA", muted="888EAA", disabled="535973",
     caretRow="1A1E34", selection="2C3760", selInactive="242A44", lineNo="4C5374", lineNoCaret="62D29B",
     guide="1B1F35", guideSel="343B5C",
     keyword="62D29B", string="F2706E", number="6CC8F0", type="F0CF5C", method="C391F2", call="D2AEF5",
@@ -27,7 +27,7 @@ CORTE = dict(
 HUIPIL = dict(
     name="Maya Huipil (Light)", dark=False, parent="Default",
     bg="F6F4EE", bgUi="EBE8E0", bgTool="F0EEE7", frame="DDD8CE", surface="FCFBF8", hover="E2DFD6",
-    border="D5D1C6", fg="403E39", muted="66635C", disabled="A9A69E",
+    border="D5D1C6", fg="403E39", muted="615E57", disabled="A9A69E",
     caretRow="EDEBE4", selection="D2DCF2", selInactive="E2E2E4", lineNo="A8A59C", lineNoCaret="0E7A4E",
     guide="E5E3DB", guideSel="CAC6BC",
     keyword="0E7A4E", string="B3201F", number="0B6E9C", type="946000", method="7A35B0", call="8A4CBC",

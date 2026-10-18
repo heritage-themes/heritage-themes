@@ -28,7 +28,7 @@ PUKA = dict(
     name="Peru Puka (Dark)", dark=True, parent="Darcula",
     bg="720041", bgUi="610036", bgTool="6A003C", frame="83164F", surface="7F124C", hover="8A2656",
     border="89365B", fg="F8ECE0", muted="D8A8B9", disabled="A0667D",
-    caretRow="7C0D49", selection="475585", selInactive="494C70", lineNo="AF7B8E", lineNoCaret="97ED9A",
+    caretRow="7C0D49", selection="414F7F", selInactive="494C70", lineNo="AF7B8E", lineNoCaret="97ED9A",
     guide="781949", guideSel="964267",
     keyword="97ED9A", string="FFC184", number="F0E395", type="D9B3FF", method="7AE6E5", call="BFF0EF",
     field="D8B46A", constant="58D8AE", annotation="99D1FF", label="FBF4EA",

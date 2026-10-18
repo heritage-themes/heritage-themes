@@ -183,8 +183,7 @@ def workbench(p):
         return over(mix(bg, p[key], 0.5), bg)
     return {
         # base. Text that names a state takes the ANSI colours, which read as their hue at 4.5:1 or more against bg.
-        # Focus outlines and match highlights take ansiBlue, as VS Code's own themes do; gold falls below the 3:1
-        # that a focus indicator needs in some light themes.
+        # Focus outlines and match highlights take ansiBlue, as VS Code's own themes do.
         "foreground": c["fg"], "disabledForeground": c["disabled"], "descriptionForeground": c["muted"],
         "errorForeground": c["ansiRed"], "icon.foreground": c["muted"], "focusBorder": c["ansiBlue"],
         "selection.background": c["selection"], "widget.border": c["border"], "widget.shadow": SHADOW[p["dark"]],
