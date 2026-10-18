@@ -134,6 +134,7 @@ def plugin_xml(families, themes):
     <ul>
 {blurbs}
     </ul>
+    <p>Report problems and suggest traditions on the <a href="{VENDOR_URL}/issues">issue tracker</a>.</p>
   ]]></description>
   <change-notes><![CDATA[
     <b>{VERSION}</b>
@@ -205,6 +206,8 @@ Choose a theme with **Preferences: Color Theme** (`Ctrl+K Ctrl+T`; `Cmd+K Cmd+T`
 
 Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs: see \
 [Heritage Themes on GitHub]({VENDOR_URL}).
+
+Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the theme, VS Code version, language and a screenshot.
 """
 
 

@@ -103,7 +103,7 @@ vscode/         CHANGELOG.md: VS Code extension release notes
 assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
 scripts/        release.sh, parent_overrides.py; shiki/ tokenises the VS Code preview; vscode/ packs and publishes the extension
 docs/           releasing.md, adding-a-theme.md
-.github/        Build, Publish and Publish VS Code workflows
+.github/        Build, Publish and Publish VS Code workflows; ISSUE_TEMPLATE/ holds the issue forms
 themes/<theme>/
   theme.py      palettes; defines FAMILY, BLURB and THEMES
   README.md     what the theme is
@@ -123,6 +123,10 @@ Only sources are tracked. Jars, zips, `.icls` and `.vsix` files are build output
 ## Add a theme
 
 See [docs/adding-a-theme.md](docs/adding-a-theme.md).
+
+## Report an issue
+
+Report a colour, contrast or readability problem, or suggest a new tradition, on the [issue tracker](https://github.com/heritage-themes/heritage-themes/issues). The bug form asks for the theme, editor and version, language and a screenshot; a report with these can be reproduced.
 
 ## Licence
 
