@@ -1,0 +1,60 @@
+name: Bug report
+description: A colour, contrast or readability problem in a theme, or a fault in the plugin or extension.
+labels: [bug]
+body:
+  - type: input
+    id: theme
+    attributes:
+      label: Theme
+      description: The full theme name, as shown in the IDE's theme list.
+      placeholder: Wuxing Night
+    validations:
+      required: true
+  - type: dropdown
+    id: editor
+    attributes:
+      label: Editor
+      options:
+        - JetBrains IDE
+        - VS Code
+        - Other VS Code-compatible editor
+    validations:
+      required: true
+  - type: input
+    id: editor-version
+    attributes:
+      label: Editor name and version
+      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3 or VS Code 1.105.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Plugin or extension version
+      description: Shown in Settings | Plugins, or in the Extensions view.
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Language or file type
+      description: Leave empty if the problem is in the user interface.
+      placeholder: TypeScript, SQL, YAML
+  - type: textarea
+    id: actual
+    attributes:
+      label: What looks wrong
+      description: Name the element, such as a keyword, a tab or a popup, and say what is wrong with it.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: Drag an image here. Include a code sample when the problem is in the editor.
+    validations:
+      required: true

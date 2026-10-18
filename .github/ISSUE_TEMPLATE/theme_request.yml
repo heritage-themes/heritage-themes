@@ -1,0 +1,26 @@
+name: Theme request
+description: Suggest a culture's colour tradition for a new theme family.
+labels: [theme request]
+body:
+  - type: input
+    id: tradition
+    attributes:
+      label: Culture and tradition
+      description: The people, region and craft or practice the colours come from.
+      placeholder: Kente cloth, Ghana
+    validations:
+      required: true
+  - type: textarea
+    id: colours
+    attributes:
+      label: Named colours and their meanings
+      description: The traditional colour names, in the original language and script where relevant, and what each one means or is made from.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: Links to books, museum pages or articles that document the colours.
+    validations:
+      required: true
