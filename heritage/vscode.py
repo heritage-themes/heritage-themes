@@ -26,6 +26,11 @@ def over(colour, base):
     return "#" + "".join(f"{v:02X}" for v in src) + f"{a:02X}"
 
 
+def luminance(hex_colour):
+    r, g, b = (c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in (x / 255 for x in rgb(hex_colour)))
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
 def mix(a, b, t):
     """a moved towards b by t, as six-digit hex."""
     return "".join(f"{round(x + (y - x) * t):02X}" for x, y in zip(rgb(a), rgb(b)))
@@ -60,7 +65,8 @@ def token_colors(p):
       "keyword.operator.of, keyword.control.directive, punctuation.definition.directive, support.type.primitive, "
       "storage.type.primitive, storage.type.built-in, entity.name.type.primitive.rust, "
       "entity.name.type.numeric.rust", "keyword", kw)
-    s("keyword.operator, punctuation, storage.type.function.arrow, meta.brace", "op")
+    s("keyword.operator, punctuation, storage.type.function.arrow, meta.brace, storage.modifier.reference, "
+      "storage.modifier.pointer", "op")
     s("variable.parameter.function.language.special.self, variable.language.special.self, "
       "variable.language.special.cls", "keyword", "italic")
     s("entity.name.type, entity.name.class, entity.other.inherited-class, support.class, support.type, "
@@ -76,7 +82,7 @@ def token_colors(p):
     s("support.function.builtin, support.type.python, support.variable.magic.python", "call", "italic")
     s("meta.annotation, storage.type.annotation, punctuation.definition.annotation, meta.decorator, "
       "entity.name.function.decorator, punctuation.definition.decorator, entity.name.function.macro, "
-      "support.macro, meta.attribute.rust, meta.attribute.rust entity.name.type, "
+      "support.macro, meta.attribute.rust, meta.attribute.rust entity.name.type, meta.attribute.rust punctuation, "
       "punctuation.definition.attribute.rust, punctuation.brackets.attribute.rust, entity.name.type.anchor.yaml, "
       "keyword.control.property.anchor.yaml, punctuation.definition.anchor.yaml, variable.other.alias.yaml",
       "annotation")
@@ -95,7 +101,7 @@ def token_colors(p):
     s("string.unquoted.argument.shell, constant.other.option", "fg")
     # HTML, XML, JSX
     s("entity.name.tag, punctuation.definition.tag, meta.tag.metadata.doctype, "
-      "meta.tag punctuation.separator.key-value, meta.tag.attributes keyword.operator.assignment", "keyword")
+      "punctuation.separator.key-value.html, meta.tag.attributes keyword.operator.assignment", "keyword")
     s("meta.tag.custom entity.name.tag", "type")
     s("support.class.component, meta.tag.metadata.doctype entity.other.attribute-name", "keyword")
     s("constant.character.entity, punctuation.definition.entity.html", "gold")
@@ -110,17 +116,17 @@ def token_colors(p):
     # SQL
     s("constant.other.database-name.sql", "fg")
     # YAML: keys as keywords, plain scalars as text, comments as doc comments
-    s("entity.name.tag.yaml", "keyword")
+    s("entity.name.tag.yaml", "keyword", kw)
     s("string.unquoted.plain.out.yaml, source.yaml constant.numeric, source.yaml constant.language", "fg")
     s("comment.line.number-sign.yaml, comment.line.number-sign.yaml punctuation.definition.comment", "doc", "italic")
     # TOML: keys and tables as keywords, booleans as predefined symbols
-    s("entity.name.section.toml, variable.other.key.toml", "keyword")
+    s("entity.name.section.toml, variable.other.key.toml", "keyword", kw)
     s("constant.language.boolean.toml", "typeParam", "italic")
     # Markdown: headings take the declaration role, markers the keyword role
     s("markup.heading, entity.name.section.markdown", "method", "bold")
     s("punctuation.definition.heading, punctuation.definition.bold, punctuation.definition.italic, "
       "punctuation.definition.list.begin.markdown, punctuation.definition.raw.markdown, "
-      "punctuation.definition.markdown", "keyword")
+      "punctuation.definition.markdown", "keyword", kw)
     s("markup.bold", "fg", "bold")
     s("markup.italic", "fg", "italic")
     s("markup.inline.raw", "string")
@@ -168,16 +174,19 @@ def workbench(p):
     """Workbench colour keys to #-prefixed colours."""
     c = {k: "#" + v for k, v in p.items() if isinstance(v, str) and re.fullmatch(r"[0-9A-F]{6}", v)}
     bg = p["bg"]
-    red_hover = "#" + mix(p["red"], p["redText"], 0.12)
+    # Hover moves the button colour away from its text, so the text keeps its contrast.
+    red_hover = "#" + mix(p["red"], "000000" if luminance(p["redText"]) > luminance(p["red"]) else "FFFFFF", 0.12)
     def layer(key, base=bg):
         return over(p[key], base)
     def wash(key):
         """Halfway from bg to the palette colour, as a layer over bg."""
         return over(mix(bg, p[key], 0.5), bg)
     return {
-        # base
+        # base. Text that names a state takes the ANSI colours, which read as their hue at 4.5:1 or more against bg.
+        # Focus outlines and match highlights take ansiBlue, as VS Code's own themes do; gold falls below the 3:1
+        # that a focus indicator needs in some light themes.
         "foreground": c["fg"], "disabledForeground": c["disabled"], "descriptionForeground": c["muted"],
-        "errorForeground": c["error"], "icon.foreground": c["muted"], "focusBorder": c["gold"],
+        "errorForeground": c["ansiRed"], "icon.foreground": c["muted"], "focusBorder": c["ansiBlue"],
         "selection.background": c["selection"], "widget.border": c["border"], "widget.shadow": SHADOW[p["dark"]],
         "sash.hoverBorder": c["gold"],
         "toolbar.hoverBackground": c["hover"], "toolbar.activeBackground": c["selection"],
@@ -195,8 +204,8 @@ def workbench(p):
         "dropdown.background": c["surface"], "dropdown.listBackground": c["surface"],
         "dropdown.border": c["border"], "dropdown.foreground": c["fg"],
         "input.background": c["surface"], "input.border": c["border"], "input.foreground": c["fg"],
-        "input.placeholderForeground": c["disabled"],
-        "inputOption.activeBackground": c["selInactive"], "inputOption.activeBorder": c["gold"],
+        "input.placeholderForeground": c["muted"],
+        "inputOption.activeBackground": c["selInactive"], "inputOption.activeBorder": c["ansiBlue"],
         "inputOption.activeForeground": c["fg"], "inputOption.hoverBackground": c["hover"],
         "inputValidation.errorBackground": c["diffDel"], "inputValidation.errorBorder": c["error"],
         "inputValidation.warningBackground": c["diffConf"], "inputValidation.warningBorder": c["warning"],
@@ -210,16 +219,16 @@ def workbench(p):
         # lists and trees
         "list.activeSelectionBackground": c["selection"], "list.inactiveSelectionBackground": c["selInactive"],
         "list.hoverBackground": c["hover"],
-        "list.focusBackground": c["selInactive"], "list.focusOutline": c["gold"],
-        "list.inactiveFocusOutline": TRANSPARENT, "list.highlightForeground": c["gold"],
-        "list.focusHighlightForeground": c["gold"], "list.dropBackground": c["selInactive"],
-        "list.errorForeground": c["error"], "list.warningForeground": c["warning"],
-        "list.invalidItemForeground": c["error"], "list.deemphasizedForeground": c["disabled"],
+        "list.focusBackground": c["selInactive"], "list.focusOutline": c["ansiBlue"],
+        "list.inactiveFocusOutline": TRANSPARENT, "list.highlightForeground": c["ansiBlue"],
+        "list.focusHighlightForeground": c["ansiBlue"], "list.dropBackground": c["selInactive"],
+        "list.errorForeground": c["ansiRed"], "list.warningForeground": c["ansiYellow"],
+        "list.invalidItemForeground": c["ansiRed"], "list.deemphasizedForeground": c["muted"],
         "tree.indentGuidesStroke": c["guideSel"], "tree.inactiveIndentGuidesStroke": c["guide"],
         # frame: title bar, activity bar, status bar
         "titleBar.activeBackground": c["frame"], "titleBar.inactiveBackground": c["frame"],
         "titleBar.activeForeground": c["fg"], "titleBar.inactiveForeground": c["muted"], "titleBar.border": TRANSPARENT,
-        "commandCenter.background": c["surface"], "commandCenter.foreground": c["muted"],
+        "commandCenter.background": c["surface"], "commandCenter.foreground": c["fg"],
         "commandCenter.activeBackground": c["hover"], "commandCenter.activeForeground": c["fg"],
         "commandCenter.border": c["border"], "commandCenter.activeBorder": c["border"],
         "menubar.selectionBackground": c["hover"], "menubar.selectionForeground": c["fg"],
@@ -229,15 +238,15 @@ def workbench(p):
         "activityBarBadge.background": c["red"], "activityBarBadge.foreground": c["redText"],
         "activityBarTop.foreground": c["fg"], "activityBarTop.inactiveForeground": c["muted"],
         "activityBarTop.activeBorder": c["red"],
-        "statusBar.background": c["frame"], "statusBar.foreground": c["muted"], "statusBar.border": TRANSPARENT,
-        "statusBar.noFolderBackground": c["frame"], "statusBar.noFolderForeground": c["muted"],
+        "statusBar.background": c["frame"], "statusBar.foreground": c["fg"], "statusBar.border": TRANSPARENT,
+        "statusBar.noFolderBackground": c["frame"], "statusBar.noFolderForeground": c["fg"],
         "statusBar.debuggingBackground": c["red"], "statusBar.debuggingForeground": c["redText"],
-        "statusBar.focusBorder": c["gold"], "statusBarItem.hoverBackground": c["hover"],
-        "statusBarItem.activeBackground": c["selection"], "statusBarItem.focusBorder": c["gold"],
+        "statusBar.focusBorder": c["ansiBlue"], "statusBarItem.hoverBackground": c["hover"],
+        "statusBarItem.activeBackground": c["selection"], "statusBarItem.focusBorder": c["ansiBlue"],
         "statusBarItem.remoteBackground": c["red"], "statusBarItem.remoteForeground": c["redText"],
         "statusBarItem.remoteHoverBackground": red_hover,
         "statusBarItem.prominentBackground": c["selInactive"], "statusBarItem.prominentHoverBackground": c["hover"],
-        "statusBarItem.errorBackground": c["error"], "statusBarItem.errorForeground": c["redText"],
+        "statusBarItem.errorBackground": c["red"], "statusBarItem.errorForeground": c["redText"],
         "statusBarItem.warningBackground": c["diffConf"], "statusBarItem.warningForeground": c["fg"],
         # tool island: side bar and panel
         "sideBar.background": c["bgTool"], "sideBar.foreground": c["fg"], "sideBar.border": c["border"],
@@ -265,7 +274,7 @@ def workbench(p):
         "tab.activeBorder": c["red"], "tab.unfocusedActiveBorder": c["gold"], "tab.activeBorderTop": TRANSPARENT,
         "tab.activeModifiedBorder": c["modified"], "tab.inactiveModifiedBorder": c["modified"],
         "breadcrumb.background": c["bg"], "breadcrumb.foreground": c["muted"],
-        "breadcrumb.focusForeground": c["fg"], "breadcrumb.activeSelectionForeground": c["gold"],
+        "breadcrumb.focusForeground": c["fg"], "breadcrumb.activeSelectionForeground": c["fg"],
         "breadcrumbPicker.background": c["surface"],
         # editor
         "editor.background": c["bg"], "editor.foreground": c["fg"],
@@ -316,8 +325,8 @@ def workbench(p):
         "editorWidget.border": c["border"], "editorWidget.resizeBorder": c["gold"],
         "editorSuggestWidget.background": c["surface"], "editorSuggestWidget.border": c["border"],
         "editorSuggestWidget.foreground": c["fg"], "editorSuggestWidget.selectedBackground": c["selection"],
-        "editorSuggestWidget.selectedForeground": c["fg"], "editorSuggestWidget.highlightForeground": c["gold"],
-        "editorSuggestWidget.focusHighlightForeground": c["gold"],
+        "editorSuggestWidget.selectedForeground": c["fg"], "editorSuggestWidget.highlightForeground": c["ansiBlue"],
+        "editorSuggestWidget.focusHighlightForeground": c["ansiBlue"],
         "editorHoverWidget.background": c["surface"], "editorHoverWidget.border": c["border"],
         "editorHoverWidget.statusBarBackground": c["surface"],
         "editorMarkerNavigation.background": c["surface"], "editorMarkerNavigationError.background": c["error"],
@@ -348,7 +357,7 @@ def workbench(p):
         "gitDecoration.untrackedResourceForeground": c["ansiRed"],
         "gitDecoration.conflictingResourceForeground": c["ansiMagenta"],
         "gitDecoration.deletedResourceForeground": c["muted"],
-        "gitDecoration.ignoredResourceForeground": c["disabled"],
+        "gitDecoration.ignoredResourceForeground": c["muted"],
         "gitDecoration.stageModifiedResourceForeground": c["ansiBlue"],
         "gitDecoration.stageDeletedResourceForeground": c["muted"],
         "gitDecoration.renamedResourceForeground": c["ansiBlue"],
@@ -360,7 +369,7 @@ def workbench(p):
         "quickInput.background": c["surface"], "quickInput.foreground": c["fg"],
         "quickInputList.focusBackground": c["selection"], "quickInputList.focusForeground": c["fg"],
         "quickInputTitle.background": c["surface"],
-        "pickerGroup.foreground": c["gold"], "pickerGroup.border": c["border"],
+        "pickerGroup.foreground": c["ansiBlue"], "pickerGroup.border": c["border"],
         "notifications.background": c["surface"], "notifications.foreground": c["fg"],
         "notifications.border": c["border"], "notificationCenterHeader.background": c["surface"],
         "notificationCenter.border": c["border"], "notificationToast.border": c["border"],
