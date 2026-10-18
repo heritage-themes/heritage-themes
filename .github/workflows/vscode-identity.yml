@@ -1,0 +1,26 @@
+name: VS Marketplace identity
+
+# Prints the Marketplace ID of the Entra ID identity that Publish VS Code signs in as. Run it by hand once,
+# then add that ID to the publisher as a Contributor (docs/releasing.md).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  identity:
+    runs-on: ubuntu-latest
+    environment: vscode-marketplace
+    permissions:
+      id-token: write
+    steps:
+      - uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+      # 499b84ac-… is the Azure DevOps resource, which the Marketplace shares.
+      - run: |
+          az rest --resource 499b84ac-1321-427f-aa17-267ca6975798 \
+            --uri https://app.vssps.visualstudio.com/_apis/profile/profiles/me --query id --output tsv

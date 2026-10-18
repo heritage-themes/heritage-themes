@@ -13,10 +13,14 @@ jobs:
   build:
     # build.py is pure standard-library Python that writes the same bytes on every OS, and it
     # validates the plugin descriptor, theme files and icons itself, so one Linux runner is enough.
+    # --vsix also packs the VS Code extension with the vsce pinned in scripts/vscode.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - run: python3 build.py
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: python3 build.py --vsix

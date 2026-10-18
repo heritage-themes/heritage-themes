@@ -12,7 +12,7 @@ Any folder in `themes/` with a `theme.py` is a theme family. `heritage.load_fami
 | `BLURB` | One sentence for the plugin description: the tradition and its main syntax mappings |
 | `THEMES` | One `dict(slug=..., id=..., palette=...)` per theme; `id` is a new UUID |
 
-From each palette, `heritage/scheme.py` builds the editor colour scheme, `heritage/ui.py` builds the UI theme and `heritage/vscode.py` builds the VS Code colour theme. `build.py` packs the scheme and the UI theme into the plugin and writes a standalone `.icls` per theme. `slug`, `id` and `name` must be unique across all themes; `build.py` fails otherwise.
+From each palette, `heritage/scheme.py` builds the editor colour scheme, `heritage/ui.py` builds the UI theme and `heritage/vscode.py` builds the VS Code colour theme. `build.py` packs the scheme and the UI theme into the JetBrains plugin, writes a standalone `.icls` per theme, and adds the VS Code theme to the VS Code extension. `slug`, `id` and `name` must be unique across all themes; `build.py` fails otherwise.
 
 A change in `heritage/` changes every family. After one, render all previews and check each family.
 
@@ -82,7 +82,7 @@ Constraints:
 ## Check the result
 
 ```bash
-python3 build.py                # prints build/heritage-themes-<version>.zip: <n> themes
+python3 build.py                # prints the plugin zip and the VS Code extension folder, each with <n> themes
 python3 preview.py <theme>      # writes themes/<theme>/build/preview.html
 python3 preview.py --vscode <theme>   # writes themes/<theme>/build/preview-vscode.html
 ```
@@ -125,6 +125,6 @@ Add these to the theme folder:
 
 1. Add a row to the table in the root `README.md`: `` | [`themes/<theme>/`](themes/<theme>/) | <Theme A>, <Theme B> | <Country> | ``.
    `<Country>` is the country name only, even for a region inside it; a tradition that spans borders lists every country, separated by commas.
-2. Add a line under `### Added` in `[Unreleased]` in `CHANGELOG.md`: `- <Theme A> and <Theme B>, drawn from <tradition>.`
+2. Add a line under `### Added` in `[Unreleased]` in both `CHANGELOG.md` and `vscode/CHANGELOG.md`: `- <Theme A> and <Theme B>, drawn from <tradition>.`
 3. Run `python3 build.py` again.
-4. Commit on `dev` as `feat(<theme>): add <Theme A> and <Theme B> themes`, limited to the theme folder, the root README row and the changelog entry. Releasing is described in [releasing.md](releasing.md).
+4. Commit on `dev` as `feat(<theme>): add <Theme A> and <Theme B> themes`, limited to the theme folder, the root README row and the changelog entries. Releasing is described in [releasing.md](releasing.md).

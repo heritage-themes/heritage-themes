@@ -1,11 +1,12 @@
 name: Publish
 
 # Fires only when a version tag (for example `v1.0.0`) is pushed, so the tag push is the release
-# gate. scripts/release.sh pushes the tag after Build has passed on the commit it points at.
+# gate. scripts/release.sh pushes the tag after Build has passed on the commit it points at. The
+# digit keeps the VS Code extension's vscode-v* tags out.
 on:
   push:
     tags:
-      - 'v*'
+      - 'v[0-9]*'
 
 permissions:
   contents: read
