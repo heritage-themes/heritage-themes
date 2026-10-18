@@ -1,6 +1,7 @@
-Heritage Themes is one JetBrains plugin with colour themes drawn from cultures' colour traditions. Each theme
-family is a folder in `themes/` with a `theme.py` holding its palettes; all colour mappings, the UI theme and the preview
-are shared code in `heritage/`. `python3 build.py` builds and validates the plugin. Work on `dev`; see the
+Heritage Themes is one JetBrains plugin and one VS Code extension with colour themes drawn from cultures' colour
+traditions. Each theme family is a folder in `themes/` with a `theme.py` holding its palettes; all colour mappings, the
+UI theme and the previews are shared code in `heritage/`. `python3 build.py` builds and validates both;
+`python3 build.py --vsix` also packs the VS Code extension. Work on `dev`; see the
 root README for layout, previews and the git workflow.
 
 ## Adding a new culture-based theme
@@ -16,16 +17,16 @@ Workflow:
    me choose unless I said "do all". Drop a concept that fails the check and say why.
 3. Create each family as described in docs/adding-a-theme.md: `theme.py`, `README.md`, `preview.png`. There is
    no `build.py` registration (it discovers `theme.py` files itself); register by adding the root `README.md`
-   table row and the `CHANGELOG.md` `[Unreleased]` entry.
+   table row and an `[Unreleased]` entry in both `CHANGELOG.md` and `vscode/CHANGELOG.md`.
 4. Run `python3 build.py`, then `python3 preview.py --png <theme>` to render the preview page and
-   `preview.png`. Look at the rendered PNG yourself. Stop there: do not install the jar in the IDE or do the
+   `preview.png`, and `python3 preview.py --vscode --png <theme>` for the VS Code preview. Look at the rendered PNG yourself. Stop there: do not install the jar in the IDE or do the
    manual IDE checks; I do those. Do not send me the jar.
 5. Check before finishing: every UI colour reference resolves; text roles meet WCAG AA against `bg` (comments
    may be about 3:1); fields and method calls are clearly distinct from plain text and from each other, unless
    the concept builds hierarchy from tone and weight rather than hue, as Shuimo does; the finished palette is
    still distinct from every existing family (compare the rendered previews side by side).
 6. Commit on `dev` as `feat(<theme>): ...`, limited to the new theme folder, the root README row and the
-   changelog entry.
+   changelog entries.
 
 Distinctiveness:
 
