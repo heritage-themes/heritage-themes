@@ -28,7 +28,7 @@ PRUSSIAN = dict(
 PLASTER = dict(
     name="Shaker Plaster (Light)", dark=False, parent="Default", kwBold=True,
     bg="F5F3EE", bgUi="EAE7E0", bgTool="F0EEE8", frame="DDD8CF", surface="FBFAF7", hover="E0DCD3",
-    border="D5D0C5", fg="34302C", muted="66625C", disabled="ABA69C",
+    border="D5D0C5", fg="34302C", muted="625E58", disabled="ABA69C",
     caretRow="EEEBE4", selection="D4DEEA", selInactive="E4E2DC", lineNo="A8A398", lineNoCaret="1F3F7A",
     guide="E6E3DC", guideSel="CBC6BA",
     keyword="1F3F7A", string="B02A22", number="0E6E5A", type="2E6A1A", method="A85A00", call="9A4E10",

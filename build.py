@@ -17,6 +17,21 @@ PLUGIN_ICONS = ("pluginIcon.svg", "pluginIcon_dark.svg")
 SINCE_BUILD = "253"  # 2025.3, the first release with the Islands Dark and Islands Light parent themes
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
+ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
+# WCAG 2.2 AA minimums for palette roles in both IDEs: 4.5:1 for text, 3:1 for comments, focus rings and the caret.
+# (foreground roles, background roles, minimum)
+CONTRAST = (
+    (("fg", "muted"), ("bg", "bgTool", "bgUi", "surface", "caretRow", "frame"), 4.5),
+    (("keyword", "string", "number", "type", "method", "call", "field", "constant", "annotation", "doc", "docTag",
+      "op", "param", "typeParam", "label", "gold", "azure") + ANSI, ("bg",), 4.5),
+    (("comment",), ("bg",), 3),
+    (ANSI, ("bgTool",), 4.5),  # console and terminal
+    (("fg",), ("hover", "selection", "selInactive", "searchBg"), 4.5),
+    (("ansiBlue",), ("selection",), 4.5),  # VS Code match highlights in a selected list row
+    (("redText",), ("red",), 4.5),
+    (("gold",), ("bgTool", "bgUi", "surface"), 3),  # IntelliJ focus ring
+    (("caret",), ("bg", "caretRow"), 3),
+)
 
 
 def luminance(hex_colour):
@@ -25,16 +40,29 @@ def luminance(hex_colour):
     return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
 
+def contrast(a, b):
+    x, y = luminance(a), luminance(b)
+    return (max(x, y) + 0.05) / (min(x, y) + 0.05)
+
+
 def check_frame(palette):
     """Fails the build when the frame does not stand apart from the editor and tool windows as Islands needs."""
-    frame = luminance(palette["frame"])
     for key in ("bg", "bgTool"):
-        island = luminance(palette[key])
-        ratio = (max(frame, island) + 0.05) / (min(frame, island) + 0.05)
-        if (frame > island) != palette["dark"] or ratio < FRAME_CONTRAST:
+        ratio = contrast(palette["frame"], palette[key])
+        lighter = luminance(palette["frame"]) > luminance(palette[key])
+        if lighter != palette["dark"] or ratio < FRAME_CONTRAST:
             side = "lighter" if palette["dark"] else "darker"
             raise SystemExit(f"{palette['name']}: frame must be {side} than {key} by {FRAME_CONTRAST:.2f}:1, "
-                             f"is {ratio:.2f}:1 {'lighter' if frame > island else 'darker'}")
+                             f"is {ratio:.2f}:1 {'lighter' if lighter else 'darker'}")
+
+
+def check_contrast(palette):
+    """Fails the build when a palette role falls below its CONTRAST minimum against a background it is drawn on."""
+    p = dict(palette, caret=palette.get("caret", palette["gold"]))
+    failures = [f"{fg} on {bg} is {contrast(p[fg], p[bg]):.2f}:1, needs {minimum}:1"
+                for fgs, bgs, minimum in CONTRAST for fg in fgs for bg in bgs if contrast(p[fg], p[bg]) < minimum]
+    if failures:
+        raise SystemExit(f"{palette['name']}: " + "; ".join(failures))
 
 
 def check_references(t):
@@ -139,6 +167,7 @@ def main():
     for f in families:
         for t in f.THEMES:
             check_frame(t["palette"])
+            check_contrast(t["palette"])
     for t in themes:
         check_references(t)
 

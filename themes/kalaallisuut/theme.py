@@ -21,7 +21,7 @@ QERNERTOQ = dict(
     comment="68717C", doc="7A8591", docTag="A0AAB5", op="959DA7", param="A3AAB3", typeParam="B6CFF4",
     gold="E6C462", red="B8323A", redText="FFF2F2", azure="8AB2EE", caret="F2F3F5",
     error="FF6B6B", warning="E8A33A", weak="8A8460",
-    searchBg="4A4012", searchBorder="E6C462", underCaret="263446", writeCaret="4A2228",
+    searchBg="483E10", searchBorder="E6C462", underCaret="263446", writeCaret="4A2228",
     braceBg="2E3E56", todo="E6C462",
     added="7FB070", modified="6A9AD8", deleted="D0605A",
     diffIns="17291E", diffMod="182A40", diffDel="34191C", diffConf="342E16", fileYellow="171C21",
@@ -30,7 +30,7 @@ QERNERTOQ = dict(
 QAQORTOQ = dict(
     name="Kalaallisuut Qaqortoq (Light)", dark=False, parent="Default",
     bg="F3F3F0", bgUi="E8E8E4", bgTool="EEEEEA", frame="D8D8D3", surface="FAFAF8", hover="DEDED8",
-    border="D2D2CC", fg="43474E", muted="686C72", disabled="ACADA8",
+    border="D2D2CC", fg="43474E", muted="5A5E64", disabled="ACADA8",
     caretRow="ECECE8", selection="D4DCEA", selInactive="E2E3E2", lineNo="A8AAA6", lineNoCaret="B0222C",
     guide="E4E4E0", guideSel="CACAC4",
     keyword="B0222C", string="B33382", number="7E5E00", type="1F4E9E", method="1E6426", call="2A6E30",

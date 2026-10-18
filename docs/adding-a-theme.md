@@ -75,7 +75,8 @@ Constraints:
 - `frame` is the main window behind the editor and tool windows, which the Islands UI draws as rounded islands of `bg` and `bgTool`. Take it from the hue of `bg`: lighter than both `bg` and `bgTool` in a dark theme, darker in a light one, by at least 1.20:1. `build.py` fails otherwise.
 - `fileYellow` colours folders that IntelliJ marks as excluded, such as `node_modules`. Use a faint wash close to `bg`, never a saturated colour. A solid colour draws the Project view as coloured bars.
 - `label` colours Spock labels (`given:`, `when:`, `then:`) as bold text with no background. It needs the same contrast against `bg` as the syntax roles.
-- The `ansi*` keys colour ANSI output in the console and terminal, and VCS file status in the Project view: `ansiGreen` added, `ansiBlue` modified, `ansiRed` unversioned, `ansiMagenta` merged. Each must read as the hue it names, whatever the family's syntax roles are, and meet 4.5:1 against `bg`.
+- The `ansi*` keys colour ANSI output in the console and terminal, and VCS file status in the Project view: `ansiGreen` added, `ansiBlue` modified, `ansiRed` unversioned, `ansiMagenta` merged. Each must read as the hue it names, whatever the family's syntax roles are.
+- Roles meet WCAG AA against the backgrounds they are drawn on: 4.5:1 for text, 3:1 for comments, the caret and `gold` as the focus ring. `CONTRAST` in `build.py` lists the pairs; the build fails on one that falls short. `gold` also colours string escapes, so in a light theme it is a deep ochre rather than a bright yellow.
 - Avoid pure white and pure black for backgrounds and text, as the existing themes do.
 
 ## Check the result

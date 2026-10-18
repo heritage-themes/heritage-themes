@@ -30,7 +30,7 @@ KAPARAMIP = dict(
 ATTUS = dict(
     name="Ainu Attus (Light)", dark=False, parent="Default", kwBold=True,
     bg="EEE6D4", bgUi="E3DAC6", bgTool="E9E1CE", frame="D7CCB6", surface="F6F1E6", hover="DBD1BC",
-    border="CFC4AC", fg="34384A", muted="5C5C62", disabled="A8A08E",
+    border="CFC4AC", fg="34384A", muted="57575D", disabled="A8A08E",
     caretRow="E6DDC9", selection="D0D5E4", selInactive="DFDACD", lineNo="9F9682", lineNoCaret="B0281C",
     guide="E0D8C4", guideSel="C6BCA4",
     keyword="1E2A62", string="1F6E3A", number="6A3AA8", type="3A5296", method="B0281C", call="9A3A2E",

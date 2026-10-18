@@ -11,6 +11,7 @@ OVERLAYS = {True: ("#FFFFFF17", "#FFFFFF29", "#FFFFFF21"), False: ("#00000012", 
 def theme(p, slug):
     c = {k: "#" + v for k, v in p.items() if isinstance(v, str) and re.fullmatch(r"[0-9A-F]{6}", v)}
     hover, pressed, separator = OVERLAYS[p["dark"]]
+    match = "gold" if p["dark"] else "searchBg"
     ui = {
         "*": {
             "background": "bgUi", "foreground": "fg", "infoForeground": "muted",
@@ -92,7 +93,9 @@ def theme(p, slug):
         "SearchEverywhere.Header.background": "surface", "SearchEverywhere.List.separatorForeground": "muted",
         "SearchEverywhere.Advertiser.background": "surface", "SearchEverywhere.List.settingsBackground": "surface",
         "SearchField.errorBackground": "diffDel",
-        "SearchMatch.startBackground": "gold", "SearchMatch.endBackground": "gold",
+        # Speed search draws matches in dark text, so the match needs a light background in both modes, as in
+        # Islands: the search wash in light themes, gold in dark ones.
+        "SearchMatch.startBackground": match, "SearchMatch.endBackground": match,
         "TextField.background": "surface", "TextArea.background": "surface",
         "PasswordField.background": "surface", "FormattedTextField.background": "surface",
         "ComboBox.background": "surface", "ComboBox.nonEditableBackground": "surface",

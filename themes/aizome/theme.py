@@ -10,7 +10,7 @@
 KACHI = dict(
     name="Aizome Kachi (Dark)", dark=True, parent="Darcula", kwBold=False,
     bg="0B1421", bgUi="070E1A", bgTool="09121E", frame="1B2738", surface="121C2B", hover="192435",
-    border="1F2939", fg="A3BED6", muted="76889B", disabled="445160",
+    border="1F2939", fg="A3BED6", muted="7D8FA2", disabled="445160",
     caretRow="101A28", selection="1F344E", selInactive="19273A", lineNo="404E60", lineNoCaret="DFEAF1",
     guide="151E2C", guideSel="2A3647",
     keyword="788FA7", string="75BFC8", number="A0A5E0", type="C1DCEB", method="E9F2F7", call="A3BED6",
@@ -27,7 +27,7 @@ KACHI = dict(
 KAMENOZOKI = dict(
     name="Aizome Kamenozoki (Light)", dark=False, parent="Default", kwBold=False,
     bg="E7F2F7", bgUi="DCE9EF", bgTool="E1EDF3", frame="C8D8E0", surface="F1F8FB", hover="D0DFE7",
-    border="C3D4DD", fg="213651", muted="586B80", disabled="97A7B3",
+    border="C3D4DD", fg="213651", muted="4B5E73", disabled="97A7B3",
     caretRow="DCEBF1", selection="BDD8EC", selInactive="D1E3EE", lineNo="8EA1B0", lineNoCaret="132139",
     guide="D6E4EA", guideSel="B2C4CF",
     keyword="576B7F", string="186575", number="4B4D8B", type="111F37", method="0A152A", call="213651",

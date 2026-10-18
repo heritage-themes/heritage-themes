@@ -11,7 +11,7 @@
 BLUE = dict(
     name="Rajasthan Blue City (Dark)", dark=True, parent="Darcula",
     bg="13273C", bgUi="102235", bgTool="122539", frame="1F364D", surface="1B3148", hover="223A54",
-    border="243E56", fg="F2EADF", muted="8F9AA3", disabled="5A6F85",
+    border="243E56", fg="F2EADF", muted="939EA7", disabled="5A6F85",
     caretRow="182E45", selection="2A4458", selInactive="233D5A", lineNo="4C6984", lineNoCaret="FF9F45",
     guide="1B3148", guideSel="36506B",
     keyword="FFA65F", string="FE99C7", number="CBDA96", type="E5C68E", method="44D6D6", call="93D9D9",
@@ -28,19 +28,19 @@ BLUE = dict(
 PINK = dict(
     name="Rajasthan Pink City (Light)", dark=False, parent="Default",
     bg="F6E6DF", bgUi="ECD2C6", bgTool="F0DBD1", frame="E5C4B5", surface="FAEEE8", hover="E4C6B8",
-    border="DCBBAB", fg="2A2026", muted="75666A", disabled="AB9594",
+    border="DCBBAB", fg="2A2026", muted="615256", disabled="AB9594",
     caretRow="F0DCD2", selection="CFE0F2", selInactive="E3D7D6", lineNo="AF9792", lineNoCaret="B34700",
     guide="EBD6CC", guideSel="D6B6A7",
     keyword="944F04", string="A0346C", number="5E6A20", type="684A01", method="067272", call="1E7272",
     field="1A7728", constant="056A9D", annotation="6A50A5", label="A72629",
     comment="7D7072", doc="7A6450", docTag="5E4A38", op="5C5458", param="2A2026", typeParam="5E6A20",
-    gold="C08A10", red="1D62B0", redText="FFF8F0", azure="1D62B0", caret="B34700",
+    gold="8D6000", red="1D62B0", redText="FFF8F0", azure="1D62B0", caret="B34700",
     error="D01E2E", warning="A86800", weak="B0986A",
     searchBg="F5DA8A", searchBorder="C08A10", underCaret="D6E4F4", writeCaret="F5D3D3",
     braceBg="CFE8C8", todo="7F5800",
     added="5FA05A", modified="5A8AD0", deleted="C85A5A",
     diffIns="E0F0D8", diffMod="DCE7F5", diffDel="F8DADA", diffConf="F5E6C2", fileYellow="F5DEBD",
-    ansiRed="B3203F", ansiGreen="377416", ansiYellow="7F5800", ansiBlue="1D62B0", ansiMagenta="A3207F", ansiCyan="067469",
+    ansiRed="B3203F", ansiGreen="337012", ansiYellow="7F5800", ansiBlue="1D62B0", ansiMagenta="A3207F", ansiCyan="056F64",
 )
 
 FAMILY = "Rajasthan"

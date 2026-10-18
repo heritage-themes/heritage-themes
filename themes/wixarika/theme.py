@@ -11,7 +11,7 @@
 HARAMARA = dict(
     name="Wixárika Haramara (Dark)", dark=True, parent="Darcula",
     bg="121113", bgUi="0E0D0F", bgTool="100F11", frame="252428", surface="1B1A1D", hover="252428",
-    border="2E2D32", fg="C4C2C8", muted="8A8890", disabled="56545A",
+    border="2E2D32", fg="C4C2C8", muted="8C8A92", disabled="56545A",
     caretRow="1B1A1D", selection="263650", selInactive="25282F", lineNo="504E55", lineNoCaret="F7D23E",
     guide="1F1E21", guideSel="3A393E",
     keyword="F7D23E", string="62AEFA", number="B592F7", type="F2607E", method="A8E04A", call="C2EB80",
@@ -28,7 +28,7 @@ HARAMARA = dict(
 WIRIKUTA = dict(
     name="Wixárika Wirikuta (Light)", dark=False, parent="Default",
     bg="F5F1E6", bgUi="EAE5D8", bgTool="EFEBDF", frame="DCD5C6", surface="FBF9F3", hover="E2DDCF",
-    border="D5CFBF", fg="3F3D38", muted="66625A", disabled="A9A498",
+    border="D5CFBF", fg="3F3D38", muted="605C54", disabled="A9A498",
     caretRow="EEEADD", selection="CFDDF2", selInactive="E2E1DC", lineNo="A8A397", lineNoCaret="B0164F",
     guide="E5E0D3", guideSel="CBC5B5",
     keyword="946000", string="0F62C8", number="7A3FD0", type="C2185B", method="2F6800", call="457A08",
