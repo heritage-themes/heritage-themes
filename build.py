@@ -1,9 +1,14 @@
-"""Builds the Heritage Themes plugin from every theme folder.
+"""Builds the Heritage Themes JetBrains plugin and VS Code extension from every theme folder.
 
 A theme folder is any directory in themes/ containing a theme.py (see heritage/__init__.py).
-Run `python3 build.py`; output goes to build/.
+
+Usage: python3 build.py [--vsix]
+  --vsix  also pack the VS Code extension into a .vsix with vsce, pinned in scripts/vscode and installed there
+          with npm ci on first use; needs Node.js 22 or later and npm
+
+Output goes to build/.
 """
-import html, json, os, re, shutil, zipfile
+import argparse, html, json, os, re, shutil, subprocess, zipfile
 import xml.etree.ElementTree as ET
 
 import heritage
@@ -13,8 +18,17 @@ OUT = os.path.join(ROOT, "build")
 CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
 VERSION = "1.0.0"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
+DESCRIPTION = "Colour themes drawn from the colour traditions of different cultures."
 PLUGIN_ICONS = ("pluginIcon.svg", "pluginIcon_dark.svg")
 SINCE_BUILD = "253"  # 2025.3, the first release with the Islands Dark and Islands Light parent themes
+# The VS Code extension has its own version, changelog and vscode-v* release tags.
+VSCODE_VERSION = "1.0.0"
+VSCODE_CHANGELOG = os.path.join(ROOT, "vscode", "CHANGELOG.md")
+VSCODE_PUBLISHER = "heritage-themes"
+VSCODE_NAME = "heritage-themes"
+VSCODE_ENGINE = "^1.75.0"
+VSCODE_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")  # the Marketplace needs a PNG of 128x128 or more
+VSCODE_TOOLS = os.path.join(ROOT, "scripts", "vscode")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -116,7 +130,7 @@ def plugin_xml(families, themes):
   <version>{VERSION}</version>
   <vendor url="{VENDOR_URL}">Heritage Themes</vendor>
   <description><![CDATA[
-    <p>Colour themes drawn from the colour traditions of different cultures.</p>
+    <p>{DESCRIPTION}</p>
     <ul>
 {blurbs}
     </ul>
@@ -157,7 +171,104 @@ def validate(jar, themes):
             ET.fromstring(z.read(f"META-INF/{icon}"))
 
 
+def vscode_manifest(themes):
+    return {
+        "name": VSCODE_NAME, "displayName": "Heritage Themes", "description": DESCRIPTION,
+        "version": VSCODE_VERSION, "publisher": VSCODE_PUBLISHER, "license": "MIT", "icon": "icon.png",
+        "repository": {"type": "git", "url": f"{VENDOR_URL}.git"}, "homepage": VENDOR_URL,
+        "bugs": {"url": f"{VENDOR_URL}/issues"},
+        "engines": {"vscode": VSCODE_ENGINE},
+        "categories": ["Themes"],
+        "keywords": ["theme", "color theme", "dark theme", "light theme", "culture", "heritage"],
+        "files": ["themes", "icon.png", "CHANGELOG.md", "LICENSE"],  # vsce adds package.json and README.md
+        "contributes": {"themes": [
+            {"label": t["name"], "uiTheme": "vs-dark" if t["dark"] else "vs",
+             "path": f"./themes/{t['slug']}-color-theme.json"} for t in themes]},
+    }
+
+
+def vscode_readme(families):
+    """The Marketplace page. Links are absolute: the Marketplace does not resolve paths in the repository."""
+    rows = "\n".join(f"| [{f.FAMILY}]({VENDOR_URL}/tree/master/themes/{heritage.folder(f)}) "
+                     f"| {', '.join(t['palette']['name'] for t in f.THEMES)} | {f.BLURB} |" for f in families)
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of \
+one tradition to syntax roles.
+
+Choose a theme with **Preferences: Color Theme** (`Ctrl+K Ctrl+T`; `Cmd+K Cmd+T` on macOS).
+
+| Family | Themes | Tradition |
+| --- | --- | --- |
+{rows}
+
+Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs: see \
+[Heritage Themes on GitHub]({VENDOR_URL}).
+"""
+
+
+def build_vscode(families, themes):
+    """Writes the VS Code extension's files to build/vscode and returns that folder."""
+    directory = os.path.join(OUT, "vscode")
+    os.makedirs(os.path.join(directory, "themes"))
+    with open(os.path.join(directory, "package.json"), "w") as f:
+        json.dump(vscode_manifest(themes), f, indent=2, ensure_ascii=False)
+    with open(os.path.join(directory, "README.md"), "w") as f:
+        f.write(vscode_readme(families))
+    shutil.copy(VSCODE_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    shutil.copy(VSCODE_ICON, os.path.join(directory, "icon.png"))
+    for t in themes:
+        with open(os.path.join(directory, "themes", f"{t['slug']}-color-theme.json"), "w") as f:
+            json.dump(t["vscode"], f, indent=2, ensure_ascii=False)
+    return directory
+
+
+def validate_vscode(directory, themes):
+    """Fails the build when the extension manifest is incomplete or a contributed theme is missing or malformed."""
+    with open(os.path.join(directory, "package.json")) as f:
+        manifest = json.load(f)
+    for key in ("name", "displayName", "description", "version", "publisher", "license", "icon", "repository",
+                "engines"):
+        if not manifest.get(key):
+            raise SystemExit(f"VS Code package.json: {key} is missing or empty")
+    contributed = manifest["contributes"]["themes"]
+    if len(contributed) != len(themes):
+        raise SystemExit(f"VS Code package.json: {len(contributed)} themes for {len(themes)} themes")
+    for entry in contributed:
+        with open(os.path.join(directory, entry["path"])) as f:
+            data = json.load(f)
+        if data["name"] != entry["label"] or (data["type"] == "dark") != (entry["uiTheme"] == "vs-dark"):
+            raise SystemExit(f"VS Code theme {entry['path']} does not match its label or uiTheme")
+    for name in ("README.md", "CHANGELOG.md", "LICENSE", manifest["icon"]):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"VS Code extension: {name} is missing")
+
+
+def pack_vsix(directory, themes):
+    """Packs the extension with the pinned vsce and returns the .vsix path."""
+    vsce = os.path.join(VSCODE_TOOLS, "node_modules", ".bin", "vsce")
+    if not os.path.isfile(vsce):
+        npm = shutil.which("npm")
+        if not npm:
+            raise SystemExit("build: --vsix needs Node.js and npm")
+        subprocess.run([npm, "ci", "--no-audit", "--no-fund"], cwd=VSCODE_TOOLS, check=True)
+    vsix = os.path.join(OUT, f"{VSCODE_NAME}-vscode-{VSCODE_VERSION}.vsix")
+    # stdin is closed so that a vsce confirmation prompt fails the build instead of waiting for input
+    subprocess.run([vsce, "package", "--no-dependencies", "--out", vsix], cwd=directory, check=True,
+                   stdin=subprocess.DEVNULL)
+    with zipfile.ZipFile(vsix) as z:
+        packed = {n for n in z.namelist() if n.startswith("extension/themes/")}
+    if len(packed) != len(themes):
+        raise SystemExit(f"{vsix}: {len(packed)} theme files for {len(themes)} themes")
+    return vsix
+
+
 def main():
+    parser = argparse.ArgumentParser(description="Build the JetBrains plugin and the VS Code extension.")
+    parser.add_argument("--vsix", action="store_true", help="also pack the VS Code extension with vsce")
+    args = parser.parse_args()
     families = heritage.load_families()
     themes = [t for f in families for t in heritage.generate(f)]
     for key in ("slug", "id", "name"):
@@ -188,6 +299,11 @@ def main():
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
         z.write(jar, f"heritage-themes/lib/{os.path.basename(jar)}")
     print(f"{archive}: {len(themes)} themes")
+    extension = build_vscode(families, themes)
+    validate_vscode(extension, themes)
+    print(f"{extension}: {len(themes)} themes", flush=True)
+    if args.vsix:
+        print(f"{pack_vsix(extension, themes)}: {len(themes)} themes")
 
 
 if __name__ == "__main__":

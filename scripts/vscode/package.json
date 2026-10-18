@@ -1,0 +1,9 @@
+{
+  "name": "heritage-themes-vscode-tools",
+  "private": true,
+  "description": "Packs and publishes the VS Code extension for build.py --vsix and the Publish VS Code workflow",
+  "dependencies": {
+    "@vscode/vsce": "4.0.0",
+    "ovsx": "1.2.0"
+  }
+}

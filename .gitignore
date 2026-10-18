@@ -3,6 +3,7 @@ build/
 *.jar
 *.zip
 *.icls
+*.vsix
 node_modules/
 
 # Editors and OS

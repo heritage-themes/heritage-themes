@@ -1,6 +1,6 @@
 # Heritage Themes
 
-Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradition. All themes ship in one plugin (plugin ID `heritage.themes`).
+Colour themes for IntelliJ-based IDEs and VS Code, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`) and one VS Code extension (`heritage-themes.heritage-themes`).
 
 | Folder | Themes | Country |
 | --- | --- | --- |
@@ -39,6 +39,8 @@ Colour themes for IntelliJ-based IDEs, each drawn from a culture's colour tradit
 
 ## Install
 
+### JetBrains IDEs
+
 Download from the [GitHub releases](https://github.com/heritage-themes/heritage-themes/releases) page:
 
 - Plugin: `heritage-themes-<version>.jar`. In the IDE choose **Settings | Plugins | ⚙ | Install Plugin from Disk…**, select the jar and restart. Then choose a theme under **Settings | Appearance & Behavior | Appearance | Theme**.
@@ -46,12 +48,17 @@ Download from the [GitHub releases](https://github.com/heritage-themes/heritage-
 
 The themes work in IntelliJ-based IDEs version 2025.3 or later, such as IntelliJ IDEA, PyCharm, WebStorm and Android Studio, and use the Islands UI: the editor and tool windows sit as rounded islands on the main window.
 
+### VS Code
+
+Install **Heritage Themes** from the Extensions view; it is published on the VS Marketplace and Open VSX. Then choose a theme with **Preferences: Color Theme** (`Ctrl+K Ctrl+T`). To install a build instead, run **Extensions: Install from VSIX…** and select `heritage-themes-vscode-<version>.vsix`.
+
 ## Build from source
 
-Requires Python 3.
+Requires Python 3. `--vsix` also needs Node.js 22 or later and npm; it installs vsce, pinned in `scripts/vscode/`, on first use.
 
 ```bash
-python3 build.py
+python3 build.py          # JetBrains plugin and VS Code extension folder
+python3 build.py --vsix   # also pack the VS Code extension
 ```
 
 Output in `build/`:
@@ -61,8 +68,10 @@ Output in `build/`:
 | `heritage-themes-<version>.jar` | The plugin: descriptor, every theme and the plugin icons. Install this in the IDE |
 | `heritage-themes-<version>.zip` | The same jar inside a `heritage-themes/lib/` folder, the layout the Marketplace expects for an uploaded plugin. Its themes are identical to the jar's |
 | `schemes/*.icls` | Standalone editor colour schemes |
+| `vscode/` | The VS Code extension: `package.json`, README, changelog and one colour theme per theme |
+| `heritage-themes-vscode-<version>.vsix` | The VS Code extension packed by `--vsix`. Install this in VS Code |
 
-Install the jar or an `.icls` file as described under [Install](#install).
+Install the jar, an `.icls` file or the `.vsix` as described under [Install](#install).
 
 ## Preview
 
@@ -80,7 +89,7 @@ The page shows each theme as an IDE window with a code sample per language, colo
 ## Layout
 
 ```text
-build.py        builds the plugin from every theme folder; holds the plugin version
+build.py        builds the plugin and the VS Code extension from every theme folder; holds both versions
 preview.py      writes theme previews and renders the README images
 heritage/       code shared by every theme family
   __init__.py   finds the theme folders in themes/; the theme.py contract
@@ -89,11 +98,12 @@ heritage/       code shared by every theme family
   vscode.py     VS Code colour theme: palette roles to TextMate scopes, semantic tokens and workbench keys
   preview.py    preview page
   samples.py    code samples shown in the preview
-CHANGELOG.md    release notes; the plugin's change notes come from it
+CHANGELOG.md    JetBrains plugin release notes; the plugin's change notes come from it
+vscode/         CHANGELOG.md: VS Code extension release notes
 assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
-scripts/        release.sh, parent_overrides.py; shiki/ tokenises the VS Code preview
+scripts/        release.sh, parent_overrides.py; shiki/ tokenises the VS Code preview; vscode/ packs and publishes the extension
 docs/           releasing.md, adding-a-theme.md
-.github/        Build and Publish workflows
+.github/        Build, Publish and Publish VS Code workflows
 themes/<theme>/
   theme.py      palettes; defines FAMILY, BLURB and THEMES
   README.md     what the theme is
@@ -101,14 +111,14 @@ themes/<theme>/
 build/          generated, not tracked
 ```
 
-Only sources are tracked. Jars, zips and `.icls` files are build output; the Publish workflow attaches them to each GitHub release.
+Only sources are tracked. Jars, zips, `.icls` and `.vsix` files are build output; the publish workflows attach them to each GitHub release.
 
 ## Git workflow
 
 - Work on `dev`. `master` receives commits only when `scripts/release.sh` cuts a release.
 - Commit subjects follow [Conventional Commits](https://www.conventionalcommits.org/), with the theme folder as the scope for a change to one theme: `fix(wuxing): soften comment contrast`. Changes outside the theme folders use a scope such as `heritage`, `build` or `ci`, or none.
 - Keep a commit within one theme folder.
-- `scripts/release.sh` tags each release `v<version>`, which publishes it. The version matches `VERSION` in `build.py`. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
+- `scripts/release.sh` tags each JetBrains release `v<version>` and, with `--vscode`, each VS Code release `vscode-v<version>`, which publishes it. The versions are `VERSION` and `VSCODE_VERSION` in `build.py`. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
 
 ## Add a theme
 
