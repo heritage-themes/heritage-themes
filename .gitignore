@@ -3,6 +3,7 @@ build/
 *.jar
 *.zip
 *.icls
+node_modules/
 
 # Editors and OS
 .idea/

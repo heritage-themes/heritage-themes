@@ -12,7 +12,7 @@ Any folder in `themes/` with a `theme.py` is a theme family. `heritage.load_fami
 | `BLURB` | One sentence for the plugin description: the tradition and its main syntax mappings |
 | `THEMES` | One `dict(slug=..., id=..., palette=...)` per theme; `id` is a new UUID |
 
-From each palette, `heritage/scheme.py` builds the editor colour scheme and `heritage/ui.py` builds the UI theme. `build.py` packs them into the plugin and writes a standalone `.icls` per theme. `slug`, `id` and `name` must be unique across all themes; `build.py` fails otherwise.
+From each palette, `heritage/scheme.py` builds the editor colour scheme, `heritage/ui.py` builds the UI theme and `heritage/vscode.py` builds the VS Code colour theme. `build.py` packs the scheme and the UI theme into the plugin and writes a standalone `.icls` per theme. `slug`, `id` and `name` must be unique across all themes; `build.py` fails otherwise.
 
 A change in `heritage/` changes every family. After one, render all previews and check each family.
 
@@ -83,6 +83,7 @@ Constraints:
 ```bash
 python3 build.py                # prints build/heritage-themes-<version>.zip: <n> themes
 python3 preview.py <theme>      # writes themes/<theme>/build/preview.html
+python3 preview.py --vscode <theme>   # writes themes/<theme>/build/preview-vscode.html
 ```
 
 Open the preview in a browser. It shows each theme as an Islands IDE window, with the frame, the tool window and editor islands, and a sample in Java, Kotlin, Groovy (Spock), Python, TypeScript, React (TSX), Vue, HTML, CSS, SQL, Go, Rust, C++, C, C#, shell, YAML, JSON, TOML and Markdown. Code colours come from the generated scheme, so the preview shows what the scheme sets. Check that:
@@ -91,6 +92,7 @@ Open the preview in a browser. It shows each theme as an Islands IDE window, wit
 - the caret row, caret and Spock labels are visible
 - the frame sets the islands apart and stays in the family's colours
 - no language sample has colours that clash with the palette
+- the VS Code preview reads like the IntelliJ one
 
 In the IDE, install `build/heritage-themes-<version>.jar` through **Settings | Plugins | ⚙ | Install Plugin from Disk…**, restart, select each theme and also check the Project view, a diff, the console and a popup.
 

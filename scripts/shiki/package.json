@@ -1,0 +1,9 @@
+{
+  "name": "heritage-themes-shiki",
+  "private": true,
+  "description": "Tokenises the preview samples with VS Code's TextMate grammars for preview.py --vscode",
+  "type": "module",
+  "dependencies": {
+    "shiki": "3.23.0"
+  }
+}

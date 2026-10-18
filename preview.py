@@ -1,18 +1,23 @@
-"""Writes the preview page of each theme family and, with --png, renders it to the README image.
+"""Writes the preview page of each theme family and, with --png, renders it to PNG.
 
-Usage: python3 preview.py [--png] [THEME ...]
-  THEME  a theme folder, for example shuimo; default: every theme folder
-  --png  also render themes/<theme>/preview.png; needs Google Chrome or Chromium, and ImageMagick
+Usage: python3 preview.py [--vscode] [--png] [THEME ...]
+  THEME     a theme folder, for example shuimo; default: every theme folder
+  --vscode  write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
+  --png     also render the page to PNG; needs Google Chrome or Chromium, and ImageMagick
 
-The page goes to themes/<theme>/build/preview.html. It uses JetBrains Mono, downloaded once from the pinned
-release below into ~/.cache/heritage-themes.
+The IntelliJ page goes to themes/<theme>/build/preview.html and its PNG to themes/<theme>/preview.png, the
+README image. The VS Code page goes to themes/<theme>/build/preview-vscode.html and its PNG next to it. The
+VS Code page is coloured by Shiki, pinned in scripts/shiki and installed there with npm ci on first use.
+Both pages use JetBrains Mono, downloaded once from the pinned release below into ~/.cache/heritage-themes.
 """
-import argparse, hashlib, os, shutil, subprocess, sys, tempfile, urllib.request, zipfile
+import argparse, hashlib, json, os, shutil, subprocess, sys, tempfile, urllib.request, zipfile
 
 import heritage
-from heritage.preview import FONT_DIR, FONTS, page
+from heritage.preview import FONT_DIR, FONTS, page, vscode_samples
+from heritage.vscode import theme as vscode_theme
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+SHIKI = os.path.join(ROOT, "scripts", "shiki")
 FONT_URL = "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip"
 FONT_SHA256 = "6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf"
 CACHE = os.path.join(os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "heritage-themes")
@@ -51,7 +56,20 @@ def tool(*names):
     for name in names:
         if shutil.which(name):
             return name
-    raise SystemExit(f"preview: --png needs one of: {', '.join(names)}")
+    raise SystemExit(f"preview: needs one of: {', '.join(names)}")
+
+
+def vscode_tokens(family):
+    """Per theme of the family, the samples tokenised by scripts/shiki/tokens.mjs with its VS Code theme."""
+    node = tool("node")
+    if not os.path.isdir(os.path.join(SHIKI, "node_modules")):
+        subprocess.run([tool("npm"), "ci", "--no-audit", "--no-fund"], cwd=SHIKI, check=True)
+    request = dict(themes=[vscode_theme(t["palette"]) for t in family.THEMES], samples=vscode_samples())
+    result = subprocess.run([node, os.path.join(SHIKI, "tokens.mjs")], input=json.dumps(request),
+                            capture_output=True, text=True, encoding="utf-8")
+    if result.returncode:
+        raise SystemExit(f"preview: tokens.mjs failed:\n{result.stderr}")
+    return json.loads(result.stdout)
 
 
 def render_png(page_path, png_path):
@@ -73,7 +91,8 @@ def render_png(page_path, png_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Write theme previews.")
-    parser.add_argument("--png", action="store_true", help="also render themes/<theme>/preview.png")
+    parser.add_argument("--vscode", action="store_true", help="write the VS Code preview")
+    parser.add_argument("--png", action="store_true", help="also render the page to PNG")
     parser.add_argument("themes", nargs="*", metavar="THEME", help="theme folders; default: all")
     args = parser.parse_args()
     families = {heritage.folder(f): f for f in heritage.load_families()}
@@ -83,12 +102,14 @@ def main():
     for name in args.themes or families:
         out = os.path.join(heritage.THEMES, name, "build")
         install_fonts(os.path.join(out, FONT_DIR))
-        page_path = os.path.join(out, "preview.html")
-        with open(page_path, "w") as f:
-            f.write(page(families[name]))
+        family = families[name]
+        page_path = os.path.join(out, "preview-vscode.html" if args.vscode else "preview.html")
+        with open(page_path, "w", encoding="utf-8") as f:
+            f.write(page(family, vscode_tokens(family) if args.vscode else None))
         print(page_path)
         if args.png:
-            png_path = os.path.join(heritage.THEMES, name, "preview.png")
+            png_path = (os.path.join(out, "preview-vscode.png") if args.vscode
+                        else os.path.join(heritage.THEMES, name, "preview.png"))
             render_png(page_path, png_path)
             print(png_path)
 
