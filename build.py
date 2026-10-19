@@ -22,7 +22,7 @@ DESCRIPTION = "Colour themes drawn from the colour traditions of different cultu
 PLUGIN_ICONS = ("pluginIcon.svg", "pluginIcon_dark.svg")
 SINCE_BUILD = "253"  # 2025.3, the first release with the Islands Dark and Islands Light parent themes
 # The VS Code extension has its own version, changelog and vscode-v* release tags.
-VSCODE_VERSION = "1.0.0"
+VSCODE_VERSION = "1.0.1"
 VSCODE_CHANGELOG = os.path.join(ROOT, "vscode", "CHANGELOG.md")
 VSCODE_PUBLISHER = "heritage-themes"
 VSCODE_NAME = "heritage-themes"

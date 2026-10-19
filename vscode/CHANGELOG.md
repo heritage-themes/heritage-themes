@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-19
+
 ### Fixed
 
 - Publish the extension to the Visual Studio Marketplace. Version 1.0.0 reached Open VSX only.
