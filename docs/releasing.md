@@ -107,26 +107,61 @@ Connect token, so no Marketplace token is stored. The extension ID is
    gh api -X PUT repos/heritage-themes/heritage-themes/environments/vscode-marketplace
    ```
 
-3. In the Azure portal, create a user-assigned managed identity. Under **Settings | Federated
-   credentials**, add a credential for **GitHub Actions deploying Azure resources** with
-   organisation `heritage-themes`, repository `heritage-themes`, entity **Environment** and
-   environment `vscode-marketplace`.
-4. Store the identity's client ID and tenant ID as repository variables:
+3. Create the managed identity in the Azure portal at <https://portal.azure.com>, not in Azure
+   DevOps. The account needs an Azure subscription and a directory it owns; a personal Microsoft
+   account with neither gets an "Interaction required" error and an empty directory list. Create a
+   free account at <https://azure.microsoft.com/free> first if needed.
+   1. Search for **Managed Identities**, select **Create**, and choose a subscription and a resource
+      group. Name the identity `heritage-themes-publish`.
+   2. Print the numeric GitHub IDs that the credential form asks for:
+
+      ```bash
+      gh api repos/heritage-themes/heritage-themes --jq '{owner_id: .owner.id, repo_id: .id}'
+      ```
+
+   3. On the identity, open **Settings | Federated credentials** and select **Add credential**.
+      Choose the scenario **GitHub Actions deploying Azure resources** and enter:
+
+      | Field | Value |
+      |---|---|
+      | Organization | `heritage-themes` |
+      | Organization ID | `owner_id` from the command above |
+      | Repository | `heritage-themes` |
+      | Repository ID | `repo_id` from the command above |
+      | Entity | **Environment** |
+      | Environment | `vscode-marketplace` |
+
+4. Store the identity's client ID and tenant ID as repository variables. The client ID is on the
+   identity's **Overview** page. The tenant ID is the `tenantId` in its **JSON View** and the
+   **Tenant ID** on the **Microsoft Entra ID** overview page; it differs from the client ID.
 
    ```bash
-   gh variable set AZURE_CLIENT_ID
-   gh variable set AZURE_TENANT_ID
+   gh variable set AZURE_CLIENT_ID -R heritage-themes/heritage-themes --body '<client id>'
+   gh variable set AZURE_TENANT_ID -R heritage-themes/heritage-themes --body '<tenant id>'
    ```
 
-5. Run **VS Marketplace identity** in GitHub Actions. On the publisher's page in the Marketplace,
-   add the ID it prints as a member with the **Contributor** role.
+5. Print the identity's Marketplace ID and add it to the publisher:
+
+   ```bash
+   gh workflow run vscode-identity.yml -R heritage-themes/heritage-themes
+   gh run list --workflow vscode-identity.yml -R heritage-themes/heritage-themes --limit 1
+   gh run view <run id> -R heritage-themes/heritage-themes --log
+   ```
+
+   The ID is the GUID on the last line of the `az rest` step. On the publisher's page at
+   <https://marketplace.visualstudio.com/manage>, open **Members**, select **Add**, enter the ID and
+   choose the **Contributor** role. The identity needs no Azure role assignment.
 6. Sign in at <https://open-vsx.org> with a GitHub account, sign the publisher agreement, and create
    an access token under **Settings | Access Tokens**. Create the namespace with the same ID as the
-   publisher and store the token:
+   publisher:
 
    ```bash
    OVSX_PAT=<token> scripts/vscode/node_modules/.bin/ovsx create-namespace <VSCODE_PUBLISHER>
-   gh secret set OVSX_PAT
    ```
 
    `scripts/vscode/node_modules` exists after the first `python3 build.py --vsix`.
+7. Store the token. `gh` prompts for the value, which keeps it out of the shell history:
+
+   ```bash
+   gh secret set OVSX_PAT -R heritage-themes/heritage-themes
+   ```
