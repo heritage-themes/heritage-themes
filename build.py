@@ -27,6 +27,7 @@ VSCODE_CHANGELOG = os.path.join(ROOT, "vscode", "CHANGELOG.md")
 VSCODE_PUBLISHER = "heritage-themes"
 VSCODE_NAME = "heritage-themes"
 VSCODE_ENGINE = "^1.75.0"
+VSCODE_SPONSOR_URL = "https://buymeacoffee.com/heritage-themes"
 VSCODE_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")  # the Marketplace needs a PNG of 128x128 or more
 VSCODE_TOOLS = os.path.join(ROOT, "scripts", "vscode")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
@@ -177,7 +178,7 @@ def vscode_manifest(themes):
         "name": VSCODE_NAME, "displayName": "Heritage Themes", "description": DESCRIPTION,
         "version": VSCODE_VERSION, "publisher": VSCODE_PUBLISHER, "license": "MIT", "icon": "icon.png",
         "repository": {"type": "git", "url": f"{VENDOR_URL}.git"}, "homepage": VENDOR_URL,
-        "bugs": {"url": f"{VENDOR_URL}/issues"},
+        "bugs": {"url": f"{VENDOR_URL}/issues"}, "sponsor": {"url": VSCODE_SPONSOR_URL},
         "engines": {"vscode": VSCODE_ENGINE},
         "categories": ["Themes"],
         "keywords": ["theme", "color theme", "dark theme", "light theme", "culture", "heritage"],

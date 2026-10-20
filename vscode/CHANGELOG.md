@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Sponsor button on the Marketplace page, linking to Buy Me a Coffee.
+
 ## [1.0.1] - 2026-10-19
 
 ### Fixed
