@@ -21,7 +21,7 @@ jobs:
     environment: vscode-marketplace
     permissions:
       contents: write # create the GitHub release
-      id-token: write # sign in to Microsoft Entra ID for the VS Marketplace
+      id-token: write # sign in to Microsoft Entra ID and to Open VSX through trusted publishing
     steps:
       - uses: actions/checkout@v7
         with:
@@ -56,10 +56,9 @@ jobs:
         env:
           AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-          OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: |
           missing=0
-          for name in AZURE_CLIENT_ID AZURE_TENANT_ID OVSX_PAT; do
+          for name in AZURE_CLIENT_ID AZURE_TENANT_ID; do
             if [ -z "${!name}" ]; then
               echo "::error::$name is empty or not set"
               missing=1
@@ -79,9 +78,7 @@ jobs:
         run: scripts/vscode/node_modules/.bin/vsce publish --azure-credential --packagePath "build/heritage-themes-vscode-$VERSION.vsix"
 
       - name: Publish to Open VSX
-        env:
-          OVSX_PAT: ${{ secrets.OVSX_PAT }}
-        run: scripts/vscode/node_modules/.bin/ovsx publish "build/heritage-themes-vscode-$VERSION.vsix"
+        run: scripts/vscode/node_modules/.bin/ovsx publish --trusted-publishing "build/heritage-themes-vscode-$VERSION.vsix"
 
       # The JetBrains release stays marked as the latest, since the jar is the download the README points to.
       - name: Create the GitHub release
