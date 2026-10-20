@@ -123,7 +123,8 @@ def theme(p, slug):
         "ScrollBar.thumbColor": "guideSel", "ScrollBar.hoverThumbColor": "lineNo",
         "ScrollBar.Mac.thumbColor": "guideSel", "ScrollBar.Mac.hoverThumbColor": "lineNo",
         "ScrollBar.Transparent.thumbColor": "guideSel", "ScrollBar.Mac.Transparent.thumbColor": "guideSel",
-        "RunWidget.background": "red", "RunWidget.foreground": "redText",
+        # The run configuration selector has no fill of its own, so its name and icon sit on the frame.
+        "RunWidget.foreground": "fg",
         "RunWidget.runningBackground": "added", "RunWidget.stopBackground": "error",
         "VersionControl.Log.Commit.currentBranchBackground": "caretRow",
         "VersionControl.Log.Commit.hoveredBackground": "hover",
