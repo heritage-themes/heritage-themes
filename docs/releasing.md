@@ -160,12 +160,17 @@ Connect token, so no Marketplace token is stored. The extension ID is
    OVSX_PAT=<token> scripts/vscode/node_modules/.bin/ovsx create-namespace <VSCODE_PUBLISHER>
    ```
 
-   `scripts/vscode/node_modules` exists after the first `python3 build.py --vsix`.
-7. Store the token. `gh` prompts for the value, which keeps it out of the shell history:
+   `scripts/vscode/node_modules` exists after the first `python3 build.py --vsix`. The token is used
+   only for this command; delete it afterwards.
+7. Register the workflow as a trusted publisher, so that it publishes with a short-lived token and no
+   secret is stored. Under <https://open-vsx.org/user-settings/namespaces>, open the namespace's
+   **Trusted publishers** section and add:
 
-   ```bash
-   gh secret set OVSX_PAT -R heritage-themes/heritage-themes
-   ```
+   | Field | Value |
+   |---|---|
+   | Repository | `heritage-themes/heritage-themes` |
+   | Workflow | `publish-vscode.yml` |
+   | Environment | `vscode-marketplace` |
 
 8. Claim the namespace. Until it has an owner, Open VSX marks every version with a warning that the
    publisher is not verified. Open an issue at
