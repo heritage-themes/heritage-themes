@@ -39,3 +39,7 @@
 - Maramureș Zadie (Dark) and Maramureș Cânepă (Light), drawn from the striped aprons and flowered skirts of Maramureș, coloured by age.
 - Aizome Kachi (Dark) and Aizome Kamenozoki (Light), drawn from the forty-eight shades of Japanese indigo dyeing.
 - Edo Cha (Dark) and Edo Nezumi (Light), drawn from the forty-eight browns and hundred greys of Edo-period dress.
+
+### Fixed
+
+- The run configuration name and icon in the main toolbar use the theme foreground, so they read on the main window colour in every theme.
