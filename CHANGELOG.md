@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-20
+
 ### Added
 
 - Islands UI for every theme: each palette has a main window colour, and the editor and tool windows sit on it as islands. Needs a 2025.3 or later IDE.
