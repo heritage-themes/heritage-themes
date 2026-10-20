@@ -27,7 +27,10 @@ VSCODE_CHANGELOG = os.path.join(ROOT, "vscode", "CHANGELOG.md")
 VSCODE_PUBLISHER = "heritage-themes"
 VSCODE_NAME = "heritage-themes"
 VSCODE_ENGINE = "^1.75.0"
+VSCODE_IMAGES_URL = "https://raw.githubusercontent.com/heritage-themes/heritage-themes/master/docs"
 VSCODE_SPONSOR_URL = "https://buymeacoffee.com/heritage-themes"
+VSCODE_SCREENSHOTS = [("holi-night", "Holi Night"), ("kalamkari-cotton", "Kalamkari Cotton (Light)"),
+                      ("sardinia-orbace", "Sardinia Orbace (Dark)"), ("wixarika-wirikuta", "Wixárika Wirikuta (Light)")]
 VSCODE_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")  # the Marketplace needs a PNG of 128x128 or more
 VSCODE_TOOLS = os.path.join(ROOT, "scripts", "vscode")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
@@ -194,12 +197,15 @@ def vscode_readme(families):
     rows = "\n".join(f"| [{f.FAMILY}]({VENDOR_URL}/tree/master/themes/{heritage.folder(f)}) "
                      f"| {', '.join(t['palette']['name'] for t in f.THEMES)} | {f.BLURB} |" for f in families)
     count = sum(len(f.THEMES) for f in families)
+    images = "\n\n".join(f"![{name}]({VSCODE_IMAGES_URL}/vscode-{slug}.png)" for slug, name in VSCODE_SCREENSHOTS)
     return f"""# Heritage Themes
 
 {DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of \
 one tradition to syntax roles.
 
 Choose a theme with **Preferences: Color Theme** (`Ctrl+K Ctrl+T`; `Cmd+K Cmd+T` on macOS).
+
+{images}
 
 | Family | Themes | Tradition |
 | --- | --- | --- |

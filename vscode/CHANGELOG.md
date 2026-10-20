@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Screenshots of four themes on the Marketplace page.
+
 ## [1.1.0] - 2026-10-20
 
 ### Added
