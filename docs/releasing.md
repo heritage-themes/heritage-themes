@@ -165,3 +165,17 @@ Connect token, so no Marketplace token is stored. The extension ID is
    ```bash
    gh secret set OVSX_PAT -R heritage-themes/heritage-themes
    ```
+
+8. Claim the namespace. Until it has an owner, Open VSX marks every version with a warning that the
+   publisher is not verified. Open an issue at
+   <https://github.com/EclipseFdn/open-vsx.org/issues/new/choose> with the namespace claim template:
+   - Namespace: `heritage-themes`.
+   - Tick the **Option 1** checkbox. The "Chose one of the following" items are plain Markdown and
+     cannot be ticked.
+   - In **Claim evidence**, state the second sub-option, give the Open VSX username that owns the
+     token, and link a commit in this repository authored by the GitHub account filing the issue.
+     The commit must show that account as its author.
+
+   Once the maintainers grant ownership, versions published by a namespace member show as verified.
+   Add any other publishing account, such as a bot, as a **Contributor** under
+   <https://open-vsx.org/user-settings/namespaces>.
