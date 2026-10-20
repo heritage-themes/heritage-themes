@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- The Run, Debug and Stop buttons in the main toolbar, and the Git Resolve and Abort buttons during a merge or rebase, keep their green or red fill on hover and shade it slightly, as the other toolbar buttons do.
+- Those buttons fill with the theme's terminal green and red and draw their icons in the tool window colour, so the icons meet WCAG AA contrast in every theme.
+- The minimise and maximise buttons in the window title use the main toolbar's hover colour.
+
 ## [1.0.1] - 2026-10-20
 
 ### Added

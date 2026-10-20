@@ -40,6 +40,7 @@ def theme(p, slug):
         "MainToolbar.Dropdown.background": "frame", "MainToolbar.Dropdown.hoverBackground": hover,
         "MainToolbar.Dropdown.transparentHoverBackground": hover, "MainToolbar.Dropdown.pressedBackground": pressed,
         "TitlePane.background": "bgUi", "TitlePane.inactiveBackground": "bgUi",
+        "TitlePane.Button.hoverBackground": hover,
         "ToolWindow.background": "bgTool", "alt.ToolWindow.background": "bgTool",
         "ToolWindow.Header.background": "bgTool", "ToolWindow.Header.inactiveBackground": "bgTool",
         "alt.ToolWindow.Header.inactiveBackground": "bgTool",
@@ -125,7 +126,13 @@ def theme(p, slug):
         "ScrollBar.Transparent.thumbColor": "guideSel", "ScrollBar.Mac.Transparent.thumbColor": "guideSel",
         # The run configuration selector has no fill of its own, so its name and icon sit on the frame.
         "RunWidget.foreground": "fg",
-        "RunWidget.runningBackground": "added", "RunWidget.stopBackground": "error",
+        # Run and Debug while running, Stop, and Git Resolve and Abort fill with the terminal green and red. Their icons
+        # take the tool window colour, which build.py holds at 4.5:1 against both, as for terminal text.
+        "RunWidget.runningBackground": "ansiGreen", "RunWidget.stopBackground": "ansiRed",
+        "RunWidget.runningIconColor": "bgTool",
+        # The IDE blends these over the fill, so they must be overlays: the "*" hoverBackground, an opaque colour, would
+        # replace the fill. They move the fill away from the icon colour, raising its contrast.
+        "RunWidget.hoverBackground": hover, "RunWidget.pressedBackground": pressed,
         "VersionControl.Log.Commit.currentBranchBackground": "caretRow",
         "VersionControl.Log.Commit.hoveredBackground": "hover",
         "VersionControl.RefLabel.backgroundBase": "gold",
