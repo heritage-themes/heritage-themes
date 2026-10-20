@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-10-20
+
 ### Fixed
 
 - Sponsor button on the Marketplace page linked to a Buy Me a Coffee page that does not exist.
