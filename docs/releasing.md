@@ -100,7 +100,8 @@ Connect token, so no Marketplace token is stored. The extension ID is
 `<VSCODE_PUBLISHER>.<VSCODE_NAME>` from `build.py`; the first publish creates the extension.
 
 1. Create the publisher at <https://marketplace.visualstudio.com/manage> with the ID in
-   `VSCODE_PUBLISHER`. A publisher ID cannot be changed.
+   `VSCODE_PUBLISHER`. The ID must match `VSCODE_PUBLISHER` exactly, including case, and cannot be
+   changed.
 2. Create the GitHub environment the workflows run in:
 
    ```bash
