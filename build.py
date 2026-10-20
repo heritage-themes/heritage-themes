@@ -28,7 +28,7 @@ VSCODE_PUBLISHER = "heritage-themes"
 VSCODE_NAME = "heritage-themes"
 VSCODE_ENGINE = "^1.75.0"
 VSCODE_IMAGES_URL = "https://raw.githubusercontent.com/heritage-themes/heritage-themes/master/docs"
-VSCODE_SPONSOR_URL = "https://buymeacoffee.com/heritage-themes"
+VSCODE_SPONSOR_URL = "https://buymeacoffee.com/heritagethemes"
 VSCODE_SCREENSHOTS = [("holi-night", "Holi Night"), ("kalamkari-cotton", "Kalamkari Cotton (Light)"),
                       ("sardinia-orbace", "Sardinia Orbace (Dark)"), ("wixarika-wirikuta", "Wixárika Wirikuta (Light)")]
 VSCODE_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")  # the Marketplace needs a PNG of 128x128 or more
