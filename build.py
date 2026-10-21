@@ -135,6 +135,7 @@ def plugin_xml(families, themes):
   <vendor url="{VENDOR_URL}">Heritage Themes</vendor>
   <description><![CDATA[
     <p>{DESCRIPTION}</p>
+    <p>Requires an IntelliJ-based IDE, version 2025.3 or later. Every theme uses the Islands UI: the editor and tool windows sit as rounded islands on the main window.</p>
     <ul>
 {blurbs}
     </ul>

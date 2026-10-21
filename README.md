@@ -46,7 +46,9 @@ Download from the [GitHub releases](https://github.com/heritage-themes/heritage-
 - Plugin: `heritage-themes-<version>.jar`. In the IDE choose **Settings | Plugins | ⚙ | Install Plugin from Disk…**, select the jar and restart. Then choose a theme under **Settings | Appearance & Behavior | Appearance | Theme**.
 - Editor colour scheme only: an `.icls` file. Choose **Settings | Editor | Color Scheme | ⚙ | Import Scheme…** and select the file.
 
-The themes work in IntelliJ-based IDEs version 2025.3 or later, such as IntelliJ IDEA, PyCharm, WebStorm and Android Studio, and use the Islands UI: the editor and tool windows sit as rounded islands on the main window.
+The themes work in IntelliJ-based IDEs version 2025.3 or later, such as IntelliJ IDEA, PyCharm, WebStorm and Android Studio.
+
+Every theme uses the Islands UI: the editor and tool windows sit as rounded islands on the main window. Choosing a Heritage theme always applies it; choose another theme for a different layout. The Classic UI plugin is not tested.
 
 ### VS Code
 
