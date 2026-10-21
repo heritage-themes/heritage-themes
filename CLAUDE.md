@@ -4,6 +4,20 @@ UI theme and the previews are shared code in `heritage/`. `python3 build.py` bui
 `python3 build.py --vsix` also packs the VS Code extension. Work on `dev`; see the
 root README for layout, previews and the git workflow.
 
+## Adding an app
+
+Each app the themes ship to (JetBrains, VS Code and any later one) is a target:
+
+- Palettes in `themes/*/theme.py` are the only source of colour. A target is a generator in
+  `heritage/<app>.py` that maps palette roles to the app's format, run by `build.py`. Never add
+  per-family or per-app colours.
+- Every target shares `VERSION` and the `v<version>` tag. It gets its own changelog, an entry in the
+  product list in `scripts/release.sh`, a job in `publish.yml`, and its last build attached to
+  releases that leave it out.
+- The theme checks (WCAG contrast, distinct roles, rendered preview) apply to each target's output.
+- Before starting, find out how the app installs and distributes themes, and whether that fits a
+  shared repository release. Tell me if it does not.
+
 ## Adding a new culture-based theme
 
 When adding a theme, follow docs/adding-a-theme.md (folder layout, `theme.py`, palette keys, README, preview,
@@ -17,7 +31,7 @@ Workflow:
    me choose unless I said "do all". Drop a concept that fails the check and say why.
 3. Create each family as described in docs/adding-a-theme.md: `theme.py`, `README.md`, `preview.png`. There is
    no `build.py` registration (it discovers `theme.py` files itself); register by adding the root `README.md`
-   table row and an `[Unreleased]` entry in both `CHANGELOG.md` and `vscode/CHANGELOG.md`.
+   table row and an `[Unreleased]` entry in every target's changelog (`CHANGELOG.md` and `vscode/CHANGELOG.md`).
 4. Run `python3 build.py`, then `python3 preview.py --png <theme>` to render the preview page and
    `preview.png`, and `python3 preview.py --vscode --png <theme>` for the VS Code preview. Look at the rendered PNG yourself. Stop there: do not install the jar in the IDE or do the
    manual IDE checks; I do those. Do not send me the jar.
