@@ -1,8 +1,9 @@
 name: Publish
 
 # Fires only when a version tag (for example `v1.0.0`) is pushed, so the tag push is the release
-# gate. scripts/release.sh pushes the tag after Build has passed on the commit it points at. The
-# digit keeps the VS Code extension's vscode-v* tags out.
+# gate. scripts/release.sh pushes the tag after Build has passed on the commit it points at.
+# Publishes each product whose changelog has a section for the version, then creates one GitHub
+# release that carries both products: a product left out keeps the build of its last release.
 on:
   push:
     tags:
@@ -15,30 +16,20 @@ concurrency:
   group: publish
   cancel-in-progress: false
 
-env:
-  # JetBrains marketplace-zip-signer CLI, pinned with the SHA-256 of the jar from Maven Central.
-  SIGNER_VERSION: 0.1.43
-  SIGNER_SHA256: 2958a0f42221d6062b50f22754e413ae5cc42f60c441467202c6700df2e22f44
-  PLUGIN_XML_ID: heritage.themes
-
 jobs:
-  publish:
+  check:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # create the GitHub release
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      jetbrains: ${{ steps.check.outputs.jetbrains }}
+      vscode: ${{ steps.check.outputs.vscode }}
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.12'
-      - uses: actions/setup-java@v6
-        with:
-          distribution: temurin
-          java-version: 21
 
       - name: Check the tag
+        id: check
         shell: bash
         run: |
           version=$(sed -n 's/^VERSION = "\(.*\)"/\1/p' build.py)
@@ -50,11 +41,38 @@ jobs:
             echo "::error::$GITHUB_REF_NAME does not point at a commit on master"
             exit 1
           fi
-          if ! grep -q "^## \[$version\]" CHANGELOG.md; then
-            echo "::error::CHANGELOG.md has no [$version] section"
+          jetbrains=false vscode=false
+          grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
+          grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
+          if [ "$jetbrains" = false ] && [ "$vscode" = false ]; then
+            echo "::error::Neither CHANGELOG.md nor vscode/CHANGELOG.md has a [$version] section"
             exit 1
           fi
-          echo "VERSION=$version" >> "$GITHUB_ENV"
+          {
+            echo "version=$version"
+            echo "jetbrains=$jetbrains"
+            echo "vscode=$vscode"
+          } >> "$GITHUB_OUTPUT"
+
+  jetbrains:
+    needs: check
+    if: needs.check.outputs.jetbrains == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      # JetBrains marketplace-zip-signer CLI, pinned with the SHA-256 of the jar from Maven Central.
+      SIGNER_VERSION: 0.1.43
+      SIGNER_SHA256: 2958a0f42221d6062b50f22754e413ae5cc42f60c441467202c6700df2e22f44
+      PLUGIN_XML_ID: heritage.themes
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
 
       # The signer exits successfully on an empty certificate or key and the upload would then
       # carry an unsigned archive. Fail before either runs.
@@ -115,17 +133,139 @@ jobs:
             --form "file=@build/heritage-themes-$VERSION-signed.zip" \
             https://plugins.jetbrains.com/plugin/uploadPlugin
 
+      - name: Collect the release files
+        run: mkdir dist && cp "build/heritage-themes-$VERSION-signed.zip" build/schemes/*.icls dist/
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: jetbrains
+          path: dist/
+          if-no-files-found: error
+
+  vscode:
+    needs: check
+    if: needs.check.outputs.vscode == 'true'
+    runs-on: ubuntu-latest
+    # The Entra ID federated credential trusts this environment (docs/releasing.md).
+    environment: vscode-marketplace
+    permissions:
+      contents: read
+      id-token: write # sign in to Microsoft Entra ID and to Open VSX through trusted publishing
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Check release settings
+        shell: bash
+        env:
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+        run: |
+          missing=0
+          for name in AZURE_CLIENT_ID AZURE_TENANT_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is empty or not set"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - run: python3 build.py --vsix
+
+      - uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Publish to the VS Marketplace
+        run: scripts/vscode/node_modules/.bin/vsce publish --azure-credential --packagePath "build/heritage-themes-vscode-$VERSION.vsix"
+
+      - name: Publish to Open VSX
+        run: scripts/vscode/node_modules/.bin/ovsx publish --trusted-publishing "build/heritage-themes-vscode-$VERSION.vsix"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: vscode
+          path: build/heritage-themes-vscode-${{ env.VERSION }}.vsix
+          if-no-files-found: error
+
+  release:
+    needs: [check, jetbrains, vscode]
+    # Runs once each product has either published or been left out of the release.
+    if: >-
+      ${{ !cancelled() && needs.check.result == 'success'
+      && contains(fromJSON('["success", "skipped"]'), needs.jetbrains.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.vscode.result) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub release
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      JETBRAINS: ${{ needs.check.outputs.jetbrains }}
+      VSCODE: ${{ needs.check.outputs.vscode }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
       - name: Create the GitHub release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          awk -v v="$VERSION" '
-            $0 ~ "^## \\[" v "\\]" {on = 1; next}
-            /^## \[/ {on = 0}
-            on' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          # Prints the changelog section for a version.
+          section() {
+            awk -v v="$2" '
+              $0 ~ "^## \\[" v "\\]" {on = 1; next}
+              /^## \[/ {on = 0}
+              on' "$1"
+          }
+          # Downloads the files matching the patterns from the newest release that carries the
+          # first one, so a product left out of this release ships the build of its last release.
+          attach() {
+            local tags
+            tags=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases" \
+              --jq ".[] | select(any(.assets[]; .name == \"$1\")) | .tag_name")
+            if [ -z "$tags" ]; then
+              echo "::error::No GitHub release carries $1"
+              exit 1
+            fi
+            local pattern patterns=()
+            for pattern in "$@"; do patterns+=(--pattern "$pattern"); done
+            gh release download "${tags%%$'\n'*}" --repo "$GITHUB_REPOSITORY" "${patterns[@]}" --dir dist
+          }
+          # Writes a product's part of the release notes and attaches its last build if it is left out.
+          notes() {
+            local title=$1 included=$2 changelog=$3 file=$4
+            shift 4
+            echo "## $title"
+            if [ "$included" = true ]; then
+              section "$changelog" "$VERSION"
+            else
+              local previous
+              previous=$(sed -n '/^## \[[0-9]/{s/^## \[\([^]]*\)\].*/\1/p;q}' "$changelog")
+              echo
+              echo "No changes. The attached build is version $previous."
+              echo
+              attach "${file/<version>/$previous}" "$@" >&2
+            fi
+          }
+          {
+            notes "JetBrains plugin" "$JETBRAINS" CHANGELOG.md "heritage-themes-<version>-signed.zip" '*.icls'
+            notes "VS Code extension" "$VSCODE" vscode/CHANGELOG.md "heritage-themes-vscode-<version>.vsix"
+          } > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \
             --notes-file "$RUNNER_TEMP/notes.md" \
-            "build/heritage-themes-$VERSION-signed.zip" \
-            build/schemes/*.icls
+            dist/*

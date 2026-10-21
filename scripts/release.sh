@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# Cuts a release from dev: sets the version, stamps the changelog, builds, commits and pushes dev,
+# Cuts a release from dev: sets the version, stamps the changelogs, builds, commits and pushes dev,
 # fast-forwards master to it, waits for Build to pass, then pushes the release tag, which starts the
 # publish workflow. See docs/releasing.md.
 #
-# Usage: scripts/release.sh [patch|minor|major|X.Y.Z] [--vscode] [--dry-run]
-#   --vscode release the VS Code extension: VSCODE_VERSION, vscode/CHANGELOG.md and a vscode-v<version>
-#            tag, which starts Publish VS Code. Without it, the JetBrains plugin: VERSION, CHANGELOG.md
-#            and a v<version> tag, which starts Publish.
+# The JetBrains plugin and the VS Code extension share VERSION in build.py and the v<version> tag.
+# The release includes each product whose changelog has entries under [Unreleased]: CHANGELOG.md
+# for the JetBrains plugin, vscode/CHANGELOG.md for the VS Code extension. A product without
+# entries keeps its last published build, which the GitHub release attaches.
+#
+# Usage: scripts/release.sh [patch|minor|major|X.Y.Z] [--dry-run]
 #   patch    third component +1 (default)
 #   minor    second component +1, third reset
 #   major    first component +1, the others reset
@@ -17,11 +19,9 @@ cd "$(git rev-parse --show-toplevel)"
 
 kind="patch"
 dry_run=false
-vscode=false
 for arg in "$@"; do
   case "$arg" in
     --dry-run) dry_run=true ;;
-    --vscode) vscode=true ;;
     patch | minor | major) kind=$arg ;;
     [0-9]*.[0-9]*.[0-9]*) kind=explicit; explicit=$arg ;;
     *) echo "release: unknown argument '$arg'" >&2; exit 1 ;;
@@ -30,16 +30,23 @@ done
 
 fail() { echo "release: $*" >&2; exit 1; }
 
-if $vscode; then
-  variable=VSCODE_VERSION changelog=vscode/CHANGELOG.md prefix=vscode-v product="VS Code extension "
-  build_args=(--vsix)
-else
-  variable=VERSION changelog=CHANGELOG.md prefix=v product=""
-  build_args=()
-fi
+# Succeeds when the changelog has at least one entry under [Unreleased].
+has_unreleased() {
+  awk '/^## \[Unreleased\]/ {on = 1; next} /^## \[/ {on = 0} on && /^- / {found = 1} END {exit !found}' "$1"
+}
 
-current=$(sed -n "s/^$variable = \"\(.*\)\"/\1/p" build.py)
-[ -n "$current" ] || fail "no $variable in build.py"
+# Prints the newest released version in the changelog.
+latest_release() {
+  sed -n '/^## \[[0-9]/{s/^## \[\([^]]*\)\].*/\1/p;q}' "$1"
+}
+
+# Succeeds when version $1 is greater than version $2.
+newer() {
+  [ "$1" != "$2" ] && [ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -n 1)" = "$1" ]
+}
+
+current=$(sed -n 's/^VERSION = "\(.*\)"/\1/p' build.py)
+[ -n "$current" ] || fail "no VERSION in build.py"
 IFS=. read -r major minor patch <<<"$current"
 
 case "$kind" in
@@ -48,10 +55,27 @@ case "$kind" in
   major) version="$((major + 1)).0.0" ;;
   explicit) version=$explicit ;;
 esac
-tag="$prefix$version"
+tag="v$version"
 
-echo "Current ${product}version: $current"
+changelogs=() products=() summary=""
+for product in "JetBrains plugin:CHANGELOG.md" "VS Code extension:vscode/CHANGELOG.md"; do
+  name=${product%%:*} changelog=${product#*:}
+  previous=$(latest_release "$changelog")
+  # The marketplaces reject a version that is not greater than the last one they received.
+  [ -z "$previous" ] || newer "$version" "$previous" \
+    || fail "$version is not greater than $previous, the last release in $changelog"
+  if has_unreleased "$changelog"; then
+    changelogs+=("$changelog") products+=("$name")
+    summary+="  $name: $version"$'\n'
+  else
+    summary+="  $name: unchanged, attaches ${previous:-nothing}"$'\n'
+  fi
+done
+[ ${#products[@]} -gt 0 ] || fail "neither CHANGELOG.md nor vscode/CHANGELOG.md has entries under [Unreleased]"
+
+echo "Current version: $current"
 echo "Release:         $version ($kind)"
+printf '%s' "$summary"
 $dry_run && exit 0
 
 [ "$(git branch --show-current)" = dev ] || fail "not on dev"
@@ -61,20 +85,19 @@ git rev-parse -q --verify "refs/tags/$tag" >/dev/null && fail "$tag already exis
 [ "$(git rev-parse dev)" = "$(git rev-parse origin/dev)" ] || fail "dev is not in sync with origin/dev"
 git merge-base --is-ancestor origin/master dev || fail "dev does not contain origin/master"
 
-# Stamping an empty section would publish release notes with no content.
-awk '/^## \[Unreleased\]/ {on = 1; next} /^## \[/ {on = 0} on && /^- / {found = 1} END {exit !found}' "$changelog" \
-  || fail "$changelog has no entries under [Unreleased]"
-
 read -r -p "Release $tag from $(git rev-parse --short dev)? [y/N] " answer
 [ "$answer" = y ] || fail "cancelled"
 
-sed -i "s/^$variable = .*/$variable = \"$version\"/" build.py
-sed -i "0,/^## \[Unreleased\]/s//## [Unreleased]\n\n## [$version] - $(date +%F)/" "$changelog"
+sed -i "s/^VERSION = .*/VERSION = \"$version\"/" build.py
+for changelog in "${changelogs[@]}"; do
+  sed -i "0,/^## \[Unreleased\]/s//## [Unreleased]\n\n## [$version] - $(date +%F)/" "$changelog"
+done
 
-python3 build.py "${build_args[@]}"
+python3 build.py --vsix
 
-git add build.py "$changelog"
-git commit -q -m "chore(release): release ${product}version $version" -m "Releases ${product}version $version."
+if [ ${#products[@]} -eq 2 ]; then included="${products[0]} and ${products[1]}"; else included=${products[0]}; fi
+git add build.py "${changelogs[@]}"
+git commit -q -m "chore(release): release version $version" -m "Releases version $version of the $included."
 git push origin dev
 
 git switch master
@@ -93,8 +116,7 @@ done
 [ -n "$run" ] || fail "no Build run appeared for $sha; tag not pushed"
 gh run watch "$run" --exit-status || fail "Build failed; tag not pushed"
 
-git tag -a "$tag" -m "Release ${product}$version"
+git tag -a "$tag" -m "Release $version"
 git push origin "$tag"
 git switch dev
-if $vscode; then workflow="Publish VS Code"; else workflow=Publish; fi
-echo "Pushed $tag. $workflow: gh run list --workflow \"$workflow\" --limit 1"
+echo "Pushed $tag. Publish: gh run list --workflow Publish --limit 1"

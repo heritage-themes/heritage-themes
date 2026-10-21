@@ -1,6 +1,6 @@
 name: VS Marketplace identity
 
-# Prints the Marketplace ID of the Entra ID identity that Publish VS Code signs in as. Run it by hand once,
+# Prints the Marketplace ID of the Entra ID identity that Publish signs in as. Run it by hand once,
 # then add that ID to the publisher as a Contributor (docs/releasing.md).
 on:
   workflow_dispatch:

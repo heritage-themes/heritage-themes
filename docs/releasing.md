@@ -1,15 +1,21 @@
 # Releasing
 
-The JetBrains plugin and the VS Code extension are released separately, each with its own version,
-changelog and tags:
+The JetBrains plugin and the VS Code extension share one version, `VERSION` in `build.py`, and
+one `v<version>` tag. Each has its own changelog:
 
-| Product | Version | Changelog | Tag | Workflow | Publishes to |
-|---|---|---|---|---|---|
-| JetBrains plugin | `VERSION` in `build.py` | `CHANGELOG.md` | `v<version>` | `publish.yml` (Publish) | JetBrains Marketplace |
-| VS Code extension | `VSCODE_VERSION` in `build.py` | `vscode/CHANGELOG.md` | `vscode-v<version>` | `publish-vscode.yml` (Publish VS Code) | VS Marketplace, Open VSX |
+| Product | Changelog | Publishes to |
+|---|---|---|
+| JetBrains plugin | `CHANGELOG.md` | JetBrains Marketplace |
+| VS Code extension | `vscode/CHANGELOG.md` | VS Marketplace, Open VSX |
 
-Pushing a tag publishes that product and attaches its build to a GitHub release. There is no
-approval step: the tag push is the gate.
+A release includes each product whose changelog has entries under `[Unreleased]`. A product
+without entries is not published and skips that version number: after 1.3.0 for both and 1.3.1 for
+the VS Code extension only, the plugin goes from 1.3.0 to the next release that includes it.
+
+Every version has one GitHub release, which becomes the latest. It carries both products: the new
+build of each included product, and the build of its last release for a product left out, so the
+latest release always has the current plugin and extension. Pushing the tag publishes; there is
+no approval step.
 
 ## Branches and CI
 
@@ -18,38 +24,39 @@ Work on `dev`. `master` receives commits only when a release is cut.
 | Workflow | Runs on | Does |
 |---|---|---|
 | `build.yml` (Build) | Push to `master`, every pull request, manual run | `python3 build.py --vsix`, which also validates the plugin, the extension and their theme files |
-| `publish.yml` (Publish) | Push of a `v<digit>…` tag | Checks the tag, builds, signs, uploads to the JetBrains Marketplace, creates the GitHub release |
-| `publish-vscode.yml` (Publish VS Code) | Push of a `vscode-v…` tag | Checks the tag, builds the `.vsix`, publishes to the VS Marketplace and Open VSX, creates the GitHub release |
-| `vscode-identity.yml` (VS Marketplace identity) | Manual run | Prints the Marketplace ID of the identity Publish VS Code signs in as |
+| `publish.yml` (Publish) | Push of a `v<digit>…` tag | Checks the tag; for each included product builds and publishes it (the plugin signed); creates the GitHub release |
+| `vscode-identity.yml` (VS Marketplace identity) | Manual run | Prints the Marketplace ID of the identity Publish signs in as |
 
 A push to `dev` runs nothing. Run the same check locally with `python3 build.py --vsix`.
 
 ## Cut a release
 
-1. Add the changes under `[Unreleased]` in `CHANGELOG.md` for the JetBrains plugin, or in
-   `vscode/CHANGELOG.md` for the VS Code extension. Commit and push `dev`.
-2. Run the release script on `dev`. Add `--vscode` to release the VS Code extension:
+1. Add the changes under `[Unreleased]` in the changelog of each product they affect: a change to a
+   palette or a new theme goes in both. Commit and push `dev`.
+2. Run the release script on `dev`:
 
    ```bash
    scripts/release.sh            # patch: 1.0.0 → 1.0.1
    scripts/release.sh minor      # 1.0.x → 1.1.0
    scripts/release.sh major      # 1.x.y → 2.0.0
    scripts/release.sh 1.0.0      # an explicit version
-   scripts/release.sh --dry-run  # print the version and stop
-   scripts/release.sh --vscode 1.0.0
+   scripts/release.sh --dry-run  # print the version and the included products, then stop
    ```
 
-   It prints the version and asks for confirmation. It then sets the version in `build.py`, stamps
-   the changelog, runs `build.py`, commits and pushes `dev`, fast-forwards `master` to it and pushes
-   it, waits for Build to pass on that commit, and pushes an annotated tag, which starts the publish
-   workflow. It stops before changing anything if it is not on `dev`, the working tree is dirty,
-   `dev` differs from `origin/dev`, the tag exists or `[Unreleased]` has no entries, and stops
-   before tagging if Build fails.
+   It prints the version and the included products and asks for confirmation. It then sets
+   `VERSION` in `build.py`, stamps the changelogs of the included products, runs
+   `python3 build.py --vsix`, commits and pushes `dev`, fast-forwards `master` to it and pushes it,
+   waits for Build to pass on that commit, and pushes an annotated tag, which starts Publish. It
+   stops before changing anything if neither changelog has entries under `[Unreleased]`, the version
+   is not greater than the last release in each changelog, it is not on `dev`, the working tree is
+   dirty, `dev` differs from `origin/dev` or the tag exists, and stops before tagging if Build
+   fails.
 
-A publish workflow fails before uploading if the tag differs from the version in `build.py`, the
-tagged commit is not on `master`, the changelog has no section for the version, or a secret or
-variable is empty. The GitHub release of the VS Code extension is not marked as the latest, so the
-latest release stays the JetBrains plugin that the README links to.
+Publish includes a product when its changelog has a section for the version. It fails before
+uploading if the tag differs from `VERSION` in `build.py`, the tagged commit is not on `master`,
+neither changelog has a section for the version, or a secret or variable of an included product is
+empty. It creates the GitHub release once every included product has published. If one fails,
+re-run the failed jobs in GitHub Actions; the products that published are not uploaded again.
 
 To withdraw a tag pushed by mistake, run `git push origin :refs/tags/<tag>` and
 `git tag -d <tag>`. The workflow may already be running; cancel it in GitHub Actions.
@@ -95,7 +102,7 @@ Publish uploads to the plugin whose descriptor `<id>` is `heritage.themes`.
 
 ## One-time setup: VS Marketplace and Open VSX
 
-Publish VS Code signs in to the VS Marketplace with Microsoft Entra ID through GitHub's OpenID
+Publish signs in to the VS Marketplace with Microsoft Entra ID through GitHub's OpenID
 Connect token, so no Marketplace token is stored. The extension ID is
 `<VSCODE_PUBLISHER>.<VSCODE_NAME>` from `build.py`; the first publish creates the extension.
 
@@ -169,7 +176,7 @@ Connect token, so no Marketplace token is stored. The extension ID is
    | Field | Value |
    |---|---|
    | Repository | `heritage-themes/heritage-themes` |
-   | Workflow | `publish-vscode.yml` |
+   | Workflow | `publish.yml` |
    | Environment | `vscode-marketplace` |
 
 8. Claim the namespace. Until it has an owner, Open VSX marks every version with a warning that the
