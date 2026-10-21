@@ -41,9 +41,11 @@ Colour themes for IntelliJ-based IDEs and VS Code, each drawn from a culture's c
 
 ### JetBrains IDEs
 
-Download from the [GitHub releases](https://github.com/heritage-themes/heritage-themes/releases) page:
+Install **Heritage Themes** from **Settings | Plugins | Marketplace**; it is published on the JetBrains Marketplace. Then choose a theme under **Settings | Appearance & Behavior | Appearance | Theme**.
 
-- Plugin: `heritage-themes-<version>.jar`. In the IDE choose **Settings | Plugins | ⚙ | Install Plugin from Disk…**, select the jar and restart. Then choose a theme under **Settings | Appearance & Behavior | Appearance | Theme**.
+To install from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest) instead:
+
+- Plugin: `heritage-themes-<version>-signed.zip`. Choose **Settings | Plugins | ⚙ | Install Plugin from Disk…**, select the zip and restart.
 - Editor colour scheme only: an `.icls` file. Choose **Settings | Editor | Color Scheme | ⚙ | Import Scheme…** and select the file.
 
 The themes work in IntelliJ-based IDEs version 2025.3 or later, such as IntelliJ IDEA, PyCharm, WebStorm and Android Studio.
@@ -52,7 +54,7 @@ Every theme uses the Islands UI: the editor and tool windows sit as rounded isla
 
 ### VS Code
 
-Install **Heritage Themes** from the Extensions view; it is published on the VS Marketplace and Open VSX. Then choose a theme with **Preferences: Color Theme** (`Ctrl+K Ctrl+T`). To install a build instead, run **Extensions: Install from VSIX…** and select `heritage-themes-vscode-<version>.vsix`.
+Install **Heritage Themes** from the Extensions view; it is published on the VS Marketplace and Open VSX. Then choose a theme with **Preferences: Color Theme** (`Ctrl+K Ctrl+T`). To install from the latest GitHub release instead, run **Extensions: Install from VSIX…** and select `heritage-themes-vscode-<version>.vsix`.
 
 ## Build from source
 
@@ -91,7 +93,7 @@ The page shows each theme as an IDE window with a code sample per language, colo
 ## Layout
 
 ```text
-build.py        builds the plugin and the VS Code extension from every theme folder; holds both versions
+build.py        builds the plugin and the VS Code extension from every theme folder; holds their shared version
 preview.py      writes theme previews and renders the README images
 heritage/       code shared by every theme family
   __init__.py   finds the theme folders in themes/; the theme.py contract
@@ -105,7 +107,7 @@ vscode/         CHANGELOG.md: VS Code extension release notes
 assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
 scripts/        release.sh, parent_overrides.py; shiki/ tokenises the VS Code preview; vscode/ packs and publishes the extension
 docs/           releasing.md, adding-a-theme.md
-.github/        Build, Publish and Publish VS Code workflows; ISSUE_TEMPLATE/ holds the issue forms
+.github/        Build and Publish workflows; ISSUE_TEMPLATE/ holds the issue forms
 themes/<theme>/
   theme.py      palettes; defines FAMILY, BLURB and THEMES
   README.md     what the theme is
@@ -120,7 +122,7 @@ Only sources are tracked. Jars, zips, `.icls` and `.vsix` files are build output
 - Work on `dev`. `master` receives commits only when `scripts/release.sh` cuts a release.
 - Commit subjects follow [Conventional Commits](https://www.conventionalcommits.org/), with the theme folder as the scope for a change to one theme: `fix(wuxing): soften comment contrast`. Changes outside the theme folders use a scope such as `heritage`, `build` or `ci`, or none.
 - Keep a commit within one theme folder.
-- `scripts/release.sh` tags each JetBrains release `v<version>` and, with `--vscode`, each VS Code release `vscode-v<version>`, which publishes it. The versions are `VERSION` and `VSCODE_VERSION` in `build.py`. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
+- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin and the VS Code extension share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
 
 ## Add a theme
 

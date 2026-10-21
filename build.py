@@ -16,13 +16,13 @@ import heritage
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
 CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
-VERSION = "1.0.1"
+# One version for the JetBrains plugin and the VS Code extension. A release publishes each product whose changelog
+# has a section for it; see docs/releasing.md.
+VERSION = "1.2.1"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 DESCRIPTION = "Colour themes drawn from the colour traditions of different cultures."
 PLUGIN_ICONS = ("pluginIcon.svg", "pluginIcon_dark.svg")
 SINCE_BUILD = "253"  # 2025.3, the first release with the Islands Dark and Islands Light parent themes
-# The VS Code extension has its own version, changelog and vscode-v* release tags.
-VSCODE_VERSION = "1.2.1"
 VSCODE_CHANGELOG = os.path.join(ROOT, "vscode", "CHANGELOG.md")
 VSCODE_PUBLISHER = "heritage-themes"
 VSCODE_NAME = "heritage-themes"
@@ -93,14 +93,17 @@ def check_references(t):
 
 
 def change_notes():
-    """HTML for the plugin's change notes: the CHANGELOG.md section for VERSION, else [Unreleased]."""
+    """HTML for the plugin's change notes: the CHANGELOG.md section for VERSION, else [Unreleased], else the newest
+    released section, which is the plugin's version when VERSION is a release that left the plugin out."""
     with open(CHANGELOG) as f:
         text = f.read()
-    for heading in (f"[{VERSION}]", "[Unreleased]"):
-        match = re.search(rf"^## {re.escape(heading)}[^\n]*\n(.*?)(?=^## \[|\Z)", text, re.M | re.S)
-        if match and match.group(1).strip():
-            return changelog_html(match.group(1))
-    raise SystemExit(f"CHANGELOG.md has no entries under [{VERSION}] or [Unreleased]")
+    sections = re.findall(r"^## \[([^\]]+)\][^\n]*\n(.*?)(?=^## \[|\Z)", text, re.M | re.S)
+    entries = {label: body for label, body in sections if body.strip()}
+    released = [label for label, _ in sections if label in entries and label != "Unreleased"]
+    for label in (VERSION, "Unreleased", *released[:1]):
+        if label in entries:
+            return f"<b>{VERSION if label == 'Unreleased' else label}</b>\n{changelog_html(entries[label])}"
+    raise SystemExit(f"CHANGELOG.md has no entries under [{VERSION}], [Unreleased] or a released version")
 
 
 def changelog_html(section):
@@ -142,8 +145,7 @@ def plugin_xml(families, themes):
     <p>Report problems and suggest traditions on the <a href="{VENDOR_URL}/issues">issue tracker</a>.</p>
   ]]></description>
   <change-notes><![CDATA[
-    <b>{VERSION}</b>
-{change_notes()}
+    {change_notes()}
   ]]></change-notes>
   <idea-version since-build="{SINCE_BUILD}"/>
   <depends>com.intellij.modules.platform</depends>
@@ -180,7 +182,7 @@ def validate(jar, themes):
 def vscode_manifest(themes):
     return {
         "name": VSCODE_NAME, "displayName": "Heritage Themes", "description": DESCRIPTION,
-        "version": VSCODE_VERSION, "publisher": VSCODE_PUBLISHER, "license": "MIT", "icon": "icon.png",
+        "version": VERSION, "publisher": VSCODE_PUBLISHER, "license": "MIT", "icon": "icon.png",
         "repository": {"type": "git", "url": f"{VENDOR_URL}.git"}, "homepage": VENDOR_URL,
         "bugs": {"url": f"{VENDOR_URL}/issues"}, "sponsor": {"url": VSCODE_SPONSOR_URL},
         "engines": {"vscode": VSCODE_ENGINE},
@@ -265,7 +267,7 @@ def pack_vsix(directory, themes):
         if not npm:
             raise SystemExit("build: --vsix needs Node.js and npm")
         subprocess.run([npm, "ci", "--no-audit", "--no-fund"], cwd=VSCODE_TOOLS, check=True)
-    vsix = os.path.join(OUT, f"{VSCODE_NAME}-vscode-{VSCODE_VERSION}.vsix")
+    vsix = os.path.join(OUT, f"{VSCODE_NAME}-vscode-{VERSION}.vsix")
     # stdin is closed so that a vsce confirmation prompt fails the build instead of waiting for input
     subprocess.run([vsce, "package", "--no-dependencies", "--out", vsix], cwd=directory, check=True,
                    stdin=subprocess.DEVNULL)
