@@ -10,14 +10,15 @@ heritage.vscode (see scripts/shiki/tokens.mjs), and its chrome from the workbenc
 Semantic highlighting needs a language server, so the page shows the TextMate colours only.
 
 The Sublime Text page takes code colours from tokens of Sublime Text's syntaxes as bat bundles them, coloured by the
-generated scheme (see preview.py). It shows the editor only: the scheme does not colour Sublime Text's own UI.
+generated scheme (see preview.py), and its chrome from the surfaces of the UI theme (heritage.sublime.SURFACES): the
+editors in one frame with the sidebar, tab bars and status bar.
 """
 import html, re
 
 from .samples import SAMPLES
 from .scheme import attributes, BOLD, ITALIC, BI, UNDER, WAVE, STRIKE, BOX, DOTTED
 from .ui import theme
-from . import vscode
+from . import sublime, vscode
 
 FONT_DIR = "fonts"
 FONTS = [("Regular", 400, "normal"), ("Italic", 400, "italic"), ("Bold", 700, "normal"), ("BoldItalic", 700, "italic")]
@@ -67,10 +68,10 @@ VSCODE_CHROME = {
     "stripeFg": "activityBar.inactiveForeground", "stripeMark": "activityBar.activeBorder",
     "status": "statusBar.background", "statusFg": "statusBar.foreground",
 }
-# CSS variable → palette role for the Sublime Text page, which has no window chrome of its own to take colours from.
+# CSS variable → palette role for the Sublime Text page. The selected tab joins its editor, so it takes bg.
 SUBLIME_CHROME = {
-    "frame": "bgUi", "editor": "bgUi", "underTabs": "border", "tab": "bg", "tabBorder": "border",
-    "status": "bgUi", "statusFg": "muted",
+    "frame": sublime.SURFACES["title"], "island": sublime.SURFACES["sidebar"], "editor": sublime.SURFACES["tabs"],
+    "tab": "bg", "status": sublime.SURFACES["status"], "statusFg": "fg",
 }
 # Shiki language id by sample file extension.
 LANGS = dict(java="java", kt="kotlin", groovy="groovy", py="python", ts="typescript", tsx="tsx", vue="vue",
@@ -225,8 +226,9 @@ body{{margin:0;padding:24px;font-family:system-ui,sans-serif}}
 .vscode .tab{{border:0;border-radius:0;border-bottom:2px solid var(--tabBorder)}}
 .vscode .stripe .on{{border-radius:0;box-shadow:inset 2px 0 var(--stripeMark)}}
 .vscode .status,.sublime .status{{color:var(--statusFg)}}
-.sublime .tab{{border:0;border-radius:0;border-bottom:2px solid var(--tabBorder)}}
-.sublime .stripe,.sublime .side{{display:none}} .sublime .body{{padding-left:5px}}
+.sublime .body{{gap:0;padding:0}} .sublime .stripe{{display:none}} .sublime .side{{border-radius:0}}
+.sublime .files{{gap:2px}} .sublime .file{{border-radius:0}}
+.sublime .tabs{{padding:5px 0 0 6px;border:0}} .sublime .tab{{padding:5px 12px;border:0;border-radius:6px 6px 0 0}}
 pre{{margin:0;padding:8px 0;font:13px/1.55 "JetBrains Mono",ui-monospace,monospace;font-variant-ligatures:none;
   overflow-x:auto;color:var(--fg)}}
 pre div{{padding:0 12px 0 0;white-space:pre}}

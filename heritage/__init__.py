@@ -39,7 +39,9 @@ def folder(family):
 
 def generate(family):
     """One dict per theme with slug, id, name, dark, scheme (editor scheme XML), theme (UI theme JSON),
-    vscode (VS Code colour theme JSON), sublime (Sublime Text colour scheme JSON)."""
+    vscode (VS Code colour theme JSON), sublime (Sublime Text colour scheme JSON), sublime_theme (Sublime Text UI
+    theme JSON)."""
     return [dict(slug=t["slug"], id=t["id"], name=t["palette"]["name"], dark=t["palette"]["dark"],
                  scheme=scheme(t["palette"]), theme=theme(t["palette"], t["slug"]),
-                 vscode=vscode.theme(t["palette"]), sublime=sublime.scheme(t["palette"])) for t in family.THEMES]
+                 vscode=vscode.theme(t["palette"]), sublime=sublime.scheme(t["palette"]),
+                 sublime_theme=sublime.ui_theme(t["palette"])) for t in family.THEMES]

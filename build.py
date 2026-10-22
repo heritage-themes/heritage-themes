@@ -40,7 +40,7 @@ SUBLIME_FONT_STYLES = {"bold", "italic", "underline"}
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
-# WCAG 2.2 AA minimums for palette roles in both IDEs: 4.5:1 for text, 3:1 for comments, focus rings and the caret.
+# WCAG 2.2 AA minimums for palette roles in every app: 4.5:1 for text, 3:1 for comments, focus rings and the caret.
 # (foreground roles, background roles, minimum)
 CONTRAST = (
     (("fg", "muted"), ("bg", "bgTool", "bgUi", "surface", "caretRow", "frame"), 4.5),
@@ -50,6 +50,7 @@ CONTRAST = (
     (ANSI, ("bgTool",), 4.5),  # console and terminal
     (("fg",), ("hover", "selection", "selInactive", "searchBg"), 4.5),
     (("ansiBlue",), ("selection",), 4.5),  # VS Code match highlights in a selected list row
+    (("ansiBlue", "azure"), ("surface",), 4.5),  # Sublime Text quick panel matches and links in popups
     (("redText",), ("red",), 4.5),
     (("gold",), ("bgTool", "bgUi", "surface"), 3),  # IntelliJ focus ring
     (("caret",), ("bg", "caretRow"), 3),
@@ -292,7 +293,9 @@ def sublime_readme(families):
 {DESCRIPTION} {count} dark and light colour schemes in {len(families)} families; each family maps the named \
 colours of one tradition to syntax roles.
 
-The schemes colour the editor. They work with every Sublime Text theme.
+Each colour scheme colours the editor. The UI theme of the same name colours the sidebar, tabs, panels, status bar \
+and popups to match; it extends Sublime Text's built-in Adaptive theme. A scheme also works on its own with any \
+other theme.
 
 ## Install
 
@@ -301,16 +304,21 @@ choose **{SUBLIME_NAME}**. To install without Package Control, download `heritag
 from the [latest release]({VENDOR_URL}/releases/latest) into the `Installed Packages` folder, which **Preferences: \
 Browse Packages** shows beside `Packages`.
 
-## Choose a scheme
+## Choose a scheme and theme
 
-Run **UI: Select Color Scheme** and choose a scheme under **{SUBLIME_NAME}**. To follow the system appearance, set \
-`color_scheme` to `auto` and name a scheme for each appearance in **Preferences: Settings**:
+Run **UI: Select Color Scheme** and choose a scheme under **{SUBLIME_NAME}**, then **UI: Select Theme** and choose \
+the theme of the same name. The theme carries its scheme's colours, so pair each theme with its own scheme. To \
+follow the system appearance, set both settings to `auto` and name a pair for each appearance in **Preferences: \
+Settings**:
 
 ```json
 {{
     "color_scheme": "auto",
     "dark_color_scheme": "Packages/{SUBLIME_NAME}/Holi Night.sublime-color-scheme",
-    "light_color_scheme": "Packages/{SUBLIME_NAME}/Kalamkari Cotton (Light).sublime-color-scheme"
+    "light_color_scheme": "Packages/{SUBLIME_NAME}/Kalamkari Cotton (Light).sublime-color-scheme",
+    "theme": "auto",
+    "dark_theme": "Holi Night.sublime-theme",
+    "light_theme": "Kalamkari Cotton (Light).sublime-theme"
 }}
 ```
 
@@ -341,13 +349,16 @@ def build_sublime(families, themes):
     """Writes the Sublime Text package's files to build/sublime and returns that folder."""
     directory = os.path.join(OUT, "sublime")
     os.makedirs(directory)
-    names = [heritage.sublime.filename(t["name"]) for t in themes]
+    names = [heritage.sublime.basename(t["name"]) for t in themes]
     if len(names) != len(set(names)):
-        raise SystemExit("sublime: two themes have the same scheme file name")
+        raise SystemExit("sublime: two themes have the same file name")
     for name, t in zip(names, themes):
-        with open(os.path.join(directory, name), "w") as f:
-            json.dump(t["sublime"], f, indent=2, ensure_ascii=False)
-            f.write("\n")
+        for filename, document in ((f"{name}.sublime-color-scheme", t["sublime"]),
+                                   (f"{name}.sublime-theme", t["sublime_theme"]),
+                                   (f"Widget - {name}.sublime-settings", heritage.sublime.widget_settings())):
+            with open(os.path.join(directory, filename), "w") as f:
+                json.dump(document, f, indent=2, ensure_ascii=False)
+                f.write("\n")
     with open(os.path.join(directory, "README.md"), "w") as f:
         f.write(sublime_readme(families))
     shutil.copy(SUBLIME_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
@@ -357,13 +368,15 @@ def build_sublime(families, themes):
 
 def validate_sublime(directory, themes):
     """Fails the build when a colour scheme is malformed, names an undefined variable or has a rule that is
-    unreadable on the background."""
+    unreadable on the background, or when a scheme lacks its UI theme and widget settings."""
     for name in ("README.md", "CHANGELOG.md", "LICENSE"):
         if not os.path.isfile(os.path.join(directory, name)):
             raise SystemExit(f"Sublime package: {name} is missing")
     schemes = sorted(n for n in os.listdir(directory) if n.endswith(".sublime-color-scheme"))
     if len(schemes) != len(themes):
         raise SystemExit(f"Sublime package: {len(schemes)} colour schemes for {len(themes)} themes")
+    for name in schemes:
+        validate_sublime_theme(directory, name.removesuffix(".sublime-color-scheme"))
     for name in schemes:
         with open(os.path.join(directory, name)) as f:
             scheme = json.load(f)
@@ -391,6 +404,24 @@ def validate_sublime(directory, themes):
         for value in colours:
             if not re.fullmatch(r"#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?", value):
                 raise SystemExit(f"{name}: {value} is not a hex colour")
+
+
+def validate_sublime_theme(directory, name):
+    """Fails the build when the UI theme or widget settings of the scheme of that name are missing or malformed."""
+    for filename in (f"{name}.sublime-theme", f"Widget - {name}.sublime-settings"):
+        if not os.path.isfile(os.path.join(directory, filename)):
+            raise SystemExit(f"Sublime package: {filename} is missing")
+    with open(os.path.join(directory, f"{name}.sublime-theme")) as f:
+        theme = json.load(f)
+    if theme.get("extends") != "Adaptive.sublime-theme" or not theme.get("rules"):
+        raise SystemExit(f"{name}.sublime-theme: must extend Adaptive.sublime-theme and add rules")
+    for rule in theme["rules"]:
+        if not rule.get("class"):
+            raise SystemExit(f"{name}.sublime-theme: a rule needs a class: {rule}")
+        for key, value in rule.items():
+            if (key.endswith(("fg", "tint", "color", "_modifier")) or key == "bg") and value != "transparent" \
+                    and not re.fullmatch(r"#[0-9A-F]{6}", value):
+                raise SystemExit(f"{name}.sublime-theme: {key} {value!r} is not a hex colour")
 
 
 def pack_sublime(directory):
