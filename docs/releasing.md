@@ -220,8 +220,9 @@ generated files only; every publish replaces its contents.
    ```json
    {
        "name": "Heritage Themes",
+       "author": "Andrzej Piontek",
        "details": "https://github.com/heritage-themes/heritage-themes-sublime",
-       "labels": ["color scheme"],
+       "labels": ["theme", "color scheme", "dark", "light"],
        "releases": [
            {
                "sublime_text": ">=4000",
