@@ -3,7 +3,7 @@ name: Publish
 # Fires only when a version tag (for example `v1.0.0`) is pushed, so the tag push is the release
 # gate. scripts/release.sh pushes the tag after Build has passed on the commit it points at.
 # Publishes each product whose changelog has a section for the version, then creates one GitHub
-# release that carries both products: a product left out keeps the build of its last release.
+# release that carries every product: a product left out keeps the build of its last release.
 on:
   push:
     tags:
@@ -23,6 +23,7 @@ jobs:
       version: ${{ steps.check.outputs.version }}
       jetbrains: ${{ steps.check.outputs.jetbrains }}
       vscode: ${{ steps.check.outputs.vscode }}
+      sublime: ${{ steps.check.outputs.sublime }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -41,17 +42,19 @@ jobs:
             echo "::error::$GITHUB_REF_NAME does not point at a commit on master"
             exit 1
           fi
-          jetbrains=false vscode=false
+          jetbrains=false vscode=false sublime=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
-          if [ "$jetbrains" = false ] && [ "$vscode" = false ]; then
-            echo "::error::Neither CHANGELOG.md nor vscode/CHANGELOG.md has a [$version] section"
+          grep -q "^## \[$version\]" sublime/CHANGELOG.md && sublime=true
+          if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$sublime" = false ]; then
+            echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
           {
             echo "version=$version"
             echo "jetbrains=$jetbrains"
             echo "vscode=$vscode"
+            echo "sublime=$sublime"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -197,13 +200,73 @@ jobs:
           path: build/heritage-themes-vscode-${{ env.VERSION }}.vsix
           if-no-files-found: error
 
+  sublime:
+    needs: check
+    if: needs.check.outputs.sublime == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      # Package Control installs from this repository, which holds the package at its root (docs/releasing.md).
+      SUBLIME_REPOSITORY: heritage-themes/heritage-themes-sublime
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Check release secrets
+        shell: bash
+        env:
+          SUBLIME_REPO_TOKEN: ${{ secrets.SUBLIME_REPO_TOKEN }}
+        run: |
+          if [ -z "$SUBLIME_REPO_TOKEN" ]; then
+            echo "::error::Repository secret SUBLIME_REPO_TOKEN is empty or not set"
+            exit 1
+          fi
+
+      - run: python3 build.py
+
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ env.SUBLIME_REPOSITORY }}
+          token: ${{ secrets.SUBLIME_REPO_TOKEN }}
+          path: sublime-repository
+          fetch-depth: 0
+
+      # Package Control reads the tag, which is the plain version: it needs a semantic version.
+      - name: Publish to the Sublime Text package repository
+        shell: bash
+        run: |
+          cd sublime-repository
+          if git rev-parse -q --verify "refs/tags/$VERSION" > /dev/null; then
+            echo "$SUBLIME_REPOSITORY is already tagged $VERSION"
+            exit 0
+          fi
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -r ../build/sublime/. .
+          git add --all
+          if ! git diff --cached --quiet; then
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit --message "Release $VERSION" \
+              --message "Generated from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+          fi
+          git tag "$VERSION"
+          git push origin HEAD "refs/tags/$VERSION"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sublime
+          path: build/heritage-themes-sublime-${{ env.VERSION }}.sublime-package
+          if-no-files-found: error
+
   release:
-    needs: [check, jetbrains, vscode]
+    needs: [check, jetbrains, vscode, sublime]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
       && contains(fromJSON('["success", "skipped"]'), needs.jetbrains.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.vscode.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.vscode.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.sublime.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -211,6 +274,7 @@ jobs:
       VERSION: ${{ needs.check.outputs.version }}
       JETBRAINS: ${{ needs.check.outputs.jetbrains }}
       VSCODE: ${{ needs.check.outputs.vscode }}
+      SUBLIME: ${{ needs.check.outputs.sublime }}
     steps:
       - uses: actions/checkout@v7
 
@@ -264,6 +328,7 @@ jobs:
           {
             notes "JetBrains plugin" "$JETBRAINS" CHANGELOG.md "heritage-themes-<version>-signed.zip" '*.icls'
             notes "VS Code extension" "$VSCODE" vscode/CHANGELOG.md "heritage-themes-vscode-<version>.vsix"
+            notes "Sublime Text package" "$SUBLIME" sublime/CHANGELOG.md "heritage-themes-sublime-<version>.sublime-package"
           } > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \
