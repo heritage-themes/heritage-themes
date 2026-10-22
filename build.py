@@ -18,7 +18,7 @@ OUT = os.path.join(ROOT, "build")
 CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
 # One version for the JetBrains plugin and the VS Code extension. A release publishes each product whose changelog
 # has a section for it; see docs/releasing.md.
-VERSION = "1.2.1"
+VERSION = "1.2.2"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 DESCRIPTION = "Colour themes drawn from the colour traditions of different cultures."
 PLUGIN_ICONS = ("pluginIcon.svg", "pluginIcon_dark.svg")
