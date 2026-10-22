@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-10-22
+
 ### Fixed
 
 - The Run, Debug and Stop buttons in the main toolbar, and the Git Resolve and Abort buttons during a merge or rebase, keep their green or red fill on hover and shade it slightly, as the other toolbar buttons do.
