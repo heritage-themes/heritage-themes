@@ -58,7 +58,7 @@ Install **Heritage Themes** from the Extensions view; it is published on the VS 
 
 ### Sublime Text
 
-Run **Package Control: Install Package** and choose **Heritage Themes**, then **UI: Select Color Scheme**. To install from the latest GitHub release instead, copy `heritage-themes-sublime-<version>.sublime-package` into the `Installed Packages` folder, which **Preferences: Browse Packages** shows beside `Packages`. The package contains colour schemes only; they work with every Sublime Text theme. Sublime Text 4 is required.
+Run **Package Control: Install Package** and choose **Heritage Themes**, then **UI: Select Color Scheme** and **UI: Select Theme**, choosing the same name in both. To install from the latest GitHub release instead, copy `heritage-themes-sublime-<version>.sublime-package` into the `Installed Packages` folder, which **Preferences: Browse Packages** shows beside `Packages`. Each colour scheme colours the editor; the UI theme of the same name extends the built-in Adaptive theme and colours the sidebar, tabs, panels and status bar to match. Sublime Text 4 is required.
 
 ## Build from source
 
@@ -78,7 +78,7 @@ Output in `build/`:
 | `schemes/*.icls` | Standalone editor colour schemes |
 | `vscode/` | The VS Code extension: `package.json`, README, changelog and one colour theme per theme |
 | `heritage-themes-vscode-<version>.vsix` | The VS Code extension packed by `--vsix`. Install this in VS Code |
-| `sublime/` | The Sublime Text package: one `.sublime-color-scheme` per theme, README, changelog and licence. The release publishes this folder to the package repository |
+| `sublime/` | The Sublime Text package: per theme a `.sublime-color-scheme`, a `.sublime-theme` and its `Widget - <name>.sublime-settings`, plus README, changelog and licence. The release publishes this folder to the package repository |
 | `heritage-themes-sublime-<version>.sublime-package` | The same files packed as a zip. Install this in Sublime Text |
 
 Install the jar, an `.icls` file, the `.vsix` or the `.sublime-package` as described under [Install](#install).
@@ -109,7 +109,8 @@ heritage/       code shared by every theme family
   scheme.py     editor colour scheme: palette roles to text attributes
   ui.py         UI theme: palette roles to UI keys
   vscode.py     VS Code colour theme: palette roles to TextMate scopes, semantic tokens and workbench keys
-  sublime.py    Sublime Text colour scheme: the VS Code scopes plus the scopes Sublime Text's syntaxes name differently
+  sublime.py    Sublime Text colour scheme: the VS Code scopes plus the scopes Sublime Text's syntaxes name differently;
+                UI theme: rules over Adaptive that give its surfaces and text palette roles
   preview.py    preview page
   samples.py    code samples shown in the preview
 CHANGELOG.md    JetBrains plugin release notes; the plugin's change notes come from it

@@ -12,7 +12,7 @@ Any folder in `themes/` with a `theme.py` is a theme family. `heritage.load_fami
 | `BLURB` | One sentence for the plugin description: the tradition and its main syntax mappings |
 | `THEMES` | One `dict(slug=..., id=..., palette=...)` per theme; `id` is a new UUID |
 
-From each palette, `heritage/scheme.py` builds the editor colour scheme, `heritage/ui.py` builds the UI theme, `heritage/vscode.py` builds the VS Code colour theme and `heritage/sublime.py` builds the Sublime Text colour scheme. `build.py` packs the scheme and the UI theme into the JetBrains plugin, writes a standalone `.icls` per theme, adds the VS Code theme to the VS Code extension and the Sublime Text scheme to the Sublime Text package. `slug`, `id` and `name` must be unique across all themes; `build.py` fails otherwise.
+From each palette, `heritage/scheme.py` builds the editor colour scheme, `heritage/ui.py` builds the UI theme, `heritage/vscode.py` builds the VS Code colour theme and `heritage/sublime.py` builds the Sublime Text colour scheme and UI theme. `build.py` packs the scheme and the UI theme into the JetBrains plugin, writes a standalone `.icls` per theme, adds the VS Code theme to the VS Code extension and the Sublime Text scheme and UI theme to the Sublime Text package. `slug`, `id` and `name` must be unique across all themes; `build.py` fails otherwise.
 
 A change in `heritage/` changes every family. After one, render all previews and check each family.
 
