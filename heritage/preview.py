@@ -8,6 +8,9 @@ the fallback chains of the bundled language plugins. The window chrome takes its
 The VS Code page takes code colours from tokens of VS Code's TextMate grammars, coloured by the theme from
 heritage.vscode (see scripts/shiki/tokens.mjs), and its chrome from the workbench colours (VSCODE_CHROME).
 Semantic highlighting needs a language server, so the page shows the TextMate colours only.
+
+The Sublime Text page takes code colours from tokens of Sublime Text's syntaxes as bat bundles them, coloured by the
+generated scheme (see preview.py). It shows the editor only: the scheme does not colour Sublime Text's own UI.
 """
 import html, re
 
@@ -63,6 +66,11 @@ VSCODE_CHROME = {
     "stripeOn": "activityBar.background", "stripeOnFg": "activityBar.foreground",
     "stripeFg": "activityBar.inactiveForeground", "stripeMark": "activityBar.activeBorder",
     "status": "statusBar.background", "statusFg": "statusBar.foreground",
+}
+# CSS variable → palette role for the Sublime Text page, which has no window chrome of its own to take colours from.
+SUBLIME_CHROME = {
+    "frame": "bgUi", "editor": "bgUi", "underTabs": "border", "tab": "bg", "tabBorder": "border",
+    "status": "bgUi", "statusFg": "muted",
 }
 # Shiki language id by sample file extension.
 LANGS = dict(java="java", kt="kotlin", groovy="groovy", py="python", ts="typescript", tsx="tsx", vue="vue",
@@ -148,9 +156,14 @@ def vscode_chrome(p):
     return ";".join(f"--{var}:{colours[key]}" for var, key in VSCODE_CHROME.items())
 
 
-def window(p, files=None):
-    """One IDE window. files holds, per sample, the lines of Shiki tokens for the VS Code page; without it the
-    window is the IntelliJ one, coloured from the editor scheme."""
+def sublime_chrome(p):
+    """CSS variables for the window chrome, taken from the palette."""
+    return ";".join(f"--{var}:#{p[role]}" for var, role in SUBLIME_CHROME.items())
+
+
+def window(p, files=None, kind="vscode"):
+    """One IDE window. files holds, per sample, the lines of tokens (text, colour, font style) for the VS Code or
+    Sublime Text page, as kind says; without it the window is the IntelliJ one, coloured from the editor scheme."""
     names = [name for name, _, _ in SAMPLES]
     variables = ";".join(f"--{k}:#{v}" for k, v in p.items() if isinstance(v, str) and re.fullmatch(r"[0-9A-F]{6}", v))
     swatches = "".join(f'<span title="{k}" style="background:#{p[k]}"></span>' for k in SWATCHES)
@@ -163,7 +176,7 @@ def window(p, files=None):
     else:
         editors = "".join(sample(name, caret, ["".join(token_html(*t) for t in line) for line in lines])
                           for (name, caret, _), lines in zip(SAMPLES, files))
-        kind, colours = "vscode", vscode_chrome(p)
+        colours = sublime_chrome(p) if kind == "sublime" else vscode_chrome(p)
     return (f'<section class="ide {kind}" style="{variables};{colours};--caret:#{p.get("caret", p["gold"])}">'
             f'<header class="bar"><b>{html.escape(p["name"])}</b><span class="swatches">{swatches}</span></header>'
             f'<div class="body"><div class="stripe"><i class="on"></i><i></i><i></i></div>'
@@ -177,13 +190,13 @@ def vscode_samples():
     return [dict(lang=LANGS[name.rsplit(".", 1)[1]], code=plain(code)) for name, _, code in SAMPLES]
 
 
-def page(family, tokens=None):
-    """The preview page for every theme in the family: the IntelliJ page, or with tokens (per theme, the output
-    of scripts/shiki/tokens.mjs) the VS Code page."""
+def page(family, tokens=None, kind="vscode"):
+    """The preview page for every theme in the family: the IntelliJ page, or with tokens (per theme, one list of
+    token lines per sample) the VS Code page or, as kind says, the Sublime Text page."""
     faces = "".join(
         f'@font-face{{font-family:"JetBrains Mono";font-weight:{w};font-style:{s};'
         f'src:url("{FONT_DIR}/JetBrainsMono-{n}.woff2") format("woff2"),local("JetBrains Mono")}}' for n, w, s in FONTS)
-    windows = "".join(window(t["palette"], tokens[i] if tokens else None) for i, t in enumerate(family.THEMES))
+    windows = "".join(window(t["palette"], tokens[i] if tokens else None, kind) for i, t in enumerate(family.THEMES))
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title>{html.escape(family.FAMILY)} Preview</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"><style>
 {faces}
@@ -211,7 +224,9 @@ body{{margin:0;padding:24px;font-family:system-ui,sans-serif}}
 .status{{padding:5px 12px;font-size:12px;color:var(--muted);background:var(--status)}}
 .vscode .tab{{border:0;border-radius:0;border-bottom:2px solid var(--tabBorder)}}
 .vscode .stripe .on{{border-radius:0;box-shadow:inset 2px 0 var(--stripeMark)}}
-.vscode .status{{color:var(--statusFg)}}
+.vscode .status,.sublime .status{{color:var(--statusFg)}}
+.sublime .tab{{border:0;border-radius:0;border-bottom:2px solid var(--tabBorder)}}
+.sublime .stripe,.sublime .side{{display:none}} .sublime .body{{padding-left:5px}}
 pre{{margin:0;padding:8px 0;font:13px/1.55 "JetBrains Mono",ui-monospace,monospace;font-variant-ligatures:none;
   overflow-x:auto;color:var(--fg)}}
 pre div{{padding:0 12px 0 0;white-space:pre}}

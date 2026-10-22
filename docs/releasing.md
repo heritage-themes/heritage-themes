@@ -1,20 +1,21 @@
 # Releasing
 
-The JetBrains plugin and the VS Code extension share one version, `VERSION` in `build.py`, and
-one `v<version>` tag. Each has its own changelog:
+The JetBrains plugin, the VS Code extension and the Sublime Text package share one version,
+`VERSION` in `build.py`, and one `v<version>` tag. Each has its own changelog:
 
 | Product | Changelog | Publishes to |
 |---|---|---|
 | JetBrains plugin | `CHANGELOG.md` | JetBrains Marketplace |
 | VS Code extension | `vscode/CHANGELOG.md` | VS Marketplace, Open VSX |
+| Sublime Text package | `sublime/CHANGELOG.md` | Package repository, listed on Package Control |
 
 A release includes each product whose changelog has entries under `[Unreleased]`. A product
-without entries is not published and skips that version number: after 1.3.0 for both and 1.3.1 for
+without entries is not published and skips that version number: after 1.3.0 for all and 1.3.1 for
 the VS Code extension only, the plugin goes from 1.3.0 to the next release that includes it.
 
-Every version has one GitHub release, which becomes the latest. It carries both products: the new
+Every version has one GitHub release, which becomes the latest. It carries every product: the new
 build of each included product, and the build of its last release for a product left out, so the
-latest release always has the current plugin and extension. Pushing the tag publishes; there is
+latest release always has the current plugin, extension and package. Pushing the tag publishes; there is
 no approval step.
 
 ## Branches and CI
@@ -23,8 +24,8 @@ Work on `dev`. `master` receives commits only when a release is cut.
 
 | Workflow | Runs on | Does |
 |---|---|---|
-| `build.yml` (Build) | Push to `master`, every pull request, manual run | `python3 build.py --vsix`, which also validates the plugin, the extension and their theme files |
-| `publish.yml` (Publish) | Push of a `v<digit>…` tag | Checks the tag; for each included product builds and publishes it (the plugin signed); creates the GitHub release |
+| `build.yml` (Build) | Push to `master`, every pull request, manual run | `python3 build.py --vsix`, which also validates the plugin, the extension, the package and their theme files |
+| `publish.yml` (Publish) | Push of a `v<digit>…` tag | Checks the tag; for each included product builds and publishes it (the plugin signed, the package pushed to its repository); creates the GitHub release |
 | `vscode-identity.yml` (VS Marketplace identity) | Manual run | Prints the Marketplace ID of the identity Publish signs in as |
 
 A push to `dev` runs nothing. Run the same check locally with `python3 build.py --vsix`.
@@ -32,7 +33,7 @@ A push to `dev` runs nothing. Run the same check locally with `python3 build.py 
 ## Cut a release
 
 1. Add the changes under `[Unreleased]` in the changelog of each product they affect: a change to a
-   palette or a new theme goes in both. Commit and push `dev`.
+   palette or a new theme goes in all three. Commit and push `dev`.
 2. Run the release script on `dev`:
 
    ```bash
@@ -47,14 +48,14 @@ A push to `dev` runs nothing. Run the same check locally with `python3 build.py 
    `VERSION` in `build.py`, stamps the changelogs of the included products, runs
    `python3 build.py --vsix`, commits and pushes `dev`, fast-forwards `master` to it and pushes it,
    waits for Build to pass on that commit, and pushes an annotated tag, which starts Publish. It
-   stops before changing anything if neither changelog has entries under `[Unreleased]`, the version
+   stops before changing anything if no changelog has entries under `[Unreleased]`, the version
    is not greater than the last release in each changelog, it is not on `dev`, the working tree is
    dirty, `dev` differs from `origin/dev` or the tag exists, and stops before tagging if Build
    fails.
 
 Publish includes a product when its changelog has a section for the version. It fails before
 uploading if the tag differs from `VERSION` in `build.py`, the tagged commit is not on `master`,
-neither changelog has a section for the version, or a secret or variable of an included product is
+no changelog has a section for the version, or a secret or variable of an included product is
 empty. It creates the GitHub release once every included product has published. If one fails,
 re-run the failed jobs in GitHub Actions; the products that published are not uploaded again.
 
@@ -192,3 +193,42 @@ Connect token, so no Marketplace token is stored. The extension ID is
    Once the maintainers grant ownership, versions published by a namespace member show as verified.
    Add any other publishing account, such as a bot, as a **Contributor** under
    <https://open-vsx.org/user-settings/namespaces>.
+
+## One-time setup: Sublime Text package
+
+Package Control installs a package from a public repository that holds the package at its root and
+tags each version with a semantic version. This repository holds more than the package, so Publish
+pushes the generated package to a separate repository and tags it there. That repository contains
+generated files only; every publish replaces its contents.
+
+1. Create the public repository `heritage-themes/heritage-themes-sublime` with a first commit on its
+   default branch, for example a README, which the first publish replaces.
+2. Create a fine-grained personal access token with **Contents: Read and write** on that repository
+   only, and store it as the repository secret `SUBLIME_REPO_TOKEN`:
+
+   ```bash
+   gh secret set SUBLIME_REPO_TOKEN -R heritage-themes/heritage-themes
+   ```
+
+3. Cut a release that includes the package. Publish pushes the files and the tag `<version>`, without
+   a `v`.
+4. Submit the package to the Package Control channel: fork
+   <https://github.com/wbond/package_control_channel>, add this entry to `repository/h.json` in
+   alphabetical order, run **ChannelRepositoryTools: Test Default Channel** in Sublime Text, and open a
+   pull request.
+
+   ```json
+   {
+       "name": "Heritage Themes",
+       "details": "https://github.com/heritage-themes/heritage-themes-sublime",
+       "labels": ["color scheme"],
+       "releases": [
+           {
+               "sublime_text": ">=4000",
+               "tags": true
+           }
+       ]
+   }
+   ```
+
+   Package Control picks up later releases from the tags without another pull request.

@@ -3,10 +3,11 @@
 # fast-forwards master to it, waits for Build to pass, then pushes the release tag, which starts the
 # publish workflow. See docs/releasing.md.
 #
-# The JetBrains plugin and the VS Code extension share VERSION in build.py and the v<version> tag.
-# The release includes each product whose changelog has entries under [Unreleased]: CHANGELOG.md
-# for the JetBrains plugin, vscode/CHANGELOG.md for the VS Code extension. A product without
-# entries keeps its last published build, which the GitHub release attaches.
+# The JetBrains plugin, the VS Code extension and the Sublime Text package share VERSION in build.py
+# and the v<version> tag. The release includes each product whose changelog has entries under
+# [Unreleased]: CHANGELOG.md for the JetBrains plugin, vscode/CHANGELOG.md for the VS Code extension,
+# sublime/CHANGELOG.md for the Sublime Text package. A product without entries keeps its last
+# published build, which the GitHub release attaches.
 #
 # Usage: scripts/release.sh [patch|minor|major|X.Y.Z] [--dry-run]
 #   patch    third component +1 (default)
@@ -58,7 +59,8 @@ esac
 tag="v$version"
 
 changelogs=() products=() summary=""
-for product in "JetBrains plugin:CHANGELOG.md" "VS Code extension:vscode/CHANGELOG.md"; do
+for product in "JetBrains plugin:CHANGELOG.md" "VS Code extension:vscode/CHANGELOG.md" \
+  "Sublime Text package:sublime/CHANGELOG.md"; do
   name=${product%%:*} changelog=${product#*:}
   previous=$(latest_release "$changelog")
   # The marketplaces reject a version that is not greater than the last one they received.
@@ -71,7 +73,7 @@ for product in "JetBrains plugin:CHANGELOG.md" "VS Code extension:vscode/CHANGEL
     summary+="  $name: unchanged, attaches ${previous:-nothing}"$'\n'
   fi
 done
-[ ${#products[@]} -gt 0 ] || fail "neither CHANGELOG.md nor vscode/CHANGELOG.md has entries under [Unreleased]"
+[ ${#products[@]} -gt 0 ] || fail "no product changelog has entries under [Unreleased]"
 
 echo "Current version: $current"
 echo "Release:         $version ($kind)"
@@ -95,7 +97,14 @@ done
 
 python3 build.py --vsix
 
-if [ ${#products[@]} -eq 2 ]; then included="${products[0]} and ${products[1]}"; else included=${products[0]}; fi
+included=""
+for i in "${!products[@]}"; do
+  case $i in
+    0) included=${products[i]} ;;
+    $((${#products[@]} - 1))) included+=" and ${products[i]}" ;;
+    *) included+=", ${products[i]}" ;;
+  esac
+done
 git add build.py "${changelogs[@]}"
 git commit -q -m "chore(release): release version $version" -m "Releases version $version of the $included."
 git push origin dev

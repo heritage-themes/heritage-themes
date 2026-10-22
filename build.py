@@ -1,4 +1,4 @@
-"""Builds the Heritage Themes JetBrains plugin and VS Code extension from every theme folder.
+"""Builds the Heritage Themes JetBrains plugin, VS Code extension and Sublime Text package from every theme folder.
 
 A theme folder is any directory in themes/ containing a theme.py (see heritage/__init__.py).
 
@@ -16,8 +16,8 @@ import heritage
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
 CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
-# One version for the JetBrains plugin and the VS Code extension. A release publishes each product whose changelog
-# has a section for it; see docs/releasing.md.
+# One version for the JetBrains plugin, the VS Code extension and the Sublime Text package. A release publishes each
+# product whose changelog has a section for it; see docs/releasing.md.
 VERSION = "1.2.2"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 DESCRIPTION = "Colour themes drawn from the colour traditions of different cultures."
@@ -33,6 +33,10 @@ VSCODE_SCREENSHOTS = [("holi-night", "Holi Night"), ("kalamkari-cotton", "Kalamk
                       ("sardinia-orbace", "Sardinia Orbace (Dark)"), ("wixarika-wirikuta", "Wixárika Wirikuta (Light)")]
 VSCODE_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")  # the Marketplace needs a PNG of 128x128 or more
 VSCODE_TOOLS = os.path.join(ROOT, "scripts", "vscode")
+SUBLIME_CHANGELOG = os.path.join(ROOT, "sublime", "CHANGELOG.md")
+SUBLIME_NAME = "Heritage Themes"  # the package's folder in Packages/, so the colour_scheme paths contain it
+SUBLIME_REPOSITORY_URL = "https://github.com/heritage-themes/heritage-themes-sublime"
+SUBLIME_FONT_STYLES = {"bold", "italic", "underline"}
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -278,8 +282,133 @@ def pack_vsix(directory, themes):
     return vsix
 
 
+def sublime_readme(families):
+    """The package's README. Links are absolute: Package Control shows it on packagecontrol.io."""
+    rows = "\n".join(f"| [{f.FAMILY}]({VENDOR_URL}/tree/master/themes/{heritage.folder(f)}) "
+                     f"| {', '.join(t['palette']['name'] for t in f.THEMES)} | {f.BLURB} |" for f in families)
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes
+
+{DESCRIPTION} {count} dark and light colour schemes in {len(families)} families; each family maps the named \
+colours of one tradition to syntax roles.
+
+The schemes colour the editor. They work with every Sublime Text theme.
+
+## Install
+
+Open the Command Palette (`Ctrl+Shift+P`; `Cmd+Shift+P` on macOS), run **Package Control: Install Package** and \
+choose **{SUBLIME_NAME}**. To install without Package Control, download `heritage-themes-sublime-<version>.sublime-package` \
+from the [latest release]({VENDOR_URL}/releases/latest) into the `Installed Packages` folder, which **Preferences: \
+Browse Packages** shows beside `Packages`.
+
+## Choose a scheme
+
+Run **UI: Select Color Scheme** and choose a scheme under **{SUBLIME_NAME}**. To follow the system appearance, set \
+`color_scheme` to `auto` and name a scheme for each appearance in **Preferences: Settings**:
+
+```json
+{{
+    "color_scheme": "auto",
+    "dark_color_scheme": "Packages/{SUBLIME_NAME}/Holi Night.sublime-color-scheme",
+    "light_color_scheme": "Packages/{SUBLIME_NAME}/Kalamkari Cotton (Light).sublime-color-scheme"
+}}
+```
+
+Every colour is a variable at the top of its scheme file. To change one, copy the scheme file into `Packages/User` \
+under the same name and override the variable there.
+
+## Languages
+
+The colours follow the scope names of Sublime Text's built-in syntaxes. A language that Sublime Text does not ship, \
+such as Kotlin, TOML or Vue, takes the scopes of the syntax package you install for it, and its colours depend on \
+how closely that package follows [Sublime Text's scope naming](https://www.sublimetext.com/docs/scope_naming.html).
+
+## Schemes
+
+| Family | Schemes | Tradition |
+| --- | --- | --- |
+{rows}
+
+Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs and VS Code: see \
+[Heritage Themes on GitHub]({VENDOR_URL}).
+
+Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the scheme, Sublime Text \
+build, syntax and a screenshot.
+"""
+
+
+def build_sublime(families, themes):
+    """Writes the Sublime Text package's files to build/sublime and returns that folder."""
+    directory = os.path.join(OUT, "sublime")
+    os.makedirs(directory)
+    names = [heritage.sublime.filename(t["name"]) for t in themes]
+    if len(names) != len(set(names)):
+        raise SystemExit("sublime: two themes have the same scheme file name")
+    for name, t in zip(names, themes):
+        with open(os.path.join(directory, name), "w") as f:
+            json.dump(t["sublime"], f, indent=2, ensure_ascii=False)
+            f.write("\n")
+    with open(os.path.join(directory, "README.md"), "w") as f:
+        f.write(sublime_readme(families))
+    shutil.copy(SUBLIME_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_sublime(directory, themes):
+    """Fails the build when a colour scheme is malformed, names an undefined variable or has a rule that is
+    unreadable on the background."""
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Sublime package: {name} is missing")
+    schemes = sorted(n for n in os.listdir(directory) if n.endswith(".sublime-color-scheme"))
+    if len(schemes) != len(themes):
+        raise SystemExit(f"Sublime package: {len(schemes)} colour schemes for {len(themes)} themes")
+    for name in schemes:
+        with open(os.path.join(directory, name)) as f:
+            scheme = json.load(f)
+        variables, colours = scheme["variables"], []
+        def colour(value):
+            match = heritage.sublime.VARIABLE.fullmatch(value)
+            if match and match.group(1) not in variables:
+                raise SystemExit(f"{name}: names undefined variable {match.group(1)}")
+            colours.append(heritage.sublime.resolve(value, scheme))
+            return colours[-1]
+        for key, value in scheme["globals"].items():
+            if not key.endswith("_options"):
+                colour(value)
+        background = colour(scheme["globals"]["background"])
+        for rule in scheme["rules"]:
+            if not rule.get("scope") or not rule.get("foreground"):
+                raise SystemExit(f"{name}: a rule needs a scope and a foreground: {rule}")
+            if not set(rule.get("font_style", "").split()) <= SUBLIME_FONT_STYLES:
+                raise SystemExit(f"{name}: unknown font_style in {rule}")
+            foreground = colour(rule["foreground"])
+            minimum = 3 if foreground == variables["comment"] else 4.5
+            ratio = contrast(foreground[1:], background[1:])
+            if ratio < minimum:
+                raise SystemExit(f"{name}: {rule['scope']} is {ratio:.2f}:1 on the background, needs {minimum}:1")
+        for value in colours:
+            if not re.fullmatch(r"#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?", value):
+                raise SystemExit(f"{name}: {value} is not a hex colour")
+
+
+def pack_sublime(directory):
+    """Zips the package into a .sublime-package, which Sublime Text loads from Installed Packages, and returns its
+    path. The entries are sorted and carry a fixed time, so the same sources give the same bytes."""
+    package = os.path.join(OUT, f"{VSCODE_NAME}-sublime-{VERSION}.sublime-package")
+    with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as z:
+        for name in sorted(os.listdir(directory)):
+            info = zipfile.ZipInfo(name, date_time=(2020, 1, 1, 0, 0, 0))
+            info.compress_type, info.external_attr = zipfile.ZIP_DEFLATED, 0o644 << 16
+            with open(os.path.join(directory, name), "rb") as f:
+                z.writestr(info, f.read())
+    return package
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Build the JetBrains plugin and the VS Code extension.")
+    parser = argparse.ArgumentParser(description="Build the JetBrains plugin, the VS Code extension and the Sublime "
+                                                 "Text package.")
     parser.add_argument("--vsix", action="store_true", help="also pack the VS Code extension with vsce")
     args = parser.parse_args()
     families = heritage.load_families()
@@ -315,6 +444,9 @@ def main():
     extension = build_vscode(families, themes)
     validate_vscode(extension, themes)
     print(f"{extension}: {len(themes)} themes", flush=True)
+    package = build_sublime(families, themes)
+    validate_sublime(package, themes)
+    print(f"{pack_sublime(package)}: {len(themes)} themes", flush=True)
     if args.vsix:
         print(f"{pack_vsix(extension, themes)}: {len(themes)} themes")
 

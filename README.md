@@ -1,6 +1,6 @@
 # Heritage Themes
 
-Colour themes for IntelliJ-based IDEs and VS Code, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`) and one VS Code extension (`heritage-themes.heritage-themes`).
+Colour themes for IntelliJ-based IDEs, VS Code and Sublime Text, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`) and one Sublime Text package (`Heritage Themes`).
 
 | Folder | Themes | Country |
 | --- | --- | --- |
@@ -56,12 +56,16 @@ Every theme uses the Islands UI: the editor and tool windows sit as rounded isla
 
 Install **Heritage Themes** from the Extensions view; it is published on the VS Marketplace and Open VSX. Then choose a theme with **Preferences: Color Theme** (`Ctrl+K Ctrl+T`). To install from the latest GitHub release instead, run **Extensions: Install from VSIX…** and select `heritage-themes-vscode-<version>.vsix`.
 
+### Sublime Text
+
+Run **Package Control: Install Package** and choose **Heritage Themes**, then **UI: Select Color Scheme**. To install from the latest GitHub release instead, copy `heritage-themes-sublime-<version>.sublime-package` into the `Installed Packages` folder, which **Preferences: Browse Packages** shows beside `Packages`. The package contains colour schemes only; they work with every Sublime Text theme. Sublime Text 4 is required.
+
 ## Build from source
 
 Requires Python 3. `--vsix` also needs Node.js 22 or later and npm; it installs vsce, pinned in `scripts/vscode/`, on first use.
 
 ```bash
-python3 build.py          # JetBrains plugin and VS Code extension folder
+python3 build.py          # JetBrains plugin, VS Code extension folder and Sublime Text package
 python3 build.py --vsix   # also pack the VS Code extension
 ```
 
@@ -74,8 +78,10 @@ Output in `build/`:
 | `schemes/*.icls` | Standalone editor colour schemes |
 | `vscode/` | The VS Code extension: `package.json`, README, changelog and one colour theme per theme |
 | `heritage-themes-vscode-<version>.vsix` | The VS Code extension packed by `--vsix`. Install this in VS Code |
+| `sublime/` | The Sublime Text package: one `.sublime-color-scheme` per theme, README, changelog and licence. The release publishes this folder to the package repository |
+| `heritage-themes-sublime-<version>.sublime-package` | The same files packed as a zip. Install this in Sublime Text |
 
-Install the jar, an `.icls` file or the `.vsix` as described under [Install](#install).
+Install the jar, an `.icls` file, the `.vsix` or the `.sublime-package` as described under [Install](#install).
 
 ## Preview
 
@@ -84,26 +90,31 @@ python3 preview.py              # every theme: themes/<theme>/build/preview.html
 python3 preview.py shuimo       # one theme
 python3 preview.py --png        # also render themes/<theme>/preview.png
 python3 preview.py --vscode     # VS Code preview: themes/<theme>/build/preview-vscode.html
+python3 preview.py --sublime    # Sublime Text preview: themes/<theme>/build/preview-sublime.html
 ```
 
 The page shows each theme as an IDE window with a code sample per language, coloured from the generated editor scheme. It downloads JetBrains Mono once into `~/.cache/heritage-themes`. `--png` needs Google Chrome or Chromium (or the `CHROME` environment variable) and ImageMagick.
 
 `--vscode` colours the samples with VS Code's TextMate grammars and the generated VS Code theme, through Shiki pinned in `scripts/shiki/`. It needs Node.js and npm, and installs Shiki there on first use. It shows TextMate colours only: semantic highlighting needs a language server. With `--png` it writes `preview-vscode.png` next to the page.
 
+`--sublime` tokenises the samples with [bat](https://github.com/sharkdp/bat), which bundles Sublime Text's syntaxes, and colours them with the generated scheme. It needs `bat` (`batcat` on Debian and Ubuntu) and shows the editor only. bat's syntaxes are close to, not identical with, the ones in the installed Sublime Text, and Sublime Text does not ship Kotlin, TOML or Vue. With `--png` it writes `preview-sublime.png` next to the page.
+
 ## Layout
 
 ```text
-build.py        builds the plugin and the VS Code extension from every theme folder; holds their shared version
+build.py        builds the plugin, the VS Code extension and the Sublime Text package from every theme folder; holds their shared version
 preview.py      writes theme previews and renders the README images
 heritage/       code shared by every theme family
   __init__.py   finds the theme folders in themes/; the theme.py contract
   scheme.py     editor colour scheme: palette roles to text attributes
   ui.py         UI theme: palette roles to UI keys
   vscode.py     VS Code colour theme: palette roles to TextMate scopes, semantic tokens and workbench keys
+  sublime.py    Sublime Text colour scheme: the VS Code scopes plus the scopes Sublime Text's syntaxes name differently
   preview.py    preview page
   samples.py    code samples shown in the preview
 CHANGELOG.md    JetBrains plugin release notes; the plugin's change notes come from it
 vscode/         CHANGELOG.md: VS Code extension release notes
+sublime/        CHANGELOG.md: Sublime Text package release notes
 assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
 scripts/        release.sh, parent_overrides.py; shiki/ tokenises the VS Code preview; vscode/ packs and publishes the extension
 docs/           releasing.md, adding-a-theme.md
@@ -115,14 +126,14 @@ themes/<theme>/
 build/          generated, not tracked
 ```
 
-Only sources are tracked. Jars, zips, `.icls` and `.vsix` files are build output; the publish workflows attach them to each GitHub release.
+Only sources are tracked. Jars, zips, `.icls`, `.vsix` and `.sublime-package` files are build output; the publish workflows attach them to each GitHub release.
 
 ## Git workflow
 
 - Work on `dev`. `master` receives commits only when `scripts/release.sh` cuts a release.
 - Commit subjects follow [Conventional Commits](https://www.conventionalcommits.org/), with the theme folder as the scope for a change to one theme: `fix(wuxing): soften comment contrast`. Changes outside the theme folders use a scope such as `heritage`, `build` or `ci`, or none.
 - Keep a commit within one theme folder.
-- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin and the VS Code extension share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
+- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin, the VS Code extension and the Sublime Text package share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
 
 ## Add a theme
 

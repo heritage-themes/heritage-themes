@@ -36,9 +36,10 @@ def mix(a, b, t):
     return "".join(f"{round(x + (y - x) * t):02X}" for x, y in zip(rgb(a), rgb(b)))
 
 
-def token_colors(p):
+def token_rules(p):
     """TextMate rules as (scope selectors, role, font style). The deepest matching scope wins, so a rule for a
-    child scope, such as the quotes of a string, overrides the rule for its parent."""
+    child scope, such as the quotes of a string, overrides the rule for its parent. heritage.sublime builds on
+    these, as Sublime Text's syntaxes follow the same scope naming."""
     kw = "bold" if p.get("kwBold", not p["dark"]) else ""
     rules = []
     def s(scopes, role, font=""):
@@ -140,8 +141,13 @@ def token_colors(p):
     s("markup.deleted", "deleted")
     s("markup.changed", "modified")
     s("meta.diff.header, meta.diff.range", "keyword")
+    return rules
+
+
+def token_colors(p):
+    """The VS Code tokenColors for a palette."""
     return [{"scope": scopes, "settings": {"foreground": "#" + p[role], "fontStyle": font}}
-            for scopes, role, font in rules]
+            for scopes, role, font in token_rules(p)]
 
 
 def semantic_token_colors(p):
