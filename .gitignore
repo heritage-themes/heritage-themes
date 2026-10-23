@@ -5,6 +5,7 @@ build/
 *.icls
 *.vsix
 node_modules/
+.venv/
 
 # Editors and OS
 .idea/

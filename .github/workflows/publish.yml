@@ -24,6 +24,7 @@ jobs:
       jetbrains: ${{ steps.check.outputs.jetbrains }}
       vscode: ${{ steps.check.outputs.vscode }}
       sublime: ${{ steps.check.outputs.sublime }}
+      zed: ${{ steps.check.outputs.zed }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -42,11 +43,12 @@ jobs:
             echo "::error::$GITHUB_REF_NAME does not point at a commit on master"
             exit 1
           fi
-          jetbrains=false vscode=false sublime=false
+          jetbrains=false vscode=false sublime=false zed=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" sublime/CHANGELOG.md && sublime=true
-          if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$sublime" = false ]; then
+          grep -q "^## \[$version\]" zed/CHANGELOG.md && zed=true
+          if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$sublime" = false ] && [ "$zed" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -55,6 +57,7 @@ jobs:
             echo "jetbrains=$jetbrains"
             echo "vscode=$vscode"
             echo "sublime=$sublime"
+            echo "zed=$zed"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -259,14 +262,129 @@ jobs:
           path: build/heritage-themes-sublime-${{ env.VERSION }}.sublime-package
           if-no-files-found: error
 
+  zed:
+    needs: check
+    if: needs.check.outputs.zed == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      # Zed's extension registry installs from this repository, which holds the extension at its root
+      # (docs/releasing.md).
+      ZED_REPOSITORY: heritage-themes/heritage-themes-zed
+      # The registry, and the fork that the pull request updating it comes from.
+      ZED_REGISTRY: zed-industries/extensions
+      ZED_REGISTRY_FORK: heritage-themes/extensions
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Check release secrets
+        shell: bash
+        env:
+          ZED_REPO_TOKEN: ${{ secrets.ZED_REPO_TOKEN }}
+          ZED_REGISTRY_TOKEN: ${{ secrets.ZED_REGISTRY_TOKEN }}
+        run: |
+          for name in ZED_REPO_TOKEN ZED_REGISTRY_TOKEN; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Repository secret $name is empty or not set"
+              exit 1
+            fi
+          done
+
+      - run: python3 build.py
+
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ env.ZED_REPOSITORY }}
+          token: ${{ secrets.ZED_REPO_TOKEN }}
+          path: zed-repository
+          fetch-depth: 0
+
+      - name: Publish to the Zed extension repository
+        id: repository
+        shell: bash
+        run: |
+          cd zed-repository
+          if ! git rev-parse -q --verify "refs/tags/v$VERSION" > /dev/null; then
+            find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+            cp -r ../build/zed/. .
+            git add --all
+            if ! git diff --cached --quiet; then
+              git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+                commit --message "Release $VERSION" \
+                --message "Generated from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+            fi
+            git tag "v$VERSION"
+            git push origin HEAD "refs/tags/v$VERSION"
+          fi
+          echo "commit=$(git rev-parse "refs/tags/v$VERSION^{commit}")" >> "$GITHUB_OUTPUT"
+
+      # The registry pins each extension as a submodule with its version in extensions.toml; a pull
+      # request that moves both publishes the release once Zed's maintainers merge it.
+      - name: Open the Zed extension registry pull request
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.ZED_REGISTRY_TOKEN }}
+          COMMIT: ${{ steps.repository.outputs.commit }}
+          ID: heritage-themes
+        run: |
+          branch="$ID-$VERSION"
+          registered=$(gh api "repos/$ZED_REGISTRY/contents/extensions.toml" -H "Accept: application/vnd.github.raw" \
+            | python3 -c 'import sys, tomllib; print(tomllib.load(sys.stdin.buffer).get(sys.argv[1], {}).get("version", ""))' "$ID")
+          if [ -z "$registered" ]; then
+            echo "::notice::$ZED_REGISTRY has no entry for $ID yet; submit it by hand (docs/releasing.md)"
+            exit 0
+          fi
+          if [ "$registered" = "$VERSION" ]; then
+            echo "$ZED_REGISTRY already has $ID $VERSION"
+            exit 0
+          fi
+          if [ -n "$(gh pr list --repo "$ZED_REGISTRY" --head "$branch" --state open --json url --jq '.[].url')" ]; then
+            echo "$ZED_REGISTRY already has an open pull request for $ID $VERSION"
+            exit 0
+          fi
+          gh repo sync "$ZED_REGISTRY_FORK" --source "$ZED_REGISTRY"
+          git clone --depth 1 --filter=blob:none "https://x-access-token:$GH_TOKEN@github.com/$ZED_REGISTRY_FORK.git" registry
+          cd registry
+          git switch -c "$branch"
+          git update-index --cacheinfo "160000,$COMMIT,extensions/$ID"
+          python3 - "$ID" "$VERSION" <<'PY'
+          import re, sys
+          extension, version = sys.argv[1:]
+          with open("extensions.toml") as f:
+              text = f.read()
+          section = re.compile(rf'(^\[{re.escape(extension)}\]\n(?:(?!\[).*\n)*?version = )"[^"]*"', re.M)
+          text, count = section.subn(rf'\g<1>"{version}"', text)
+          if count != 1:
+              sys.exit(f"extensions.toml: no version for [{extension}]")
+          with open("extensions.toml", "w") as f:
+              f.write(text)
+          PY
+          git add extensions.toml
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit --message "Update $ID to $VERSION"
+          git push origin "$branch"
+          gh pr create --repo "$ZED_REGISTRY" --head "${ZED_REGISTRY_FORK%%/*}:$branch" \
+            --title "Update $ID to $VERSION" \
+            --body "Updates Heritage Themes to $VERSION: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/v$VERSION"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: zed
+          path: build/heritage-themes-zed-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   release:
-    needs: [check, jetbrains, vscode, sublime]
+    needs: [check, jetbrains, vscode, sublime, zed]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
       && contains(fromJSON('["success", "skipped"]'), needs.jetbrains.result)
       && contains(fromJSON('["success", "skipped"]'), needs.vscode.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.sublime.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.sublime.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.zed.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -275,6 +393,7 @@ jobs:
       JETBRAINS: ${{ needs.check.outputs.jetbrains }}
       VSCODE: ${{ needs.check.outputs.vscode }}
       SUBLIME: ${{ needs.check.outputs.sublime }}
+      ZED: ${{ needs.check.outputs.zed }}
     steps:
       - uses: actions/checkout@v7
 
@@ -329,6 +448,7 @@ jobs:
             notes "JetBrains plugin" "$JETBRAINS" CHANGELOG.md "heritage-themes-<version>-signed.zip" '*.icls'
             notes "VS Code extension" "$VSCODE" vscode/CHANGELOG.md "heritage-themes-vscode-<version>.vsix"
             notes "Sublime Text package" "$SUBLIME" sublime/CHANGELOG.md "heritage-themes-sublime-<version>.sublime-package"
+            notes "Zed extension" "$ZED" zed/CHANGELOG.md "heritage-themes-zed-<version>.zip"
           } > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \

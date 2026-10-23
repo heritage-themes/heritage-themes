@@ -1,13 +1,14 @@
 # Releasing
 
-The JetBrains plugin, the VS Code extension and the Sublime Text package share one version,
-`VERSION` in `build.py`, and one `v<version>` tag. Each has its own changelog:
+The JetBrains plugin, the VS Code extension, the Sublime Text package and the Zed extension share
+one version, `VERSION` in `build.py`, and one `v<version>` tag. Each has its own changelog:
 
 | Product | Changelog | Publishes to |
 |---|---|---|
 | JetBrains plugin | `CHANGELOG.md` | JetBrains Marketplace |
 | VS Code extension | `vscode/CHANGELOG.md` | VS Marketplace, Open VSX |
 | Sublime Text package | `sublime/CHANGELOG.md` | Package repository, listed on Package Control |
+| Zed extension | `zed/CHANGELOG.md` | Extension repository, listed in Zed's extension registry by a pull request |
 
 A release includes each product whose changelog has entries under `[Unreleased]`. A product
 without entries is not published and skips that version number: after 1.3.0 for all and 1.3.1 for
@@ -15,8 +16,9 @@ the VS Code extension only, the plugin goes from 1.3.0 to the next release that 
 
 Every version has one GitHub release, which becomes the latest. It carries every product: the new
 build of each included product, and the build of its last release for a product left out, so the
-latest release always has the current plugin, extension and package. Pushing the tag publishes; there is
-no approval step.
+latest release always has the current build of every product. Pushing the tag publishes; there is
+no approval step, except that a Zed release reaches users once Zed's maintainers merge the registry pull
+request that Publish opens.
 
 ## Branches and CI
 
@@ -24,8 +26,8 @@ Work on `dev`. `master` receives commits only when a release is cut.
 
 | Workflow | Runs on | Does |
 |---|---|---|
-| `build.yml` (Build) | Push to `master`, every pull request, manual run | `python3 build.py --vsix`, which also validates the plugin, the extension, the package and their theme files |
-| `publish.yml` (Publish) | Push of a `v<digit>…` tag | Checks the tag; for each included product builds and publishes it (the plugin signed, the package pushed to its repository); creates the GitHub release |
+| `build.yml` (Build) | Push to `master`, every pull request, manual run | `python3 build.py --vsix`, which also validates every product and its theme files |
+| `publish.yml` (Publish) | Push of a `v<digit>…` tag | Checks the tag; for each included product builds and publishes it (the plugin signed, the Sublime Text package and the Zed extension pushed to their repositories, the Zed registry pull request opened); creates the GitHub release |
 | `vscode-identity.yml` (VS Marketplace identity) | Manual run | Prints the Marketplace ID of the identity Publish signs in as |
 
 A push to `dev` runs nothing. Run the same check locally with `python3 build.py --vsix`.
@@ -33,7 +35,7 @@ A push to `dev` runs nothing. Run the same check locally with `python3 build.py 
 ## Cut a release
 
 1. Add the changes under `[Unreleased]` in the changelog of each product they affect: a change to a
-   palette or a new theme goes in all three. Commit and push `dev`.
+   palette or a new theme goes in all four. Commit and push `dev`.
 2. Run the release script on `dev`:
 
    ```bash
@@ -233,3 +235,54 @@ generated files only; every publish replaces its contents.
    ```
 
    Package Control picks up later releases from the tags without another pull request.
+
+## One-time setup: Zed extension
+
+Zed's extension registry, the repository `zed-industries/extensions`, pins each extension as a
+submodule at a commit of a public repository that holds the extension at its root, with the version in
+`extensions.toml`. Publish pushes the generated extension to a separate repository, tags it
+`v<version>`, and opens a pull request against the registry that moves the submodule and the version.
+That repository contains generated files only; every publish replaces its contents.
+
+1. Create the public repository `heritage-themes/heritage-themes-zed` with a first commit on its
+   default branch, for example a README, which the first publish replaces.
+2. Create a fine-grained personal access token with **Contents: Read and write** on that repository
+   only, and store it as the repository secret `ZED_REPO_TOKEN`:
+
+   ```bash
+   gh secret set ZED_REPO_TOKEN -R heritage-themes/heritage-themes
+   ```
+
+3. Fork <https://github.com/zed-industries/extensions> into the organisation as
+   `heritage-themes/extensions`.
+4. Create a classic personal access token with the `public_repo` scope, which can push to the fork and
+   open pull requests against the registry, and store it as the repository secret
+   `ZED_REGISTRY_TOKEN`. A fine-grained token cannot open a pull request in a repository of another
+   owner.
+
+   ```bash
+   gh secret set ZED_REGISTRY_TOKEN -R heritage-themes/heritage-themes
+   ```
+
+5. Cut a release that includes the extension. Publish pushes the files and the tag, and skips the
+   registry pull request with a notice, because the registry has no entry for the extension yet.
+6. Submit the extension to the registry by hand, following Zed's
+   [publishing guide](https://zed.dev/docs/extensions/publishing/publishing-guide): in a branch of the fork,
+   add the submodule at the tagged commit and the entry, run `pnpm sort-extensions`, and open a pull
+   request.
+
+   ```bash
+   git submodule add https://github.com/heritage-themes/heritage-themes-zed.git extensions/heritage-themes
+   git -C extensions/heritage-themes checkout v<version>
+   ```
+
+   ```toml
+   [heritage-themes]
+   submodule = "extensions/heritage-themes"
+   version = "<version>"
+   ```
+
+   Install the extension in Zed from the tagged commit first: **zed: install dev extension** on a
+   checkout of `heritage-themes-zed`. The registry requires a manual test at the submitted commit.
+
+Once the entry is merged, Publish opens the pull request for each later release.

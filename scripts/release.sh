@@ -3,11 +3,12 @@
 # fast-forwards master to it, waits for Build to pass, then pushes the release tag, which starts the
 # publish workflow. See docs/releasing.md.
 #
-# The JetBrains plugin, the VS Code extension and the Sublime Text package share VERSION in build.py
-# and the v<version> tag. The release includes each product whose changelog has entries under
-# [Unreleased]: CHANGELOG.md for the JetBrains plugin, vscode/CHANGELOG.md for the VS Code extension,
-# sublime/CHANGELOG.md for the Sublime Text package. A product without entries keeps its last
-# published build, which the GitHub release attaches.
+# The JetBrains plugin, the VS Code extension, the Sublime Text package and the Zed extension share
+# VERSION in build.py and the v<version> tag. The release includes each product whose changelog has
+# entries under [Unreleased]: CHANGELOG.md for the JetBrains plugin, vscode/CHANGELOG.md for the
+# VS Code extension, sublime/CHANGELOG.md for the Sublime Text package, zed/CHANGELOG.md for the Zed
+# extension. A product without entries keeps its last published build, which the GitHub release
+# attaches.
 #
 # Usage: scripts/release.sh [patch|minor|major|X.Y.Z] [--dry-run]
 #   patch    third component +1 (default)
@@ -60,7 +61,7 @@ tag="v$version"
 
 changelogs=() products=() summary=""
 for product in "JetBrains plugin:CHANGELOG.md" "VS Code extension:vscode/CHANGELOG.md" \
-  "Sublime Text package:sublime/CHANGELOG.md"; do
+  "Sublime Text package:sublime/CHANGELOG.md" "Zed extension:zed/CHANGELOG.md"; do
   name=${product%%:*} changelog=${product#*:}
   previous=$(latest_release "$changelog")
   # The marketplaces reject a version that is not greater than the last one they received.
