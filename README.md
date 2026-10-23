@@ -56,6 +56,8 @@ Every theme uses the Islands UI: the editor and tool windows sit as rounded isla
 
 Install **Heritage Themes** from the Extensions view; it is published on the VS Marketplace and Open VSX. Then choose a theme with **Preferences: Color Theme** (`Ctrl+K Ctrl+T`). To install from the latest GitHub release instead, run **Extensions: Install from VSIX…** and select `heritage-themes-vscode-<version>.vsix`.
 
+The extension also works in VS Code forks such as Cursor, Windsurf and VSCodium, which install from Open VSX.
+
 ### Sublime Text
 
 Run **Package Control: Install Package** and choose **Heritage Themes**, then **UI: Select Color Scheme** and **UI: Select Theme**, choosing the same name in both. To install from the latest GitHub release instead, copy `heritage-themes-sublime-<version>.sublime-package` into the `Installed Packages` folder, which **Preferences: Browse Packages** shows beside `Packages`. Each colour scheme colours the editor; the UI theme of the same name extends the built-in Adaptive theme and colours the sidebar, tabs, panels and status bar to match. Sublime Text 4 is required.
