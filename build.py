@@ -39,7 +39,7 @@ SUBLIME_NAME = "Heritage Themes"  # the package's folder in Packages/, so the co
 SUBLIME_REPOSITORY_URL = "https://github.com/heritage-themes/heritage-themes-sublime"
 SUBLIME_FONT_STYLES = {"bold", "italic", "underline"}
 ZED_CHANGELOG = os.path.join(ROOT, "zed", "CHANGELOG.md")
-ZED_ID = "heritage-themes"  # the extension's ID in Zed's extension registry
+ZED_ID = "heritage-theme"  # the extension's ID in Zed's extension registry
 ZED_REPOSITORY_URL = "https://github.com/heritage-themes/heritage-themes-zed"
 ZED_HEX = re.compile(r"#[0-9A-F]{6}([0-9A-F]{2})?")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.

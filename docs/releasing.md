@@ -272,13 +272,13 @@ That repository contains generated files only; every publish replaces its conten
    request.
 
    ```bash
-   git submodule add https://github.com/heritage-themes/heritage-themes-zed.git extensions/heritage-themes
-   git -C extensions/heritage-themes checkout v<version>
+   git submodule add https://github.com/heritage-themes/heritage-themes-zed.git extensions/heritage-theme
+   git -C extensions/heritage-theme checkout v<version>
    ```
 
    ```toml
-   [heritage-themes]
-   submodule = "extensions/heritage-themes"
+   [heritage-theme]
+   submodule = "extensions/heritage-theme"
    version = "<version>"
    ```
 
