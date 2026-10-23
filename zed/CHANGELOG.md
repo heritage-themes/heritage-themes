@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-10-23
+
 ### Changed
 
 - The extension ID is `heritage-theme`, which marks it as a theme extension for Zed's extension registry.
