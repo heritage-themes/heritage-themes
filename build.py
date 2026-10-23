@@ -622,9 +622,9 @@ def main():
     package = build_sublime(families, themes)
     validate_sublime(package, themes)
     print(f"{pack_sublime(package)}: {len(themes)} themes", flush=True)
-    extension = build_zed(families)
-    validate_zed(extension, themes)
-    print(f"{pack_zed(extension)}: {len(themes)} themes", flush=True)
+    zed_extension = build_zed(families)
+    validate_zed(zed_extension, themes)
+    print(f"{pack_zed(zed_extension)}: {len(themes)} themes", flush=True)
     if args.vsix:
         print(f"{pack_vsix(extension, themes)}: {len(themes)} themes")
 
