@@ -12,13 +12,16 @@ Semantic highlighting needs a language server, so the page shows the TextMate co
 The Sublime Text page takes code colours from tokens of Sublime Text's syntaxes as bat bundles them, coloured by the
 generated scheme (see preview.py), and its chrome from the surfaces of the UI theme (heritage.sublime.SURFACES): the
 editors in one frame with the sidebar, tab bars and status bar.
+
+The Zed page takes code colours from the Tree-sitter grammars and queries that Zed ships, coloured by the theme from
+heritage.zed (see scripts/zed/tokens.py), and its chrome from the theme's UI colours (ZED_CHROME).
 """
 import html, re
 
 from .samples import SAMPLES
 from .scheme import attributes, BOLD, ITALIC, BI, UNDER, WAVE, STRIKE, BOX, DOTTED
 from .ui import theme
-from . import sublime, vscode
+from . import sublime, vscode, zed
 
 FONT_DIR = "fonts"
 FONTS = [("Regular", 400, "normal"), ("Italic", 400, "italic"), ("Bold", 700, "normal"), ("BoldItalic", 700, "italic")]
@@ -72,6 +75,12 @@ VSCODE_CHROME = {
 SUBLIME_CHROME = {
     "frame": sublime.SURFACES["title"], "island": sublime.SURFACES["sidebar"], "editor": sublime.SURFACES["tabs"],
     "tab": "bg", "status": sublime.SURFACES["status"], "statusFg": "fg",
+}
+# CSS variable → Zed theme colour key.
+ZED_CHROME = {
+    "frame": "title_bar.background", "island": "panel.background", "editor": "tab_bar.background",
+    "underTabs": "border", "tab": "tab.active_background", "tabBorder": "border",
+    "status": "status_bar.background", "statusFg": "text",
 }
 # Shiki language id by sample file extension.
 LANGS = dict(java="java", kt="kotlin", groovy="groovy", py="python", ts="typescript", tsx="tsx", vue="vue",
@@ -162,9 +171,16 @@ def sublime_chrome(p):
     return ";".join(f"--{var}:#{p[role]}" for var, role in SUBLIME_CHROME.items())
 
 
+def zed_chrome(p):
+    """CSS variables for the window chrome, resolved from the Zed theme's UI colours."""
+    style = zed.theme(p)["style"]
+    return ";".join(f"--{var}:{style[key]}" for var, key in ZED_CHROME.items())
+
+
 def window(p, files=None, kind="vscode"):
-    """One IDE window. files holds, per sample, the lines of tokens (text, colour, font style) for the VS Code or
-    Sublime Text page, as kind says; without it the window is the IntelliJ one, coloured from the editor scheme."""
+    """One IDE window. files holds, per sample, the lines of tokens (text, colour, font style) for the VS Code,
+    Sublime Text or Zed page, as kind says; without it the window is the IntelliJ one, coloured from the editor
+    scheme."""
     names = [name for name, _, _ in SAMPLES]
     variables = ";".join(f"--{k}:#{v}" for k, v in p.items() if isinstance(v, str) and re.fullmatch(r"[0-9A-F]{6}", v))
     swatches = "".join(f'<span title="{k}" style="background:#{p[k]}"></span>' for k in SWATCHES)
@@ -177,7 +193,7 @@ def window(p, files=None, kind="vscode"):
     else:
         editors = "".join(sample(name, caret, ["".join(token_html(*t) for t in line) for line in lines])
                           for (name, caret, _), lines in zip(SAMPLES, files))
-        colours = sublime_chrome(p) if kind == "sublime" else vscode_chrome(p)
+        colours = {"sublime": sublime_chrome, "zed": zed_chrome}.get(kind, vscode_chrome)(p)
     return (f'<section class="ide {kind}" style="{variables};{colours};--caret:#{p.get("caret", p["gold"])}">'
             f'<header class="bar"><b>{html.escape(p["name"])}</b><span class="swatches">{swatches}</span></header>'
             f'<div class="body"><div class="stripe"><i class="on"></i><i></i><i></i></div>'
@@ -193,7 +209,7 @@ def vscode_samples():
 
 def page(family, tokens=None, kind="vscode"):
     """The preview page for every theme in the family: the IntelliJ page, or with tokens (per theme, one list of
-    token lines per sample) the VS Code page or, as kind says, the Sublime Text page."""
+    token lines per sample) the VS Code page or, as kind says, the Sublime Text or Zed page."""
     faces = "".join(
         f'@font-face{{font-family:"JetBrains Mono";font-weight:{w};font-style:{s};'
         f'src:url("{FONT_DIR}/JetBrainsMono-{n}.woff2") format("woff2"),local("JetBrains Mono")}}' for n, w, s in FONTS)
@@ -225,10 +241,16 @@ body{{margin:0;padding:24px;font-family:system-ui,sans-serif}}
 .status{{padding:5px 12px;font-size:12px;color:var(--muted);background:var(--status)}}
 .vscode .tab{{border:0;border-radius:0;border-bottom:2px solid var(--tabBorder)}}
 .vscode .stripe .on{{border-radius:0;box-shadow:inset 2px 0 var(--stripeMark)}}
-.vscode .status,.sublime .status{{color:var(--statusFg)}}
+.vscode .status,.sublime .status,.zed .status{{color:var(--statusFg)}}
 .sublime .body{{gap:0;padding:0}} .sublime .stripe{{display:none}} .sublime .side{{border-radius:0}}
 .sublime .files{{gap:2px}} .sublime .file{{border-radius:0}}
 .sublime .tabs{{padding:5px 0 0 6px;border:0}} .sublime .tab{{padding:5px 12px;border:0;border-radius:6px 6px 0 0}}
+.zed .bar{{border-bottom:1px solid var(--border)}} .zed .body{{gap:0;padding:0}} .zed .stripe{{display:none}}
+.zed .side{{border-radius:0;border-right:1px solid var(--border)}}
+.zed .files{{gap:1px;background:var(--border)}} .zed .file{{border-radius:0}}
+.zed .tabs{{padding:0;display:flex}} .zed .tab{{padding:6px 14px;border:0;border-right:1px solid var(--tabBorder);
+  border-radius:0;margin-bottom:-1px}}
+.zed .status{{border-top:1px solid var(--border)}}
 pre{{margin:0;padding:8px 0;font:13px/1.55 "JetBrains Mono",ui-monospace,monospace;font-variant-ligatures:none;
   overflow-x:auto;color:var(--fg)}}
 pre div{{padding:0 12px 0 0;white-space:pre}}

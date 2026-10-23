@@ -18,13 +18,15 @@ body:
         - JetBrains IDE
         - VS Code
         - Other VS Code-compatible editor
+        - Sublime Text
+        - Zed
     validations:
       required: true
   - type: input
     id: editor-version
     attributes:
       label: Editor name and version
-      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3 or VS Code 1.105.
+      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Sublime Text 4200 or Zed 1.25.
     validations:
       required: true
   - type: input

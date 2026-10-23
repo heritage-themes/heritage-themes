@@ -1,4 +1,5 @@
-"""Builds the Heritage Themes JetBrains plugin, VS Code extension and Sublime Text package from every theme folder.
+"""Builds the Heritage Themes JetBrains plugin, VS Code extension, Sublime Text package and Zed extension from every
+theme folder.
 
 A theme folder is any directory in themes/ containing a theme.py (see heritage/__init__.py).
 
@@ -8,7 +9,7 @@ Usage: python3 build.py [--vsix]
 
 Output goes to build/.
 """
-import argparse, html, json, os, re, shutil, subprocess, zipfile
+import argparse, html, json, os, re, shutil, subprocess, tomllib, zipfile
 import xml.etree.ElementTree as ET
 
 import heritage
@@ -16,8 +17,8 @@ import heritage
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
 CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
-# One version for the JetBrains plugin, the VS Code extension and the Sublime Text package. A release publishes each
-# product whose changelog has a section for it; see docs/releasing.md.
+# One version for the JetBrains plugin, the VS Code extension, the Sublime Text package and the Zed extension. A release
+# publishes each product whose changelog has a section for it; see docs/releasing.md.
 VERSION = "1.3.0"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 DESCRIPTION = "Colour themes drawn from the colour traditions of different cultures."
@@ -37,6 +38,10 @@ SUBLIME_CHANGELOG = os.path.join(ROOT, "sublime", "CHANGELOG.md")
 SUBLIME_NAME = "Heritage Themes"  # the package's folder in Packages/, so the colour_scheme paths contain it
 SUBLIME_REPOSITORY_URL = "https://github.com/heritage-themes/heritage-themes-sublime"
 SUBLIME_FONT_STYLES = {"bold", "italic", "underline"}
+ZED_CHANGELOG = os.path.join(ROOT, "zed", "CHANGELOG.md")
+ZED_ID = "heritage-themes"  # the extension's ID in Zed's extension registry
+ZED_REPOSITORY_URL = "https://github.com/heritage-themes/heritage-themes-zed"
+ZED_HEX = re.compile(r"#[0-9A-F]{6}([0-9A-F]{2})?")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -437,9 +442,148 @@ def pack_sublime(directory):
     return package
 
 
+def zed_manifest():
+    return f"""id = "{ZED_ID}"
+name = "Heritage Themes"
+version = "{VERSION}"
+schema_version = 1
+authors = ["Heritage Themes"]
+description = "{DESCRIPTION}"
+repository = "{ZED_REPOSITORY_URL}"
+"""
+
+
+def zed_readme(families):
+    """The extension repository's README. Links are absolute, as the repository holds the build only."""
+    rows = "\n".join(f"| [{f.FAMILY}]({VENDOR_URL}/tree/master/themes/{heritage.folder(f)}) "
+                     f"| {', '.join(t['palette']['name'] for t in f.THEMES)} | {f.BLURB} |" for f in families)
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+This repository holds the Zed extension that [Heritage Themes]({VENDOR_URL}) generates for each release. Report \
+problems and make changes there.
+
+## Install
+
+Open the Extensions page (**zed: extensions**), search for **Heritage Themes** and install it. Choose a theme with \
+**theme selector: toggle** (`Ctrl+K Ctrl+T`; `Cmd+K Cmd+T` on macOS). To follow the system appearance, name a theme \
+for each appearance in your settings:
+
+```json
+{{
+  "theme": {{
+    "mode": "system",
+    "dark": "Holi Night",
+    "light": "Kalamkari Cotton (Light)"
+  }}
+}}
+```
+
+## Languages
+
+Zed colours code by the Tree-sitter captures of each language's queries. A capture names the construct, not the \
+language, so the themes colour a construct alike in every language: annotations, Rust attributes and HTML attribute \
+names share the annotation colour, and keys in YAML, TOML and JSON take the field colour.
+
+## Themes
+
+| Family | Themes | Tradition |
+| --- | --- | --- |
+{rows}
+
+Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs, VS Code and \
+Sublime Text: see [Heritage Themes on GitHub]({VENDOR_URL}).
+
+Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the theme, Zed version, \
+language and a screenshot.
+"""
+
+
+def build_zed(families):
+    """Writes the Zed extension's files to build/zed and returns that folder."""
+    directory = os.path.join(OUT, "zed")
+    os.makedirs(os.path.join(directory, "themes"))
+    with open(os.path.join(directory, "extension.toml"), "w") as f:
+        f.write(zed_manifest())
+    for family in families:
+        document = heritage.zed.family(family.FAMILY, [t["palette"] for t in family.THEMES])
+        with open(os.path.join(directory, "themes", f"{heritage.folder(family)}.json"), "w") as f:
+            json.dump(document, f, indent=2, ensure_ascii=False)
+            f.write("\n")
+    with open(os.path.join(directory, "README.md"), "w") as f:
+        f.write(zed_readme(families))
+    shutil.copy(ZED_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_zed(directory, themes):
+    """Fails the build when the extension manifest is incomplete, or when a theme is malformed, has a colour that is not
+    hex or has a syntax colour that is unreadable on the editor background."""
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Zed extension: {name} is missing")
+    with open(os.path.join(directory, "extension.toml"), "rb") as f:
+        manifest = tomllib.load(f)
+    for key in ("id", "name", "version", "schema_version", "authors", "description", "repository"):
+        if not manifest.get(key):
+            raise SystemExit(f"Zed extension.toml: {key} is missing or empty")
+    if manifest["version"] != VERSION:
+        raise SystemExit(f"Zed extension.toml: version {manifest['version']} is not {VERSION}")
+    names = {t["name"]: t["dark"] for t in themes}
+    found = []
+    for filename in sorted(os.listdir(os.path.join(directory, "themes"))):
+        with open(os.path.join(directory, "themes", filename)) as f:
+            family = json.load(f)
+        for theme in family["themes"]:
+            name, style = theme["name"], theme["style"]
+            found.append(name)
+            if name not in names or (theme["appearance"] == "dark") != names[name]:
+                raise SystemExit(f"Zed {filename}: {name} does not match a palette's name or appearance")
+            colours = [v for k, v in style.items()
+                       if k not in ("syntax", "players", "accents", "background.appearance")]
+            colours += style["accents"] + [v for player in style["players"] for v in player.values()]
+            colours += [s["color"] for s in style["syntax"].values()]
+            for value in colours:
+                if value is not None and not ZED_HEX.fullmatch(value):
+                    raise SystemExit(f"Zed {filename}: {name} has {value!r}, which is not a hex colour")
+            background = style["editor.background"][1:]
+            for key, s in style["syntax"].items():
+                if not set(s) <= {"color", "font_style", "font_weight"} or s.get("font_style", "italic") != "italic" \
+                        or s.get("font_weight", 700) != 700:
+                    raise SystemExit(f"Zed {filename}: {name} has an unknown syntax style for {key}: {s}")
+                minimum = 3 if key.startswith("comment") else 4.5
+                ratio = contrast(s["color"][1:], background)
+                if ratio < minimum:
+                    raise SystemExit(f"Zed {filename}: {name} {key} is {ratio:.2f}:1 on the editor background, "
+                                     f"needs {minimum}:1")
+    if sorted(found) != sorted(names):
+        raise SystemExit(f"Zed extension: {len(found)} themes for {len(names)} themes")
+
+
+def pack_zed(directory):
+    """Zips the extension into a folder that Zed installs with zed: install dev extension, and returns the zip's path.
+    The entries are sorted and carry a fixed time, so the same sources give the same bytes."""
+    package = os.path.join(OUT, f"{VSCODE_NAME}-zed-{VERSION}.zip")
+    with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as z:
+        for root, folders, files in os.walk(directory):
+            folders.sort()
+            for name in sorted(files):
+                path = os.path.join(root, name)
+                info = zipfile.ZipInfo(os.path.join(ZED_ID, os.path.relpath(path, directory)),
+                                       date_time=(2020, 1, 1, 0, 0, 0))
+                info.compress_type, info.external_attr = zipfile.ZIP_DEFLATED, 0o644 << 16
+                with open(path, "rb") as f:
+                    z.writestr(info, f.read())
+    return package
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Build the JetBrains plugin, the VS Code extension and the Sublime "
-                                                 "Text package.")
+    parser = argparse.ArgumentParser(description="Build the JetBrains plugin, the VS Code extension, the Sublime Text "
+                                                 "package and the Zed extension.")
     parser.add_argument("--vsix", action="store_true", help="also pack the VS Code extension with vsce")
     args = parser.parse_args()
     families = heritage.load_families()
@@ -478,6 +622,9 @@ def main():
     package = build_sublime(families, themes)
     validate_sublime(package, themes)
     print(f"{pack_sublime(package)}: {len(themes)} themes", flush=True)
+    extension = build_zed(families)
+    validate_zed(extension, themes)
+    print(f"{pack_zed(extension)}: {len(themes)} themes", flush=True)
     if args.vsix:
         print(f"{pack_vsix(extension, themes)}: {len(themes)} themes")
 

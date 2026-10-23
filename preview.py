@@ -1,9 +1,10 @@
 """Writes the preview page of each theme family and, with --png, renders it to PNG.
 
-Usage: python3 preview.py [--vscode | --sublime] [--png] [THEME ...]
+Usage: python3 preview.py [--vscode | --sublime | --zed] [--png] [THEME ...]
   THEME      a theme folder, for example shuimo; default: every theme folder
   --vscode   write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --sublime  write the Sublime Text preview instead of the IntelliJ one; needs bat
+  --zed      write the Zed preview instead of the IntelliJ one; needs a C compiler (cc)
   --png      also render the page to PNG; needs Google Chrome or Chromium, and ImageMagick
 
 The IntelliJ page goes to themes/<theme>/build/preview.html and its PNG to themes/<theme>/preview.png, the
@@ -11,8 +12,10 @@ README image. The VS Code page goes to themes/<theme>/build/preview-vscode.html 
 VS Code page is coloured by Shiki, pinned in scripts/shiki and installed there with npm ci on first use.
 The Sublime Text page goes to themes/<theme>/build/preview-sublime.html. bat tokenises the samples with the
 .sublime-syntax files it bundles, which are Sublime Text's own for most languages, and colours them with the
-generated scheme converted to a .tmTheme. All pages use JetBrains Mono, downloaded once from the pinned release
-below into ~/.cache/heritage-themes.
+generated scheme converted to a .tmTheme. The Zed page goes to themes/<theme>/build/preview-zed.html. It is coloured
+by scripts/zed/tokens.py, which runs in a virtual environment that preview.py creates in scripts/zed/.venv from the
+pinned requirements.txt, and keeps the grammars it compiles in ~/.cache/heritage-themes/zed. All pages use
+JetBrains Mono, downloaded once from the pinned release below into ~/.cache/heritage-themes.
 """
 import argparse, hashlib, json, os, plistlib, re, shutil, subprocess, sys, tempfile, urllib.request, zipfile
 
@@ -21,9 +24,11 @@ from heritage.preview import FONT_DIR, FONTS, SHIKI_BOLD, SHIKI_ITALIC, SHIKI_UN
 from heritage.samples import SAMPLES
 from heritage.sublime import resolve, scheme as sublime_scheme
 from heritage.vscode import theme as vscode_theme
+from heritage.zed import theme as zed_theme
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SHIKI = os.path.join(ROOT, "scripts", "shiki")
+ZED = os.path.join(ROOT, "scripts", "zed")
 FONT_URL = "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip"
 FONT_SHA256 = "6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf"
 CACHE = os.path.join(os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "heritage-themes")
@@ -158,6 +163,26 @@ def sublime_tokens(family):
         return out
 
 
+def zed_tokens(family):
+    """Per theme of the family, the samples coloured by scripts/zed/tokens.py with its Zed theme, in the shape that
+    vscode_tokens returns."""
+    tool("cc")
+    venv = os.path.join(ZED, ".venv")
+    python = os.path.join(venv, "bin", "python")
+    if not os.path.isfile(python):
+        subprocess.run([sys.executable, "-m", "venv", venv], check=True)
+    if subprocess.run([python, "-c", "import tree_sitter"], capture_output=True).returncode:
+        subprocess.run([python, "-m", "pip", "install", "--quiet", "--disable-pip-version-check", "-r",
+                        os.path.join(ZED, "requirements.txt")], check=True)
+    request = dict(themes=[zed_theme(t["palette"]) for t in family.THEMES],
+                   samples=[dict(suffix=name.rsplit(".", 1)[1], code=plain(code)) for name, _, code in SAMPLES])
+    result = subprocess.run([python, "-I", os.path.join(ZED, "tokens.py"), os.path.join(CACHE, "zed")],
+                            input=json.dumps(request), capture_output=True, text=True, encoding="utf-8")
+    if result.returncode:
+        raise SystemExit(f"preview: tokens.py failed:\n{result.stderr}")
+    return json.loads(result.stdout)
+
+
 def render_png(page_path, png_path):
     chrome = os.environ.get("CHROME") or tool(*CHROMES)
     magick = tool("magick", "convert")
@@ -180,6 +205,7 @@ def main():
     kind = parser.add_mutually_exclusive_group()
     kind.add_argument("--vscode", action="store_true", help="write the VS Code preview")
     kind.add_argument("--sublime", action="store_true", help="write the Sublime Text preview")
+    kind.add_argument("--zed", action="store_true", help="write the Zed preview")
     parser.add_argument("--png", action="store_true", help="also render the page to PNG")
     parser.add_argument("themes", nargs="*", metavar="THEME", help="theme folders; default: all")
     args = parser.parse_args()
@@ -191,9 +217,10 @@ def main():
         out = os.path.join(heritage.THEMES, name, "build")
         install_fonts(os.path.join(out, FONT_DIR))
         family = families[name]
-        target = "vscode" if args.vscode else "sublime" if args.sublime else None
+        target = "vscode" if args.vscode else "sublime" if args.sublime else "zed" if args.zed else None
         page_path = os.path.join(out, f"preview-{target}.html" if target else "preview.html")
-        tokens = {"vscode": vscode_tokens, "sublime": sublime_tokens}.get(target, lambda family: None)(family)
+        tokens = {"vscode": vscode_tokens, "sublime": sublime_tokens, "zed": zed_tokens}.get(
+            target, lambda family: None)(family)
         with open(page_path, "w", encoding="utf-8") as f:
             f.write(page(family, tokens, target))
         print(page_path)
