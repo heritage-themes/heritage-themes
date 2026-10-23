@@ -328,7 +328,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ZED_REGISTRY_TOKEN }}
           COMMIT: ${{ steps.repository.outputs.commit }}
-          ID: heritage-themes
+          ID: heritage-theme
         run: |
           branch="$ID-$VERSION"
           registered=$(gh api "repos/$ZED_REGISTRY/contents/extensions.toml" -H "Accept: application/vnd.github.raw" \

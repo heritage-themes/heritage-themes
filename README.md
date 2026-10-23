@@ -87,7 +87,7 @@ Output in `build/`:
 | `sublime/` | The Sublime Text package: per theme a `.sublime-color-scheme`, a `.sublime-theme` and its `Widget - <name>.sublime-settings`, plus README, changelog and licence. The release publishes this folder to the package repository |
 | `heritage-themes-sublime-<version>.sublime-package` | The same files packed as a zip. Install this in Sublime Text |
 | `zed/` | The Zed extension: `extension.toml`, one theme family file per theme folder in `themes/`, README, changelog and licence. The release publishes this folder to the extension repository |
-| `heritage-themes-zed-<version>.zip` | The same files in a `heritage-themes/` folder. Unzip it and install the folder in Zed |
+| `heritage-themes-zed-<version>.zip` | The same files in a `heritage-theme/` folder. Unzip it and install the folder in Zed |
 
 Install the jar, an `.icls` file, the `.vsix`, the `.sublime-package` or the Zed extension as described under [Install](#install).
 
