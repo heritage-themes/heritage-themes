@@ -70,7 +70,7 @@ def query(cache, base, name, language, required):
 
 class Languages:
     def __init__(self, cache):
-        with open(os.path.join(HERE, "languages.json")) as f:
+        with open(os.path.join(HERE, "languages.json"), encoding="utf-8") as f:
             manifest = json.load(f)
         self.cache, self.specs, self.grammars, self.loaded = cache, manifest["grammars"], {}, {}
         self.configs = manifest["languages"]

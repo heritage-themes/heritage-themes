@@ -92,7 +92,7 @@ def compile_grammar(spec, path):
 
 def install(cache, site):
     """nvim-treesitter's folder, after compiling each grammar into site/parser as nvim-treesitter installs it."""
-    with open(os.path.join(HERE, "parsers.json")) as f:
+    with open(os.path.join(HERE, "parsers.json"), encoding="utf-8") as f:
         manifest = json.load(f)
     plugin = manifest["nvim-treesitter"]
     treesitter = cached(os.path.join(cache, "nvim-treesitter-" + plugin["sha256"][:16]), lambda p: extract(plugin, p))
@@ -195,7 +195,7 @@ def main():
         for sample in request["samples"]:
             path = os.path.join(tmp, "samples", sample["name"])
             os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, "w") as f:
+            with open(path, "w", encoding="utf-8", newline="\n") as f:
                 f.write(sample["code"] + "\n")
             samples.append((path, sample["code"].split("\n")))
         if max(len(lines) for _, lines in samples) >= ROWS:

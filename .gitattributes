@@ -1,0 +1,2 @@
+# Check out text files with LF line ends on every OS, so that build.py copies and packs the same bytes everywhere.
+* text=auto eol=lf

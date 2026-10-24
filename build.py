@@ -66,6 +66,12 @@ CONTRAST = (
 )
 
 
+def write_text(path, text):
+    """Writes text as UTF-8 with LF line ends, so that the build writes the same bytes on every OS."""
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(text)
+
+
 def luminance(hex_colour):
     channels = [int(hex_colour[i:i + 2], 16) / 255 for i in (0, 2, 4)]
     r, g, b = (c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in channels)
@@ -109,7 +115,7 @@ def check_references(t):
 def change_notes():
     """HTML for the plugin's change notes: the CHANGELOG.md section for VERSION, else [Unreleased], else the newest
     released section, which is the plugin's version when VERSION is a release that left the plugin out."""
-    with open(CHANGELOG) as f:
+    with open(CHANGELOG, encoding="utf-8") as f:
         text = f.read()
     sections = re.findall(r"^## \[([^\]]+)\][^\n]*\n(.*?)(?=^## \[|\Z)", text, re.M | re.S)
     entries = {label: body for label, body in sections if body.strip()}
@@ -239,22 +245,21 @@ def build_vscode(families, themes):
     """Writes the VS Code extension's files to build/vscode and returns that folder."""
     directory = os.path.join(OUT, "vscode")
     os.makedirs(os.path.join(directory, "themes"))
-    with open(os.path.join(directory, "package.json"), "w") as f:
-        json.dump(vscode_manifest(themes), f, indent=2, ensure_ascii=False)
-    with open(os.path.join(directory, "README.md"), "w") as f:
-        f.write(vscode_readme(families))
+    write_text(os.path.join(directory, "package.json"),
+               json.dumps(vscode_manifest(themes), indent=2, ensure_ascii=False))
+    write_text(os.path.join(directory, "README.md"), vscode_readme(families))
     shutil.copy(VSCODE_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
     shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
     shutil.copy(VSCODE_ICON, os.path.join(directory, "icon.png"))
     for t in themes:
-        with open(os.path.join(directory, "themes", f"{t['slug']}-color-theme.json"), "w") as f:
-            json.dump(t["vscode"], f, indent=2, ensure_ascii=False)
+        write_text(os.path.join(directory, "themes", f"{t['slug']}-color-theme.json"),
+                   json.dumps(t["vscode"], indent=2, ensure_ascii=False))
     return directory
 
 
 def validate_vscode(directory, themes):
     """Fails the build when the extension manifest is incomplete or a contributed theme is missing or malformed."""
-    with open(os.path.join(directory, "package.json")) as f:
+    with open(os.path.join(directory, "package.json"), encoding="utf-8") as f:
         manifest = json.load(f)
     for key in ("name", "displayName", "description", "version", "publisher", "license", "icon", "repository",
                 "engines"):
@@ -264,7 +269,7 @@ def validate_vscode(directory, themes):
     if len(contributed) != len(themes):
         raise SystemExit(f"VS Code package.json: {len(contributed)} themes for {len(themes)} themes")
     for entry in contributed:
-        with open(os.path.join(directory, entry["path"])) as f:
+        with open(os.path.join(directory, entry["path"]), encoding="utf-8") as f:
             data = json.load(f)
         if data["name"] != entry["label"] or (data["type"] == "dark") != (entry["uiTheme"] == "vs-dark"):
             raise SystemExit(f"VS Code theme {entry['path']} does not match its label or uiTheme")
@@ -365,11 +370,8 @@ def build_sublime(families, themes):
         for filename, document in ((f"{name}.sublime-color-scheme", t["sublime"]),
                                    (f"{name}.sublime-theme", t["sublime_theme"]),
                                    (f"Widget - {name}.sublime-settings", heritage.sublime.widget_settings())):
-            with open(os.path.join(directory, filename), "w") as f:
-                json.dump(document, f, indent=2, ensure_ascii=False)
-                f.write("\n")
-    with open(os.path.join(directory, "README.md"), "w") as f:
-        f.write(sublime_readme(families))
+            write_text(os.path.join(directory, filename), json.dumps(document, indent=2, ensure_ascii=False) + "\n")
+    write_text(os.path.join(directory, "README.md"), sublime_readme(families))
     shutil.copy(SUBLIME_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
     shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
     return directory
@@ -387,7 +389,7 @@ def validate_sublime(directory, themes):
     for name in schemes:
         validate_sublime_theme(directory, name.removesuffix(".sublime-color-scheme"))
     for name in schemes:
-        with open(os.path.join(directory, name)) as f:
+        with open(os.path.join(directory, name), encoding="utf-8") as f:
             scheme = json.load(f)
         variables, colours = scheme["variables"], []
         def colour(value):
@@ -420,7 +422,7 @@ def validate_sublime_theme(directory, name):
     for filename in (f"{name}.sublime-theme", f"Widget - {name}.sublime-settings"):
         if not os.path.isfile(os.path.join(directory, filename)):
             raise SystemExit(f"Sublime package: {filename} is missing")
-    with open(os.path.join(directory, f"{name}.sublime-theme")) as f:
+    with open(os.path.join(directory, f"{name}.sublime-theme"), encoding="utf-8") as f:
         theme = json.load(f)
     if theme.get("extends") != "Adaptive.sublime-theme" or not theme.get("rules"):
         raise SystemExit(f"{name}.sublime-theme: must extend Adaptive.sublime-theme and add rules")
@@ -433,14 +435,21 @@ def validate_sublime_theme(directory, name):
                 raise SystemExit(f"{name}.sublime-theme: {key} {value!r} is not a hex colour")
 
 
+def zip_entry(name):
+    """A zip entry for a file with a fixed time and Unix permissions, so that the same sources give the same entries on
+    every OS."""
+    info = zipfile.ZipInfo(name, date_time=(2020, 1, 1, 0, 0, 0))
+    info.compress_type, info.external_attr, info.create_system = zipfile.ZIP_DEFLATED, 0o644 << 16, 3
+    return info
+
+
 def pack_sublime(directory):
     """Zips the package into a .sublime-package, which Sublime Text loads from Installed Packages, and returns its
     path. The entries are sorted and carry a fixed time, so the same sources give the same bytes."""
     package = os.path.join(OUT, f"{VSCODE_NAME}-sublime-{VERSION}.sublime-package")
     with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as z:
         for name in sorted(os.listdir(directory)):
-            info = zipfile.ZipInfo(name, date_time=(2020, 1, 1, 0, 0, 0))
-            info.compress_type, info.external_attr = zipfile.ZIP_DEFLATED, 0o644 << 16
+            info = zip_entry(name)
             with open(os.path.join(directory, name), "rb") as f:
                 z.writestr(info, f.read())
     return package
@@ -510,15 +519,12 @@ def build_zed(families):
     """Writes the Zed extension's files to build/zed and returns that folder."""
     directory = os.path.join(OUT, "zed")
     os.makedirs(os.path.join(directory, "themes"))
-    with open(os.path.join(directory, "extension.toml"), "w") as f:
-        f.write(zed_manifest())
+    write_text(os.path.join(directory, "extension.toml"), zed_manifest())
     for family in families:
         document = heritage.zed.family(family.FAMILY, [t["palette"] for t in family.THEMES])
-        with open(os.path.join(directory, "themes", f"{heritage.folder(family)}.json"), "w") as f:
-            json.dump(document, f, indent=2, ensure_ascii=False)
-            f.write("\n")
-    with open(os.path.join(directory, "README.md"), "w") as f:
-        f.write(zed_readme(families))
+        write_text(os.path.join(directory, "themes", f"{heritage.folder(family)}.json"),
+                   json.dumps(document, indent=2, ensure_ascii=False) + "\n")
+    write_text(os.path.join(directory, "README.md"), zed_readme(families))
     shutil.copy(ZED_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
     shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
     return directory
@@ -540,7 +546,7 @@ def validate_zed(directory, themes):
     names = {t["name"]: t["dark"] for t in themes}
     found = []
     for filename in sorted(os.listdir(os.path.join(directory, "themes"))):
-        with open(os.path.join(directory, "themes", filename)) as f:
+        with open(os.path.join(directory, "themes", filename), encoding="utf-8") as f:
             family = json.load(f)
         for theme in family["themes"]:
             name, style = theme["name"], theme["style"]
@@ -571,17 +577,18 @@ def validate_zed(directory, themes):
 def pack_zed(directory):
     """Zips the extension into a folder that Zed installs with zed: install dev extension, and returns the zip's path.
     The entries are sorted and carry a fixed time, so the same sources give the same bytes."""
-    package = os.path.join(OUT, f"{VSCODE_NAME}-zed-{VERSION}.zip")
+    return pack_folder(directory, os.path.join(OUT, f"{VSCODE_NAME}-zed-{VERSION}.zip"), ZED_ID)
+
+
+def pack_folder(directory, package, folder):
+    """Zips the files under directory into package, in a folder of that name, and returns package."""
     with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as z:
         for root, folders, files in os.walk(directory):
             folders.sort()
             for name in sorted(files):
                 path = os.path.join(root, name)
-                info = zipfile.ZipInfo(os.path.join(ZED_ID, os.path.relpath(path, directory)),
-                                       date_time=(2020, 1, 1, 0, 0, 0))
-                info.compress_type, info.external_attr = zipfile.ZIP_DEFLATED, 0o644 << 16
                 with open(path, "rb") as f:
-                    z.writestr(info, f.read())
+                    z.writestr(zip_entry(os.path.join(folder, os.path.relpath(path, directory))), f.read())
     return package
 
 
@@ -677,12 +684,11 @@ def build_nvim(families):
         source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
         for t in family.THEMES:
             scheme = heritage.nvim.name(t)
-            with open(os.path.join(directory, "colors", f"{scheme}.lua"), "w") as f:
-                f.write(heritage.nvim.colorscheme(t["palette"], scheme, source))
-            with open(os.path.join(directory, "lua", "lualine", "themes", f"{scheme}.lua"), "w") as f:
-                f.write(heritage.nvim.lualine_theme(t["palette"], source))
-    with open(os.path.join(directory, "README.md"), "w") as f:
-        f.write(nvim_readme(families))
+            write_text(os.path.join(directory, "colors", f"{scheme}.lua"),
+                       heritage.nvim.colorscheme(t["palette"], scheme, source))
+            write_text(os.path.join(directory, "lua", "lualine", "themes", f"{scheme}.lua"),
+                       heritage.nvim.lualine_theme(t["palette"], source))
+    write_text(os.path.join(directory, "README.md"), nvim_readme(families))
     shutil.copy(NVIM_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
     shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
     return directory
@@ -726,7 +732,7 @@ def validate_nvim(directory, families):
             terminal = heritage.nvim.terminal(p)
             if len(terminal) != 16 or not all(NVIM_HEX.fullmatch(v) for v in terminal):
                 raise SystemExit(f"Neovim {scheme}: the terminal needs 16 hex colours")
-            with open(os.path.join(directory, "colors", f"{scheme}.lua")) as f:
+            with open(os.path.join(directory, "colors", f"{scheme}.lua"), encoding="utf-8") as f:
                 if f"vim.g.colors_name = \"{scheme}\"" not in f.read():
                     raise SystemExit(f"Neovim colors/{scheme}.lua does not set its colors_name")
     for folder in ("colors", os.path.join("lua", "lualine", "themes")):
@@ -738,18 +744,7 @@ def validate_nvim(directory, families):
 def pack_nvim(directory):
     """Zips the plugin into a folder that Neovim loads from a pack/*/start directory, and returns the zip's path. The
     entries are sorted and carry a fixed time, so the same sources give the same bytes."""
-    package = os.path.join(OUT, f"{VSCODE_NAME}-nvim-{VERSION}.zip")
-    with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as z:
-        for root, folders, files in os.walk(directory):
-            folders.sort()
-            for name in sorted(files):
-                path = os.path.join(root, name)
-                info = zipfile.ZipInfo(os.path.join(NVIM_NAME, os.path.relpath(path, directory)),
-                                       date_time=(2020, 1, 1, 0, 0, 0))
-                info.compress_type, info.external_attr = zipfile.ZIP_DEFLATED, 0o644 << 16
-                with open(path, "rb") as f:
-                    z.writestr(info, f.read())
-    return package
+    return pack_folder(directory, os.path.join(OUT, f"{VSCODE_NAME}-nvim-{VERSION}.zip"), NVIM_NAME)
 
 
 def main():
@@ -780,8 +775,7 @@ def main():
         for t in themes:
             z.writestr(f"themes/{t['slug']}.xml", t["scheme"])
             z.writestr(f"themes/{t['slug']}.theme.json", json.dumps(t["theme"], indent=2))
-            with open(os.path.join(OUT, "schemes", f"{t['name']}.icls"), "w") as f:
-                f.write(t["scheme"])
+            write_text(os.path.join(OUT, "schemes", f"{t['name']}.icls"), t["scheme"])
     validate(jar, themes)
     archive = os.path.join(OUT, f"heritage-themes-{VERSION}.zip")
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:

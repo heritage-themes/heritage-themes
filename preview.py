@@ -21,7 +21,7 @@ scripts/nvim/.venv in the same way and keeps nvim-treesitter and the grammars it
 ~/.cache/heritage-themes/nvim. All pages use JetBrains Mono, downloaded once from the pinned release below into
 ~/.cache/heritage-themes.
 """
-import argparse, hashlib, json, os, plistlib, re, shutil, subprocess, sys, tempfile, urllib.request, zipfile
+import argparse, hashlib, json, os, pathlib, plistlib, re, shutil, subprocess, sys, tempfile, urllib.request, zipfile
 
 import heritage
 from heritage.preview import FONT_DIR, FONTS, SHIKI_BOLD, SHIKI_ITALIC, SHIKI_UNDERLINE, page, plain, vscode_samples
@@ -171,7 +171,7 @@ def sublime_tokens(family):
 def venv_python(folder, module):
     """The Python of folder/.venv, created with folder/requirements.txt installed when module does not import."""
     venv = os.path.join(folder, ".venv")
-    python = os.path.join(venv, "bin", "python")
+    python = os.path.join(venv, "Scripts" if os.name == "nt" else "bin", "python")
     if not os.path.isfile(python):
         subprocess.run([sys.executable, "-m", "venv", venv], check=True)
     if subprocess.run([python, "-c", f"import {module}"], capture_output=True).returncode:
@@ -204,7 +204,7 @@ def nvim_tokens(family):
         os.makedirs(os.path.join(plugin, "colors"))
         for t in family.THEMES:
             scheme = heritage.nvim.name(t)
-            with open(os.path.join(plugin, "colors", f"{scheme}.lua"), "w") as f:
+            with open(os.path.join(plugin, "colors", f"{scheme}.lua"), "w", encoding="utf-8", newline="\n") as f:
                 f.write(heritage.nvim.colorscheme(t["palette"], scheme, f"themes/{heritage.folder(family)}"))
         request = dict(schemes=[heritage.nvim.name(t) for t in family.THEMES],
                        samples=[dict(name=name, code=plain(code)) for name, _, code in SAMPLES])
@@ -217,12 +217,13 @@ def nvim_tokens(family):
 
 def render_png(page_path, png_path):
     chrome = os.environ.get("CHROME") or tool(*CHROMES)
-    magick = tool("magick", "convert")
+    # Windows has a convert command of its own, which converts file systems, so ImageMagick 6's name is not looked up.
+    magick = tool("magick") if os.name == "nt" else tool("magick", "convert")
     with tempfile.TemporaryDirectory() as tmp:
         shot = os.path.join(tmp, "shot.png")
         subprocess.run([chrome, "--headless=new", "--disable-gpu", "--hide-scrollbars",
                         f"--force-device-scale-factor={SCALE}", "--default-background-color=00000000",
-                        f"--window-size={WIDTH},{HEIGHT}", f"--screenshot={shot}", f"file://{page_path}"],
+                        f"--window-size={WIDTH},{HEIGHT}", f"--screenshot={shot}", pathlib.Path(page_path).as_uri()],
                        check=True, capture_output=True)
         box = subprocess.run([magick, shot, "-format", "%@", "info:"], check=True, capture_output=True, text=True)
         size, y = box.stdout.split("+")[0], int(box.stdout.split("+")[2])
