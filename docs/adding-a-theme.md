@@ -12,7 +12,7 @@ Any folder in `themes/` with a `theme.py` is a theme family. `heritage.load_fami
 | `BLURB` | One sentence for the plugin description: the tradition and its main syntax mappings |
 | `THEMES` | One `dict(slug=..., id=..., palette=...)` per theme; `id` is a new UUID |
 
-From each palette, `heritage/scheme.py` builds the editor colour scheme, `heritage/ui.py` builds the UI theme, `heritage/vscode.py` builds the VS Code colour theme, `heritage/sublime.py` builds the Sublime Text colour scheme and UI theme, `heritage/zed.py` builds the Zed theme, and `heritage/nvim.py` builds the Neovim colour scheme and lualine theme. `build.py` packs the scheme and the UI theme into the JetBrains plugin, writes a standalone `.icls` per theme, adds the VS Code theme to the VS Code extension, the Sublime Text scheme and UI theme to the Sublime Text package, the family's Zed theme family file to the Zed extension, and the Neovim colour scheme, named `heritage-` and the `slug` in kebab case plus `-dark` or `-light` when the name ends in ` (Dark)` or ` (Light)`, to the Neovim plugin. `slug`, `id` and `name` must be unique across all themes; `build.py` fails otherwise.
+From each palette, `heritage/scheme.py` builds the editor colour scheme, `heritage/ui.py` builds the UI theme, `heritage/vscode.py` builds the VS Code colour theme, `heritage/sublime.py` builds the Sublime Text colour scheme and UI theme, `heritage/zed.py` builds the Zed theme, `heritage/nvim.py` builds the Neovim colour scheme and lualine theme, and `heritage/notepadpp.py` builds the Notepad++ theme. `build.py` packs the scheme and the UI theme into the JetBrains plugin, writes a standalone `.icls` per theme, adds the VS Code theme to the VS Code extension, the Sublime Text scheme and UI theme to the Sublime Text package, the family's Zed theme family file to the Zed extension, the Neovim colour scheme, named `heritage-` and the `slug` in kebab case plus `-dark` or `-light` when the name ends in ` (Dark)` or ` (Light)`, to the Neovim plugin, and the Notepad++ theme, in a file named after the palette `name`, to the Notepad++ themes. `slug`, `id` and `name` must be unique across all themes; `build.py` fails otherwise.
 
 A change in `heritage/` changes every family. After one, render all previews and check each family.
 
@@ -31,6 +31,8 @@ Names follow one pattern:
 The second word of a theme name is its setting in the tradition: Night and Day for Shuimo, Ink and Paper for Danqing, Baluchari and Laal Paar for Bengal.
 
 A name that does not say Night or Day ends in ` (Dark)` or ` (Light)`, matching `dark`, so the IDE theme list shows the brightness: `Edo Cha (Dark)`, `Edo Nezumi (Light)`. The Neovim scheme names carry it too: `heritage-edo-cha-dark`, `heritage-edo-nezumi-light`. The `slug` omits the suffix.
+
+Notepad++ lists a theme by its file name, so the palette `name` is a Windows file name: none of `< > : " / \ | ? *`, and no trailing space or full stop. `build.py` fails otherwise.
 
 ### Palette
 
@@ -82,12 +84,13 @@ Constraints:
 ## Check the result
 
 ```bash
-python3 build.py                # prints the plugin zip, the VS Code extension folder, the Sublime Text package, the Zed extension zip and the Neovim plugin zip, each with <n> themes
+python3 build.py                # prints the plugin zip, the VS Code extension folder, the Sublime Text package, the Zed extension zip, the Neovim plugin zip and the Notepad++ themes zip, each with <n> themes
 python3 preview.py <theme>      # writes themes/<theme>/build/preview.html
 python3 preview.py --vscode <theme>   # writes themes/<theme>/build/preview-vscode.html
 python3 preview.py --sublime <theme>  # writes themes/<theme>/build/preview-sublime.html
 python3 preview.py --zed <theme>      # writes themes/<theme>/build/preview-zed.html
 python3 preview.py --nvim <theme>     # writes themes/<theme>/build/preview-nvim.html
+python3 preview.py --notepadpp <theme>  # writes themes/<theme>/build/preview-notepadpp.html
 ```
 
 Open the preview in a browser. It shows each theme as an Islands IDE window, with the frame, the tool window and editor islands, and a sample in Java, Kotlin, Groovy (Spock), Python, TypeScript, React (TSX), Vue, HTML, CSS, SQL, Go, Rust, C++, C, C#, shell, YAML, JSON, TOML and Markdown. Code colours come from the generated scheme, so the preview shows what the scheme sets. Check that:
@@ -96,7 +99,7 @@ Open the preview in a browser. It shows each theme as an Islands IDE window, wit
 - the caret row, caret and Spock labels are visible
 - the frame sets the islands apart and stays in the family's colours
 - no language sample has colours that clash with the palette
-- the VS Code, Sublime Text, Zed and Neovim previews read like the IntelliJ one
+- the VS Code, Sublime Text, Zed, Neovim and Notepad++ previews read like the IntelliJ one
 
 In the IDE, install `build/heritage-themes-<version>.jar` through **Settings | Plugins | ⚙ | Install Plugin from Disk…**, restart, select each theme and also check the Project view, a diff, the console and a popup.
 
@@ -128,6 +131,6 @@ Add these to the theme folder:
 
 1. Add a row to the table in the root `README.md`: `` | [`themes/<theme>/`](themes/<theme>/) | <Theme A>, <Theme B> | <Country> | ``.
    `<Country>` is the country name only, even for a region inside it; a tradition that spans borders lists every country, separated by commas.
-2. Add a line under `### Added` in `[Unreleased]` in each of `CHANGELOG.md`, `vscode/CHANGELOG.md`, `sublime/CHANGELOG.md`, `zed/CHANGELOG.md` and `nvim/CHANGELOG.md`: `- <Theme A> and <Theme B>, drawn from <tradition>.`
+2. Add a line under `### Added` in `[Unreleased]` in each of `CHANGELOG.md`, `vscode/CHANGELOG.md`, `sublime/CHANGELOG.md`, `zed/CHANGELOG.md`, `nvim/CHANGELOG.md` and `notepadpp/CHANGELOG.md`: `- <Theme A> and <Theme B>, drawn from <tradition>.`
 3. Run `python3 build.py` again.
 4. Commit on `dev` as `feat(<theme>): add <Theme A> and <Theme B> themes`, limited to the theme folder, the root README row and the changelog entries. Releasing is described in [releasing.md](releasing.md).

@@ -1,6 +1,6 @@
 # Heritage Themes
 
-Colour themes for IntelliJ-based IDEs, VS Code, Sublime Text, Zed and Neovim, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Sublime Text package (`Heritage Themes`), one Zed extension (`heritage-theme`) and one Neovim plugin (`heritage-themes/heritage-themes.nvim`).
+Colour themes for IntelliJ-based IDEs, VS Code, Sublime Text, Zed, Neovim and Notepad++, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Sublime Text package (`Heritage Themes`), one Zed extension (`heritage-theme`), one Neovim plugin (`heritage-themes/heritage-themes.nvim`) and one zip of Notepad++ themes (`heritage-themes-notepadpp-<version>.zip`).
 
 | Folder | Themes | Country |
 | --- | --- | --- |
@@ -76,12 +76,17 @@ Install `heritage-themes/heritage-themes.nvim` with a plugin manager, for exampl
 
 Then choose a theme with `:colorscheme heritage-<theme>`, for example `:colorscheme heritage-holi-night`; press `Tab` after `heritage-` to list them. To install from the latest GitHub release instead, unzip `heritage-themes-nvim-<version>.zip` into `~/.local/share/nvim/site/pack/heritage/start/`. Each colour scheme colours the editor, Tree-sitter and LSP semantic highlights, diagnostics, the status line, tab line, floating windows, the completion menu, diff mode and the terminal; it comes with a lualine theme of the same name and colours the signs of gitsigns.nvim. Neovim 0.10 or later in a terminal with 24-bit colour is required.
 
+### Notepad++
+
+Download `heritage-themes-notepadpp-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest) and copy the files in its `themes` folder into `%AppData%\Notepad++\themes` (for a portable Notepad++, the `themes` folder beside `notepad++.exe`). Restart Notepad++ and choose a theme under **Settings | Style Configurator… | Select theme**. Notepad++ keeps one theme for Light Mode and one for Dark Mode: choose a dark theme while **Settings | Preferences… | Dark Mode** is on. Each theme colours every language Notepad++ highlights, the caret, current line, selection, margins, fold markers, highlights, the document map and the bar on the active tab, and in Light Mode the tabs' text. Notepad++ draws its menu bar, toolbar, dialogs and, in Dark Mode, its tabs in its own Dark Mode colours. It has no lexer for Kotlin or Groovy, and colours Markdown with a user-defined language that keeps its own colours.
+
 ## Build from source
 
 Requires Python 3. `--vsix` also needs Node.js 22 or later and npm; it installs vsce, pinned in `scripts/vscode/`, on first use.
 
 ```bash
-python3 build.py          # JetBrains plugin, VS Code extension folder, Sublime Text package, Zed extension and Neovim plugin
+python3 build.py          # JetBrains plugin, VS Code extension folder, Sublime Text package, Zed extension, Neovim plugin
+                          # and Notepad++ themes
 python3 build.py --vsix   # also pack the VS Code extension
 ```
 
@@ -100,8 +105,10 @@ Output in `build/`:
 | `heritage-themes-zed-<version>.zip` | The same files in a `heritage-theme/` folder. Unzip it and install the folder in Zed |
 | `nvim/` | The Neovim plugin: one colour scheme per theme in `colors/`, one lualine theme per theme in `lua/lualine/themes/`, README, changelog and licence. The release publishes this folder to the plugin repository |
 | `heritage-themes-nvim-<version>.zip` | The same files in a `heritage-themes.nvim/` folder. Unzip it into a `pack/*/start/` folder of Neovim |
+| `notepadpp/` | The Notepad++ themes: one theme file per theme in `themes/`, named as Notepad++ lists it, plus README, changelog and licence |
+| `heritage-themes-notepadpp-<version>.zip` | The same files in a `heritage-themes-notepadpp/` folder. The release attaches it |
 
-Install the jar, an `.icls` file, the `.vsix`, the `.sublime-package`, the Zed extension or the Neovim plugin as described under [Install](#install).
+Install the jar, an `.icls` file, the `.vsix`, the `.sublime-package`, the Zed extension, the Neovim plugin or the Notepad++ themes as described under [Install](#install).
 
 ## Preview
 
@@ -113,6 +120,7 @@ python3 preview.py --vscode     # VS Code preview: themes/<theme>/build/preview-
 python3 preview.py --sublime    # Sublime Text preview: themes/<theme>/build/preview-sublime.html
 python3 preview.py --zed        # Zed preview: themes/<theme>/build/preview-zed.html
 python3 preview.py --nvim       # Neovim preview: themes/<theme>/build/preview-nvim.html
+python3 preview.py --notepadpp  # Notepad++ preview: themes/<theme>/build/preview-notepadpp.html
 ```
 
 The page shows each theme as an IDE window with a code sample per language, coloured from the generated editor scheme. It downloads JetBrains Mono once into `~/.cache/heritage-themes`. `--png` needs Google Chrome or Chromium (or the `CHROME` environment variable) and ImageMagick.
@@ -125,11 +133,13 @@ The page shows each theme as an IDE window with a code sample per language, colo
 
 `--nvim` shows the samples as Neovim draws them: it runs Neovim embedded with the theme's colour schemes and nvim-treesitter, opens each sample and reads the colours from the screen Neovim sends to its UI. It needs Neovim and a C compiler (`cc`): it creates a virtual environment with msgpack in `scripts/nvim/.venv`, and downloads nvim-treesitter and compiles the grammars, pinned in `scripts/nvim/parsers.json`, into `~/.cache/heritage-themes/nvim` on first use. It fails when a colour scheme leaves a highlight group with a colour of Neovim's default scheme. Language servers can add semantic colours that the page does not show. With `--png` it writes `preview-nvim.png` next to the page.
 
+`--notepadpp` styles the samples with the Lexilla lexers of the Notepad++ source pinned in `scripts/notepadpp/source.json`, set up for each language as Notepad++ sets them up (`scripts/notepadpp/lexers.json`), and colours them with the generated theme. It needs a C++ compiler (`c++`): it downloads the source and compiles the lexers into `~/.cache/heritage-themes/notepadpp` on first use. The page shows Kotlin, Groovy and Markdown as plain text: Notepad++ has no lexer for Kotlin or Groovy, and colours Markdown with a user-defined language whose colours no theme sets. The window frame and tabs take Notepad++'s own default colours, which a theme does not set. With `--png` it writes `preview-notepadpp.png` next to the page.
+
 ## Layout
 
 ```text
-build.py        builds the plugin, the VS Code extension, the Sublime Text package, the Zed extension and the Neovim plugin
-                from every theme folder; holds their shared version
+build.py        builds the plugin, the VS Code extension, the Sublime Text package, the Zed extension, the Neovim plugin
+                and the Notepad++ themes from every theme folder; holds their shared version
 preview.py      writes theme previews and renders the README images
 heritage/       code shared by every theme family
   __init__.py   finds the theme folders in themes/; the theme.py contract
@@ -141,6 +151,8 @@ heritage/       code shared by every theme family
   zed.py        Zed theme: palette roles to Tree-sitter captures and UI keys
   nvim.py       Neovim colour scheme: palette roles to highlight groups, Tree-sitter captures and LSP semantic tokens;
                 lualine theme
+  notepadpp.py  Notepad++ theme: palette roles to the styles of each lexer and the global styles
+  notepadpp.json  the lexers and styles of the pinned Notepad++, written by scripts/notepadpp/styles.py
   preview.py    preview page
   samples.py    code samples shown in the preview
 CHANGELOG.md    JetBrains plugin release notes; the plugin's change notes come from it
@@ -148,9 +160,11 @@ vscode/         CHANGELOG.md: VS Code extension release notes
 sublime/        CHANGELOG.md: Sublime Text package release notes
 zed/            CHANGELOG.md: Zed extension release notes
 nvim/           CHANGELOG.md: Neovim plugin release notes
+notepadpp/      CHANGELOG.md: Notepad++ themes release notes
 assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
 scripts/        release.sh, parent_overrides.py; shiki/ tokenises the VS Code preview; vscode/ packs and publishes the extension;
-                zed/ colours the Zed preview; nvim/ draws the Neovim preview
+                zed/ colours the Zed preview; nvim/ draws the Neovim preview; notepadpp/ pins Notepad++, lists its styles
+                and colours the Notepad++ preview
 docs/           releasing.md, adding-a-theme.md
 .github/        Build and Publish workflows; ISSUE_TEMPLATE/ holds the issue forms
 themes/<theme>/
@@ -160,14 +174,14 @@ themes/<theme>/
 build/          generated, not tracked
 ```
 
-Only sources are tracked. Jars, zips, `.icls`, `.vsix`, `.sublime-package` and Neovim `.lua` files are build output; the publish workflows attach them to each GitHub release.
+Only sources are tracked. Jars, zips, `.icls`, `.vsix`, `.sublime-package`, Neovim `.lua` and Notepad++ theme files are build output; the publish workflows attach them to each GitHub release.
 
 ## Git workflow
 
 - Work on `dev`. `master` receives commits only when `scripts/release.sh` cuts a release.
 - Commit subjects follow [Conventional Commits](https://www.conventionalcommits.org/), with the theme folder as the scope for a change to one theme: `fix(wuxing): soften comment contrast`. Changes outside the theme folders use a scope such as `heritage`, `build` or `ci`, or none.
 - Keep a commit within one theme folder.
-- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin, the VS Code extension, the Sublime Text package, the Zed extension and the Neovim plugin share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
+- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin, the VS Code extension, the Sublime Text package, the Zed extension, the Neovim plugin and the Notepad++ themes share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
 
 ## Add a theme
 

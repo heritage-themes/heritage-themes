@@ -20,13 +20,18 @@ The Neovim page takes code colours from the screen that Neovim draws with the co
 nvim-treesitter's grammars and queries (see scripts/nvim/screen.py), and its chrome from the scheme's highlight groups
 (NVIM_CHROME): the tab line on top, a file tree and the editors in windows with window bars, split by separators, and
 the status line below.
+
+The Notepad++ page takes code colours from the styles that Notepad++'s Lexilla lexers give the samples, coloured by
+the theme from heritage.notepadpp (see scripts/notepadpp/tokens.py), and its chrome from notepadpp_chrome: the tab bar
+and status bar in the colours Notepad++ draws itself in, with the editors side by side and no side panel, as
+Notepad++ opens.
 """
 import html, re
 
 from .samples import SAMPLES
 from .scheme import attributes, BOLD, ITALIC, BI, UNDER, WAVE, STRIKE, BOX, DOTTED
 from .ui import theme
-from . import nvim, sublime, vscode, zed
+from . import notepadpp, nvim, sublime, vscode, zed
 
 FONT_DIR = "fonts"
 FONTS = [("Regular", 400, "normal"), ("Italic", 400, "italic"), ("Bold", 700, "normal"), ("BoldItalic", 700, "italic")]
@@ -193,10 +198,23 @@ def nvim_chrome(p):
     return ";".join(f"--{var}:{groups[group][key]}" for var, (group, key) in NVIM_CHROME.items())
 
 
+def notepadpp_chrome(p):
+    """CSS variables for the window chrome: Notepad++'s own colours in Dark Mode for a dark theme and in Light Mode
+    for a light one, with the theme's colours where Notepad++ takes them: the bar on the active tab and, in Light
+    Mode, the tab text."""
+    widgets = notepadpp.widgets(p)
+    mode = notepadpp.DARK_MODE if p["dark"] else notepadpp.LIGHT_MODE
+    colours = dict(frame=mode["frame"], editor=mode["background"], tab=mode["control"],
+                   tabFg=mode["text"] if p["dark"] else widgets["Active tab text"]["fgColor"],
+                   tabBorder=widgets["Active tab focused indicator"]["fgColor"], status=mode["background"],
+                   statusFg=mode["text"])
+    return ";".join(f"--{var}:#{colour}" for var, colour in colours.items())
+
+
 def window(p, files=None, kind="vscode"):
     """One IDE window. files holds, per sample, the lines of tokens (text, colour, font style) for the VS Code,
-    Sublime Text, Zed or Neovim page, as kind says; without it the window is the IntelliJ one, coloured from the editor
-    scheme."""
+    Sublime Text, Zed, Neovim or Notepad++ page, as kind says; without it the window is the IntelliJ one, coloured from
+    the editor scheme."""
     names = [name for name, _, _ in SAMPLES]
     variables = ";".join(f"--{k}:#{v}" for k, v in p.items() if isinstance(v, str) and re.fullmatch(r"[0-9A-F]{6}", v))
     swatches = "".join(f'<span title="{k}" style="background:#{p[k]}"></span>' for k in SWATCHES)
@@ -209,7 +227,8 @@ def window(p, files=None, kind="vscode"):
     else:
         editors = "".join(sample(name, caret, ["".join(token_html(*t) for t in line) for line in lines])
                           for (name, caret, _), lines in zip(SAMPLES, files))
-        colours = {"sublime": sublime_chrome, "zed": zed_chrome, "nvim": nvim_chrome}.get(kind, vscode_chrome)(p)
+        colours = {"sublime": sublime_chrome, "zed": zed_chrome, "nvim": nvim_chrome,
+                   "notepadpp": notepadpp_chrome}.get(kind, vscode_chrome)(p)
     return (f'<section class="ide {kind}" style="{variables};{colours};--caret:#{p.get("caret", p["gold"])}">'
             f'<header class="bar"><b>{html.escape(p["name"])}</b><span class="swatches">{swatches}</span></header>'
             f'<div class="body"><div class="stripe"><i class="on"></i><i></i><i></i></div>'
@@ -225,7 +244,7 @@ def vscode_samples():
 
 def page(family, tokens=None, kind="vscode"):
     """The preview page for every theme in the family: the IntelliJ page, or with tokens (per theme, one list of
-    token lines per sample) the VS Code page or, as kind says, the Sublime Text, Zed or Neovim page."""
+    token lines per sample) the VS Code page or, as kind says, the Sublime Text, Zed, Neovim or Notepad++ page."""
     faces = "".join(
         f'@font-face{{font-family:"JetBrains Mono";font-weight:{w};font-style:{s};'
         f'src:url("{FONT_DIR}/JetBrainsMono-{n}.woff2") format("woff2"),local("JetBrains Mono")}}' for n, w, s in FONTS)
@@ -273,6 +292,12 @@ body{{margin:0;padding:24px;font-family:system-ui,sans-serif}}
 .nvim .files{{gap:1px;background:var(--separator)}} .nvim .file{{border-radius:0}}
 .nvim .tabs{{padding:3px 0 0;border:0}} .nvim .tab{{padding:0 12px;border:0;background:none;color:var(--tabFg);
   font:700 12px "JetBrains Mono",ui-monospace,monospace}}
+.notepadpp .bar{{color:var(--statusFg)}} .notepadpp .bar b{{color:var(--statusFg)}}
+.notepadpp .body{{gap:0;padding:0}} .notepadpp .stripe,.notepadpp .side{{display:none}}
+.notepadpp .files{{gap:1px;background:var(--frame)}} .notepadpp .file{{border-radius:0}}
+.notepadpp .tabs{{padding:2px 0 0 2px;border:0}} .notepadpp .tab{{padding:3px 12px;border:0;border-radius:0;
+  border-top:3px solid var(--tabBorder);color:var(--tabFg)}}
+.notepadpp .status{{color:var(--statusFg)}}
 pre{{margin:0;padding:8px 0;font:13px/1.55 "JetBrains Mono",ui-monospace,monospace;font-variant-ligatures:none;
   overflow-x:auto;color:var(--fg)}}
 pre div{{padding:0 12px 0 0;white-space:pre}}

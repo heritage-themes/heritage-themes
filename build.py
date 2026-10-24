@@ -1,5 +1,5 @@
-"""Builds the Heritage Themes JetBrains plugin, VS Code extension, Sublime Text package, Zed extension and Neovim plugin
-from every theme folder.
+"""Builds the Heritage Themes JetBrains plugin, VS Code extension, Sublime Text package, Zed extension, Neovim plugin
+and Notepad++ themes from every theme folder.
 
 A theme folder is any directory in themes/ containing a theme.py (see heritage/__init__.py).
 
@@ -17,8 +17,9 @@ import heritage
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
 CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
-# One version for the JetBrains plugin, the VS Code extension, the Sublime Text package, the Zed extension and the
-# Neovim plugin. A release publishes each product whose changelog has a section for it; see docs/releasing.md.
+# One version for the JetBrains plugin, the VS Code extension, the Sublime Text package, the Zed extension, the Neovim
+# plugin and the Notepad++ themes. A release publishes each product whose changelog has a section for it; see
+# docs/releasing.md.
 VERSION = "1.3.3"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 DESCRIPTION = "Colour themes drawn from the colour traditions of different cultures."
@@ -46,6 +47,11 @@ NVIM_CHANGELOG = os.path.join(ROOT, "nvim", "CHANGELOG.md")
 NVIM_NAME = "heritage-themes.nvim"  # the plugin's repository, which plugin managers install from
 NVIM_REPOSITORY_URL = f"https://github.com/heritage-themes/{NVIM_NAME}"
 NVIM_HEX = re.compile(r"#[0-9A-F]{6}")
+NOTEPADPP_CHANGELOG = os.path.join(ROOT, "notepadpp", "CHANGELOG.md")
+NOTEPADPP_NAME = "heritage-themes-notepadpp"  # the folder in the zip
+NOTEPADPP_PROLOG = '<?xml version="1.0" encoding="UTF-8" ?>'  # Notepad++'s Themes Collection requires it first
+NOTEPADPP_HEX = re.compile(r"[0-9A-F]{6}")
+WINDOWS_NAME = re.compile(r'[^<>:"/\\|?*\x00-\x1f]+(?<![ .])')  # a file name that Windows accepts
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -668,7 +674,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {{
 {rows}
 
 Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs, VS Code, \
-Sublime Text and Zed: see [Heritage Themes on GitHub]({VENDOR_URL}).
+Sublime Text, Zed and Notepad++: see [Heritage Themes on GitHub]({VENDOR_URL}).
 
 Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the colour scheme, \
 Neovim version, language and a screenshot.
@@ -747,9 +753,155 @@ def pack_nvim(directory):
     return pack_folder(directory, os.path.join(OUT, f"{VSCODE_NAME}-nvim-{VERSION}.zip"), NVIM_NAME)
 
 
+def notepadpp_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    rows = "\n".join(f"| [{f.FAMILY}]({VENDOR_URL}/tree/master/themes/{heritage.folder(f)}) "
+                     f"| {', '.join(t['palette']['name'] for t in f.THEMES)} | {f.BLURB} |" for f in families)
+    count = sum(len(f.THEMES) for f in families)
+    model = heritage.notepadpp.MODEL
+    return f"""# Heritage Themes for Notepad++
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+1. Copy the files in `themes` into the `themes` folder of your Notepad++ settings: `%AppData%\\Notepad++\\themes` \
+for an installed Notepad++, or the `themes` folder beside `notepad++.exe` for a portable one. Create the folder if it \
+does not exist.
+2. Restart Notepad++ and choose a theme under **Settings | Style Configurator… | Select theme**.
+
+**Settings | Import | Import Style Themes…** installs the files you select instead, into the `themes` folder of the \
+Notepad++ installation, which can need Notepad++ to run as administrator.
+
+Notepad++ keeps one theme for Light Mode and one for Dark Mode, set under **Settings | Preferences… | Dark Mode**: \
+choose a dark theme while Dark Mode is on and a light theme while it is off.
+
+## What is coloured
+
+Each theme sets every style of every language that Notepad++ {model["notepad++"]} lists, and the editor around the \
+text: the caret, current line, selection, margins, fold markers, find and mark highlights, brace matching, the \
+document map and the bar that marks the active tab. In Light Mode it also colours the text of the tabs and the \
+background of the inactive ones. Notepad++ draws the menu bar, toolbar, dialogs and, in Dark Mode, the tabs from its \
+own Dark Mode colours, which a theme cannot set; to bring them closer to a theme, choose the **Customized** tone \
+under **Settings | Preferences… | Dark Mode**.
+
+## Languages
+
+Notepad++ colours each language with its own lexer, so the themes give each lexer's styles the role of the construct \
+they mark: keywords, strings, numbers, types, functions, fields, annotations and comments take the same colours as \
+in the other editors. Notepad++ has no lexer for Kotlin or Groovy, which open as plain text, and colours Markdown \
+with a user-defined language that keeps its own colours. A style that a later Notepad++ adds takes the theme's text \
+colour until a release of the themes sets it.
+
+## Themes
+
+| Family | Themes | Tradition |
+| --- | --- | --- |
+{rows}
+
+Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs, VS Code, \
+Sublime Text, Zed and Neovim: see [Heritage Themes on GitHub]({VENDOR_URL}).
+
+Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the theme, Notepad++ \
+version, language and a screenshot.
+"""
+
+
+def build_notepadpp(families):
+    """Writes the Notepad++ themes to build/notepadpp/themes, one file per theme named as Notepad++ lists it, and
+    returns build/notepadpp."""
+    directory = os.path.join(OUT, "notepadpp")
+    os.makedirs(os.path.join(directory, "themes"))
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            write_text(os.path.join(directory, "themes", f"{t['palette']['name']}.xml"),
+                       heritage.notepadpp.theme(t["palette"], source))
+    write_text(os.path.join(directory, "README.md"), notepadpp_readme(families))
+    shutil.copy(NOTEPADPP_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_notepadpp(directory, families):
+    """Fails the build when the README, changelog, licence or the file of a theme is missing or a theme is malformed."""
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Notepad++ themes: {name} is missing")
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            p = t["palette"]
+            if not WINDOWS_NAME.fullmatch(p["name"]):
+                raise SystemExit(f"Notepad++: {p['name']!r} is not a Windows file name")
+            expected.add(f"{p['name']}.xml")
+            validate_notepadpp_theme(os.path.join(directory, "themes", f"{p['name']}.xml"), p)
+    found = set(os.listdir(os.path.join(directory, "themes")))
+    if found != expected:
+        raise SystemExit(f"Notepad++ themes: {len(found)} files for {len(expected)} themes")
+
+
+def validate_notepadpp_theme(path, p):
+    """Fails the build when the theme file does not start with its XML declaration, leaves out or misnames a style of
+    notepadpp.json, has a colour that is not hex or a font style that is not one, or has a text style that is
+    unreadable on its background."""
+    model, name = heritage.notepadpp.MODEL, os.path.basename(path)
+    def fail(message):
+        raise SystemExit(f"Notepad++ {name}: {message}")
+    with open(path, "rb") as f:
+        data = f.read()
+    if not data.startswith(NOTEPADPP_PROLOG.encode()):
+        fail(f"does not start with {NOTEPADPP_PROLOG}")
+    root = ET.fromstring(data)
+    if root.tag != "NotepadPlus" or root.get("modelDate") != str(model["modelDate"]):
+        fail(f"the root is not <NotepadPlus modelDate=\"{model['modelDate']}\">")
+    widgets = root.findall("GlobalStyles/WidgetStyle")
+    if [(w.get("name"), int(w.get("styleID"))) for w in widgets] != [(w["name"], w["id"]) for w in model["widgets"]]:
+        fail("the GlobalStyles are not those of notepadpp.json")
+    styles = {w.get("name"): w for w in widgets}
+    # The matched brace is a state marker on one character, held to 3:1 as the caret is; the other targets draw it
+    # on braceBg in the colour of the bracket.
+    pairs = [(widget, styles[widget].get("fgColor"), styles[widget].get("bgColor"), minimum)
+             for widget, minimum in (("Default Style", 4.5), ("Brace highlight style", 3), ("Bad brace colour", 4.5),
+                                     ("Inactive tabs", 4.5), ("Selected text colour", 4.5))]
+    lexers = root.findall("LexerStyles/LexerType")
+    if [x.get("name") for x in lexers] != [x["name"] for x in model["lexers"]]:
+        fail("the LexerTypes are not those of notepadpp.json")
+    for lexer, spec in zip(lexers, model["lexers"]):
+        words = lexer.findall("WordsStyle")
+        if [(w.get("name"), int(w.get("styleID"))) for w in words] != [(s["name"], s["id"]) for s in spec["styles"]]:
+            fail(f"the styles of {spec['name']} are not those of notepadpp.json")
+        for w in words:
+            if w.get("fgColor") is None or heritage.notepadpp.decorative(spec["name"], w.get("name")):
+                continue
+            # A style with COLORSTYLE_FOREGROUND alone is drawn on the Default Style's background.
+            own = w.get("colorStyle") != str(heritage.notepadpp.COLORSTYLE_FOREGROUND)
+            background = w.get("bgColor") if own else styles["Default Style"].get("bgColor")
+            minimum = 3 if w.get("fgColor") == p["comment"] else 4.5
+            pairs.append((f"{spec['name']} {w.get('name')}", w.get("fgColor"), background, minimum))
+    for element in root.iter():
+        for key in ("fgColor", "bgColor"):
+            if element.get(key) is not None and not NOTEPADPP_HEX.fullmatch(element.get(key)):
+                fail(f"{element.get('name')} has {key} {element.get(key)!r}")
+        if element.get("fontStyle") not in (None, *map(str, range(8))):
+            fail(f"{element.get('name')} has fontStyle {element.get('fontStyle')!r}")
+    for style, fg, bg, minimum in pairs:
+        ratio = contrast(fg, bg)
+        if ratio < minimum:
+            fail(f"{style} is {ratio:.2f}:1 on its background, needs {minimum}:1")
+
+
+def pack_notepadpp(directory):
+    """Zips the themes, README, changelog and licence into a folder, and returns the zip's path. A zip keeps the file
+    names, which Notepad++ lists the themes by; GitHub would rename loose release files to ASCII without spaces."""
+    return pack_folder(directory, os.path.join(OUT, f"{NOTEPADPP_NAME}-{VERSION}.zip"), NOTEPADPP_NAME)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Build the JetBrains plugin, the VS Code extension, the Sublime Text "
-                                                 "package, the Zed extension and the Neovim plugin.")
+                                                 "package, the Zed extension, the Neovim plugin and the Notepad++ "
+                                                 "themes.")
     parser.add_argument("--vsix", action="store_true", help="also pack the VS Code extension with vsce")
     args = parser.parse_args()
     families = heritage.load_families()
@@ -793,6 +945,9 @@ def main():
     nvim_plugin = build_nvim(families)
     validate_nvim(nvim_plugin, families)
     print(f"{pack_nvim(nvim_plugin)}: {len(themes)} themes", flush=True)
+    notepadpp_themes = build_notepadpp(families)
+    validate_notepadpp(notepadpp_themes, families)
+    print(f"{pack_notepadpp(notepadpp_themes)}: {len(themes)} themes", flush=True)
     if args.vsix:
         print(f"{pack_vsix(extension, themes)}: {len(themes)} themes")
 

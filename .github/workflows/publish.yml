@@ -26,6 +26,7 @@ jobs:
       sublime: ${{ steps.check.outputs.sublime }}
       zed: ${{ steps.check.outputs.zed }}
       nvim: ${{ steps.check.outputs.nvim }}
+      notepadpp: ${{ steps.check.outputs.notepadpp }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -44,14 +45,15 @@ jobs:
             echo "::error::$GITHUB_REF_NAME does not point at a commit on master"
             exit 1
           fi
-          jetbrains=false vscode=false sublime=false zed=false nvim=false
+          jetbrains=false vscode=false sublime=false zed=false nvim=false notepadpp=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" sublime/CHANGELOG.md && sublime=true
           grep -q "^## \[$version\]" zed/CHANGELOG.md && zed=true
           grep -q "^## \[$version\]" nvim/CHANGELOG.md && nvim=true
+          grep -q "^## \[$version\]" notepadpp/CHANGELOG.md && notepadpp=true
           if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$sublime" = false ] && [ "$zed" = false ] \
-              && [ "$nvim" = false ]; then
+              && [ "$nvim" = false ] && [ "$notepadpp" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -62,6 +64,7 @@ jobs:
             echo "sublime=$sublime"
             echo "zed=$zed"
             echo "nvim=$nvim"
+            echo "notepadpp=$notepadpp"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -439,8 +442,30 @@ jobs:
           path: build/heritage-themes-nvim-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # Notepad++ has no theme registry: users install the theme files from the zip that the GitHub release
+  # attaches (docs/releasing.md).
+  notepadpp:
+    needs: check
+    if: needs.check.outputs.notepadpp == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: notepadpp
+          path: build/heritage-themes-notepadpp-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   release:
-    needs: [check, jetbrains, vscode, sublime, zed, nvim]
+    needs: [check, jetbrains, vscode, sublime, zed, nvim, notepadpp]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -448,7 +473,8 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.vscode.result)
       && contains(fromJSON('["success", "skipped"]'), needs.sublime.result)
       && contains(fromJSON('["success", "skipped"]'), needs.zed.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.nvim.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.nvim.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.notepadpp.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -459,6 +485,7 @@ jobs:
       SUBLIME: ${{ needs.check.outputs.sublime }}
       ZED: ${{ needs.check.outputs.zed }}
       NVIM: ${{ needs.check.outputs.nvim }}
+      NOTEPADPP: ${{ needs.check.outputs.notepadpp }}
     steps:
       - uses: actions/checkout@v7
 
@@ -515,6 +542,7 @@ jobs:
             notes "Sublime Text package" "$SUBLIME" sublime/CHANGELOG.md "heritage-themes-sublime-<version>.sublime-package"
             notes "Zed extension" "$ZED" zed/CHANGELOG.md "heritage-themes-zed-<version>.zip"
             notes "Neovim plugin" "$NVIM" nvim/CHANGELOG.md "heritage-themes-nvim-<version>.zip"
+            notes "Notepad++ themes" "$NOTEPADPP" notepadpp/CHANGELOG.md "heritage-themes-notepadpp-<version>.zip"
           } > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \
