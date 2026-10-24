@@ -33,6 +33,16 @@ done
 
 fail() { echo "release: $*" >&2; exit 1; }
 
+# The first Python 3 that runs. On Windows, python3 can be the Microsoft Store placeholder, which fails.
+python=""
+for candidate in python3 python py; do
+  if "$candidate" -c 'import sys; sys.exit(sys.version_info < (3,))' >/dev/null 2>&1; then
+    python=$candidate
+    break
+  fi
+done
+[ -n "$python" ] || fail "Python 3 not found"
+
 # Succeeds when the changelog has at least one entry under [Unreleased].
 has_unreleased() {
   awk '/^## \[Unreleased\]/ {on = 1; next} /^## \[/ {on = 0} on && /^- / {found = 1} END {exit !found}' "$1"
@@ -98,7 +108,7 @@ for changelog in "${changelogs[@]}"; do
   sed -i "0,/^## \[Unreleased\]/s//## [Unreleased]\n\n## [$version] - $(date +%F)/" "$changelog"
 done
 
-python3 build.py --vsix
+"$python" build.py --vsix
 
 included=""
 for i in "${!products[@]}"; do
