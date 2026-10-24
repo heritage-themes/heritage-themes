@@ -1,7 +1,8 @@
 # Releasing
 
-The JetBrains plugin, the VS Code extension, the Sublime Text package and the Zed extension share
-one version, `VERSION` in `build.py`, and one `v<version>` tag. Each has its own changelog:
+The JetBrains plugin, the VS Code extension, the Sublime Text package, the Zed extension and the
+Neovim plugin share one version, `VERSION` in `build.py`, and one `v<version>` tag. Each has its own
+changelog:
 
 | Product | Changelog | Publishes to |
 |---|---|---|
@@ -9,6 +10,7 @@ one version, `VERSION` in `build.py`, and one `v<version>` tag. Each has its own
 | VS Code extension | `vscode/CHANGELOG.md` | VS Marketplace, Open VSX |
 | Sublime Text package | `sublime/CHANGELOG.md` | Package repository, listed on Package Control |
 | Zed extension | `zed/CHANGELOG.md` | Extension repository, listed in Zed's extension registry by a pull request |
+| Neovim plugin | `nvim/CHANGELOG.md` | Plugin repository, which plugin managers install from |
 
 A release includes each product whose changelog has entries under `[Unreleased]`. A product
 without entries is not published and skips that version number: after 1.3.0 for all and 1.3.1 for
@@ -27,7 +29,7 @@ Work on `dev`. `master` receives commits only when a release is cut.
 | Workflow | Runs on | Does |
 |---|---|---|
 | `build.yml` (Build) | Push to `master`, every pull request, manual run | `python3 build.py --vsix`, which also validates every product and its theme files |
-| `publish.yml` (Publish) | Push of a `v<digit>…` tag | Checks the tag; for each included product builds and publishes it (the plugin signed, the Sublime Text package and the Zed extension pushed to their repositories, the Zed registry pull request opened); creates the GitHub release |
+| `publish.yml` (Publish) | Push of a `v<digit>…` tag | Checks the tag; for each included product builds and publishes it (the plugin signed, the Sublime Text package, the Zed extension and the Neovim plugin pushed to their repositories, the Zed registry pull request opened); creates the GitHub release |
 | `vscode-identity.yml` (VS Marketplace identity) | Manual run | Prints the Marketplace ID of the identity Publish signs in as |
 
 A push to `dev` runs nothing. Run the same check locally with `python3 build.py --vsix`.
@@ -35,7 +37,7 @@ A push to `dev` runs nothing. Run the same check locally with `python3 build.py 
 ## Cut a release
 
 1. Add the changes under `[Unreleased]` in the changelog of each product they affect: a change to a
-   palette or a new theme goes in all four. Commit and push `dev`.
+   palette or a new theme goes in all five. Commit and push `dev`.
 2. Run the release script on `dev`:
 
    ```bash
@@ -286,3 +288,21 @@ That repository contains generated files only; every publish replaces its conten
    checkout of `heritage-themes-zed`. The registry requires a manual test at the submitted commit.
 
 Once the entry is merged, Publish opens the pull request for each later release.
+
+## One-time setup: Neovim plugin
+
+Neovim's plugin managers, such as lazy.nvim and `vim.pack`, install a plugin from a public repository
+that holds it at its root, and pick a release by its `v<version>` tag. Publish pushes the generated
+plugin to a separate repository and tags it there. That repository contains generated files only;
+every publish replaces its contents. Neovim has no plugin registry to submit to.
+
+1. Create the public repository `heritage-themes/heritage-themes.nvim` with a first commit on its
+   default branch, for example a README, which the first publish replaces.
+2. Create a fine-grained personal access token with **Contents: Read and write** on that repository
+   only, and store it as the repository secret `NVIM_REPO_TOKEN`:
+
+   ```bash
+   gh secret set NVIM_REPO_TOKEN -R heritage-themes/heritage-themes
+   ```
+
+3. Cut a release that includes the plugin. Publish pushes the files and the tag `v<version>`.

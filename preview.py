@@ -1,10 +1,11 @@
 """Writes the preview page of each theme family and, with --png, renders it to PNG.
 
-Usage: python3 preview.py [--vscode | --sublime | --zed] [--png] [THEME ...]
+Usage: python3 preview.py [--vscode | --sublime | --zed | --nvim] [--png] [THEME ...]
   THEME      a theme folder, for example shuimo; default: every theme folder
   --vscode   write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --sublime  write the Sublime Text preview instead of the IntelliJ one; needs bat
   --zed      write the Zed preview instead of the IntelliJ one; needs a C compiler (cc)
+  --nvim     write the Neovim preview instead of the IntelliJ one; needs Neovim and a C compiler (cc)
   --png      also render the page to PNG; needs Google Chrome or Chromium, and ImageMagick
 
 The IntelliJ page goes to themes/<theme>/build/preview.html and its PNG to themes/<theme>/preview.png, the
@@ -14,8 +15,11 @@ The Sublime Text page goes to themes/<theme>/build/preview-sublime.html. bat tok
 .sublime-syntax files it bundles, which are Sublime Text's own for most languages, and colours them with the
 generated scheme converted to a .tmTheme. The Zed page goes to themes/<theme>/build/preview-zed.html. It is coloured
 by scripts/zed/tokens.py, which runs in a virtual environment that preview.py creates in scripts/zed/.venv from the
-pinned requirements.txt, and keeps the grammars it compiles in ~/.cache/heritage-themes/zed. All pages use
-JetBrains Mono, downloaded once from the pinned release below into ~/.cache/heritage-themes.
+pinned requirements.txt, and keeps the grammars it compiles in ~/.cache/heritage-themes/zed. The Neovim page goes to
+themes/<theme>/build/preview-nvim.html. It is drawn by Neovim itself through scripts/nvim/screen.py, which runs in
+scripts/nvim/.venv in the same way and keeps nvim-treesitter and the grammars it compiles in
+~/.cache/heritage-themes/nvim. All pages use JetBrains Mono, downloaded once from the pinned release below into
+~/.cache/heritage-themes.
 """
 import argparse, hashlib, json, os, plistlib, re, shutil, subprocess, sys, tempfile, urllib.request, zipfile
 
@@ -29,6 +33,7 @@ from heritage.zed import theme as zed_theme
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SHIKI = os.path.join(ROOT, "scripts", "shiki")
 ZED = os.path.join(ROOT, "scripts", "zed")
+NVIM = os.path.join(ROOT, "scripts", "nvim")
 FONT_URL = "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip"
 FONT_SHA256 = "6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf"
 CACHE = os.path.join(os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "heritage-themes")
@@ -163,23 +168,50 @@ def sublime_tokens(family):
         return out
 
 
+def venv_python(folder, module):
+    """The Python of folder/.venv, created with folder/requirements.txt installed when module does not import."""
+    venv = os.path.join(folder, ".venv")
+    python = os.path.join(venv, "bin", "python")
+    if not os.path.isfile(python):
+        subprocess.run([sys.executable, "-m", "venv", venv], check=True)
+    if subprocess.run([python, "-c", f"import {module}"], capture_output=True).returncode:
+        subprocess.run([python, "-m", "pip", "install", "--quiet", "--disable-pip-version-check", "-r",
+                        os.path.join(folder, "requirements.txt")], check=True)
+    return python
+
+
 def zed_tokens(family):
     """Per theme of the family, the samples coloured by scripts/zed/tokens.py with its Zed theme, in the shape that
     vscode_tokens returns."""
     tool("cc")
-    venv = os.path.join(ZED, ".venv")
-    python = os.path.join(venv, "bin", "python")
-    if not os.path.isfile(python):
-        subprocess.run([sys.executable, "-m", "venv", venv], check=True)
-    if subprocess.run([python, "-c", "import tree_sitter"], capture_output=True).returncode:
-        subprocess.run([python, "-m", "pip", "install", "--quiet", "--disable-pip-version-check", "-r",
-                        os.path.join(ZED, "requirements.txt")], check=True)
+    python = venv_python(ZED, "tree_sitter")
     request = dict(themes=[zed_theme(t["palette"]) for t in family.THEMES],
                    samples=[dict(suffix=name.rsplit(".", 1)[1], code=plain(code)) for name, _, code in SAMPLES])
     result = subprocess.run([python, "-I", os.path.join(ZED, "tokens.py"), os.path.join(CACHE, "zed")],
                             input=json.dumps(request), capture_output=True, text=True, encoding="utf-8")
     if result.returncode:
         raise SystemExit(f"preview: tokens.py failed:\n{result.stderr}")
+    return json.loads(result.stdout)
+
+
+def nvim_tokens(family):
+    """Per theme of the family, the samples as Neovim draws them with its colour scheme, through scripts/nvim/screen.py,
+    in the shape that vscode_tokens returns."""
+    tool("cc")
+    tool("nvim")
+    python = venv_python(NVIM, "msgpack")
+    with tempfile.TemporaryDirectory() as plugin:
+        os.makedirs(os.path.join(plugin, "colors"))
+        for t in family.THEMES:
+            scheme = heritage.nvim.name(t)
+            with open(os.path.join(plugin, "colors", f"{scheme}.lua"), "w") as f:
+                f.write(heritage.nvim.colorscheme(t["palette"], scheme, f"themes/{heritage.folder(family)}"))
+        request = dict(schemes=[heritage.nvim.name(t) for t in family.THEMES],
+                       samples=[dict(name=name, code=plain(code)) for name, _, code in SAMPLES])
+        result = subprocess.run([python, "-I", os.path.join(NVIM, "screen.py"), os.path.join(CACHE, "nvim"), plugin],
+                                input=json.dumps(request), capture_output=True, text=True, encoding="utf-8")
+    if result.returncode:
+        raise SystemExit(f"preview: screen.py failed:\n{result.stderr}")
     return json.loads(result.stdout)
 
 
@@ -206,6 +238,7 @@ def main():
     kind.add_argument("--vscode", action="store_true", help="write the VS Code preview")
     kind.add_argument("--sublime", action="store_true", help="write the Sublime Text preview")
     kind.add_argument("--zed", action="store_true", help="write the Zed preview")
+    kind.add_argument("--nvim", action="store_true", help="write the Neovim preview")
     parser.add_argument("--png", action="store_true", help="also render the page to PNG")
     parser.add_argument("themes", nargs="*", metavar="THEME", help="theme folders; default: all")
     args = parser.parse_args()
@@ -217,9 +250,10 @@ def main():
         out = os.path.join(heritage.THEMES, name, "build")
         install_fonts(os.path.join(out, FONT_DIR))
         family = families[name]
-        target = "vscode" if args.vscode else "sublime" if args.sublime else "zed" if args.zed else None
+        target = ("vscode" if args.vscode else "sublime" if args.sublime else "zed" if args.zed
+                  else "nvim" if args.nvim else None)
         page_path = os.path.join(out, f"preview-{target}.html" if target else "preview.html")
-        tokens = {"vscode": vscode_tokens, "sublime": sublime_tokens, "zed": zed_tokens}.get(
+        tokens = {"vscode": vscode_tokens, "sublime": sublime_tokens, "zed": zed_tokens, "nvim": nvim_tokens}.get(
             target, lambda family: None)(family)
         with open(page_path, "w", encoding="utf-8") as f:
             f.write(page(family, tokens, target))

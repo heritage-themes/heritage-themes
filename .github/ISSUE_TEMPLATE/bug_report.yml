@@ -1,5 +1,5 @@
 name: Bug report
-description: A colour, contrast or readability problem in a theme, or a fault in the plugin or extension.
+description: A colour, contrast or readability problem in a theme, or a fault in the plugin, extension or package.
 labels: [bug]
 body:
   - type: input
@@ -20,20 +20,21 @@ body:
         - Other VS Code-compatible editor
         - Sublime Text
         - Zed
+        - Neovim
     validations:
       required: true
   - type: input
     id: editor-version
     attributes:
       label: Editor name and version
-      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Sublime Text 4200 or Zed 1.25.
+      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Sublime Text 4200, Zed 1.25 or Neovim 0.12.
     validations:
       required: true
   - type: input
     id: version
     attributes:
       label: Plugin or extension version
-      description: Shown in Settings | Plugins, or in the Extensions view.
+      description: Shown in Settings | Plugins, in the Extensions view, or for Neovim in your plugin manager or the tag you installed.
     validations:
       required: true
   - type: input
