@@ -52,6 +52,8 @@ NOTEPADPP_NAME = "heritage-themes-notepadpp"  # the folder in the zip
 NOTEPADPP_PROLOG = '<?xml version="1.0" encoding="UTF-8" ?>'  # Notepad++'s Themes Collection requires it first
 NOTEPADPP_HEX = re.compile(r"[0-9A-F]{6}")
 WINDOWS_NAME = re.compile(r'[^<>:"/\\|?*\x00-\x1f]+(?<![ .])')  # a file name that Windows accepts
+# The editors the themes ship to, as the READMEs name them.
+EDITORS = ("JetBrains IDEs", "VS Code", "Sublime Text", "Zed", "Neovim", "Notepad++")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -70,6 +72,12 @@ CONTRAST = (
     (("gold",), ("bgTool", "bgUi", "surface"), 3),  # IntelliJ focus ring
     (("caret",), ("bg", "caretRow"), 3),
 )
+
+
+def elsewhere(editor):
+    """The editors other than editor, for the README of its product to name the others."""
+    others = [e for e in EDITORS if e != editor]
+    return ", ".join(others[:-1]) + " and " + others[-1]
 
 
 def write_text(path, text):
@@ -240,7 +248,7 @@ Choose a theme with **Preferences: Color Theme** (`Ctrl+K Ctrl+T`; `Cmd+K Cmd+T`
 | --- | --- | --- |
 {rows}
 
-Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs: see \
+Each family's page describes its colour tradition. The same themes are available for {elsewhere("VS Code")}: see \
 [Heritage Themes on GitHub]({VENDOR_URL}).
 
 Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the theme, VS Code version, language and a screenshot.
@@ -357,8 +365,8 @@ how closely that package follows [Sublime Text's scope naming](https://www.subli
 | --- | --- | --- |
 {rows}
 
-Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs and VS Code: see \
-[Heritage Themes on GitHub]({VENDOR_URL}).
+Each family's page describes its colour tradition. The same themes are available for {elsewhere("Sublime Text")}: \
+see [Heritage Themes on GitHub]({VENDOR_URL}).
 
 Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the scheme, Sublime Text \
 build, syntax and a screenshot.
@@ -513,8 +521,8 @@ names share the annotation colour, and keys in YAML, TOML and JSON take the fiel
 | --- | --- | --- |
 {rows}
 
-Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs, VS Code and \
-Sublime Text: see [Heritage Themes on GitHub]({VENDOR_URL}).
+Each family's page describes its colour tradition. The same themes are available for {elsewhere("Zed")}: see \
+[Heritage Themes on GitHub]({VENDOR_URL}).
 
 Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the theme, Zed version, \
 language and a screenshot.
@@ -673,8 +681,8 @@ vim.api.nvim_create_autocmd("ColorScheme", {{
 | --- | --- | --- |
 {rows}
 
-Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs, VS Code, \
-Sublime Text, Zed and Notepad++: see [Heritage Themes on GitHub]({VENDOR_URL}).
+Each family's page describes its colour tradition. The same themes are available for {elsewhere("Neovim")}: see \
+[Heritage Themes on GitHub]({VENDOR_URL}).
 
 Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the colour scheme, \
 Neovim version, language and a screenshot.
@@ -800,8 +808,8 @@ colour until a release of the themes sets it.
 | --- | --- | --- |
 {rows}
 
-Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs, VS Code, \
-Sublime Text, Zed and Neovim: see [Heritage Themes on GitHub]({VENDOR_URL}).
+Each family's page describes its colour tradition. The same themes are available for {elsewhere("Notepad++")}: see \
+[Heritage Themes on GitHub]({VENDOR_URL}).
 
 Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the theme, Notepad++ \
 version, language and a screenshot.
