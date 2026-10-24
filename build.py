@@ -294,7 +294,7 @@ def validate_vscode(directory, themes):
 
 def pack_vsix(directory, themes):
     """Packs the extension with the pinned vsce and returns the .vsix path."""
-    vsce = os.path.join(VSCODE_TOOLS, "node_modules", ".bin", "vsce")
+    vsce = os.path.join(VSCODE_TOOLS, "node_modules", ".bin", "vsce.cmd" if os.name == "nt" else "vsce")
     if not os.path.isfile(vsce):
         npm = shutil.which("npm")
         if not npm:
