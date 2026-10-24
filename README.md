@@ -84,6 +84,8 @@ Download `heritage-themes-notepadpp-<version>.zip` from the [latest GitHub relea
 
 Requires Python 3. `--vsix` also needs Node.js 22 or later and npm; it installs vsce, pinned in `scripts/vscode/`, on first use.
 
+On Windows, run the scripts with `python` or `py` in place of `python3`: `python3` can resolve to the Microsoft Store placeholder, which fails with "Python was not found". Every command below works that way, for example `python build.py`.
+
 ```bash
 python3 build.py          # JetBrains plugin, VS Code extension folder, Sublime Text package, Zed extension, Neovim plugin
                           # and Notepad++ themes
