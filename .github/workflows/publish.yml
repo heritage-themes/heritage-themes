@@ -25,6 +25,7 @@ jobs:
       vscode: ${{ steps.check.outputs.vscode }}
       sublime: ${{ steps.check.outputs.sublime }}
       zed: ${{ steps.check.outputs.zed }}
+      nvim: ${{ steps.check.outputs.nvim }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -43,12 +44,14 @@ jobs:
             echo "::error::$GITHUB_REF_NAME does not point at a commit on master"
             exit 1
           fi
-          jetbrains=false vscode=false sublime=false zed=false
+          jetbrains=false vscode=false sublime=false zed=false nvim=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" sublime/CHANGELOG.md && sublime=true
           grep -q "^## \[$version\]" zed/CHANGELOG.md && zed=true
-          if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$sublime" = false ] && [ "$zed" = false ]; then
+          grep -q "^## \[$version\]" nvim/CHANGELOG.md && nvim=true
+          if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$sublime" = false ] && [ "$zed" = false ] \
+              && [ "$nvim" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -58,6 +61,7 @@ jobs:
             echo "vscode=$vscode"
             echo "sublime=$sublime"
             echo "zed=$zed"
+            echo "nvim=$nvim"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -376,15 +380,75 @@ jobs:
           path: build/heritage-themes-zed-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  nvim:
+    needs: check
+    if: needs.check.outputs.nvim == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      # Neovim's plugin managers install from this repository, which holds the plugin at its root (docs/releasing.md).
+      NVIM_REPOSITORY: heritage-themes/heritage-themes.nvim
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Check release secrets
+        shell: bash
+        env:
+          NVIM_REPO_TOKEN: ${{ secrets.NVIM_REPO_TOKEN }}
+        run: |
+          if [ -z "$NVIM_REPO_TOKEN" ]; then
+            echo "::error::Repository secret NVIM_REPO_TOKEN is empty or not set"
+            exit 1
+          fi
+
+      - run: python3 build.py
+
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ env.NVIM_REPOSITORY }}
+          token: ${{ secrets.NVIM_REPO_TOKEN }}
+          path: nvim-repository
+          fetch-depth: 0
+
+      # Plugin managers read the tags: lazy.nvim's version = "*" and vim.pack's version ranges need v<semver>.
+      - name: Publish to the Neovim plugin repository
+        shell: bash
+        run: |
+          cd nvim-repository
+          if git rev-parse -q --verify "refs/tags/v$VERSION" > /dev/null; then
+            echo "$NVIM_REPOSITORY is already tagged v$VERSION"
+            exit 0
+          fi
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -r ../build/nvim/. .
+          git add --all
+          if ! git diff --cached --quiet; then
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit --message "Release $VERSION" \
+              --message "Generated from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+          fi
+          git tag "v$VERSION"
+          git push origin HEAD "refs/tags/v$VERSION"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nvim
+          path: build/heritage-themes-nvim-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   release:
-    needs: [check, jetbrains, vscode, sublime, zed]
+    needs: [check, jetbrains, vscode, sublime, zed, nvim]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
       && contains(fromJSON('["success", "skipped"]'), needs.jetbrains.result)
       && contains(fromJSON('["success", "skipped"]'), needs.vscode.result)
       && contains(fromJSON('["success", "skipped"]'), needs.sublime.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.zed.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.zed.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.nvim.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -394,6 +458,7 @@ jobs:
       VSCODE: ${{ needs.check.outputs.vscode }}
       SUBLIME: ${{ needs.check.outputs.sublime }}
       ZED: ${{ needs.check.outputs.zed }}
+      NVIM: ${{ needs.check.outputs.nvim }}
     steps:
       - uses: actions/checkout@v7
 
@@ -449,6 +514,7 @@ jobs:
             notes "VS Code extension" "$VSCODE" vscode/CHANGELOG.md "heritage-themes-vscode-<version>.vsix"
             notes "Sublime Text package" "$SUBLIME" sublime/CHANGELOG.md "heritage-themes-sublime-<version>.sublime-package"
             notes "Zed extension" "$ZED" zed/CHANGELOG.md "heritage-themes-zed-<version>.zip"
+            notes "Neovim plugin" "$NVIM" nvim/CHANGELOG.md "heritage-themes-nvim-<version>.zip"
           } > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \

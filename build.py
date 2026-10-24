@@ -1,5 +1,5 @@
-"""Builds the Heritage Themes JetBrains plugin, VS Code extension, Sublime Text package and Zed extension from every
-theme folder.
+"""Builds the Heritage Themes JetBrains plugin, VS Code extension, Sublime Text package, Zed extension and Neovim plugin
+from every theme folder.
 
 A theme folder is any directory in themes/ containing a theme.py (see heritage/__init__.py).
 
@@ -17,8 +17,8 @@ import heritage
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
 CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
-# One version for the JetBrains plugin, the VS Code extension, the Sublime Text package and the Zed extension. A release
-# publishes each product whose changelog has a section for it; see docs/releasing.md.
+# One version for the JetBrains plugin, the VS Code extension, the Sublime Text package, the Zed extension and the
+# Neovim plugin. A release publishes each product whose changelog has a section for it; see docs/releasing.md.
 VERSION = "1.3.2"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 DESCRIPTION = "Colour themes drawn from the colour traditions of different cultures."
@@ -42,6 +42,10 @@ ZED_CHANGELOG = os.path.join(ROOT, "zed", "CHANGELOG.md")
 ZED_ID = "heritage-theme"  # the extension's ID in Zed's extension registry
 ZED_REPOSITORY_URL = "https://github.com/heritage-themes/heritage-themes-zed"
 ZED_HEX = re.compile(r"#[0-9A-F]{6}([0-9A-F]{2})?")
+NVIM_CHANGELOG = os.path.join(ROOT, "nvim", "CHANGELOG.md")
+NVIM_NAME = "heritage-themes.nvim"  # the plugin's repository, which plugin managers install from
+NVIM_REPOSITORY_URL = f"https://github.com/heritage-themes/{NVIM_NAME}"
+NVIM_HEX = re.compile(r"#[0-9A-F]{6}")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -581,9 +585,176 @@ def pack_zed(directory):
     return package
 
 
+def nvim_readme(families):
+    """The plugin repository's README. Links are absolute, as the repository holds the build only."""
+    rows = "\n".join(f"| [{f.FAMILY}]({VENDOR_URL}/tree/master/themes/{heritage.folder(f)}) "
+                     f"| {', '.join(f'`{heritage.nvim.name(t)}`' for t in f.THEMES)} | {f.BLURB} |" for f in families)
+    count = sum(len(f.THEMES) for f in families)
+    repository = NVIM_REPOSITORY_URL.removeprefix("https://github.com/")
+    return f"""# Heritage Themes
+
+{DESCRIPTION} {count} dark and light colour schemes in {len(families)} families; each family maps the named colours \
+of one tradition to syntax roles.
+
+This repository holds the Neovim plugin that [Heritage Themes]({VENDOR_URL}) generates for each release. Report \
+problems and make changes there.
+
+## Install
+
+The plugin needs Neovim 0.10 or later and a terminal with 24-bit colour, for which Neovim turns on `termguicolors` \
+itself.
+
+With [lazy.nvim](https://github.com/folke/lazy.nvim):
+
+```lua
+{{
+  "{repository}",
+  lazy = false,
+  priority = 1000,
+  config = function()
+    vim.cmd.colorscheme("heritage-holi-night")
+  end,
+}}
+```
+
+With `vim.pack`, built into Neovim 0.12:
+
+```lua
+vim.pack.add({{ "{NVIM_REPOSITORY_URL}" }})
+vim.cmd.colorscheme("heritage-holi-night")
+```
+
+Without a plugin manager, unzip `heritage-themes-nvim-<version>.zip` from the \
+[latest release]({VENDOR_URL}/releases/latest) into `~/.local/share/nvim/site/pack/heritage/start/`.
+
+Run `:colorscheme heritage-` and press `Tab` to list the schemes. Each scheme sets `background` to its own \
+brightness.
+
+## What is coloured
+
+Each scheme colours the editor, Tree-sitter captures, LSP semantic tokens, diagnostics, the status line, tab line, \
+window bar, floating windows, the completion menu, diff mode and the terminal. It also colours the signs of \
+[gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim), and ships a \
+[lualine](https://github.com/nvim-lualine/lualine.nvim) theme of the same name, which lualine's default `auto` theme \
+loads.
+
+Code is coloured by Tree-sitter once a parser for its language is installed, for example with \
+[nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter). The groups follow the capture names of \
+nvim-treesitter's queries, so a construct takes one colour in every language: keys in YAML, TOML and JSON take the \
+field colour, and decorators, annotations and attributes the annotation colour.
+
+To change a group, set it in a `ColorScheme` autocommand, so that it survives switching schemes:
+
+```lua
+vim.api.nvim_create_autocmd("ColorScheme", {{
+  pattern = "heritage-*",
+  callback = function()
+    vim.api.nvim_set_hl(0, "Comment", {{ fg = "#808080", italic = true }})
+  end,
+}})
+```
+
+## Colour schemes
+
+| Family | Colour schemes | Tradition |
+| --- | --- | --- |
+{rows}
+
+Each family's page describes its colour tradition. The same themes are available for JetBrains IDEs, VS Code, \
+Sublime Text and Zed: see [Heritage Themes on GitHub]({VENDOR_URL}).
+
+Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the colour scheme, \
+Neovim version, language and a screenshot.
+"""
+
+
+def build_nvim(families):
+    """Writes the Neovim plugin's files to build/nvim and returns that folder."""
+    directory = os.path.join(OUT, "nvim")
+    os.makedirs(os.path.join(directory, "colors"))
+    os.makedirs(os.path.join(directory, "lua", "lualine", "themes"))
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            scheme = heritage.nvim.name(t)
+            with open(os.path.join(directory, "colors", f"{scheme}.lua"), "w") as f:
+                f.write(heritage.nvim.colorscheme(t["palette"], scheme, source))
+            with open(os.path.join(directory, "lua", "lualine", "themes", f"{scheme}.lua"), "w") as f:
+                f.write(heritage.nvim.lualine_theme(t["palette"], source))
+    with open(os.path.join(directory, "README.md"), "w") as f:
+        f.write(nvim_readme(families))
+    shutil.copy(NVIM_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_nvim(directory, families):
+    """Fails the build when a colour scheme or lualine theme is missing, a highlight definition is malformed or names an
+    undefined group, or a text colour is unreadable on the background it is drawn on."""
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Neovim plugin: {name} is missing")
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            scheme, p = heritage.nvim.name(t), t["palette"]
+            if not re.fullmatch(r"heritage(-[a-z]+)+", scheme):
+                raise SystemExit(f"Neovim: {scheme} is not a lower-case ASCII colour scheme name")
+            expected.add(scheme)
+            groups = heritage.nvim.highlights(p)
+            for group, definition in groups.items():
+                if not re.fullmatch(r"[A-Za-z0-9_.@-]+", group):
+                    raise SystemExit(f"Neovim {scheme}: {group!r} is not a valid group name")
+                for key, value in definition.items():
+                    valid = (key in heritage.nvim.COLOURS and NVIM_HEX.fullmatch(value)) or \
+                            (key in heritage.nvim.FLAGS and value is True) or \
+                            (key == "blend" and isinstance(value, int) and 0 <= value <= 100)
+                    if not valid:
+                        raise SystemExit(f"Neovim {scheme}: {group} has {key} = {value!r}")
+                if "fg" in definition and group not in heritage.nvim.DECORATIVE:
+                    background = definition.get("bg", groups["Normal"]["bg"])
+                    minimum = 3 if group in heritage.nvim.LOW_CONTRAST else 4.5
+                    ratio = contrast(definition["fg"][1:], background[1:])
+                    if ratio < minimum:
+                        raise SystemExit(f"Neovim {scheme}: {group} is {ratio:.2f}:1 on its background, "
+                                         f"needs {minimum}:1")
+            for mode, sections in heritage.nvim.lualine(p).items():
+                for section, colours in sections.items():
+                    ratio = contrast(colours["fg"][1:], colours["bg"][1:])
+                    if ratio < 4.5:
+                        raise SystemExit(f"Neovim {scheme}: lualine {mode}.{section} is {ratio:.2f}:1, needs 4.5:1")
+            terminal = heritage.nvim.terminal(p)
+            if len(terminal) != 16 or not all(NVIM_HEX.fullmatch(v) for v in terminal):
+                raise SystemExit(f"Neovim {scheme}: the terminal needs 16 hex colours")
+            with open(os.path.join(directory, "colors", f"{scheme}.lua")) as f:
+                if f"vim.g.colors_name = \"{scheme}\"" not in f.read():
+                    raise SystemExit(f"Neovim colors/{scheme}.lua does not set its colors_name")
+    for folder in ("colors", os.path.join("lua", "lualine", "themes")):
+        found = {name.removesuffix(".lua") for name in os.listdir(os.path.join(directory, folder))}
+        if found != expected:
+            raise SystemExit(f"Neovim {folder}: {len(found)} files for {len(expected)} themes")
+
+
+def pack_nvim(directory):
+    """Zips the plugin into a folder that Neovim loads from a pack/*/start directory, and returns the zip's path. The
+    entries are sorted and carry a fixed time, so the same sources give the same bytes."""
+    package = os.path.join(OUT, f"{VSCODE_NAME}-nvim-{VERSION}.zip")
+    with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as z:
+        for root, folders, files in os.walk(directory):
+            folders.sort()
+            for name in sorted(files):
+                path = os.path.join(root, name)
+                info = zipfile.ZipInfo(os.path.join(NVIM_NAME, os.path.relpath(path, directory)),
+                                       date_time=(2020, 1, 1, 0, 0, 0))
+                info.compress_type, info.external_attr = zipfile.ZIP_DEFLATED, 0o644 << 16
+                with open(path, "rb") as f:
+                    z.writestr(info, f.read())
+    return package
+
+
 def main():
     parser = argparse.ArgumentParser(description="Build the JetBrains plugin, the VS Code extension, the Sublime Text "
-                                                 "package and the Zed extension.")
+                                                 "package, the Zed extension and the Neovim plugin.")
     parser.add_argument("--vsix", action="store_true", help="also pack the VS Code extension with vsce")
     args = parser.parse_args()
     families = heritage.load_families()
@@ -625,6 +796,9 @@ def main():
     zed_extension = build_zed(families)
     validate_zed(zed_extension, themes)
     print(f"{pack_zed(zed_extension)}: {len(themes)} themes", flush=True)
+    nvim_plugin = build_nvim(families)
+    validate_nvim(nvim_plugin, families)
+    print(f"{pack_nvim(nvim_plugin)}: {len(themes)} themes", flush=True)
     if args.vsix:
         print(f"{pack_vsix(extension, themes)}: {len(themes)} themes")
 

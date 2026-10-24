@@ -1,6 +1,6 @@
 # Heritage Themes
 
-Colour themes for IntelliJ-based IDEs, VS Code, Sublime Text and Zed, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Sublime Text package (`Heritage Themes`) and one Zed extension (`heritage-themes`).
+Colour themes for IntelliJ-based IDEs, VS Code, Sublime Text, Zed and Neovim, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Sublime Text package (`Heritage Themes`), one Zed extension (`heritage-theme`) and one Neovim plugin (`heritage-themes/heritage-themes.nvim`).
 
 | Folder | Themes | Country |
 | --- | --- | --- |
@@ -64,14 +64,24 @@ Run **Package Control: Install Package** and choose **Heritage Themes**, then **
 
 ### Zed
 
-Install **Heritage Themes** from the Extensions page (**zed: extensions**), then choose a theme with **theme selector: toggle** (`Ctrl+K Ctrl+T`). To install from the latest GitHub release instead, unzip `heritage-themes-zed-<version>.zip`, run **zed: install dev extension** and select the unzipped `heritage-themes` folder. Each theme colours the editor, panels, tabs, title and status bars, terminal and popups.
+Install **Heritage Themes** from the Extensions page (**zed: extensions**), then choose a theme with **theme selector: toggle** (`Ctrl+K Ctrl+T`). To install from the latest GitHub release instead, unzip `heritage-themes-zed-<version>.zip`, run **zed: install dev extension** and select the unzipped `heritage-theme` folder. Each theme colours the editor, panels, tabs, title and status bars, terminal and popups.
+
+### Neovim
+
+Install `heritage-themes/heritage-themes.nvim` with a plugin manager, for example with [lazy.nvim](https://github.com/folke/lazy.nvim):
+
+```lua
+{ "heritage-themes/heritage-themes.nvim", lazy = false, priority = 1000 }
+```
+
+Then choose a theme with `:colorscheme heritage-<theme>`, for example `:colorscheme heritage-holi-night`; press `Tab` after `heritage-` to list them. To install from the latest GitHub release instead, unzip `heritage-themes-nvim-<version>.zip` into `~/.local/share/nvim/site/pack/heritage/start/`. Each colour scheme colours the editor, Tree-sitter and LSP semantic highlights, diagnostics, the status line, tab line, floating windows, the completion menu, diff mode and the terminal; it comes with a lualine theme of the same name and colours the signs of gitsigns.nvim. Neovim 0.10 or later in a terminal with 24-bit colour is required.
 
 ## Build from source
 
 Requires Python 3. `--vsix` also needs Node.js 22 or later and npm; it installs vsce, pinned in `scripts/vscode/`, on first use.
 
 ```bash
-python3 build.py          # JetBrains plugin, VS Code extension folder, Sublime Text package and Zed extension
+python3 build.py          # JetBrains plugin, VS Code extension folder, Sublime Text package, Zed extension and Neovim plugin
 python3 build.py --vsix   # also pack the VS Code extension
 ```
 
@@ -88,8 +98,10 @@ Output in `build/`:
 | `heritage-themes-sublime-<version>.sublime-package` | The same files packed as a zip. Install this in Sublime Text |
 | `zed/` | The Zed extension: `extension.toml`, one theme family file per theme folder in `themes/`, README, changelog and licence. The release publishes this folder to the extension repository |
 | `heritage-themes-zed-<version>.zip` | The same files in a `heritage-theme/` folder. Unzip it and install the folder in Zed |
+| `nvim/` | The Neovim plugin: one colour scheme per theme in `colors/`, one lualine theme per theme in `lua/lualine/themes/`, README, changelog and licence. The release publishes this folder to the plugin repository |
+| `heritage-themes-nvim-<version>.zip` | The same files in a `heritage-themes.nvim/` folder. Unzip it into a `pack/*/start/` folder of Neovim |
 
-Install the jar, an `.icls` file, the `.vsix`, the `.sublime-package` or the Zed extension as described under [Install](#install).
+Install the jar, an `.icls` file, the `.vsix`, the `.sublime-package`, the Zed extension or the Neovim plugin as described under [Install](#install).
 
 ## Preview
 
@@ -100,6 +112,7 @@ python3 preview.py --png        # also render themes/<theme>/preview.png
 python3 preview.py --vscode     # VS Code preview: themes/<theme>/build/preview-vscode.html
 python3 preview.py --sublime    # Sublime Text preview: themes/<theme>/build/preview-sublime.html
 python3 preview.py --zed        # Zed preview: themes/<theme>/build/preview-zed.html
+python3 preview.py --nvim       # Neovim preview: themes/<theme>/build/preview-nvim.html
 ```
 
 The page shows each theme as an IDE window with a code sample per language, coloured from the generated editor scheme. It downloads JetBrains Mono once into `~/.cache/heritage-themes`. `--png` needs Google Chrome or Chromium (or the `CHROME` environment variable) and ImageMagick.
@@ -110,11 +123,13 @@ The page shows each theme as an IDE window with a code sample per language, colo
 
 `--zed` colours the samples with the Tree-sitter grammars and highlight queries that Zed and its language extensions ship, pinned in `scripts/zed/languages.json`, and the generated Zed theme. It needs a C compiler (`cc`): it creates a virtual environment with py-tree-sitter in `scripts/zed/.venv` and compiles the grammars into `~/.cache/heritage-themes/zed` on first use. Zed's language servers can add semantic colours that the page does not show. With `--png` it writes `preview-zed.png` next to the page.
 
+`--nvim` shows the samples as Neovim draws them: it runs Neovim embedded with the theme's colour schemes and nvim-treesitter, opens each sample and reads the colours from the screen Neovim sends to its UI. It needs Neovim and a C compiler (`cc`): it creates a virtual environment with msgpack in `scripts/nvim/.venv`, and downloads nvim-treesitter and compiles the grammars, pinned in `scripts/nvim/parsers.json`, into `~/.cache/heritage-themes/nvim` on first use. It fails when a colour scheme leaves a highlight group with a colour of Neovim's default scheme. Language servers can add semantic colours that the page does not show. With `--png` it writes `preview-nvim.png` next to the page.
+
 ## Layout
 
 ```text
-build.py        builds the plugin, the VS Code extension, the Sublime Text package and the Zed extension from every theme
-                folder; holds their shared version
+build.py        builds the plugin, the VS Code extension, the Sublime Text package, the Zed extension and the Neovim plugin
+                from every theme folder; holds their shared version
 preview.py      writes theme previews and renders the README images
 heritage/       code shared by every theme family
   __init__.py   finds the theme folders in themes/; the theme.py contract
@@ -124,15 +139,18 @@ heritage/       code shared by every theme family
   sublime.py    Sublime Text colour scheme: the VS Code scopes plus the scopes Sublime Text's syntaxes name differently;
                 UI theme: rules over Adaptive that give its surfaces and text palette roles
   zed.py        Zed theme: palette roles to Tree-sitter captures and UI keys
+  nvim.py       Neovim colour scheme: palette roles to highlight groups, Tree-sitter captures and LSP semantic tokens;
+                lualine theme
   preview.py    preview page
   samples.py    code samples shown in the preview
 CHANGELOG.md    JetBrains plugin release notes; the plugin's change notes come from it
 vscode/         CHANGELOG.md: VS Code extension release notes
 sublime/        CHANGELOG.md: Sublime Text package release notes
 zed/            CHANGELOG.md: Zed extension release notes
+nvim/           CHANGELOG.md: Neovim plugin release notes
 assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
 scripts/        release.sh, parent_overrides.py; shiki/ tokenises the VS Code preview; vscode/ packs and publishes the extension;
-                zed/ colours the Zed preview
+                zed/ colours the Zed preview; nvim/ draws the Neovim preview
 docs/           releasing.md, adding-a-theme.md
 .github/        Build and Publish workflows; ISSUE_TEMPLATE/ holds the issue forms
 themes/<theme>/
@@ -142,14 +160,14 @@ themes/<theme>/
 build/          generated, not tracked
 ```
 
-Only sources are tracked. Jars, zips, `.icls`, `.vsix` and `.sublime-package` files are build output; the publish workflows attach them to each GitHub release.
+Only sources are tracked. Jars, zips, `.icls`, `.vsix`, `.sublime-package` and Neovim `.lua` files are build output; the publish workflows attach them to each GitHub release.
 
 ## Git workflow
 
 - Work on `dev`. `master` receives commits only when `scripts/release.sh` cuts a release.
 - Commit subjects follow [Conventional Commits](https://www.conventionalcommits.org/), with the theme folder as the scope for a change to one theme: `fix(wuxing): soften comment contrast`. Changes outside the theme folders use a scope such as `heritage`, `build` or `ci`, or none.
 - Keep a commit within one theme folder.
-- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin, the VS Code extension, the Sublime Text package and the Zed extension share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
+- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin, the VS Code extension, the Sublime Text package, the Zed extension and the Neovim plugin share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
 
 ## Add a theme
 
