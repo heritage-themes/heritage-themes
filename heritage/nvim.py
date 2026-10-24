@@ -31,8 +31,12 @@ SHADOW = "#000000"
 
 
 def name(theme):
-    """The colour scheme name of a theme dict from a theme.py, for example "heritage-shuimo-night"."""
-    return PREFIX + re.sub(r"(?<!^)(?=[A-Z])", "-", theme["slug"]).lower()
+    """The colour scheme name of a theme dict from a theme.py, for example "heritage-shuimo-night". A palette name
+    that ends in (Dark) or (Light) adds the brightness, as in "heritage-edo-cha-dark", so the list of schemes shows it
+    as the IDE theme list does."""
+    brightness = re.search(r" \((Dark|Light)\)$", theme["palette"]["name"])
+    return (PREFIX + re.sub(r"(?<!^)(?=[A-Z])", "-", theme["slug"]).lower()
+            + (f"-{brightness[1].lower()}" if brightness else ""))
 
 
 def syntax_rules(p):
