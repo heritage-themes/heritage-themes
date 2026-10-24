@@ -12,7 +12,7 @@ Any folder in `themes/` with a `theme.py` is a theme family. `heritage.load_fami
 | `BLURB` | One sentence for the plugin description: the tradition and its main syntax mappings |
 | `THEMES` | One `dict(slug=..., id=..., palette=...)` per theme; `id` is a new UUID |
 
-From each palette, `heritage/scheme.py` builds the editor colour scheme, `heritage/ui.py` builds the UI theme, `heritage/vscode.py` builds the VS Code colour theme, `heritage/sublime.py` builds the Sublime Text colour scheme and UI theme, `heritage/zed.py` builds the Zed theme, and `heritage/nvim.py` builds the Neovim colour scheme and lualine theme. `build.py` packs the scheme and the UI theme into the JetBrains plugin, writes a standalone `.icls` per theme, adds the VS Code theme to the VS Code extension, the Sublime Text scheme and UI theme to the Sublime Text package, the family's Zed theme family file to the Zed extension, and the Neovim colour scheme, named `heritage-` and the `slug` in kebab case, to the Neovim plugin. `slug`, `id` and `name` must be unique across all themes; `build.py` fails otherwise.
+From each palette, `heritage/scheme.py` builds the editor colour scheme, `heritage/ui.py` builds the UI theme, `heritage/vscode.py` builds the VS Code colour theme, `heritage/sublime.py` builds the Sublime Text colour scheme and UI theme, `heritage/zed.py` builds the Zed theme, and `heritage/nvim.py` builds the Neovim colour scheme and lualine theme. `build.py` packs the scheme and the UI theme into the JetBrains plugin, writes a standalone `.icls` per theme, adds the VS Code theme to the VS Code extension, the Sublime Text scheme and UI theme to the Sublime Text package, the family's Zed theme family file to the Zed extension, and the Neovim colour scheme, named `heritage-` and the `slug` in kebab case plus `-dark` or `-light` when the name ends in ` (Dark)` or ` (Light)`, to the Neovim plugin. `slug`, `id` and `name` must be unique across all themes; `build.py` fails otherwise.
 
 A change in `heritage/` changes every family. After one, render all previews and check each family.
 
@@ -30,7 +30,7 @@ Names follow one pattern:
 
 The second word of a theme name is its setting in the tradition: Night and Day for Shuimo, Ink and Paper for Danqing, Baluchari and Laal Paar for Bengal.
 
-A name that does not say Night or Day ends in ` (Dark)` or ` (Light)`, matching `dark`, so the IDE theme list shows the brightness: `Edo Cha (Dark)`, `Edo Nezumi (Light)`. The `slug` omits the suffix.
+A name that does not say Night or Day ends in ` (Dark)` or ` (Light)`, matching `dark`, so the IDE theme list shows the brightness: `Edo Cha (Dark)`, `Edo Nezumi (Light)`. The Neovim scheme names carry it too: `heritage-edo-cha-dark`, `heritage-edo-nezumi-light`. The `slug` omits the suffix.
 
 ### Palette
 
