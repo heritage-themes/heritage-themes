@@ -52,10 +52,12 @@ NOTEPADPP_NAME = "heritage-themes-notepadpp"  # the folder in the zip
 NOTEPADPP_PROLOG = '<?xml version="1.0" encoding="UTF-8" ?>'  # Notepad++'s Themes Collection requires it first
 NOTEPADPP_HEX = re.compile(r"[0-9A-F]{6}")
 WINDOWS_NAME = re.compile(r'[^<>:"/\\|?*\x00-\x1f]+(?<![ .])')  # a file name that Windows accepts
-# The extension's VSIX identity, which Visual Studio matches installed extensions and updates by, and its name on the
-# Marketplace; both are fixed once published.
-VISUALSTUDIO_ID = "heritage-themes-visualstudio"
-# The extension's Marketplace name, which differs from the VS Code extension's so that the two listings do not clash.
+# The extension's VSIX identity, which Visual Studio matches installed extensions and updates by, and which the
+# Marketplace requires to be unique across all publishers; its internal name on the Marketplace, which also names the
+# .vsix; and its display name, which differs from the VS Code extension's so that the two listings do not clash. The
+# identity and the internal name are fixed once published.
+VISUALSTUDIO_ID = "HeritageThemes.0e5e1c82-df1d-4bf5-b6f9-366c6f0bb488"
+VISUALSTUDIO_ITEM = "heritage-themes-visualstudio"
 VISUALSTUDIO_NAME = "Heritage Themes for Visual Studio"
 VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
@@ -945,7 +947,7 @@ version, language and a screenshot.
 def visualstudio_publish_manifest():
     """The Marketplace listing that VsixPublisher reads with the .vsix; the rest comes from extension.vsixmanifest."""
     return {"$schema": "http://json.schemastore.org/vsix-publish", "categories": ["theme"],
-            "identity": {"internalName": VISUALSTUDIO_ID}, "overview": "README.md", "priceCategory": "free",
+            "identity": {"internalName": VISUALSTUDIO_ITEM}, "overview": "README.md", "priceCategory": "free",
             "publisher": VSCODE_PUBLISHER, "private": False, "qna": True, "repo": VENDOR_URL}
 
 
@@ -1019,7 +1021,7 @@ def validate_visualstudio(directory, listing, families):
 def pack_visualstudio(directory):
     """Zips the extension into a .vsix and returns its path. The entries are sorted and carry a fixed time, so the same
     sources give the same bytes."""
-    return heritage.visualstudio.pack(directory, os.path.join(OUT, f"{VISUALSTUDIO_ID}-{VERSION}.vsix"), zip_entry)
+    return heritage.visualstudio.pack(directory, os.path.join(OUT, f"{VISUALSTUDIO_ITEM}-{VERSION}.vsix"), zip_entry)
 
 
 def main():
