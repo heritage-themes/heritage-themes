@@ -60,7 +60,7 @@ The extension also works in VS Code forks such as Cursor, Windsurf and VSCodium,
 
 ### Visual Studio
 
-Install **Heritage Themes** from **Extensions | Manage Extensions**; it is published on the VS Marketplace. Restart Visual Studio, then choose a theme under **Tools | Theme**. To install from the latest GitHub release instead, open `heritage-themes-visualstudio-<version>.vsix`, which runs the VSIX Installer, and restart Visual Studio.
+Install **Heritage Themes for Visual Studio** from **Extensions | Manage Extensions**; it is published on the VS Marketplace. Restart Visual Studio, then choose a theme under **Tools | Theme**. To install from the latest GitHub release instead, open `heritage-themes-visualstudio-<version>.vsix`, which runs the VSIX Installer, and restart Visual Studio.
 
 Visual Studio 2026 is required. Each theme colours the window, tool windows, tabs, menus, dialogs, status bar and terminal, and the editor in every language that Visual Studio highlights. A Visual Studio theme sets colours only, so keywords and comments keep the regular font. Visual Studio colours the languages it has no language service for, such as Go, Rust, Java and shell, through TextMate grammars that it maps to a few classifications: function names there take the type colour. It has no grammar for Kotlin or TOML, which open as plain text.
 

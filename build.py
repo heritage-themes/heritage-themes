@@ -55,6 +55,8 @@ WINDOWS_NAME = re.compile(r'[^<>:"/\\|?*\x00-\x1f]+(?<![ .])')  # a file name th
 # The extension's VSIX identity, which Visual Studio matches installed extensions and updates by, and its name on the
 # Marketplace; both are fixed once published.
 VISUALSTUDIO_ID = "heritage-themes-visualstudio"
+# The extension's Marketplace name, which differs from the VS Code extension's so that the two listings do not clash.
+VISUALSTUDIO_NAME = "Heritage Themes for Visual Studio"
 VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++")
@@ -963,7 +965,7 @@ def build_visualstudio(families):
     <Icon>icon.png</Icon>
     <Tags>theme, color theme, dark theme, light theme, culture, heritage</Tags>
 """
-    heritage.visualstudio.package(directory, VISUALSTUDIO_ID, VERSION, "Heritage Themes",
+    heritage.visualstudio.package(directory, VISUALSTUDIO_ID, VERSION, VISUALSTUDIO_NAME,
                                   visualstudio_description(themes), themes, metadata)
     write_text(os.path.join(listing, "README.md"), visualstudio_readme(families))
     write_text(os.path.join(listing, "publishManifest.json"),
