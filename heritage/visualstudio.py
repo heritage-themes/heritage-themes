@@ -754,8 +754,10 @@ def check(text, p, guid):
 
 
 # A VSIX of themes for Visual Studio 2026, whose themes build on the Fluent colour tokens that earlier versions do not
-# read. It needs only the core editor, which every edition has.
-VERSIONS = "[18.0,19.0)"
+# read. It needs only the core editor, which every edition has. The Marketplace rejects 18.0 as an installation target's
+# lower bound and Visual Studio 2026 ignores the upper bound, so the target is 17.14 and the core editor prerequisite,
+# which Visual Studio 2022 does not meet, keeps the extension to Visual Studio 2026.
+VERSIONS = "[17.14,)"
 CORE_EDITOR = ("Microsoft.VisualStudio.Component.CoreEditor", "18.0")
 # The media types of the files in a VSIX, which the Open Packaging Conventions require it to list.
 CONTENT_TYPES = {"vsixmanifest": "text/xml", "pkgdef": "text/plain", "png": "application/octet-stream",
