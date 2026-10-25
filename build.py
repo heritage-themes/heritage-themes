@@ -930,7 +930,7 @@ def visualstudio_readme(families):
 one tradition to syntax roles.
 
 Choose a theme under **Tools | Theme**, or under **Tools | Options | Environment | Visual Experience | Color theme**. \
-The themes need Visual Studio 2026.
+The themes need Visual Studio 2026. Visual Studio has no language service for some languages, so they show \nfewer colours than in other editors: see [the language table]({VENDOR_URL}#visual-studio).
 
 | Family | Themes | Tradition |
 | --- | --- | --- |

@@ -62,7 +62,20 @@ The extension also works in VS Code forks such as Cursor, Windsurf and VSCodium,
 
 Install **Heritage Themes for Visual Studio** from **Extensions | Manage Extensions**; it is published on the VS Marketplace. Restart Visual Studio, then choose a theme under **Tools | Theme**. To install from the latest GitHub release instead, open `heritage-themes-visualstudio-<version>.vsix`, which runs the VSIX Installer, and restart Visual Studio.
 
-Visual Studio 2026 is required. Each theme colours the window, tool windows, tabs, menus, dialogs, status bar and terminal, and the editor in every language that Visual Studio highlights. A Visual Studio theme sets colours only, so keywords and comments keep the regular font. Visual Studio colours the languages it has no language service for, such as Go, Rust, Java and shell, through TextMate grammars that it maps to a few classifications: function names there take the type colour. It has no grammar for Kotlin or TOML, which open as plain text.
+Visual Studio 2026 is required. Each theme colours the window, tool windows, tabs, menus, dialogs, status bar and terminal, and the editor in every language that Visual Studio highlights. A Visual Studio theme sets colours only, so keywords and comments keep the regular font.
+
+Visual Studio colours only the roles that its language services and grammars classify, so some languages show fewer of the palette's colours than the same theme in VS Code or an IntelliJ-based IDE:
+
+| Languages | Colours |
+| --- | --- |
+| C#, C, C++, HTML, CSS, JSON, SQL, Vue, YAML, Markdown | Every role the language has: keywords, types, functions, fields, attributes or tags, strings, numbers and comments. |
+| TypeScript, JSX and TSX | Keywords, types, strings, regular expressions, numbers, comments and JSX tags and attributes. Function and property names take the plain text colour. |
+| Python | Keywords, types, strings, numbers and comments. Function names take the plain text colour, decorators the type colour. |
+| Java, Groovy | Keywords, types, strings, numbers and comments. Fields, constants, annotations and calls take the plain text colour. |
+| Go, Rust, shell | Keywords, types, strings, numbers and comments. A function declaration takes the type colour and a call the plain text colour; Rust attributes take the plain text colour. |
+| Kotlin, TOML | No colours: Visual Studio has no grammar for them, so they open as plain text. |
+
+A function declaration and a call have separate colours in the palette, and Visual Studio classifies them alike, so both take the call colour in C# and C++.
 
 ### Sublime Text
 
