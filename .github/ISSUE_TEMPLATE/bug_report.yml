@@ -18,6 +18,7 @@ body:
         - JetBrains IDE
         - VS Code
         - Other VS Code-compatible editor
+        - Visual Studio
         - Sublime Text
         - Zed
         - Neovim
@@ -28,14 +29,14 @@ body:
     id: editor-version
     attributes:
       label: Editor name and version
-      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Sublime Text 4200, Zed 1.25, Neovim 0.12 or Notepad++ 8.9.8.
+      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Visual Studio 2026 18.11, Sublime Text 4200, Zed 1.25, Neovim 0.12 or Notepad++ 8.9.8.
     validations:
       required: true
   - type: input
     id: version
     attributes:
       label: Plugin or extension version
-      description: Shown in Settings | Plugins, in the Extensions view, for Neovim in your plugin manager or the tag you installed, or for Notepad++ in the name of the release zip.
+      description: Shown in Settings | Plugins, in the Extensions view, in Visual Studio under Extensions | Manage Extensions, for Neovim in your plugin manager or the tag you installed, or for Notepad++ in the name of the release zip.
     validations:
       required: true
   - type: input

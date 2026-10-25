@@ -1,5 +1,5 @@
-"""Builds the Heritage Themes JetBrains plugin, VS Code extension, Sublime Text package, Zed extension, Neovim plugin
-and Notepad++ themes from every theme folder.
+"""Builds the Heritage Themes JetBrains plugin, VS Code extension, Visual Studio extension, Sublime Text package, Zed
+extension, Neovim plugin and Notepad++ themes from every theme folder.
 
 A theme folder is any directory in themes/ containing a theme.py (see heritage/__init__.py).
 
@@ -17,9 +17,9 @@ import heritage
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
 CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
-# One version for the JetBrains plugin, the VS Code extension, the Sublime Text package, the Zed extension, the Neovim
-# plugin and the Notepad++ themes. A release publishes each product whose changelog has a section for it; see
-# docs/releasing.md.
+# One version for the JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package,
+# the Zed extension, the Neovim plugin and the Notepad++ themes. A release publishes each product whose changelog has
+# a section for it; see docs/releasing.md.
 VERSION = "1.4.0"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 DESCRIPTION = "Colour themes drawn from the colour traditions of different cultures."
@@ -52,8 +52,12 @@ NOTEPADPP_NAME = "heritage-themes-notepadpp"  # the folder in the zip
 NOTEPADPP_PROLOG = '<?xml version="1.0" encoding="UTF-8" ?>'  # Notepad++'s Themes Collection requires it first
 NOTEPADPP_HEX = re.compile(r"[0-9A-F]{6}")
 WINDOWS_NAME = re.compile(r'[^<>:"/\\|?*\x00-\x1f]+(?<![ .])')  # a file name that Windows accepts
+# The extension's VSIX identity, which Visual Studio matches installed extensions and updates by, and its name on the
+# Marketplace; both are fixed once published.
+VISUALSTUDIO_ID = "heritage-themes-visualstudio"
+VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
-EDITORS = ("JetBrains IDEs", "VS Code", "Sublime Text", "Zed", "Neovim", "Notepad++")
+EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -906,10 +910,120 @@ def pack_notepadpp(directory):
     return pack_folder(directory, os.path.join(OUT, f"{NOTEPADPP_NAME}-{VERSION}.zip"), NOTEPADPP_NAME)
 
 
+def visualstudio_description(themes):
+    """The extension's description in Visual Studio's Extension Manager."""
+    return f"{DESCRIPTION} {len(themes)} dark and light themes, each drawn from the named colours of one tradition."
+
+
+def visualstudio_readme(families):
+    """The Marketplace page. Links are absolute: the Marketplace does not resolve paths in the repository."""
+    rows = "\n".join(f"| [{f.FAMILY}]({VENDOR_URL}/tree/master/themes/{heritage.folder(f)}) "
+                     f"| {', '.join(t['palette']['name'] for t in f.THEMES)} | {f.BLURB} |" for f in families)
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of \
+one tradition to syntax roles.
+
+Choose a theme under **Tools | Theme**, or under **Tools | Options | Environment | Visual Experience | Color theme**. \
+The themes need Visual Studio 2026.
+
+| Family | Themes | Tradition |
+| --- | --- | --- |
+{rows}
+
+Each family's page describes its colour tradition. The same themes are available for {elsewhere("Visual Studio")}: \
+see [Heritage Themes on GitHub]({VENDOR_URL}).
+
+Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the theme, Visual Studio \
+version, language and a screenshot.
+"""
+
+
+def visualstudio_publish_manifest():
+    """The Marketplace listing that VsixPublisher reads with the .vsix; the rest comes from extension.vsixmanifest."""
+    return {"$schema": "http://json.schemastore.org/vsix-publish", "categories": ["theme"],
+            "identity": {"internalName": VISUALSTUDIO_ID}, "overview": "README.md", "priceCategory": "free",
+            "publisher": VSCODE_PUBLISHER, "private": False, "qna": True, "repo": VENDOR_URL}
+
+
+def build_visualstudio(families):
+    """Writes the files of the Visual Studio extension's VSIX to build/visualstudio, and its Marketplace listing to
+    build/visualstudio-marketplace, and returns both folders."""
+    directory, listing = os.path.join(OUT, "visualstudio"), os.path.join(OUT, "visualstudio-marketplace")
+    os.makedirs(directory)
+    os.makedirs(listing)
+    shutil.copy(VISUALSTUDIO_ICON, os.path.join(directory, "icon.png"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE.txt"))
+    themes = [(t["slug"], t["id"], t["palette"], f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}")
+              for family in families for t in family.THEMES]
+    metadata = f"""    <MoreInfo>{VENDOR_URL}</MoreInfo>
+    <License>LICENSE.txt</License>
+    <ReleaseNotes>{VENDOR_URL}/blob/master/visualstudio/CHANGELOG.md</ReleaseNotes>
+    <Icon>icon.png</Icon>
+    <Tags>theme, color theme, dark theme, light theme, culture, heritage</Tags>
+"""
+    heritage.visualstudio.package(directory, VISUALSTUDIO_ID, VERSION, "Heritage Themes",
+                                  visualstudio_description(themes), themes, metadata)
+    write_text(os.path.join(listing, "README.md"), visualstudio_readme(families))
+    write_text(os.path.join(listing, "publishManifest.json"),
+               json.dumps(visualstudio_publish_manifest(), indent=2) + "\n")
+    return directory, listing
+
+
+def validate_visualstudio(directory, listing, families):
+    """Fails the build when the VSIX manifest is incomplete or does not list exactly the themes' .pkgdef files, a file
+    lacks a media type, or a theme does not decode to the categories and colours that heritage.visualstudio gives it,
+    sets a colour that visualstudio.json does not have, or has text that is unreadable on its background."""
+    namespace = {"v": "http://schemas.microsoft.com/developer/vsx-schema/2011"}
+    root = ET.parse(os.path.join(directory, "extension.vsixmanifest")).getroot()
+    identity = root.find("v:Metadata/v:Identity", namespace)
+    if identity is None or identity.get("Id") != VISUALSTUDIO_ID or identity.get("Version") != VERSION:
+        raise SystemExit(f"Visual Studio extension.vsixmanifest: the Identity is not {VISUALSTUDIO_ID} {VERSION}")
+    for tag in ("DisplayName", "Description", "MoreInfo", "License", "Icon", "Tags"):
+        element = root.find(f"v:Metadata/v:{tag}", namespace)
+        if element is None or not (element.text or "").strip():
+            raise SystemExit(f"Visual Studio extension.vsixmanifest: <{tag}> is missing or empty")
+    for tag in ("License", "Icon"):
+        if not os.path.isfile(os.path.join(directory, root.find(f"v:Metadata/v:{tag}", namespace).text)):
+            raise SystemExit(f"Visual Studio extension: the {tag} file is missing")
+    assets = [a.get("Path").replace("\\", "/") for a in root.findall("v:Assets/v:Asset", namespace)]
+    expected = [f"themes/{t['slug']}.pkgdef" for family in families for t in family.THEMES]
+    if sorted(assets) != sorted(expected) or sorted(os.listdir(os.path.join(directory, "themes"))) != \
+            sorted(os.path.basename(a) for a in expected):
+        raise SystemExit(f"Visual Studio extension: {len(assets)} assets for {len(expected)} themes")
+    for folder, _, files in os.walk(directory):
+        for name in files:
+            if name != "[Content_Types].xml" and name.rpartition(".")[2] not in heritage.visualstudio.CONTENT_TYPES:
+                raise SystemExit(f"Visual Studio extension: {name} has no media type in [Content_Types].xml")
+    with open(os.path.join(listing, "publishManifest.json"), encoding="utf-8") as f:
+        publish = json.load(f)
+    if not os.path.isfile(os.path.join(listing, publish["overview"])):
+        raise SystemExit("Visual Studio Marketplace listing: the overview is missing")
+    guids = set()
+    for family in families:
+        for t in family.THEMES:
+            path = os.path.join(directory, "themes", f"{t['slug']}.pkgdef")
+            with open(path, encoding="utf-8") as f:
+                text = f.read()
+            if not text.startswith(heritage.visualstudio.BOM):
+                raise SystemExit(f"Visual Studio {t['slug']}.pkgdef: does not start with a byte order mark")
+            guid = heritage.visualstudio.check(text, t["palette"], t["id"])
+            if guid in guids:
+                raise SystemExit(f"Visual Studio {t['slug']}.pkgdef: the theme GUID {guid} is not unique")
+            guids.add(guid)
+
+
+def pack_visualstudio(directory):
+    """Zips the extension into a .vsix and returns its path. The entries are sorted and carry a fixed time, so the same
+    sources give the same bytes."""
+    return heritage.visualstudio.pack(directory, os.path.join(OUT, f"{VISUALSTUDIO_ID}-{VERSION}.vsix"), zip_entry)
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Build the JetBrains plugin, the VS Code extension, the Sublime Text "
-                                                 "package, the Zed extension, the Neovim plugin and the Notepad++ "
-                                                 "themes.")
+    parser = argparse.ArgumentParser(description="Build the JetBrains plugin, the VS Code extension, the Visual Studio "
+                                                 "extension, the Sublime Text package, the Zed extension, the Neovim "
+                                                 "plugin and the Notepad++ themes.")
     parser.add_argument("--vsix", action="store_true", help="also pack the VS Code extension with vsce")
     args = parser.parse_args()
     families = heritage.load_families()
@@ -944,6 +1058,9 @@ def main():
     extension = build_vscode(families, themes)
     validate_vscode(extension, themes)
     print(f"{extension}: {len(themes)} themes", flush=True)
+    visualstudio_extension, visualstudio_listing = build_visualstudio(families)
+    validate_visualstudio(visualstudio_extension, visualstudio_listing, families)
+    print(f"{pack_visualstudio(visualstudio_extension)}: {len(themes)} themes", flush=True)
     package = build_sublime(families, themes)
     validate_sublime(package, themes)
     print(f"{pack_sublime(package)}: {len(themes)} themes", flush=True)

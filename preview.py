@@ -1,8 +1,9 @@
 """Writes the preview page of each theme family and, with --png, renders it to PNG.
 
-Usage: python3 preview.py [--vscode | --sublime | --zed | --nvim | --notepadpp] [--png] [THEME ...]
+Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
+  --visualstudio  write the Visual Studio preview instead of the IntelliJ one; needs Windows and Visual Studio 2026
   --sublime    write the Sublime Text preview instead of the IntelliJ one; needs bat
   --zed        write the Zed preview instead of the IntelliJ one; needs a C compiler (cc)
   --nvim       write the Neovim preview instead of the IntelliJ one; needs Neovim and a C compiler (cc)
@@ -21,8 +22,10 @@ themes/<theme>/build/preview-nvim.html. It is drawn by Neovim itself through scr
 scripts/nvim/.venv in the same way and keeps nvim-treesitter and the grammars it compiles in
 ~/.cache/heritage-themes/nvim. The Notepad++ page goes to themes/<theme>/build/preview-notepadpp.html. It is coloured
 by scripts/notepadpp/tokens.py, which compiles the lexers of the pinned Notepad++ source with c++ and keeps them in
-~/.cache/heritage-themes/notepadpp. All pages use JetBrains Mono, downloaded once from the pinned release below into
-~/.cache/heritage-themes.
+~/.cache/heritage-themes/notepadpp. The Visual Studio page goes to themes/<theme>/build/preview-visualstudio.html,
+with the captures it shows in themes/<theme>/build/visualstudio. scripts/visualstudio/screen.ps1 takes them in Visual
+Studio 2026 itself, in an instance of its own with the family's themes installed. All pages use JetBrains Mono,
+downloaded once from the pinned release below into ~/.cache/heritage-themes.
 """
 import argparse, hashlib, json, os, pathlib, plistlib, re, shutil, subprocess, sys, tempfile, urllib.request, zipfile
 
@@ -38,6 +41,8 @@ SHIKI = os.path.join(ROOT, "scripts", "shiki")
 ZED = os.path.join(ROOT, "scripts", "zed")
 NVIM = os.path.join(ROOT, "scripts", "nvim")
 NOTEPADPP = os.path.join(ROOT, "scripts", "notepadpp")
+VISUALSTUDIO = os.path.join(ROOT, "scripts", "visualstudio")
+VISUALSTUDIO_ID = "heritage-themes-preview"  # the identity of the VSIX that the preview installs
 FONT_URL = "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip"
 FONT_SHA256 = "6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf"
 CACHE = os.path.join(os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "heritage-themes")
@@ -233,6 +238,42 @@ def notepadpp_tokens(family):
     return json.loads(result.stdout)
 
 
+def png_size(path):
+    """(width, height) of a PNG, from its IHDR chunk."""
+    with open(path, "rb") as f:
+        header = f.read(24)
+    return int.from_bytes(header[16:20], "big"), int.from_bytes(header[20:24], "big")
+
+
+def visualstudio_captures(family, out):
+    """Per theme of the family, the samples as Visual Studio 2026 draws them, captured by
+    scripts/visualstudio/screen.ps1 into out/visualstudio: per sample, the capture's path relative to out, width and
+    height."""
+    if os.name != "nt":
+        raise SystemExit("preview: --visualstudio needs Windows and Visual Studio 2026")
+    captures = os.path.join(out, "visualstudio")
+    shutil.rmtree(captures, ignore_errors=True)
+    ids = [heritage.visualstudio.setting_id(t["palette"]["name"]) for t in family.THEMES]
+    with tempfile.TemporaryDirectory() as tmp:
+        samples, package = os.path.join(tmp, "samples"), os.path.join(tmp, "package")
+        os.makedirs(samples)
+        for name, _, code in SAMPLES:
+            with open(os.path.join(samples, name), "w", encoding="utf-8", newline="\n") as f:
+                f.write(plain(code) + "\n")
+        themes = [(t["slug"], t["id"], t["palette"], f"themes/{heritage.folder(family)}") for t in family.THEMES]
+        heritage.visualstudio.package(package, VISUALSTUDIO_ID, "1.0.0", "Heritage Themes Preview",
+                                      f"The {family.FAMILY} themes, for preview.py.", themes)
+        vsix = heritage.visualstudio.pack(package, os.path.join(tmp, "preview.vsix"), zipfile.ZipInfo)
+        result = subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+                                 os.path.join(VISUALSTUDIO, "screen.ps1"), "-Vsix", vsix, "-Id", VISUALSTUDIO_ID,
+                                 "-Themes", ",".join(ids), "-Samples", samples, "-Out", captures],
+                                capture_output=True, text=True, encoding="utf-8")
+    if result.returncode:
+        raise SystemExit(f"preview: screen.ps1 failed:\n{result.stderr or result.stdout}")
+    return [[(f"visualstudio/{i}/{name}.png", *png_size(os.path.join(captures, i, f"{name}.png")))
+             for name, _, _ in SAMPLES] for i in ids]
+
+
 def render_png(page_path, png_path):
     chrome = os.environ.get("CHROME") or tool(*CHROMES)
     # Windows has a convert command of its own, which converts file systems, so ImageMagick 6's name is not looked up.
@@ -255,6 +296,7 @@ def main():
     parser = argparse.ArgumentParser(description="Write theme previews.")
     kind = parser.add_mutually_exclusive_group()
     kind.add_argument("--vscode", action="store_true", help="write the VS Code preview")
+    kind.add_argument("--visualstudio", action="store_true", help="write the Visual Studio preview")
     kind.add_argument("--sublime", action="store_true", help="write the Sublime Text preview")
     kind.add_argument("--zed", action="store_true", help="write the Zed preview")
     kind.add_argument("--nvim", action="store_true", help="write the Neovim preview")
@@ -270,11 +312,12 @@ def main():
         out = os.path.join(heritage.THEMES, name, "build")
         install_fonts(os.path.join(out, FONT_DIR))
         family = families[name]
-        target = ("vscode" if args.vscode else "sublime" if args.sublime else "zed" if args.zed
-                  else "nvim" if args.nvim else "notepadpp" if args.notepadpp else None)
+        target = ("vscode" if args.vscode else "visualstudio" if args.visualstudio else "sublime" if args.sublime
+                  else "zed" if args.zed else "nvim" if args.nvim else "notepadpp" if args.notepadpp else None)
         page_path = os.path.join(out, f"preview-{target}.html" if target else "preview.html")
         tokens = {"vscode": vscode_tokens, "sublime": sublime_tokens, "zed": zed_tokens, "nvim": nvim_tokens,
-                  "notepadpp": notepadpp_tokens}.get(target, lambda family: None)(family)
+                  "notepadpp": notepadpp_tokens, "visualstudio": lambda f: visualstudio_captures(f, out)
+                  }.get(target, lambda family: None)(family)
         with open(page_path, "w", encoding="utf-8") as f:
             f.write(page(family, tokens, target))
         print(page_path)

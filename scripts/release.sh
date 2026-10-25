@@ -3,10 +3,11 @@
 # fast-forwards master to it, waits for Build to pass, then pushes the release tag, which starts the
 # publish workflow. See docs/releasing.md.
 #
-# The JetBrains plugin, the VS Code extension, the Sublime Text package, the Zed extension, the
-# Neovim plugin and the Notepad++ themes share VERSION in build.py and the v<version> tag. The release
-# includes each product whose changelog has entries under [Unreleased]: CHANGELOG.md for the JetBrains
-# plugin, vscode/CHANGELOG.md for the VS Code extension, sublime/CHANGELOG.md for the Sublime Text
+# The JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package,
+# the Zed extension, the Neovim plugin and the Notepad++ themes share VERSION in build.py and the
+# v<version> tag. The release includes each product whose changelog has entries under [Unreleased]:
+# CHANGELOG.md for the JetBrains plugin, vscode/CHANGELOG.md for the VS Code extension,
+# visualstudio/CHANGELOG.md for the Visual Studio extension, sublime/CHANGELOG.md for the Sublime Text
 # package, zed/CHANGELOG.md for the Zed extension, nvim/CHANGELOG.md for the Neovim plugin,
 # notepadpp/CHANGELOG.md for the Notepad++ themes. A product without entries keeps its last published
 # build, which the GitHub release attaches.
@@ -72,6 +73,7 @@ tag="v$version"
 
 changelogs=() products=() summary=""
 for product in "JetBrains plugin:CHANGELOG.md" "VS Code extension:vscode/CHANGELOG.md" \
+  "Visual Studio extension:visualstudio/CHANGELOG.md" \
   "Sublime Text package:sublime/CHANGELOG.md" "Zed extension:zed/CHANGELOG.md" \
   "Neovim plugin:nvim/CHANGELOG.md" "Notepad++ themes:notepadpp/CHANGELOG.md"; do
   name=${product%%:*} changelog=${product#*:}

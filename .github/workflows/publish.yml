@@ -23,6 +23,7 @@ jobs:
       version: ${{ steps.check.outputs.version }}
       jetbrains: ${{ steps.check.outputs.jetbrains }}
       vscode: ${{ steps.check.outputs.vscode }}
+      visualstudio: ${{ steps.check.outputs.visualstudio }}
       sublime: ${{ steps.check.outputs.sublime }}
       zed: ${{ steps.check.outputs.zed }}
       nvim: ${{ steps.check.outputs.nvim }}
@@ -45,15 +46,16 @@ jobs:
             echo "::error::$GITHUB_REF_NAME does not point at a commit on master"
             exit 1
           fi
-          jetbrains=false vscode=false sublime=false zed=false nvim=false notepadpp=false
+          jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
+          grep -q "^## \[$version\]" visualstudio/CHANGELOG.md && visualstudio=true
           grep -q "^## \[$version\]" sublime/CHANGELOG.md && sublime=true
           grep -q "^## \[$version\]" zed/CHANGELOG.md && zed=true
           grep -q "^## \[$version\]" nvim/CHANGELOG.md && nvim=true
           grep -q "^## \[$version\]" notepadpp/CHANGELOG.md && notepadpp=true
-          if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$sublime" = false ] && [ "$zed" = false ] \
-              && [ "$nvim" = false ] && [ "$notepadpp" = false ]; then
+          if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$visualstudio" = false ] && [ "$sublime" = false ] \
+              && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -61,6 +63,7 @@ jobs:
             echo "version=$version"
             echo "jetbrains=$jetbrains"
             echo "vscode=$vscode"
+            echo "visualstudio=$visualstudio"
             echo "sublime=$sublime"
             echo "zed=$zed"
             echo "nvim=$nvim"
@@ -208,6 +211,78 @@ jobs:
         with:
           name: vscode
           path: build/heritage-themes-vscode-${{ env.VERSION }}.vsix
+          if-no-files-found: error
+
+  # VsixPublisher, the Marketplace's tool for Visual Studio extensions, runs on Windows. It signs in with a Microsoft
+  # Entra ID token of the identity that publishes the VS Code extension, passed where it takes a personal access
+  # token (docs/releasing.md).
+  visualstudio:
+    needs: check
+    if: needs.check.outputs.visualstudio == 'true'
+    runs-on: windows-latest
+    environment: vscode-marketplace
+    permissions:
+      contents: read
+      id-token: write # sign in to Microsoft Entra ID
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      # VsixPublisher from the Visual Studio SDK build tools, pinned with the SHA-256 of the package from NuGet.
+      VSSDK_VERSION: 18.9.820
+      VSSDK_SHA256: adb94ec5cf730264bec92fa2f2a6fbf3abe455fbe27f3e7737b9df0176bb1e7a
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Check release settings
+        shell: bash
+        env:
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+        run: |
+          missing=0
+          for name in AZURE_CLIENT_ID AZURE_TENANT_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is empty or not set"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - run: python build.py
+
+      - name: Get VsixPublisher
+        shell: bash
+        run: |
+          package="$RUNNER_TEMP/vssdk.nupkg"
+          curl --fail --silent --show-error --location --output "$package" \
+            "https://api.nuget.org/v3-flatcontainer/microsoft.vssdk.buildtools/$VSSDK_VERSION/microsoft.vssdk.buildtools.$VSSDK_VERSION.nupkg"
+          echo "$VSSDK_SHA256  $package" | sha256sum --check -
+          unzip -q "$package" 'tools/vssdk/bin/*' -d "$RUNNER_TEMP/vssdk"
+          echo "VSIX_PUBLISHER=$RUNNER_TEMP/vssdk/tools/vssdk/bin/VsixPublisher.exe" >> "$GITHUB_ENV"
+
+      - uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      # 499b84ac-1321-427f-aa17-267ca6975798 is Azure DevOps, which the Marketplace signs in through.
+      - name: Publish to the VS Marketplace
+        shell: bash
+        run: |
+          token=$(az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken --output tsv)
+          echo "::add-mask::$token"
+          "$VSIX_PUBLISHER" login -personalAccessToken "$token" -publisherName heritage-themes -overwrite
+          "$VSIX_PUBLISHER" publish -payload "build/heritage-themes-visualstudio-$VERSION.vsix" \
+            -publishManifest build/visualstudio-marketplace/publishManifest.json
+          "$VSIX_PUBLISHER" logout -publisherName heritage-themes
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: visualstudio
+          path: build/heritage-themes-visualstudio-${{ env.VERSION }}.vsix
           if-no-files-found: error
 
   sublime:
@@ -465,12 +540,13 @@ jobs:
           if-no-files-found: error
 
   release:
-    needs: [check, jetbrains, vscode, sublime, zed, nvim, notepadpp]
+    needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
       && contains(fromJSON('["success", "skipped"]'), needs.jetbrains.result)
       && contains(fromJSON('["success", "skipped"]'), needs.vscode.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.visualstudio.result)
       && contains(fromJSON('["success", "skipped"]'), needs.sublime.result)
       && contains(fromJSON('["success", "skipped"]'), needs.zed.result)
       && contains(fromJSON('["success", "skipped"]'), needs.nvim.result)
@@ -482,6 +558,7 @@ jobs:
       VERSION: ${{ needs.check.outputs.version }}
       JETBRAINS: ${{ needs.check.outputs.jetbrains }}
       VSCODE: ${{ needs.check.outputs.vscode }}
+      VISUALSTUDIO: ${{ needs.check.outputs.visualstudio }}
       SUBLIME: ${{ needs.check.outputs.sublime }}
       ZED: ${{ needs.check.outputs.zed }}
       NVIM: ${{ needs.check.outputs.nvim }}
@@ -539,6 +616,8 @@ jobs:
           {
             notes "JetBrains plugin" "$JETBRAINS" CHANGELOG.md "heritage-themes-<version>-signed.zip" '*.icls'
             notes "VS Code extension" "$VSCODE" vscode/CHANGELOG.md "heritage-themes-vscode-<version>.vsix"
+            notes "Visual Studio extension" "$VISUALSTUDIO" visualstudio/CHANGELOG.md \
+              "heritage-themes-visualstudio-<version>.vsix"
             notes "Sublime Text package" "$SUBLIME" sublime/CHANGELOG.md "heritage-themes-sublime-<version>.sublime-package"
             notes "Zed extension" "$ZED" zed/CHANGELOG.md "heritage-themes-zed-<version>.zip"
             notes "Neovim plugin" "$NVIM" nvim/CHANGELOG.md "heritage-themes-nvim-<version>.zip"

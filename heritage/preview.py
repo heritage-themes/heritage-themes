@@ -25,13 +25,18 @@ The Notepad++ page takes code colours from the styles that Notepad++'s Lexilla l
 the theme from heritage.notepadpp (see scripts/notepadpp/tokens.py), and its chrome from notepadpp_chrome: the tab bar
 and status bar in the colours Notepad++ draws itself in, with the editors side by side and no side panel, as
 Notepad++ opens.
+
+The Visual Studio page shows the samples as Visual Studio 2026 draws them with the theme from heritage.visualstudio:
+captures of its editor (see scripts/visualstudio/screen.ps1), each at half its size, as Visual Studio draws them at
+twice the default font size. Its chrome takes the palette roles that the theme gives Visual Studio's surfaces
+(VISUALSTUDIO_CHROME): tool windows and editors as islands on the environment, as in the IntelliJ page.
 """
 import html, re
 
 from .samples import SAMPLES
 from .scheme import attributes, BOLD, ITALIC, BI, UNDER, WAVE, STRIKE, BOX, DOTTED
 from .ui import theme
-from . import notepadpp, nvim, sublime, vscode, zed
+from . import notepadpp, nvim, sublime, visualstudio, vscode, zed
 
 FONT_DIR = "fonts"
 FONTS = [("Regular", 400, "normal"), ("Italic", 400, "italic"), ("Bold", 700, "normal"), ("BoldItalic", 700, "italic")]
@@ -96,6 +101,12 @@ ZED_CHROME = {
 NVIM_CHROME = {
     "frame": ("TabLineFill", "bg"), "island": ("Normal", "bg"), "editor": ("WinBar", "bg"), "tabFg": ("WinBar", "fg"),
     "separator": ("WinSeparator", "fg"), "status": ("StatusLine", "bg"), "statusFg": ("StatusLine", "fg"),
+}
+# CSS variable → palette role for the Visual Studio page, as heritage.visualstudio gives them to the environment, tool
+# windows, document tabs and status bar.
+VISUALSTUDIO_CHROME = {
+    "frame": "frame", "island": "bgTool", "editor": "frame", "tab": "bg", "tabBorder": "red",
+    "status": "frame", "statusFg": "fg", "stripeOn": "bgTool", "stripeOnFg": "fg", "stripeFg": "muted",
 }
 # Shiki language id by sample file extension.
 LANGS = dict(java="java", kt="kotlin", groovy="groovy", py="python", ts="typescript", tsx="tsx", vue="vue",
@@ -211,10 +222,22 @@ def notepadpp_chrome(p):
     return ";".join(f"--{var}:#{colour}" for var, colour in colours.items())
 
 
+def visualstudio_chrome(p):
+    """CSS variables for the window chrome, taken from the palette."""
+    return ";".join(f"--{var}:#{p[role]}" for var, role in VISUALSTUDIO_CHROME.items())
+
+
+def capture(name, image):
+    """One editor island of the Visual Studio page: a tab and the capture of the editor, (path, width, height)."""
+    path, width, height = image
+    return (f'<article class="file"><div class="tabs"><span class="tab">{html.escape(name)}</span></div>'
+            f'<img src="{html.escape(path)}" width="{width // 2}" height="{height // 2}" alt=""></article>')
+
+
 def window(p, files=None, kind="vscode"):
     """One IDE window. files holds, per sample, the lines of tokens (text, colour, font style) for the VS Code,
-    Sublime Text, Zed, Neovim or Notepad++ page, as kind says; without it the window is the IntelliJ one, coloured from
-    the editor scheme."""
+    Sublime Text, Zed, Neovim or Notepad++ page, or the capture (path, width, height) for the Visual Studio page, as
+    kind says; without it the window is the IntelliJ one, coloured from the editor scheme."""
     names = [name for name, _, _ in SAMPLES]
     variables = ";".join(f"--{k}:#{v}" for k, v in p.items() if isinstance(v, str) and re.fullmatch(r"[0-9A-F]{6}", v))
     swatches = "".join(f'<span title="{k}" style="background:#{p[k]}"></span>' for k in SWATCHES)
@@ -224,6 +247,9 @@ def window(p, files=None, kind="vscode"):
         editors = "".join(sample(name, caret, [highlight(p, attrs, line) for line in code.split("\n")])
                           for name, caret, code in SAMPLES)
         kind, colours = "intellij", chrome(p)
+    elif kind == "visualstudio":
+        editors = "".join(capture(name, image) for (name, _, _), image in zip(SAMPLES, files))
+        colours = visualstudio_chrome(p)
     else:
         editors = "".join(sample(name, caret, ["".join(token_html(*t) for t in line) for line in lines])
                           for (name, caret, _), lines in zip(SAMPLES, files))
@@ -244,7 +270,8 @@ def vscode_samples():
 
 def page(family, tokens=None, kind="vscode"):
     """The preview page for every theme in the family: the IntelliJ page, or with tokens (per theme, one list of
-    token lines per sample) the VS Code page or, as kind says, the Sublime Text, Zed, Neovim or Notepad++ page."""
+    token lines per sample) the VS Code page or, as kind says, the Sublime Text, Zed, Neovim or Notepad++ page, or with
+    captures instead of token lines the Visual Studio page."""
     faces = "".join(
         f'@font-face{{font-family:"JetBrains Mono";font-weight:{w};font-style:{s};'
         f'src:url("{FONT_DIR}/JetBrainsMono-{n}.woff2") format("woff2"),local("JetBrains Mono")}}' for n, w, s in FONTS)
@@ -298,6 +325,8 @@ body{{margin:0;padding:24px;font-family:system-ui,sans-serif}}
 .notepadpp .tabs{{padding:2px 0 0 2px;border:0}} .notepadpp .tab{{padding:3px 12px;border:0;border-radius:0;
   border-top:3px solid var(--tabBorder);color:var(--tabFg)}}
 .notepadpp .status{{color:var(--statusFg)}}
+.visualstudio .status{{color:var(--statusFg)}} .visualstudio .tab{{border-radius:6px 6px 0 0;border-width:1px 1px 0}}
+.visualstudio .file img{{display:block;max-width:100%;height:auto}}
 pre{{margin:0;padding:8px 0;font:13px/1.55 "JetBrains Mono",ui-monospace,monospace;font-variant-ligatures:none;
   overflow-x:auto;color:var(--fg)}}
 pre div{{padding:0 12px 0 0;white-space:pre}}
