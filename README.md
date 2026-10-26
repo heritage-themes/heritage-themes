@@ -1,6 +1,6 @@
 # Heritage Themes
 
-Colour themes for IntelliJ-based IDEs, VS Code, Visual Studio, Sublime Text, Zed, Neovim and Notepad++, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Visual Studio extension (`heritage-themes.heritage-themes-visualstudio`), one Sublime Text package (`Heritage Themes`), one Zed extension (`heritage-theme`), one Neovim plugin (`heritage-themes/heritage-themes.nvim`) and one zip of Notepad++ themes (`heritage-themes-notepadpp-<version>.zip`).
+Colour themes for IntelliJ-based IDEs, VS Code, Visual Studio, Sublime Text, Zed, Neovim, Notepad++ and Xcode, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Visual Studio extension (`heritage-themes.heritage-themes-visualstudio`), one Sublime Text package (`Heritage Themes`), one Zed extension (`heritage-theme`), one Neovim plugin (`heritage-themes/heritage-themes.nvim`), one zip of Notepad++ themes (`heritage-themes-notepadpp-<version>.zip`) and one zip of Xcode themes (`heritage-themes-xcode-<version>.zip`).
 
 | Folder | Themes | Country |
 | --- | --- | --- |
@@ -99,6 +99,12 @@ Then choose a theme with `:colorscheme heritage-<theme>`, for example `:colorsch
 
 Download `heritage-themes-notepadpp-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest) and copy the files in its `themes` folder into `%AppData%\Notepad++\themes` (for a portable Notepad++, the `themes` folder beside `notepad++.exe`). Restart Notepad++ and choose a theme under **Settings | Style Configurator… | Select theme**. Notepad++ keeps one theme for Light Mode and one for Dark Mode: choose a dark theme while **Settings | Preferences… | Dark Mode** is on. Each theme colours every language Notepad++ highlights, the caret, current line, selection, margins, fold markers, highlights, the document map and the bar on the active tab, and in Light Mode the tabs' text. Notepad++ draws its menu bar, toolbar, dialogs and, in Dark Mode, its tabs in its own Dark Mode colours. It has no lexer for Kotlin or Groovy, and colours Markdown with a user-defined language that keeps its own colours.
 
+### Xcode
+
+Download `heritage-themes-xcode-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest) and copy the files in its `themes` folder into `~/Library/Developer/Xcode/UserData/FontAndColorThemes`, creating the folder if it does not exist. Restart Xcode and choose a theme under **Xcode | Settings… | Appearance | Theme | Choose…** in Xcode 27 and later, or under **Xcode | Settings… | Themes** in Xcode 26 and earlier. Each theme comes as an `.xcworkspacecolortheme` file for Xcode 27 and an `.xccolortheme` file for earlier releases; do not import the `.xccolortheme` into Xcode 27 with **Import Classic Theme**, which changes its colours. Xcode keeps one theme for the light appearance and one for the dark appearance.
+
+In Xcode 27, each theme colours the editor and the toolbar, jump bar and status bar, which Xcode draws in the editor's background, and tints the rest of the window; fonts are a setting of Xcode 27 that the themes leave as they are. In Xcode 26 and earlier, each theme colours the editor, the console and the rendered documentation, and sets the editor font to SF Mono; Xcode draws the rest of its window in the macOS appearance. Xcode colours Swift with its language service, and Objective-C, C and C++ in a project; it colours the other languages it ships a grammar for with fewer roles, opens Markdown in a rendered editor and HTML beside a live preview, and has no grammar for Kotlin, Groovy, Go, Rust, C# or Vue, which open as plain text.
+
 ## Build from source
 
 Requires Python 3. `--vsix` also needs Node.js 22 or later and npm; it installs vsce, pinned in `scripts/vscode/`, on first use.
@@ -107,7 +113,7 @@ On Windows, run the scripts with `python` or `py` in place of `python3`: `python
 
 ```bash
 python3 build.py          # JetBrains plugin, VS Code extension folder, Visual Studio extension, Sublime Text package,
-                          # Zed extension, Neovim plugin and Notepad++ themes
+                          # Zed extension, Neovim plugin, Notepad++ themes and Xcode themes
 python3 build.py --vsix   # also pack the VS Code extension
 ```
 
@@ -131,8 +137,10 @@ Output in `build/`:
 | `heritage-themes-nvim-<version>.zip` | The same files in a `heritage-themes.nvim/` folder. Unzip it into a `pack/*/start/` folder of Neovim |
 | `notepadpp/` | The Notepad++ themes: one theme file per theme in `themes/`, named as Notepad++ lists it, plus README, changelog and licence |
 | `heritage-themes-notepadpp-<version>.zip` | The same files in a `heritage-themes-notepadpp/` folder. The release attaches it |
+| `xcode/` | The Xcode themes: per theme an `.xcworkspacecolortheme` and an `.xccolortheme` in `themes/`, named as Xcode lists them, plus README, changelog and licence |
+| `heritage-themes-xcode-<version>.zip` | The same files in a `heritage-themes-xcode/` folder. The release attaches it |
 
-Install the jar, an `.icls` file, a `.vsix`, the `.sublime-package`, the Zed extension, the Neovim plugin or the Notepad++ themes as described under [Install](#install).
+Install the jar, an `.icls` file, a `.vsix`, the `.sublime-package`, the Zed extension, the Neovim plugin, the Notepad++ themes or the Xcode themes as described under [Install](#install).
 
 ## Preview
 
@@ -146,6 +154,7 @@ python3 preview.py --sublime    # Sublime Text preview: themes/<theme>/build/pre
 python3 preview.py --zed        # Zed preview: themes/<theme>/build/preview-zed.html
 python3 preview.py --nvim       # Neovim preview: themes/<theme>/build/preview-nvim.html
 python3 preview.py --notepadpp  # Notepad++ preview: themes/<theme>/build/preview-notepadpp.html
+python3 preview.py --xcode      # Xcode preview: themes/<theme>/build/preview-xcode.html
 ```
 
 The page shows each theme as an IDE window with a code sample per language, coloured from the generated editor scheme. It downloads JetBrains Mono once into `~/.cache/heritage-themes`. `--png` needs Google Chrome or Chromium (or the `CHROME` environment variable) and ImageMagick.
@@ -162,11 +171,14 @@ The page shows each theme as an IDE window with a code sample per language, colo
 
 `--notepadpp` styles the samples with the Lexilla lexers of the Notepad++ source pinned in `scripts/notepadpp/source.json`, set up for each language as Notepad++ sets them up (`scripts/notepadpp/lexers.json`), and colours them with the generated theme. It needs a C++ compiler (`c++`): it downloads the source and compiles the lexers into `~/.cache/heritage-themes/notepadpp` on first use. The page shows Kotlin, Groovy and Markdown as plain text: Notepad++ has no lexer for Kotlin or Groovy, and colours Markdown with a user-defined language whose colours no theme sets. The window frame and tabs take Notepad++'s own default colours, which a theme does not set. With `--png` it writes `preview-notepadpp.png` next to the page.
 
+`--xcode` shows the samples, with a Swift and an Objective-C sample first, as Xcode 27 draws them with the family's `.xcworkspacecolortheme` files. It needs macOS, Xcode 27 or later and Screen Recording and Accessibility permission for the terminal, and Xcode must be closed: Xcode keeps its settings in one place for every instance, so `scripts/xcode/screen.py` saves them, runs an Xcode of its own for each theme with a temporary home, the themes folder and the theme passed as launch arguments, and restores the saved settings at the end. It opens each sample on its own, so that Swift takes the colours of Xcode's language service while Objective-C, outside a project, takes only its syntactic colours. Each window is as wide as the editors on the page, so Markdown shows in Xcode's rendered editor at that width and HTML without the live preview, which Xcode then puts under the editor. It captures the editors into `themes/<theme>/build/xcode/`, compiling `scripts/xcode/capture.swift` into `~/.cache/heritage-themes/xcode` on first use. Xcode's windows show meanwhile, and the screen must stay unlocked; the script keeps the display awake. The `.xccolortheme` files have no preview: Xcode 27 shows them only after converting them. With `--png` it writes `preview-xcode.png` next to the page.
+
 ## Layout
 
 ```text
 build.py        builds the plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package, the Zed
-                extension, the Neovim plugin and the Notepad++ themes from every theme folder; holds their shared version
+                extension, the Neovim plugin, the Notepad++ themes and the Xcode themes from every theme folder; holds
+                their shared version
 preview.py      writes theme previews and renders the README images
 heritage/       code shared by every theme family
   __init__.py   finds the theme folders in themes/; the theme.py contract
@@ -184,6 +196,9 @@ heritage/       code shared by every theme family
                 lualine theme
   notepadpp.py  Notepad++ theme: palette roles to the styles of each lexer and the global styles
   notepadpp.json  the lexers and styles of the pinned Notepad++, written by scripts/notepadpp/styles.py
+  xcode.py      Xcode themes: palette roles to the colours of an Xcode 27 theme recipe, and to the syntax node types,
+                console and markup keys of an earlier Xcode's theme
+  xcode.json    the keys of Xcode's own Default themes, written by scripts/xcode/keys.py
   preview.py    preview page
   samples.py    code samples shown in the preview
 CHANGELOG.md    JetBrains plugin release notes; the plugin's change notes come from it
@@ -193,10 +208,11 @@ sublime/        CHANGELOG.md: Sublime Text package release notes
 zed/            CHANGELOG.md: Zed extension release notes
 nvim/           CHANGELOG.md: Neovim plugin release notes
 notepadpp/      CHANGELOG.md: Notepad++ themes release notes
+xcode/          CHANGELOG.md: Xcode themes release notes
 assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
 scripts/        release.sh, parent_overrides.py; shiki/ tokenises the VS Code preview; vscode/ packs and publishes the extension;
                 visualstudio/ reads Visual Studio's colours and captures the Visual Studio preview; zed/ colours the Zed preview; nvim/ draws the Neovim preview; notepadpp/ pins Notepad++, lists its styles
-                and colours the Notepad++ preview
+                and colours the Notepad++ preview; xcode/ reads Xcode's theme keys and captures the Xcode preview
 docs/           adding-a-theme.md
 .github/        Build and Publish workflows; ISSUE_TEMPLATE/ holds the issue forms
 themes/<theme>/
@@ -206,14 +222,14 @@ themes/<theme>/
 build/          generated, not tracked
 ```
 
-Only sources are tracked. Jars, zips, `.icls`, `.vsix`, `.sublime-package`, Neovim `.lua` and Notepad++ theme files are build output; the publish workflows attach them to each GitHub release.
+Only sources are tracked. Jars, zips, `.icls`, `.vsix`, `.sublime-package`, Neovim `.lua`, Notepad++ and Xcode theme files are build output; the publish workflows attach them to each GitHub release.
 
 ## Git workflow
 
 - Work on `dev`. `master` receives commits only when `scripts/release.sh` cuts a release.
 - Commit subjects follow [Conventional Commits](https://www.conventionalcommits.org/), with the theme folder as the scope for a change to one theme: `fix(wuxing): soften comment contrast`. Changes outside the theme folders use a scope such as `heritage`, `build` or `ci`, or none.
 - Keep a commit within one theme folder.
-- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package, the Zed extension, the Neovim plugin and the Notepad++ themes share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme.
+- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package, the Zed extension, the Neovim plugin, the Notepad++ themes and the Xcode themes share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme.
 
 ## Add a theme
 

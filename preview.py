@@ -1,6 +1,7 @@
 """Writes the preview page of each theme family and, with --png, renders it to PNG.
 
-Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp] [--png] [THEME ...]
+Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode] [--png]
+                         [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --visualstudio  write the Visual Studio preview instead of the IntelliJ one; needs Windows and Visual Studio 2026
@@ -8,6 +9,7 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --zed        write the Zed preview instead of the IntelliJ one; needs a C compiler (cc)
   --nvim       write the Neovim preview instead of the IntelliJ one; needs Neovim and a C compiler (cc)
   --notepadpp  write the Notepad++ preview instead of the IntelliJ one; needs a C++ compiler (c++)
+  --xcode      write the Xcode preview instead of the IntelliJ one; needs macOS and Xcode 27 or later, closed
   --png        also render the page to PNG; needs Google Chrome or Chromium, and ImageMagick
 
 The IntelliJ page goes to themes/<theme>/build/preview.html and its PNG to themes/<theme>/preview.png, the
@@ -24,14 +26,18 @@ scripts/nvim/.venv in the same way and keeps nvim-treesitter and the grammars it
 by scripts/notepadpp/tokens.py, which compiles the lexers of the pinned Notepad++ source with c++ and keeps them in
 ~/.cache/heritage-themes/notepadpp. The Visual Studio page goes to themes/<theme>/build/preview-visualstudio.html,
 with the captures it shows in themes/<theme>/build/visualstudio. scripts/visualstudio/screen.ps1 takes them in Visual
-Studio 2026 itself, in an instance of its own with the family's themes installed. All pages use JetBrains Mono,
-downloaded once from the pinned release below into ~/.cache/heritage-themes.
+Studio 2026 itself, in an instance of its own with the family's themes installed. The Xcode page goes to
+themes/<theme>/build/preview-xcode.html, with the captures it shows in themes/<theme>/build/xcode.
+scripts/xcode/screen.py takes them in Xcode itself, which it runs with the family's themes while restoring Xcode's
+settings afterwards; Xcode must be closed. All pages use JetBrains Mono, downloaded once from the pinned release below
+into ~/.cache/heritage-themes.
 """
 import argparse, hashlib, json, os, pathlib, plistlib, re, shutil, subprocess, sys, tempfile, urllib.request, zipfile
 
 import heritage
-from heritage.preview import FONT_DIR, FONTS, SHIKI_BOLD, SHIKI_ITALIC, SHIKI_UNDERLINE, page, plain, vscode_samples
-from heritage.samples import SAMPLES
+from heritage.preview import (FONT_DIR, FONTS, SHIKI_BOLD, SHIKI_ITALIC, SHIKI_UNDERLINE, XCODE_COLUMN, page, plain,
+                              vscode_samples)
+from heritage.samples import SAMPLES, XCODE_SAMPLES
 from heritage.sublime import resolve, scheme as sublime_scheme
 from heritage.vscode import theme as vscode_theme
 from heritage.zed import theme as zed_theme
@@ -42,6 +48,7 @@ ZED = os.path.join(ROOT, "scripts", "zed")
 NVIM = os.path.join(ROOT, "scripts", "nvim")
 NOTEPADPP = os.path.join(ROOT, "scripts", "notepadpp")
 VISUALSTUDIO = os.path.join(ROOT, "scripts", "visualstudio")
+XCODE = os.path.join(ROOT, "scripts", "xcode")
 VISUALSTUDIO_ID = "heritage-themes-preview"  # the identity of the VSIX that the preview installs
 FONT_URL = "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip"
 FONT_SHA256 = "6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf"
@@ -270,8 +277,40 @@ def visualstudio_captures(family, out):
                                 capture_output=True, text=True, encoding="utf-8")
     if result.returncode:
         raise SystemExit(f"preview: screen.ps1 failed:\n{result.stderr or result.stdout}")
-    return [[(f"visualstudio/{i}/{name}.png", *png_size(os.path.join(captures, i, f"{name}.png")))
+    # Visual Studio draws the samples at twice the default font size, so each capture shows at half its size.
+    return [[(f"visualstudio/{i}/{name}.png", *png_size(os.path.join(captures, i, f"{name}.png")), 2)
              for name, _, _ in SAMPLES] for i in ids]
+
+
+def xcode_captures(family, out):
+    """Per theme of the family, the samples of XCODE_SAMPLES as Xcode draws them, captured by scripts/xcode/screen.py
+    into out/xcode: per sample, the capture's path relative to out, width and height in pixels, and pixels per
+    point."""
+    if sys.platform != "darwin":
+        raise SystemExit("preview: --xcode needs macOS and Xcode 27 or later")
+    captures = os.path.join(out, "xcode")
+    shutil.rmtree(captures, ignore_errors=True)
+    names = [t["palette"]["name"] for t in family.THEMES]
+    with tempfile.TemporaryDirectory() as tmp:
+        themes, samples = os.path.join(tmp, "themes"), os.path.join(tmp, "samples")
+        os.makedirs(themes)
+        os.makedirs(samples)
+        for t in family.THEMES:
+            with open(os.path.join(themes, f"{t['palette']['name']}.xcworkspacecolortheme"), "wb") as f:
+                f.write(heritage.xcode.recipe_document(t["palette"]))
+        for name, _, code in XCODE_SAMPLES:
+            with open(os.path.join(samples, name), "w", encoding="utf-8", newline="\n") as f:
+                f.write(plain(code) + "\n")
+        request = [dict(name=t["palette"]["name"], background=t["palette"]["bg"], line=t["palette"]["caretRow"])
+                   for t in family.THEMES]
+        result = subprocess.run([sys.executable, "-I", os.path.join(XCODE, "screen.py"), os.path.join(CACHE, "xcode"),
+                                 themes, samples, captures, str(XCODE_COLUMN), json.dumps(request)],
+                                capture_output=True, text=True, encoding="utf-8")
+    if result.returncode:
+        raise SystemExit(f"preview: screen.py failed:\n{result.stderr or result.stdout}")
+    scales = json.loads(result.stdout)
+    return [[(f"xcode/{name}/{sample}.png", *png_size(os.path.join(captures, name, f"{sample}.png")),
+              scales[name][sample]) for sample, _, _ in XCODE_SAMPLES] for name in names]
 
 
 def render_png(page_path, png_path):
@@ -301,6 +340,7 @@ def main():
     kind.add_argument("--zed", action="store_true", help="write the Zed preview")
     kind.add_argument("--nvim", action="store_true", help="write the Neovim preview")
     kind.add_argument("--notepadpp", action="store_true", help="write the Notepad++ preview")
+    kind.add_argument("--xcode", action="store_true", help="write the Xcode preview")
     parser.add_argument("--png", action="store_true", help="also render the page to PNG")
     parser.add_argument("themes", nargs="*", metavar="THEME", help="theme folders; default: all")
     args = parser.parse_args()
@@ -313,11 +353,12 @@ def main():
         install_fonts(os.path.join(out, FONT_DIR))
         family = families[name]
         target = ("vscode" if args.vscode else "visualstudio" if args.visualstudio else "sublime" if args.sublime
-                  else "zed" if args.zed else "nvim" if args.nvim else "notepadpp" if args.notepadpp else None)
+                  else "zed" if args.zed else "nvim" if args.nvim else "notepadpp" if args.notepadpp
+                  else "xcode" if args.xcode else None)
         page_path = os.path.join(out, f"preview-{target}.html" if target else "preview.html")
         tokens = {"vscode": vscode_tokens, "sublime": sublime_tokens, "zed": zed_tokens, "nvim": nvim_tokens,
-                  "notepadpp": notepadpp_tokens, "visualstudio": lambda f: visualstudio_captures(f, out)
-                  }.get(target, lambda family: None)(family)
+                  "notepadpp": notepadpp_tokens, "visualstudio": lambda f: visualstudio_captures(f, out),
+                  "xcode": lambda f: xcode_captures(f, out)}.get(target, lambda family: None)(family)
         with open(page_path, "w", encoding="utf-8") as f:
             f.write(page(family, tokens, target))
         print(page_path)

@@ -4,13 +4,13 @@
 # publish workflow.
 #
 # The JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package,
-# the Zed extension, the Neovim plugin and the Notepad++ themes share VERSION in build.py and the
-# v<version> tag. The release includes each product whose changelog has entries under [Unreleased]:
-# CHANGELOG.md for the JetBrains plugin, vscode/CHANGELOG.md for the VS Code extension,
-# visualstudio/CHANGELOG.md for the Visual Studio extension, sublime/CHANGELOG.md for the Sublime Text
-# package, zed/CHANGELOG.md for the Zed extension, nvim/CHANGELOG.md for the Neovim plugin,
-# notepadpp/CHANGELOG.md for the Notepad++ themes. A product without entries keeps its last published
-# build, which the GitHub release attaches.
+# the Zed extension, the Neovim plugin, the Notepad++ themes and the Xcode themes share VERSION in
+# build.py and the v<version> tag. The release includes each product whose changelog has entries
+# under [Unreleased]: CHANGELOG.md for the JetBrains plugin, vscode/CHANGELOG.md for the VS Code
+# extension, visualstudio/CHANGELOG.md for the Visual Studio extension, sublime/CHANGELOG.md for the
+# Sublime Text package, zed/CHANGELOG.md for the Zed extension, nvim/CHANGELOG.md for the Neovim
+# plugin, notepadpp/CHANGELOG.md for the Notepad++ themes, xcode/CHANGELOG.md for the Xcode themes.
+# A product without entries keeps its last published build, which the GitHub release attaches.
 #
 # Usage: scripts/release.sh [patch|minor|major|X.Y.Z] [--dry-run]
 #   patch    third component +1 (default)
@@ -75,7 +75,8 @@ changelogs=() products=() summary=""
 for product in "JetBrains plugin:CHANGELOG.md" "VS Code extension:vscode/CHANGELOG.md" \
   "Visual Studio extension:visualstudio/CHANGELOG.md" \
   "Sublime Text package:sublime/CHANGELOG.md" "Zed extension:zed/CHANGELOG.md" \
-  "Neovim plugin:nvim/CHANGELOG.md" "Notepad++ themes:notepadpp/CHANGELOG.md"; do
+  "Neovim plugin:nvim/CHANGELOG.md" "Notepad++ themes:notepadpp/CHANGELOG.md" \
+  "Xcode themes:xcode/CHANGELOG.md"; do
   name=${product%%:*} changelog=${product#*:}
   previous=$(latest_release "$changelog")
   # The marketplaces reject a version that is not greater than the last one they received.

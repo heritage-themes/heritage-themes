@@ -30,13 +30,18 @@ The Visual Studio page shows the samples as Visual Studio 2026 draws them with t
 captures of its editor (see scripts/visualstudio/screen.ps1), each at half its size, as Visual Studio draws them at
 twice the default font size. Its chrome takes the palette roles that the theme gives Visual Studio's surfaces
 (VISUALSTUDIO_CHROME): tool windows and editors as islands on the environment, as in the IntelliJ page.
+
+The Xcode page shows the samples, with Swift and Objective-C first (XCODE_SAMPLES), as Xcode draws them with the theme
+from heritage.xcode: captures of its editor (see scripts/xcode/screen.py), each at its size in points. Its chrome takes
+the palette roles that Xcode gives its window with the theme (XCODE_CHROME): the toolbar, jump bar and status bar in
+the editor background, and the navigator darker, as one window without islands.
 """
 import html, re
 
-from .samples import SAMPLES
+from .samples import SAMPLES, XCODE_SAMPLES
 from .scheme import attributes, BOLD, ITALIC, BI, UNDER, WAVE, STRIKE, BOX, DOTTED
 from .ui import theme
-from . import notepadpp, nvim, sublime, visualstudio, vscode, zed
+from . import notepadpp, nvim, sublime, vscode, zed
 
 FONT_DIR = "fonts"
 FONTS = [("Regular", 400, "normal"), ("Italic", 400, "italic"), ("Bold", 700, "normal"), ("BoldItalic", 700, "italic")]
@@ -108,6 +113,13 @@ VISUALSTUDIO_CHROME = {
     "frame": "frame", "island": "bgTool", "editor": "frame", "tab": "bg", "tabBorder": "red",
     "status": "frame", "statusFg": "fg", "stripeOn": "bgTool", "stripeOnFg": "fg", "stripeFg": "muted",
 }
+# CSS variable → palette role for the Xcode page. Xcode draws its window in the theme's background and the navigator
+# darker, as bgTool is in dark themes.
+XCODE_CHROME = {"frame": "bg", "island": "bgTool", "editor": "bg", "tab": "bg", "status": "bg", "statusFg": "muted"}
+# The width of an editor on the page in CSS pixels, which Xcode's editors are sized to in the captures so that they fill
+# it: the window's 1280 less its two borders, the side panel's 180 and its border, and the 1 between the two editors,
+# halved.
+XCODE_COLUMN = (1280 - 2 - 181 - 1) // 2
 # Shiki language id by sample file extension.
 LANGS = dict(java="java", kt="kotlin", groovy="groovy", py="python", ts="typescript", tsx="tsx", vue="vue",
              html="html", css="css", sql="sql", go="go", rs="rust", cpp="cpp", c="c", cs="csharp", sh="shellscript",
@@ -227,18 +239,25 @@ def visualstudio_chrome(p):
     return ";".join(f"--{var}:#{p[role]}" for var, role in VISUALSTUDIO_CHROME.items())
 
 
+def xcode_chrome(p):
+    """CSS variables for the window chrome, taken from the palette."""
+    return ";".join(f"--{var}:#{p[role]}" for var, role in XCODE_CHROME.items())
+
+
 def capture(name, image):
-    """One editor island of the Visual Studio page: a tab and the capture of the editor, (path, width, height)."""
-    path, width, height = image
+    """One editor of the Visual Studio or Xcode page: a tab and the capture of the editor, (path, width, height,
+    scale) with the size in pixels and the pixels per point, shown at its size in points."""
+    path, width, height, scale = image
     return (f'<article class="file"><div class="tabs"><span class="tab">{html.escape(name)}</span></div>'
-            f'<img src="{html.escape(path)}" width="{width // 2}" height="{height // 2}" alt=""></article>')
+            f'<img src="{html.escape(path)}" width="{width // scale}" height="{height // scale}" alt=""></article>')
 
 
 def window(p, files=None, kind="vscode"):
     """One IDE window. files holds, per sample, the lines of tokens (text, colour, font style) for the VS Code,
-    Sublime Text, Zed, Neovim or Notepad++ page, or the capture (path, width, height) for the Visual Studio page, as
-    kind says; without it the window is the IntelliJ one, coloured from the editor scheme."""
-    names = [name for name, _, _ in SAMPLES]
+    Sublime Text, Zed, Neovim or Notepad++ page, or the capture (path, width, height, scale) for the Visual Studio or
+    Xcode page, as kind says; without it the window is the IntelliJ one, coloured from the editor scheme."""
+    samples = XCODE_SAMPLES if kind == "xcode" else SAMPLES
+    names = [name for name, _, _ in samples]
     variables = ";".join(f"--{k}:#{v}" for k, v in p.items() if isinstance(v, str) and re.fullmatch(r"[0-9A-F]{6}", v))
     swatches = "".join(f'<span title="{k}" style="background:#{p[k]}"></span>' for k in SWATCHES)
     tree = "".join(f'<div{" class=on" if i == 0 else ""}>{html.escape(n)}</div>' for i, n in enumerate(names))
@@ -247,9 +266,9 @@ def window(p, files=None, kind="vscode"):
         editors = "".join(sample(name, caret, [highlight(p, attrs, line) for line in code.split("\n")])
                           for name, caret, code in SAMPLES)
         kind, colours = "intellij", chrome(p)
-    elif kind == "visualstudio":
-        editors = "".join(capture(name, image) for (name, _, _), image in zip(SAMPLES, files))
-        colours = visualstudio_chrome(p)
+    elif kind in ("visualstudio", "xcode"):
+        editors = "".join(capture(name, image) for (name, _, _), image in zip(samples, files))
+        colours = visualstudio_chrome(p) if kind == "visualstudio" else xcode_chrome(p)
     else:
         editors = "".join(sample(name, caret, ["".join(token_html(*t) for t in line) for line in lines])
                           for (name, caret, _), lines in zip(SAMPLES, files))
@@ -271,7 +290,7 @@ def vscode_samples():
 def page(family, tokens=None, kind="vscode"):
     """The preview page for every theme in the family: the IntelliJ page, or with tokens (per theme, one list of
     token lines per sample) the VS Code page or, as kind says, the Sublime Text, Zed, Neovim or Notepad++ page, or with
-    captures instead of token lines the Visual Studio page."""
+    captures instead of token lines the Visual Studio or Xcode page."""
     faces = "".join(
         f'@font-face{{font-family:"JetBrains Mono";font-weight:{w};font-style:{s};'
         f'src:url("{FONT_DIR}/JetBrainsMono-{n}.woff2") format("woff2"),local("JetBrains Mono")}}' for n, w, s in FONTS)
@@ -326,7 +345,13 @@ body{{margin:0;padding:24px;font-family:system-ui,sans-serif}}
   border-top:3px solid var(--tabBorder);color:var(--tabFg)}}
 .notepadpp .status{{color:var(--statusFg)}}
 .visualstudio .status{{color:var(--statusFg)}} .visualstudio .tab{{border-radius:6px 6px 0 0;border-width:1px 1px 0}}
-.visualstudio .file img{{display:block;max-width:100%;height:auto}}
+.visualstudio .file img,.xcode .file img{{display:block;max-width:100%;height:auto}}
+.xcode .body{{gap:0;padding:0}} .xcode .stripe{{display:none}}
+.xcode .side{{border-radius:0;border-right:1px solid var(--border)}}
+.xcode .files{{gap:1px;background:var(--border)}} .xcode .file{{border-radius:0}}
+.xcode .tabs{{border-bottom:1px solid var(--border)}} .xcode .tab{{border:0;background:none;padding:3px 6px}}
+.xcode .bar{{border-bottom:1px solid var(--border)}}
+.xcode .status{{color:var(--statusFg);border-top:1px solid var(--border)}}
 pre{{margin:0;padding:8px 0;font:13px/1.55 "JetBrains Mono",ui-monospace,monospace;font-variant-ligatures:none;
   overflow-x:auto;color:var(--fg)}}
 pre div{{padding:0 12px 0 0;white-space:pre}}

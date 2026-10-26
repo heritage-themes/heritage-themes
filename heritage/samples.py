@@ -270,3 +270,42 @@ MARKDOWN = ("README.md", None, """\
 
 SAMPLES = [JAVA, KOTLIN, GROOVY, PYTHON, TYPESCRIPT, TSX, VUE, HTML, CSS, SQL, GO, RUST, CPP, C, CSHARP, SHELL,
            YAML, JSON, TOML, MARKDOWN]
+
+# Xcode's own languages, which only the Xcode preview shows. Xcode colours them, so they carry no markup.
+SWIFT = ("Order.swift", 13, """\
+import Foundation
+
+/// An order line.
+/// - Parameter id: The order's number.
+@MainActor
+struct Order: Identifiable {
+    static let maxItems = 42
+    let id: Int
+    var items: [String] = []
+
+    // MARK: - Totals
+    func total(price: Double) -> String {
+        let sum = Double(items.count) * price
+        return String(format: "%.2f €\\n", sum)
+    }
+}""")
+
+OBJECTIVE_C = ("OrderStore.m", 13, """\
+#import <Foundation/Foundation.h>
+
+#define MAX_ITEMS 42
+
+/// Keeps the orders.
+@interface OrderStore : NSObject
+@property (nonatomic, copy) NSArray<NSString *> *orders;
+- (NSUInteger)countWithLimit:(NSUInteger)limit;
+@end
+
+@implementation OrderStore
+- (NSUInteger)countWithLimit:(NSUInteger)limit {
+    NSLog(@"orders: %lu", (unsigned long)self.orders.count);
+    return MIN(self.orders.count, limit);
+}
+@end""")
+
+XCODE_SAMPLES = [SWIFT, OBJECTIVE_C] + SAMPLES

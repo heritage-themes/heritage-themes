@@ -28,6 +28,7 @@ jobs:
       zed: ${{ steps.check.outputs.zed }}
       nvim: ${{ steps.check.outputs.nvim }}
       notepadpp: ${{ steps.check.outputs.notepadpp }}
+      xcode: ${{ steps.check.outputs.xcode }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -46,7 +47,7 @@ jobs:
             echo "::error::$GITHUB_REF_NAME does not point at a commit on master"
             exit 1
           fi
-          jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false
+          jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" visualstudio/CHANGELOG.md && visualstudio=true
@@ -54,8 +55,9 @@ jobs:
           grep -q "^## \[$version\]" zed/CHANGELOG.md && zed=true
           grep -q "^## \[$version\]" nvim/CHANGELOG.md && nvim=true
           grep -q "^## \[$version\]" notepadpp/CHANGELOG.md && notepadpp=true
+          grep -q "^## \[$version\]" xcode/CHANGELOG.md && xcode=true
           if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$visualstudio" = false ] && [ "$sublime" = false ] \
-              && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ]; then
+              && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ] && [ "$xcode" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -68,6 +70,7 @@ jobs:
             echo "zed=$zed"
             echo "nvim=$nvim"
             echo "notepadpp=$notepadpp"
+            echo "xcode=$xcode"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -538,8 +541,30 @@ jobs:
           path: build/heritage-themes-notepadpp-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # Xcode has no theme registry: users install the theme files from the zip that the GitHub release
+  # attaches (docs/releasing.md).
+  xcode:
+    needs: check
+    if: needs.check.outputs.xcode == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: xcode
+          path: build/heritage-themes-xcode-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   release:
-    needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp]
+    needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -549,7 +574,8 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.sublime.result)
       && contains(fromJSON('["success", "skipped"]'), needs.zed.result)
       && contains(fromJSON('["success", "skipped"]'), needs.nvim.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.notepadpp.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.notepadpp.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.xcode.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -562,6 +588,7 @@ jobs:
       ZED: ${{ needs.check.outputs.zed }}
       NVIM: ${{ needs.check.outputs.nvim }}
       NOTEPADPP: ${{ needs.check.outputs.notepadpp }}
+      XCODE: ${{ needs.check.outputs.xcode }}
     steps:
       - uses: actions/checkout@v7
 
@@ -621,6 +648,7 @@ jobs:
             notes "Zed extension" "$ZED" zed/CHANGELOG.md "heritage-themes-zed-<version>.zip"
             notes "Neovim plugin" "$NVIM" nvim/CHANGELOG.md "heritage-themes-nvim-<version>.zip"
             notes "Notepad++ themes" "$NOTEPADPP" notepadpp/CHANGELOG.md "heritage-themes-notepadpp-<version>.zip"
+            notes "Xcode themes" "$XCODE" xcode/CHANGELOG.md "heritage-themes-xcode-<version>.zip"
           } > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \

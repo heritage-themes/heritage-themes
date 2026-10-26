@@ -1,5 +1,5 @@
 """Builds the Heritage Themes JetBrains plugin, VS Code extension, Visual Studio extension, Sublime Text package, Zed
-extension, Neovim plugin and Notepad++ themes from every theme folder.
+extension, Neovim plugin, Notepad++ themes and Xcode themes from every theme folder.
 
 A theme folder is any directory in themes/ containing a theme.py (see heritage/__init__.py).
 
@@ -9,7 +9,7 @@ Usage: python3 build.py [--vsix]
 
 Output goes to build/.
 """
-import argparse, html, json, os, re, shutil, subprocess, tomllib, zipfile
+import argparse, html, json, os, plistlib, re, shutil, subprocess, tomllib, zipfile
 import xml.etree.ElementTree as ET
 
 import heritage
@@ -18,8 +18,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
 CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
 # One version for the JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package,
-# the Zed extension, the Neovim plugin and the Notepad++ themes. A release publishes each product whose changelog has
-# a section for it.
+# the Zed extension, the Neovim plugin, the Notepad++ themes and the Xcode themes. A release publishes each product
+# whose changelog has a section for it.
 VERSION = "1.4.0"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 DESCRIPTION = "Colour themes drawn from the colour traditions of different cultures."
@@ -51,6 +51,10 @@ NOTEPADPP_CHANGELOG = os.path.join(ROOT, "notepadpp", "CHANGELOG.md")
 NOTEPADPP_NAME = "heritage-themes-notepadpp"  # the folder in the zip
 NOTEPADPP_PROLOG = '<?xml version="1.0" encoding="UTF-8" ?>'  # Notepad++'s Themes Collection requires it first
 NOTEPADPP_HEX = re.compile(r"[0-9A-F]{6}")
+XCODE_CHANGELOG = os.path.join(ROOT, "xcode", "CHANGELOG.md")
+XCODE_NAME = "heritage-themes-xcode"  # the folder in the zip
+XCODE_THEMES = "~/Library/Developer/Xcode/UserData/FontAndColorThemes"  # where Xcode looks for a user's themes
+XCODE_FONT = re.compile(r"[.\w-]+ - \d+\.\d")
 WINDOWS_NAME = re.compile(r'[^<>:"/\\|?*\x00-\x1f]+(?<![ .])')  # a file name that Windows accepts
 # The extension's VSIX identity, which Visual Studio matches installed extensions and updates by, and which the
 # Marketplace requires to be unique across all publishers; its internal name on the Marketplace, which also names the
@@ -61,7 +65,7 @@ VISUALSTUDIO_ITEM = "heritage-themes-visualstudio"
 VISUALSTUDIO_NAME = "Heritage Themes for Visual Studio"
 VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
-EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++")
+EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -914,6 +918,200 @@ def pack_notepadpp(directory):
     return pack_folder(directory, os.path.join(OUT, f"{NOTEPADPP_NAME}-{VERSION}.zip"), NOTEPADPP_NAME)
 
 
+def xcode_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    rows = "\n".join(f"| [{f.FAMILY}]({VENDOR_URL}/tree/master/themes/{heritage.folder(f)}) "
+                     f"| {', '.join(t['palette']['name'] for t in f.THEMES)} | {f.BLURB} |" for f in families)
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Xcode
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+Each theme comes as an `.xcworkspacecolortheme` file for Xcode 27 and later, and an `.xccolortheme` file for Xcode 26 \
+and earlier.
+
+1. Copy the files in `themes` into `{XCODE_THEMES}`, creating the folder if it does not exist. In Terminal, from the \
+unzipped folder:
+
+   ```bash
+   mkdir -p {XCODE_THEMES}
+   cp themes/* {XCODE_THEMES}/
+   ```
+
+2. Restart Xcode. In Xcode 27, choose a theme under **Xcode | Settings… | Appearance | Theme | Choose…**; in \
+Xcode 26 and earlier, under **Xcode | Settings… | Themes**.
+
+Xcode keeps one theme for the light appearance and one for the dark appearance: choose a dark theme while Xcode \
+appears dark and a light theme while it appears light.
+
+Do not import an `.xccolortheme` file into Xcode 27 with **Import Classic Theme**: Xcode 27 changes its colours as it \
+converts it. Choose the `.xcworkspacecolortheme` file of the same name instead.
+
+## What is coloured
+
+In Xcode 27, each theme colours the editor and the toolbar, jump bar and status bar, which Xcode draws in the editor's \
+background, and tints the rest of the window. Fonts are a setting of Xcode 27, under **Appearance | Fonts**, which the \
+themes leave as they are.
+
+In Xcode 26 and earlier, each theme colours the source editor, the console and the documentation markup that Xcode \
+renders, and the markers in the editor's scroll bar; Xcode draws the rest of its window in the colours of the macOS \
+appearance. A theme also sets the editor's font: SF Mono, at the weight and size of Xcode's default themes, with \
+keywords in bold where the theme's keywords are bold, and comments in italic.
+
+## Languages
+
+Xcode colours Swift with its language service, which tells project and SDK names apart; the themes give both the same \
+colour, the one that types, functions, properties and constants take in the other editors. Objective-C, C and C++ \
+take these colours in a project, and only their keywords, strings, numbers, comments and preprocessor directives in a \
+file that Xcode opens on its own. Xcode colours JavaScript, TypeScript, Python, Java, SQL, HTML, CSS, JSON, YAML, \
+TOML and shell scripts with its own grammars, which mark fewer roles, and opens Markdown in a rendered editor that \
+takes the theme's text and link colours. It has no grammar for Kotlin, Groovy, Go, Rust, C# or Vue, which open as \
+plain text.
+
+## Themes
+
+| Family | Themes | Tradition |
+| --- | --- | --- |
+{rows}
+
+Each family's page describes its colour tradition. The same themes are available for {elsewhere("Xcode")}: see \
+[Heritage Themes on GitHub]({VENDOR_URL}).
+
+Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the theme, Xcode version, \
+language and a screenshot.
+"""
+
+
+def build_xcode(families):
+    """Writes the Xcode themes to build/xcode/themes, an .xcworkspacecolortheme and an .xccolortheme per theme named as
+    Xcode lists it, and returns build/xcode."""
+    directory = os.path.join(OUT, "xcode")
+    os.makedirs(os.path.join(directory, "themes"))
+    for family in families:
+        for t in family.THEMES:
+            name = t["palette"]["name"]
+            for extension, document in ((".xcworkspacecolortheme", heritage.xcode.recipe_document),
+                                        (".xccolortheme", heritage.xcode.document)):
+                with open(os.path.join(directory, "themes", name + extension), "wb") as f:
+                    f.write(document(t["palette"]))
+    write_text(os.path.join(directory, "README.md"), xcode_readme(families))
+    shutil.copy(XCODE_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_xcode(directory, families):
+    """Fails the build when the README, changelog, licence or a file of a theme is missing, two themes share a recipe
+    ID, or a theme file fails validate_xcode_recipe or validate_xcode_theme."""
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Xcode themes: {name} is missing")
+    expected, ids = set(), set()
+    for family in families:
+        for t in family.THEMES:
+            p = t["palette"]
+            if not WINDOWS_NAME.fullmatch(p["name"]):
+                raise SystemExit(f"Xcode: {p['name']!r} is not a file name that macOS and Windows accept")
+            if heritage.xcode.recipe_id(p["name"]) in ids:
+                raise SystemExit(f"Xcode: the recipe ID of {p['name']} is not unique")
+            ids.add(heritage.xcode.recipe_id(p["name"]))
+            expected |= {f"{p['name']}.xcworkspacecolortheme", f"{p['name']}.xccolortheme"}
+            validate_xcode_recipe(os.path.join(directory, "themes", f"{p['name']}.xcworkspacecolortheme"), p)
+            validate_xcode_theme(os.path.join(directory, "themes", f"{p['name']}.xccolortheme"), p)
+    found = set(os.listdir(os.path.join(directory, "themes")))
+    if found != expected:
+        raise SystemExit(f"Xcode themes: {len(found)} files for {len(expected)} themes")
+
+
+def validate_xcode_recipe(path, p):
+    """Fails the build when the recipe file is malformed, does not set exactly the colour overrides of
+    heritage.xcode.RECIPE, has a colour that is not an opaque sRGB colour of its palette role, or has a text colour
+    that is unreadable on the editor background."""
+    name = os.path.basename(path)
+    def fail(message):
+        raise SystemExit(f"Xcode {name}: {message}")
+    with open(path, encoding="utf-8") as f:
+        document = json.load(f)
+    if set(document) != {"fileVersion", "recipe", "showsInAllColorSchemes"} or document["fileVersion"] != 1:
+        fail("is not a version 1 recipe file")
+    recipe = document["recipe"]
+    if set(recipe) != {"background", "colorScheme", "palette"} or \
+            recipe["colorScheme"] != ("dark" if p["dark"] else "light"):
+        fail("does not set the background, palette and its palette's colour scheme")
+    palette, overrides = recipe["palette"], recipe["palette"]["colorOverrides"]
+    if set(palette) != {"colorOverrides", "primary", "secondary"} or set(overrides) != set(heritage.xcode.RECIPE):
+        fail("does not set exactly the tints and colour overrides of heritage.xcode.RECIPE")
+    r = dict(p, caret=p.get("caret", p["gold"]))
+    colours = {"background": (recipe["background"], "customColor", "bg"),
+               "primary": (palette["primary"], "custom", heritage.xcode.PRIMARY),
+               "secondary": (palette["secondary"], "custom", heritage.xcode.SECONDARY),
+               **{key: (overrides[key], kind, role) for key, (kind, role) in heritage.xcode.RECIPE.items()}}
+    hexes = {}
+    for key, (holder, kind, role) in colours.items():
+        if set(holder) != {kind}:
+            fail(f"{key} is not a {kind}")
+        value = holder[kind]
+        if set(value) != {"chroma", "gamut", "hue", "lightness", "opacity"} or value["gamut"] != "sRGB" \
+                or value["opacity"] != 1:
+            fail(f"{key} is not an opaque sRGB colour")
+        hexes[key] = heritage.xcode.srgb(value["lightness"]["exact"], value["chroma"]["exact"], value["hue"]["radians"])
+        if hexes[key] != r[role]:
+            fail(f"{key} is #{hexes[key]}, not #{r[role]} of {role}")
+    for key, (kind, role) in heritage.xcode.RECIPE.items():
+        if kind == "color" and key != "invisibles":
+            minimum = 3 if key in ("comment", "insertionPointColor") else 4.5
+            ratio = contrast(hexes[key], hexes["background"])
+            if ratio < minimum:
+                fail(f"{key} is {ratio:.2f}:1 on the background, needs {minimum}:1")
+
+
+def validate_xcode_theme(path, p):
+    """Fails the build when the theme file is malformed, sets other keys than xcode.json, has a colour or font that is
+    not one, or has a syntax, console or markup text colour that is unreadable on its background."""
+    name = os.path.basename(path)
+    def fail(message):
+        raise SystemExit(f"Xcode {name}: {message}")
+    with open(path, "rb") as f:
+        theme = plistlib.load(f)
+    try:
+        heritage.xcode.check(theme)
+    except ValueError as e:
+        fail(str(e))
+    syntax_colours, syntax_fonts = theme["DVTSourceTextSyntaxColors"], theme["DVTSourceTextSyntaxFonts"]
+    colours = {k: v for k, v in theme.items() if k.endswith("Color") or k == "DVTSourceTextBackground"}
+    fonts = {k: v for k, v in theme.items() if k.endswith("Font")}
+    if set(theme) - set(colours) - set(fonts) != {"DVTSourceTextSyntaxColors", "DVTSourceTextSyntaxFonts",
+                                                    "DVTFontAndColorVersion", "DVTLineSpacing"}:
+        fail("has a key that is neither a colour nor a font")
+    hexes = {}
+    for key, value in [*colours.items(), *syntax_colours.items()]:
+        try:
+            hexes[key] = heritage.xcode.hex_colour(value)
+        except (TypeError, ValueError):
+            fail(f"{key} has {value!r}, which is not an opaque Xcode colour")
+    for key, value in [*fonts.items(), *syntax_fonts.items()]:
+        if not isinstance(value, str) or not XCODE_FONT.fullmatch(value):
+            fail(f"{key} has {value!r}, which is not an Xcode font")
+    _, text = heritage.xcode.roles(p)
+    backgrounds = {"bg": hexes["DVTSourceTextBackground"], "bgTool": hexes["DVTConsoleTextBackgroundColor"]}
+    pairs = [(key, hexes[key], backgrounds[role], 4.5) for key, role in text.items()]
+    pairs += [(key, hexes[key], backgrounds["bg"], 3 if key == "xcode.syntax.comment" else 4.5)
+              for key in syntax_colours]
+    for key, fg, bg, minimum in pairs:
+        ratio = contrast(fg, bg)
+        if ratio < minimum:
+            fail(f"{key} is {ratio:.2f}:1 on its background, needs {minimum}:1")
+
+
+def pack_xcode(directory):
+    """Zips the themes, README, changelog and licence into a folder, and returns the zip's path. A zip keeps the file
+    names, which Xcode lists the themes by; GitHub would rename loose release files to ASCII without spaces."""
+    return pack_folder(directory, os.path.join(OUT, f"{XCODE_NAME}-{VERSION}.zip"), XCODE_NAME)
+
+
 def visualstudio_description(themes):
     """The extension's description in Visual Studio's Extension Manager."""
     return f"{DESCRIPTION} {len(themes)} dark and light themes, each drawn from the named colours of one tradition."
@@ -1027,7 +1225,7 @@ def pack_visualstudio(directory):
 def main():
     parser = argparse.ArgumentParser(description="Build the JetBrains plugin, the VS Code extension, the Visual Studio "
                                                  "extension, the Sublime Text package, the Zed extension, the Neovim "
-                                                 "plugin and the Notepad++ themes.")
+                                                 "plugin, the Notepad++ themes and the Xcode themes.")
     parser.add_argument("--vsix", action="store_true", help="also pack the VS Code extension with vsce")
     args = parser.parse_args()
     families = heritage.load_families()
@@ -1077,6 +1275,9 @@ def main():
     notepadpp_themes = build_notepadpp(families)
     validate_notepadpp(notepadpp_themes, families)
     print(f"{pack_notepadpp(notepadpp_themes)}: {len(themes)} themes", flush=True)
+    xcode_themes = build_xcode(families)
+    validate_xcode(xcode_themes, families)
+    print(f"{pack_xcode(xcode_themes)}: {len(themes)} themes", flush=True)
     if args.vsix:
         print(f"{pack_vsix(extension, themes)}: {len(themes)} themes")
 
