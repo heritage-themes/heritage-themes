@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Cuts a release from dev: sets the version, stamps the changelogs, builds, commits and pushes dev,
 # fast-forwards master to it, waits for Build to pass, then pushes the release tag, which starts the
-# publish workflow. See docs/releasing.md.
+# publish workflow.
 #
 # The JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package,
 # the Zed extension, the Neovim plugin and the Notepad++ themes share VERSION in build.py and the

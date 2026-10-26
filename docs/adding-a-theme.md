@@ -134,4 +134,4 @@ Add these to the theme folder:
    `<Country>` is the country name only, even for a region inside it; a tradition that spans borders lists every country, separated by commas.
 2. Add a line under `### Added` in `[Unreleased]` in each of `CHANGELOG.md`, `vscode/CHANGELOG.md`, `visualstudio/CHANGELOG.md`, `sublime/CHANGELOG.md`, `zed/CHANGELOG.md`, `nvim/CHANGELOG.md` and `notepadpp/CHANGELOG.md`: `- <Theme A> and <Theme B>, drawn from <tradition>.`
 3. Run `python3 build.py` again.
-4. Commit on `dev` as `feat(<theme>): add <Theme A> and <Theme B> themes`, limited to the theme folder, the root README row and the changelog entries. Releasing is described in [releasing.md](releasing.md).
+4. Commit on `dev` as `feat(<theme>): add <Theme A> and <Theme B> themes`, limited to the theme folder, the root README row and the changelog entries.

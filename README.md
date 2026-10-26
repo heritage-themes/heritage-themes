@@ -197,7 +197,7 @@ assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
 scripts/        release.sh, parent_overrides.py; shiki/ tokenises the VS Code preview; vscode/ packs and publishes the extension;
                 visualstudio/ reads Visual Studio's colours and captures the Visual Studio preview; zed/ colours the Zed preview; nvim/ draws the Neovim preview; notepadpp/ pins Notepad++, lists its styles
                 and colours the Notepad++ preview
-docs/           releasing.md, adding-a-theme.md
+docs/           adding-a-theme.md
 .github/        Build and Publish workflows; ISSUE_TEMPLATE/ holds the issue forms
 themes/<theme>/
   theme.py      palettes; defines FAMILY, BLURB and THEMES
@@ -213,7 +213,7 @@ Only sources are tracked. Jars, zips, `.icls`, `.vsix`, `.sublime-package`, Neov
 - Work on `dev`. `master` receives commits only when `scripts/release.sh` cuts a release.
 - Commit subjects follow [Conventional Commits](https://www.conventionalcommits.org/), with the theme folder as the scope for a change to one theme: `fix(wuxing): soften comment contrast`. Changes outside the theme folders use a scope such as `heritage`, `build` or `ci`, or none.
 - Keep a commit within one theme folder.
-- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package, the Zed extension, the Neovim plugin and the Notepad++ themes share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme. See [docs/releasing.md](docs/releasing.md).
+- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package, the Zed extension, the Neovim plugin and the Notepad++ themes share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme.
 
 ## Add a theme
 

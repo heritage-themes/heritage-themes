@@ -19,7 +19,7 @@ OUT = os.path.join(ROOT, "build")
 CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
 # One version for the JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package,
 # the Zed extension, the Neovim plugin and the Notepad++ themes. A release publishes each product whose changelog has
-# a section for it; see docs/releasing.md.
+# a section for it.
 VERSION = "1.4.0"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 DESCRIPTION = "Colour themes drawn from the colour traditions of different cultures."
