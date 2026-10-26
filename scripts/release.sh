@@ -51,7 +51,7 @@ has_unreleased() {
 
 # Prints the newest released version in the changelog.
 latest_release() {
-  sed -n '/^## \[[0-9]/{s/^## \[\([^]]*\)\].*/\1/p;q}' "$1"
+  sed -n '/^## \[[0-9]/{s/^## \[\([^]]*\)\].*/\1/p;q;}' "$1"
 }
 
 # Succeeds when version $1 is greater than version $2.
@@ -106,9 +106,13 @@ git merge-base --is-ancestor origin/master dev || fail "dev does not contain ori
 read -r -p "Release $tag from $(git rev-parse --short dev)? [y/N] " answer
 [ "$answer" = y ] || fail "cancelled"
 
-sed -i "s/^VERSION = .*/VERSION = \"$version\"/" build.py
+# BSD sed, as on macOS, needs a backup suffix after -i and GNU sed takes one only attached to it, so both get .bak.
+sed -i.bak "s/^VERSION = .*/VERSION = \"$version\"/" build.py && rm build.py.bak
 for changelog in "${changelogs[@]}"; do
-  sed -i "0,/^## \[Unreleased\]/s//## [Unreleased]\n\n## [$version] - $(date +%F)/" "$changelog"
+  awk -v version="$version" -v date="$(date +%F)" '
+    !done && /^## \[Unreleased\]/ {print; print ""; print "## [" version "] - " date; done = 1; next}
+    {print}' "$changelog" > "$changelog.new"
+  mv "$changelog.new" "$changelog"
 done
 
 "$python" build.py --vsix
