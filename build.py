@@ -650,6 +650,9 @@ With [lazy.nvim](https://github.com/folke/lazy.nvim):
 }}
 ```
 
+Update with `:Lazy update {NVIM_NAME}`. lazy.nvim records the installed commit in `lazy-lock.json`; commit that file \
+to keep every machine on the same version.
+
 With `vim.pack`, built into Neovim 0.12:
 
 ```lua
