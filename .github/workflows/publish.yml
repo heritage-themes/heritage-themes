@@ -1,7 +1,7 @@
 name: Publish
 
 # Fires only when a version tag (for example `v1.0.0`) is pushed, so the tag push is the release
-# gate. scripts/release.sh pushes the tag after Build has passed on the commit it points at.
+# gate. The tag is pushed after Build has passed on the commit it points at.
 # Publishes each product whose changelog has a section for the version, then creates one GitHub
 # release that carries every product: a product left out keeps the build of its last release.
 on:
@@ -560,7 +560,7 @@ jobs:
           if-no-files-found: error
 
   # Xcode has no theme registry: users install the theme files from the zip that the GitHub release
-  # attaches (docs/releasing.md).
+  # attaches.
   xcode:
     needs: check
     if: needs.check.outputs.xcode == 'true'

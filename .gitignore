@@ -16,5 +16,10 @@ __pycache__/
 # Local reference material in each theme folder, not part of the repository
 themes/*/docs/
 
-# Local release notes, not part of the repository
+# Local release and theme-authoring notes, not part of the repository
 docs/releasing.md
+docs/adding-a-theme.md
+scripts/release.sh
+
+# Local agent instructions, not part of the repository
+CLAUDE.md
