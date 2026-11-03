@@ -29,6 +29,11 @@ jobs:
       nvim: ${{ steps.check.outputs.nvim }}
       notepadpp: ${{ steps.check.outputs.notepadpp }}
       xcode: ${{ steps.check.outputs.xcode }}
+      helix: ${{ steps.check.outputs.helix }}
+      kakoune: ${{ steps.check.outputs.kakoune }}
+      micro: ${{ steps.check.outputs.micro }}
+      vim: ${{ steps.check.outputs.vim }}
+      emacs: ${{ steps.check.outputs.emacs }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -47,7 +52,8 @@ jobs:
             echo "::error::$GITHUB_REF_NAME does not point at a commit on master"
             exit 1
           fi
-          jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false
+          jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
+            kakoune=false micro=false vim=false emacs=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" visualstudio/CHANGELOG.md && visualstudio=true
@@ -56,8 +62,15 @@ jobs:
           grep -q "^## \[$version\]" nvim/CHANGELOG.md && nvim=true
           grep -q "^## \[$version\]" notepadpp/CHANGELOG.md && notepadpp=true
           grep -q "^## \[$version\]" xcode/CHANGELOG.md && xcode=true
+          grep -q "^## \[$version\]" helix/CHANGELOG.md && helix=true
+          grep -q "^## \[$version\]" kakoune/CHANGELOG.md && kakoune=true
+          grep -q "^## \[$version\]" micro/CHANGELOG.md && micro=true
+          grep -q "^## \[$version\]" vim/CHANGELOG.md && vim=true
+          grep -q "^## \[$version\]" emacs/CHANGELOG.md && emacs=true
           if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$visualstudio" = false ] && [ "$sublime" = false ] \
-              && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ] && [ "$xcode" = false ]; then
+              && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ] && [ "$xcode" = false ] \
+              && [ "$helix" = false ] && [ "$kakoune" = false ] && [ "$micro" = false ] && [ "$vim" = false ] \
+              && [ "$emacs" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -71,6 +84,11 @@ jobs:
             echo "nvim=$nvim"
             echo "notepadpp=$notepadpp"
             echo "xcode=$xcode"
+            echo "helix=$helix"
+            echo "kakoune=$kakoune"
+            echo "micro=$micro"
+            echo "vim=$vim"
+            echo "emacs=$emacs"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -563,8 +581,119 @@ jobs:
           path: build/heritage-themes-xcode-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # Helix has no theme registry: users install the theme files from the zip that the GitHub release
+  # attaches.
+  helix:
+    needs: check
+    if: needs.check.outputs.helix == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: helix
+          path: build/heritage-themes-helix-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  # Kakoune has no theme registry: users install the theme files from the zip that the GitHub release
+  # attaches.
+  kakoune:
+    needs: check
+    if: needs.check.outputs.kakoune == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: kakoune
+          path: build/heritage-themes-kakoune-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  # Micro has no theme registry: users install the theme files from the zip that the GitHub release
+  # attaches.
+  micro:
+    needs: check
+    if: needs.check.outputs.micro == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: micro
+          path: build/heritage-themes-micro-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  # Users unzip the Vim package that the GitHub release attaches; Vim's plugin managers install from
+  # git repositories, which this release does not publish to.
+  vim:
+    needs: check
+    if: needs.check.outputs.vim == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: vim
+          path: build/heritage-themes-vim-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  # Users install the Emacs themes from the zip that the GitHub release attaches; Emacs package archives
+  # such as MELPA build from git repositories, which this release does not publish to.
+  emacs:
+    needs: check
+    if: needs.check.outputs.emacs == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: emacs
+          path: build/heritage-themes-emacs-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   release:
-    needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode]
+    needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
+            emacs]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -575,7 +704,12 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.zed.result)
       && contains(fromJSON('["success", "skipped"]'), needs.nvim.result)
       && contains(fromJSON('["success", "skipped"]'), needs.notepadpp.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.xcode.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.xcode.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.helix.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.kakoune.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.micro.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.vim.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.emacs.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -589,6 +723,11 @@ jobs:
       NVIM: ${{ needs.check.outputs.nvim }}
       NOTEPADPP: ${{ needs.check.outputs.notepadpp }}
       XCODE: ${{ needs.check.outputs.xcode }}
+      HELIX: ${{ needs.check.outputs.helix }}
+      KAKOUNE: ${{ needs.check.outputs.kakoune }}
+      MICRO: ${{ needs.check.outputs.micro }}
+      VIM: ${{ needs.check.outputs.vim }}
+      EMACS: ${{ needs.check.outputs.emacs }}
     steps:
       - uses: actions/checkout@v7
 
@@ -649,6 +788,11 @@ jobs:
             notes "Neovim plugin" "$NVIM" nvim/CHANGELOG.md "heritage-themes-nvim-<version>.zip"
             notes "Notepad++ themes" "$NOTEPADPP" notepadpp/CHANGELOG.md "heritage-themes-notepadpp-<version>.zip"
             notes "Xcode themes" "$XCODE" xcode/CHANGELOG.md "heritage-themes-xcode-<version>.zip"
+            notes "Helix themes" "$HELIX" helix/CHANGELOG.md "heritage-themes-helix-<version>.zip"
+            notes "Kakoune colour schemes" "$KAKOUNE" kakoune/CHANGELOG.md "heritage-themes-kakoune-<version>.zip"
+            notes "Micro colour schemes" "$MICRO" micro/CHANGELOG.md "heritage-themes-micro-<version>.zip"
+            notes "Vim colour schemes" "$VIM" vim/CHANGELOG.md "heritage-themes-vim-<version>.zip"
+            notes "Emacs themes" "$EMACS" emacs/CHANGELOG.md "heritage-themes-emacs-<version>.zip"
           } > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \

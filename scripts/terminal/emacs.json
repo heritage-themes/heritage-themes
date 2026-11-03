@@ -1,0 +1,10 @@
+{
+  "modes": {"go": "go-ts-mode", "rs": "rust-ts-mode", "ts": "typescript-ts-mode", "tsx": "tsx-ts-mode", "ya?ml": "yaml-ts-mode"},
+  "grammars": {
+    "go": {"url": "https://github.com/tree-sitter/tree-sitter-go/archive/refs/tags/v0.23.4.tar.gz", "sha256": "967870d7d120e9b760e538aeb8331a72f70ffcca4f1eaf1e1dea5375886d25d2", "src": "src"},
+    "rust": {"url": "https://github.com/tree-sitter/tree-sitter-rust/archive/refs/tags/v0.23.2.tar.gz", "sha256": "71ce61738f8aff4531afed443572ca68aa74a66a07569a1d50863eb34787c782", "src": "src"},
+    "typescript": {"url": "https://github.com/tree-sitter/tree-sitter-typescript/archive/refs/tags/v0.23.2.tar.gz", "sha256": "2c4ce711ae8d1218a3b2f899189298159d672870b5b34dff5d937bed2f3e8983", "src": "typescript/src"},
+    "tsx": {"url": "https://github.com/tree-sitter/tree-sitter-typescript/archive/refs/tags/v0.23.2.tar.gz", "sha256": "2c4ce711ae8d1218a3b2f899189298159d672870b5b34dff5d937bed2f3e8983", "src": "tsx/src"},
+    "yaml": {"url": "https://github.com/tree-sitter-grammars/tree-sitter-yaml/archive/refs/tags/v0.7.0.tar.gz", "sha256": "8182760587f14d5131161dee3605613ccebe86062909f0879edf63b4bdd99d44", "src": "src"}
+  }
+}

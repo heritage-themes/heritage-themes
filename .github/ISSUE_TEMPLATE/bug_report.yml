@@ -24,20 +24,25 @@ body:
         - Neovim
         - Notepad++
         - Xcode
+        - Helix
+        - Kakoune
+        - Micro
+        - Vim
+        - GNU Emacs
     validations:
       required: true
   - type: input
     id: editor-version
     attributes:
       label: Editor name and version
-      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Visual Studio 2026 18.11, Sublime Text 4200, Zed 1.25, Neovim 0.12, Notepad++ 8.9.8 or Xcode 27.1.
+      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Visual Studio 2026 18.11, Sublime Text 4200, Zed 1.25, Neovim 0.12, Notepad++ 8.9.8, Xcode 27.1, Helix 25.07, Kakoune 2026.04.12, Micro 2.0.15, Vim 9.2 or Emacs 30.2.
     validations:
       required: true
   - type: input
     id: version
     attributes:
       label: Plugin or extension version
-      description: Shown in Settings | Plugins, in the Extensions view, in Visual Studio under Extensions | Manage Extensions, for Neovim in your plugin manager or the tag you installed, or for Notepad++ and Xcode in the name of the release zip.
+      description: Shown in Settings | Plugins, in the Extensions view, in Visual Studio under Extensions | Manage Extensions, for Neovim in your plugin manager or the tag you installed, or for Notepad++, Xcode, Helix, Kakoune, Micro, Vim and Emacs in the name of the release zip.
     validations:
       required: true
   - type: input

@@ -1,6 +1,6 @@
 # Heritage Themes
 
-Colour themes for IntelliJ-based IDEs, VS Code, Visual Studio, Sublime Text, Zed, Neovim, Notepad++ and Xcode, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Visual Studio extension (`heritage-themes.heritage-themes-visualstudio`), one Sublime Text package (`Heritage Themes`), one Zed extension (`heritage-theme`), one Neovim plugin (`heritage-themes/heritage-themes.nvim`), one zip of Notepad++ themes (`heritage-themes-notepadpp-<version>.zip`) and one zip of Xcode themes (`heritage-themes-xcode-<version>.zip`).
+Colour themes for IntelliJ-based IDEs, VS Code, Visual Studio, Sublime Text, Zed, Neovim, Notepad++, Xcode, Helix, Kakoune, Micro, Vim and GNU Emacs, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Visual Studio extension (`heritage-themes.heritage-themes-visualstudio`), one Sublime Text package (`Heritage Themes`), one Zed extension (`heritage-theme`), one Neovim plugin (`heritage-themes/heritage-themes.nvim`), one zip of Notepad++ themes (`heritage-themes-notepadpp-<version>.zip`), one zip of Xcode themes (`heritage-themes-xcode-<version>.zip`), one zip of Helix themes (`heritage-themes-helix-<version>.zip`), one zip each of Kakoune, Micro and Vim colour schemes (`heritage-themes-kakoune-<version>.zip`, `heritage-themes-micro-<version>.zip`, `heritage-themes-vim-<version>.zip`) and one zip of Emacs themes (`heritage-themes-emacs-<version>.zip`).
 
 | Folder | Themes | Country |
 | --- | --- | --- |
@@ -105,6 +105,33 @@ Download `heritage-themes-xcode-<version>.zip` from the [latest GitHub release](
 
 In Xcode 27, each theme colours the editor and the toolbar, jump bar and status bar, which Xcode draws in the editor's background, and tints the rest of the window; fonts are a setting of Xcode 27 that the themes leave as they are. In Xcode 26 and earlier, each theme colours the editor, the console and the rendered documentation, and sets the editor font to SF Mono; Xcode draws the rest of its window in the macOS appearance. Xcode colours Swift with its language service, and Objective-C, C and C++ in a project; it colours the other languages it ships a grammar for with fewer roles, opens Markdown in a rendered editor and HTML beside a live preview, and has no grammar for Kotlin, Groovy, Go, Rust, C# or Vue, which open as plain text.
 
+### Helix
+
+Download `heritage-themes-helix-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest) and copy the files in its `themes` folder into `~/.config/helix/themes` (`%AppData%\helix\themes` on Windows), creating the folder if it does not exist. Choose a theme with `theme = "heritage_holi_night"` at the top of `config.toml`, or try one with `:theme heritage_` and `Tab`. The themes need a terminal with 24-bit colour; Helix falls back to its default theme when it does not detect one, which `true-color = true` under `[editor]` overrides. Each theme colours the editor, the gutter, cursors, selections, diagnostics, the status line, buffer line, pickers, popups, the completion menu, inlay hints and jump labels. The cursor takes the colour of the mode, and so does the mode name in the status line with `color-modes = true` under `[editor]`. Helix gives a construct one capture in every language, so function declarations and calls share the call colour, Python decorators take it too, and Rust lifetimes take the label colour.
+
+### Kakoune
+
+Download `heritage-themes-kakoune-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest) and copy the files in its `colors` folder into `~/.config/kak/colors`, creating the folder if it does not exist. Choose a scheme with `colorscheme heritage-holi-night` in `kakrc`, or try one with `:colorscheme heritage-` and `Tab`. The schemes need a terminal with 24-bit colour. Each scheme colours the editor, selections, cursors, line numbers, menus, information boxes, diagnostics, the status line and the prompt. Kakoune's language scripts give each construct one of a few faces shared by every language: Java annotations, Rust attributes and C's `#include` share the keyword colour, and Python decorators, HTML attribute names and YAML keys the annotation colour. Kakoune ships no script for C#.
+
+### Micro
+
+Download `heritage-themes-micro-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest) and copy the files in its `colorschemes` folder into `~/.config/micro/colorschemes`, creating the folder if it does not exist. Press `Ctrl-e` and choose a scheme with `set colorscheme heritage-holi-night`. Micro draws the schemes in 24-bit colour when the terminal reports it in `COLORTERM`, and in the nearest of 256 colours otherwise; set `truecolor` to `on` for a terminal with 24-bit colour that does not report it. Each scheme colours the editor, selections, line numbers, the cursor line, search matches, the gutter's marks, the status line, the tab bar, split dividers and the completion menu. Micro's syntax files name their groups after Vim's and use them as each language needs, so a group can cover different constructs in different languages.
+
+### Vim
+
+Download `heritage-themes-vim-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest) and unzip it into `~/.vim/pack/heritage/start/` (`~/vimfiles/pack/heritage/start/` on Windows). Choose a scheme with `colorscheme heritage-holi-night` in your `vimrc`, after `set termguicolors`, or try one with `:colorscheme heritage-` and `Tab`. The schemes need Vim 9.0 or later; without `termguicolors`, a terminal draws them in the nearest of 256 colours. Each scheme colours the editor, the syntax groups of `:help group-name`, the status line, tab line, tab panel, popup windows, the completion menu, diff mode, spelling, the GUI's menus and tooltips, and the terminal window. Where a syntax file links a construct to a group of another role, the scheme sets the language's group: Java annotations, Python decorators and Rust attributes take the annotation colour, and Rust lifetimes the type parameter colour. For Neovim, use the Neovim plugin.
+
+### GNU Emacs
+
+Download `heritage-themes-emacs-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), copy the files in its `themes` folder into `~/.emacs.d/themes`, and load a theme in your init file:
+
+```elisp
+(add-to-list 'custom-theme-load-path (locate-user-emacs-file "themes/"))
+(load-theme 'heritage-holi-night t)
+```
+
+The themes need Emacs 29.1 or later. Each theme colours Emacs itself (the editor, mode line, header line, tab bar, tab line, minibuffer, search, completion, menus and tooltips) and the packages that ship with Emacs: font-lock and the Tree-sitter modes, compilation, Flymake, Flyspell, Eglot, diff, smerge and Ediff, Dired, Eshell, Org, outlines, Info, whitespace-mode, which-key, xref, Ido, hi-lock, EWW, message composition, Customize and the terminal colours. Emacs 30 opens Kotlin, Groovy, Vue and Markdown as plain text, and colours Go, Rust, TypeScript and YAML once their Tree-sitter grammars are installed with `M-x treesit-install-language-grammar`. The modes without Tree-sitter colour a declared name in one face, so fields, HTML attribute names and local variables take the field colour where they are declared.
+
 ## Build from source
 
 Requires Python 3. `--vsix` also needs Node.js 22 or later and npm; it installs vsce, pinned in `scripts/vscode/`, on first use.
@@ -113,7 +140,8 @@ On Windows, run the scripts with `python` or `py` in place of `python3`: `python
 
 ```bash
 python3 build.py          # JetBrains plugin, VS Code extension folder, Visual Studio extension, Sublime Text package,
-                          # Zed extension, Neovim plugin, Notepad++ themes and Xcode themes
+                          # Zed extension, Neovim plugin, Notepad++ themes, Xcode themes, and the Helix, Kakoune,
+                          # Micro, Vim and Emacs themes
 python3 build.py --vsix   # also pack the VS Code extension
 ```
 
@@ -139,8 +167,18 @@ Output in `build/`:
 | `heritage-themes-notepadpp-<version>.zip` | The same files in a `heritage-themes-notepadpp/` folder. The release attaches it |
 | `xcode/` | The Xcode themes: per theme an `.xcworkspacecolortheme` and an `.xccolortheme` in `themes/`, named as Xcode lists them, plus README, changelog and licence |
 | `heritage-themes-xcode-<version>.zip` | The same files in a `heritage-themes-xcode/` folder. The release attaches it |
+| `helix/` | The Helix themes: one `.toml` file per theme in `themes/`, named as Helix lists it, plus README, changelog and licence |
+| `heritage-themes-helix-<version>.zip` | The same files in a `heritage-themes-helix/` folder. The release attaches it |
+| `kakoune/` | The Kakoune colour schemes: one `.kak` file per theme in `colors/`, named as Kakoune lists it, plus README, changelog and licence |
+| `heritage-themes-kakoune-<version>.zip` | The same files in a `heritage-themes-kakoune/` folder. The release attaches it |
+| `micro/` | The Micro colour schemes: one `.micro` file per theme in `colorschemes/`, named as Micro lists it, plus README, changelog and licence |
+| `heritage-themes-micro-<version>.zip` | The same files in a `heritage-themes-micro/` folder. The release attaches it |
+| `vim/` | The Vim colour schemes: one `.vim` file per theme in `colors/`, named as Vim lists it, plus README, changelog and licence |
+| `heritage-themes-vim-<version>.zip` | The same files in a `heritage-themes-vim/` folder, a Vim package. The release attaches it |
+| `emacs/` | The Emacs themes: one `-theme.el` file per theme in `themes/`, named as Emacs lists it, plus README, changelog and licence |
+| `heritage-themes-emacs-<version>.zip` | The same files in a `heritage-themes-emacs/` folder. The release attaches it |
 
-Install the jar, an `.icls` file, a `.vsix`, the `.sublime-package`, the Zed extension, the Neovim plugin, the Notepad++ themes or the Xcode themes as described under [Install](#install).
+Install the jar, an `.icls` file, a `.vsix`, the `.sublime-package`, the Zed extension, the Neovim plugin, or the Notepad++, Xcode, Helix, Kakoune, Micro, Vim or Emacs themes as described under [Install](#install).
 
 ## Preview
 
@@ -155,6 +193,11 @@ python3 preview.py --zed        # Zed preview: themes/<theme>/build/preview-zed.
 python3 preview.py --nvim       # Neovim preview: themes/<theme>/build/preview-nvim.html
 python3 preview.py --notepadpp  # Notepad++ preview: themes/<theme>/build/preview-notepadpp.html
 python3 preview.py --xcode      # Xcode preview: themes/<theme>/build/preview-xcode.html
+python3 preview.py --helix      # Helix preview: themes/<theme>/build/preview-helix.html
+python3 preview.py --kakoune    # Kakoune preview: themes/<theme>/build/preview-kakoune.html
+python3 preview.py --micro      # Micro preview: themes/<theme>/build/preview-micro.html
+python3 preview.py --vim        # Vim preview: themes/<theme>/build/preview-vim.html
+python3 preview.py --emacs      # Emacs preview: themes/<theme>/build/preview-emacs.html
 ```
 
 The page shows each theme as an IDE window with a code sample per language, coloured from the generated editor scheme. It downloads JetBrains Mono once into `~/.cache/heritage-themes`. `--png` needs Google Chrome or Chromium (or the `CHROME` environment variable) and ImageMagick.
@@ -173,12 +216,14 @@ The page shows each theme as an IDE window with a code sample per language, colo
 
 `--xcode` shows the samples, with a Swift and an Objective-C sample first, as Xcode 27 draws them with the family's `.xcworkspacecolortheme` files. It needs macOS, Xcode 27 or later and Screen Recording and Accessibility permission for the terminal, and Xcode must be closed: Xcode keeps its settings in one place for every instance, so `scripts/xcode/screen.py` saves them, runs an Xcode of its own for each theme with a temporary home, the themes folder and the theme passed as launch arguments, and restores the saved settings at the end. It opens each sample on its own, so that Swift takes the colours of Xcode's language service while Objective-C, outside a project, takes only its syntactic colours. Each window is as wide as the editors on the page, so Markdown shows in Xcode's rendered editor at that width and HTML without the live preview, which Xcode then puts under the editor. It captures the editors into `themes/<theme>/build/xcode/`, compiling `scripts/xcode/capture.swift` into `~/.cache/heritage-themes/xcode` on first use. Xcode's windows show meanwhile, and the screen must stay unlocked; the script keeps the display awake. The `.xccolortheme` files have no preview: Xcode 27 shows them only after converting them. With `--png` it writes `preview-xcode.png` next to the page.
 
+`--helix`, `--kakoune`, `--micro`, `--vim` and `--emacs` show the samples as the editor draws them: `scripts/terminal/screen.py` opens each sample in the editor in a pseudo-terminal with 24-bit colour and reads the colours from the screen through the pyte terminal emulator. They need Linux or macOS and create a virtual environment with pyte in `scripts/terminal/.venv` on first use. `--helix` downloads the Helix release pinned in `scripts/terminal/helix.json` into `~/.cache/heritage-themes/helix` and uses the grammars and queries it ships. `--kakoune`, `--micro`, `--vim` and `--emacs` need the editor installed and use the syntax highlighting it ships; `--emacs` also needs a C compiler (`cc`) to build the Tree-sitter grammars pinned in `scripts/terminal/emacs.json` into `~/.cache/heritage-themes/emacs`, for the samples whose language Emacs colours only with Tree-sitter. Each editor runs with its own configuration in a temporary home, without a gutter, cursor line, bracket matching or language servers. The preview fails when the editor logs a problem, or draws code on another background or in a colour the theme does not set. With `--png` it writes `preview-<editor>.png` next to the page.
+
 ## Layout
 
 ```text
 build.py        builds the plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package, the Zed
-                extension, the Neovim plugin, the Notepad++ themes and the Xcode themes from every theme folder; holds
-                their shared version
+                extension, the Neovim plugin, and the Notepad++, Xcode, Helix, Kakoune, Micro, Vim and Emacs themes from
+                every theme folder; holds their shared version
 preview.py      writes theme previews and renders the README images
 heritage/       code shared by every theme family
   __init__.py   finds the theme folders in themes/; the theme.py contract
@@ -199,6 +244,11 @@ heritage/       code shared by every theme family
   xcode.py      Xcode themes: palette roles to the colours of an Xcode 27 theme recipe, and to the syntax node types,
                 console and markup keys of an earlier Xcode's theme
   xcode.json    the keys of Xcode's own Default themes, written by scripts/xcode/keys.py
+  helix.py      Helix theme: palette roles to Tree-sitter scopes and UI keys
+  kakoune.py    Kakoune colour scheme: palette roles to code, markup and built-in faces
+  micro.py      Micro colour scheme: palette roles to syntax and UI groups
+  vim.py        Vim colour scheme: the Neovim scheme's groups that Vim shares, Vim's own and language groups
+  emacs.py      Emacs theme: palette roles to font-lock faces and the faces of Emacs and its packages
   preview.py    preview page
   samples.py    code samples shown in the preview
 CHANGELOG.md    JetBrains plugin release notes; the plugin's change notes come from it
@@ -209,10 +259,16 @@ zed/            CHANGELOG.md: Zed extension release notes
 nvim/           CHANGELOG.md: Neovim plugin release notes
 notepadpp/      CHANGELOG.md: Notepad++ themes release notes
 xcode/          CHANGELOG.md: Xcode themes release notes
+helix/          CHANGELOG.md: Helix themes release notes
+kakoune/        CHANGELOG.md: Kakoune colour schemes release notes
+micro/          CHANGELOG.md: Micro colour schemes release notes
+vim/            CHANGELOG.md: Vim colour schemes release notes
+emacs/          CHANGELOG.md: Emacs themes release notes
 assets/         plugin icons (pluginIcon.svg, pluginIcon_dark.svg)
 scripts/        release.sh, parent_overrides.py; shiki/ tokenises the VS Code preview; vscode/ packs and publishes the extension;
                 visualstudio/ reads Visual Studio's colours and captures the Visual Studio preview; zed/ colours the Zed preview; nvim/ draws the Neovim preview; notepadpp/ pins Notepad++, lists its styles
-                and colours the Notepad++ preview; xcode/ reads Xcode's theme keys and captures the Xcode preview
+                and colours the Notepad++ preview; xcode/ reads Xcode's theme keys and captures the Xcode preview; terminal/
+                draws the Helix, Kakoune, Micro, Vim and Emacs previews
 docs/           adding-a-theme.md
 .github/        Build and Publish workflows; ISSUE_TEMPLATE/ holds the issue forms
 themes/<theme>/
@@ -222,14 +278,14 @@ themes/<theme>/
 build/          generated, not tracked
 ```
 
-Only sources are tracked. Jars, zips, `.icls`, `.vsix`, `.sublime-package`, Neovim `.lua`, Notepad++ and Xcode theme files are build output; the publish workflows attach them to each GitHub release.
+Only sources are tracked. Jars, zips, `.icls`, `.vsix`, `.sublime-package`, Neovim `.lua`, and Notepad++, Xcode, Helix, Kakoune, Micro, Vim and Emacs theme files are build output; the publish workflows attach them to each GitHub release.
 
 ## Git workflow
 
 - Work on `dev`. `master` receives commits only when `scripts/release.sh` cuts a release.
 - Commit subjects follow [Conventional Commits](https://www.conventionalcommits.org/), with the theme folder as the scope for a change to one theme: `fix(wuxing): soften comment contrast`. Changes outside the theme folders use a scope such as `heritage`, `build` or `ci`, or none.
 - Keep a commit within one theme folder.
-- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package, the Zed extension, the Neovim plugin, the Notepad++ themes and the Xcode themes share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme.
+- `scripts/release.sh` tags each release `v<version>`, which publishes it. The JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package, the Zed extension, the Neovim plugin, and the Notepad++, Xcode, Helix, Kakoune, Micro, Vim and Emacs themes share the version, `VERSION` in `build.py`; a release publishes each product with changelog entries. One release ships every theme.
 
 ## Add a theme
 

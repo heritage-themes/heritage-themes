@@ -1,5 +1,6 @@
 """Builds the Heritage Themes JetBrains plugin, VS Code extension, Visual Studio extension, Sublime Text package, Zed
-extension, Neovim plugin, Notepad++ themes and Xcode themes from every theme folder.
+extension, Neovim plugin, and the Notepad++, Xcode, Helix, Kakoune, Micro, Vim and Emacs themes from every theme
+folder.
 
 A theme folder is any directory in themes/ containing a theme.py (see heritage/__init__.py).
 
@@ -18,8 +19,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
 CHANGELOG = os.path.join(ROOT, "CHANGELOG.md")
 # One version for the JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package,
-# the Zed extension, the Neovim plugin, the Notepad++ themes and the Xcode themes. A release publishes each product
-# whose changelog has a section for it.
+# the Zed extension, the Neovim plugin, and the Notepad++, Xcode, Helix, Kakoune, Micro, Vim and Emacs themes. A
+# release publishes each product whose changelog has a section for it.
 VERSION = "1.5.0"
 VENDOR_URL = "https://github.com/heritage-themes/heritage-themes"
 DESCRIPTION = "Colour themes drawn from the colour traditions of different cultures."
@@ -55,6 +56,16 @@ XCODE_CHANGELOG = os.path.join(ROOT, "xcode", "CHANGELOG.md")
 XCODE_NAME = "heritage-themes-xcode"  # the folder in the zip
 XCODE_THEMES = "~/Library/Developer/Xcode/UserData/FontAndColorThemes"  # where Xcode looks for a user's themes
 XCODE_FONT = re.compile(r"[.\w-]+ - \d+\.\d")
+HELIX_CHANGELOG = os.path.join(ROOT, "helix", "CHANGELOG.md")
+HELIX_NAME = "heritage-themes-helix"  # the folder in the zip
+HELIX_HEX = re.compile(r"#[0-9A-F]{6}")
+# A Kakoune face: up to three colours, then attributes. A Micro style: font styles, then fg and an optional bg. A Vim
+# :highlight command with the attributes that heritage.vim sets.
+KAKOUNE_FACE = re.compile(r"(default|rgb:[0-9A-F]{6})(,(default|rgb:[0-9A-F]{6})){0,2}(\+[bicudrsFf]+)?")
+MICRO_STYLE = re.compile(r"((bold|italic|underline|reverse) )*#[0-9A-F]{6}(,#[0-9A-F]{6})?")
+VIM_HIGHLIGHT = re.compile(r"hi \w+( (guifg|guibg|guisp)=(#[0-9A-F]{6}|NONE)"
+                           r"| (ctermfg|ctermbg|ctermul)=(1[6-9]|[2-9]\d|1\d\d|2[0-4]\d|25[0-5]|NONE)"
+                           r"| (gui|cterm)=(NONE|[a-z]+(,[a-z]+)*)| term=NONE)+")
 WINDOWS_NAME = re.compile(r'[^<>:"/\\|?*\x00-\x1f]+(?<![ .])')  # a file name that Windows accepts
 # The extension's VSIX identity, which Visual Studio matches installed extensions and updates by, and which the
 # Marketplace requires to be unique across all publishers; its internal name on the Marketplace, which also names the
@@ -65,7 +76,8 @@ VISUALSTUDIO_ITEM = "heritage-themes-visualstudio"
 VISUALSTUDIO_NAME = "Heritage Themes for Visual Studio"
 VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
-EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode")
+EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
+           "Helix", "Kakoune", "Micro", "Vim", "Emacs")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -1115,6 +1127,539 @@ def pack_xcode(directory):
     return pack_folder(directory, os.path.join(OUT, f"{XCODE_NAME}-{VERSION}.zip"), XCODE_NAME)
 
 
+def helix_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    rows = "\n".join(f"| [{f.FAMILY}]({VENDOR_URL}/tree/master/themes/{heritage.folder(f)}) "
+                     f"| {', '.join(f'`{heritage.helix.name(t)}`' for t in f.THEMES)} | {f.BLURB} |" for f in families)
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Helix
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+1. Copy the files in `themes` into the `themes` folder of your Helix configuration: `~/.config/helix/themes` on \
+Linux and macOS, `%AppData%\\helix\\themes` on Windows. Create the folder if it does not exist. In a terminal, from \
+the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.config/helix/themes
+   cp themes/* ~/.config/helix/themes/
+   ```
+
+2. Choose a theme at the top of `config.toml`, or try one with `:theme heritage_` and `Tab`:
+
+   ```toml
+   theme = "heritage_holi_night"
+   ```
+
+The themes use 24-bit colour. Helix falls back to its default theme when it does not detect a terminal with 24-bit \
+colour; if your terminal has it, set `true-color = true` under `[editor]`.
+
+## What is coloured
+
+Each theme colours the editor, the gutter, cursors, selections, diagnostics, the status line, buffer line, pickers, \
+popups, the completion menu, inlay hints and jump labels. The cursor takes the colour of the mode, and so does the \
+mode name in the status line with `color-modes = true` under `[editor]`.
+
+## Languages
+
+Helix colours code by the Tree-sitter captures of the queries it ships. A capture names the construct, not the \
+language, so the themes colour a construct alike in every language: keys in YAML, TOML and JSON take the field \
+colour, Java annotations and HTML attribute names the annotation colour, and Rust lifetimes the label colour. Helix \
+gives function declarations and calls one capture, so both take the call colour, and Python decorators take it too.
+
+To change a colour, make a theme of your own that inherits one of these, in the same `themes` folder:
+
+```toml
+inherits = "heritage_holi_night"
+"comment" = {{ fg = "#808080", modifiers = ["italic"] }}
+```
+
+## Themes
+
+| Family | Themes | Tradition |
+| --- | --- | --- |
+{rows}
+
+Each family's page describes its colour tradition. The same themes are available for {elsewhere("Helix")}: see \
+[Heritage Themes on GitHub]({VENDOR_URL}).
+
+Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the theme, Helix \
+version, terminal, language and a screenshot.
+"""
+
+
+def build_helix(families):
+    """Writes the Helix themes to build/helix/themes, one file per theme named as Helix lists it, and returns
+    build/helix."""
+    directory = os.path.join(OUT, "helix")
+    os.makedirs(os.path.join(directory, "themes"))
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            write_text(os.path.join(directory, "themes", f"{heritage.helix.name(t)}.toml"),
+                       heritage.helix.theme(t["palette"], source))
+    write_text(os.path.join(directory, "README.md"), helix_readme(families))
+    shutil.copy(HELIX_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_helix(directory, families):
+    """Fails the build when the README, changelog, licence or the file of a theme is missing, a theme leaves out a UI
+    key that Helix looks up, has a malformed style, or has a text colour that is unreadable on its background."""
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Helix themes: {name} is missing")
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name = heritage.helix.name(t)
+            if not re.fullmatch(r"heritage(_[a-z]+)+", name):
+                raise SystemExit(f"Helix: {name} is not a lower-case ASCII theme name")
+            expected.add(f"{name}.toml")
+            validate_helix_theme(os.path.join(directory, "themes", f"{name}.toml"), name)
+    found = set(os.listdir(os.path.join(directory, "themes")))
+    if found != expected:
+        raise SystemExit(f"Helix themes: {len(found)} files for {len(expected)} themes")
+
+
+def validate_helix_theme(path, name):
+    """Fails the build when the theme file is not TOML, leaves out a key of heritage.helix.UI_KEYS, has a style
+    attribute, colour, modifier or underline style that Helix does not accept, or has a text colour below 4.5:1 (3:1
+    for comments, the caret and the status line's diagnostic marks) on a background Helix draws it on."""
+    def fail(message):
+        raise SystemExit(f"Helix {name}: {message}")
+    with open(path, "rb") as f:
+        styles = tomllib.load(f)
+    missing = [key for key in heritage.helix.UI_KEYS if key not in styles]
+    if missing:
+        fail(f"leaves out {', '.join(missing)}")
+    for key, style in styles.items():
+        if not isinstance(style, dict) or not style or not set(style) <= set(heritage.helix.ATTRIBUTES):
+            fail(f"{key} has {style!r}")
+        underline = style.get("underline", {})
+        colours = [style.get("fg"), style.get("bg"), underline.get("color")]
+        if not all(c is None or HELIX_HEX.fullmatch(c) for c in colours) \
+                or not set(style.get("modifiers", [])) <= set(heritage.helix.MODIFIERS) \
+                or not set(underline) <= {"color", "style"} \
+                or underline.get("style", "line") not in heritage.helix.UNDERLINES:
+            fail(f"{key} has {style!r}")
+        if "fg" not in style or key in heritage.helix.DECORATIVE:
+            continue
+        minimum = 3 if key in heritage.helix.LOW_CONTRAST else 4.5
+        backgrounds = [(style["bg"], minimum)] if "bg" in style else \
+            [(styles[k]["bg"], m) for k, m in heritage.helix.DRAWN_ON.get(key, (("ui.background", minimum),))]
+        for background, minimum in backgrounds:
+            ratio = contrast(style["fg"][1:], background[1:])
+            if ratio < minimum:
+                fail(f"{key} is {ratio:.2f}:1 on {background}, needs {minimum}:1")
+
+
+def pack_helix(directory):
+    """Zips the themes, README, changelog and licence into a folder, and returns the zip's path."""
+    return pack_folder(directory, os.path.join(OUT, f"{HELIX_NAME}-{VERSION}.zip"), HELIX_NAME)
+
+
+def theme_rows(families, name):
+    """The rows of a README's table of families, with each family's themes as name gives them."""
+    return "\n".join(f"| [{f.FAMILY}]({VENDOR_URL}/tree/master/themes/{heritage.folder(f)}) "
+                     f"| {', '.join(f'`{name(t)}`' for t in f.THEMES)} | {f.BLURB} |" for f in families)
+
+
+def readme_footer(families, editor, heading, report):
+    """The table of families and the links that end the README of a product."""
+    return f"""## {heading}
+
+| Family | {heading} | Tradition |
+| --- | --- | --- |
+{theme_rows(families, TERMINAL_NAMES[editor])}
+
+Each family's page describes its colour tradition. The same themes are available for {elsewhere(editor)}: see \
+[Heritage Themes on GitHub]({VENDOR_URL}).
+
+Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include {report} and a \
+screenshot.
+"""
+
+
+def check_styles(label, styles, fg, bg, default, decorative, low_contrast, drawn_on):
+    """Fails the build when a style's text colour is below 4.5:1 (3:1 for low_contrast) on the background it is drawn
+    on: its own bg, else those of drawn_on ((key, minimum) pairs), else the bg of default. fg and bg name the colour
+    attributes of a style."""
+    for key, style in styles.items():
+        if fg not in style or key in decorative:
+            continue
+        minimum = 3 if key in low_contrast else 4.5
+        backgrounds = [(style[bg], minimum)] if bg in style else \
+            [(styles[k][bg], m) for k, m in drawn_on.get(key, ((default, minimum),))]
+        for background, needed in backgrounds:
+            ratio = contrast(style[fg][1:], background[1:])
+            if ratio < needed:
+                raise SystemExit(f"{label}: {key} is {ratio:.2f}:1 on {background}, needs {needed}:1")
+
+
+def check_files(label, directory, folder, expected):
+    """Fails the build when the README, changelog or licence is missing, or folder holds other files than expected."""
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"{label}: {name} is missing")
+    found = set(os.listdir(os.path.join(directory, folder)))
+    if found != expected:
+        raise SystemExit(f"{label}: {len(found)} files in {folder} for {len(expected)} themes")
+
+
+def build_themes(families, editor, folder, files):
+    """Writes each theme's file to build/<editor>/<folder>, with the README, changelog and licence, and returns
+    build/<editor>. files gives a theme dict and the URL of its family's folder as (file name, text)."""
+    directory = os.path.join(OUT, editor.lower())
+    os.makedirs(os.path.join(directory, folder))
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            filename, text = files(t, source)
+            write_text(os.path.join(directory, folder, filename), text)
+    write_text(os.path.join(directory, "README.md"), TERMINAL_READMES[editor](families))
+    shutil.copy(os.path.join(ROOT, editor.lower(), "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def kakoune_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Kakoune
+
+{DESCRIPTION} {count} dark and light colour schemes in {len(families)} families; each family maps the named colours \
+of one tradition to syntax roles.
+
+## Install
+
+1. Copy the files in `colors` into `~/.config/kak/colors`, creating the folder if it does not exist. In a terminal, \
+from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.config/kak/colors
+   cp colors/* ~/.config/kak/colors/
+   ```
+
+2. Choose a scheme in `~/.config/kak/kakrc`, or try one with `:colorscheme heritage-` and `Tab`:
+
+   ```kak
+   colorscheme heritage-holi-night
+   ```
+
+The schemes need a terminal with 24-bit colour.
+
+## What is coloured
+
+Each scheme sets Kakoune's built-in faces: the editor, selections, cursors, line numbers, menus, information boxes, \
+diagnostics, the status line and the prompt.
+
+## Languages
+
+Kakoune's language scripts give each construct one of a few faces, shared by every language. `meta` takes the keyword \
+colour, so Java annotations, Rust attributes, C's `#include` and Python's `import` share it; `attribute` takes the \
+annotation colour, so Python decorators, HTML attribute names, YAML keys and Java's modifiers share that. Python's \
+script colours built-in functions but neither other calls nor the names of the functions you declare. Diffs and \
+Git views use the terminal's own colours. Kakoune ships no script for C# and opens it as plain text.
+
+To change a face, set it after the scheme in `kakrc`:
+
+```kak
+colorscheme heritage-holi-night
+set-face global comment rgb:808080+i
+```
+
+{readme_footer(families, "Kakoune", "Colour schemes", "the colour scheme, Kakoune version, terminal, language")}"""
+
+
+def validate_kakoune(directory, families):
+    """Fails the build when a file is missing, a scheme leaves out a face of heritage.kakoune, has a malformed face, or
+    has a text colour that is unreadable on its background."""
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.kakoune.name(t), t["palette"]
+            expected.add(f"{name}.kak")
+            label = f"Kakoune {name}"
+            with open(os.path.join(directory, "colors", f"{name}.kak"), encoding="utf-8") as f:
+                faces = dict(re.fullmatch(r"set-face global (\w+) (\S+)", line).groups()
+                             for line in f.read().splitlines() if line.startswith("set-face"))
+            missing = [k for k in heritage.kakoune.UI_FACES + heritage.kakoune.SYNTAX_FACES if k not in faces]
+            if missing:
+                raise SystemExit(f"{label}: leaves out {', '.join(missing)}")
+            for key, value in faces.items():
+                if not KAKOUNE_FACE.fullmatch(value):
+                    raise SystemExit(f"{label}: {key} has {value!r}")
+            styles = heritage.kakoune.styles(p)
+            check_styles(label, styles, "fg", "bg", "Default", heritage.kakoune.DECORATIVE,
+                         heritage.kakoune.LOW_CONTRAST, heritage.kakoune.DRAWN_ON)
+    check_files("Kakoune colour schemes", directory, "colors", expected)
+
+
+def micro_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Micro
+
+{DESCRIPTION} {count} dark and light colour schemes in {len(families)} families; each family maps the named colours \
+of one tradition to syntax roles.
+
+## Install
+
+1. Copy the files in `colorschemes` into `~/.config/micro/colorschemes`, creating the folder if it does not exist. \
+In a terminal, from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.config/micro/colorschemes
+   cp colorschemes/* ~/.config/micro/colorschemes/
+   ```
+
+2. Press `Ctrl-e` in Micro and choose a scheme, or try one with `set colorscheme heritage-` and `Tab`:
+
+   ```text
+   set colorscheme heritage-holi-night
+   ```
+
+Micro draws the schemes in 24-bit colour when the terminal reports it in `COLORTERM`, and in the nearest of 256 \
+colours otherwise. Set `truecolor` to `on` if your terminal has 24-bit colour and does not report it.
+
+## What is coloured
+
+Each scheme colours the editor, selections, line numbers, the cursor line, search and brace matches, the gutter's \
+diagnostics and version control marks, the status line, the tab bar, split dividers and the completion menu.
+
+## Languages
+
+Micro's syntax files name their groups after Vim's and use them as each language needs, so a group can cover \
+different constructs in different languages: `identifier` marks Python's built-in functions as well as HTML attribute \
+names, and Java's syntax file files its modifiers under `type`. Python's syntax file colours a function's name where \
+it is declared and built-in functions where they are called, but not calls to other functions.
+
+To change a group, make a scheme of your own that includes one of these, in the same `colorschemes` folder:
+
+```text
+include "heritage-holi-night"
+color-link comment "italic #808080"
+```
+
+{readme_footer(families, "Micro", "Colour schemes", "the colour scheme, Micro version, terminal, language")}"""
+
+
+def validate_micro(directory, families):
+    """Fails the build when a file is missing, a scheme leaves out a group of heritage.micro.UI_GROUPS, does not set
+    default first, has a malformed style, or has a text colour that is unreadable on its background."""
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.micro.name(t), t["palette"]
+            expected.add(f"{name}.micro")
+            label = f"Micro {name}"
+            with open(os.path.join(directory, "colorschemes", f"{name}.micro"), encoding="utf-8") as f:
+                links = [re.fullmatch(r'color-link ([\w.-]+) "([^"]+)"', line).groups()
+                         for line in f.read().splitlines() if line.startswith("color-link")]
+            groups = dict(links)
+            if links[0][0] != "default":
+                raise SystemExit(f"{label}: default is not the first group")
+            missing = [g for g in heritage.micro.UI_GROUPS if g not in groups]
+            if missing:
+                raise SystemExit(f"{label}: leaves out {', '.join(missing)}")
+            for group, value in groups.items():
+                if not MICRO_STYLE.fullmatch(value):
+                    raise SystemExit(f"{label}: {group} has {value!r}")
+            check_styles(label, heritage.micro.styles(p), "fg", "bg", "default", heritage.micro.DECORATIVE,
+                         heritage.micro.LOW_CONTRAST, {})
+    check_files("Micro colour schemes", directory, "colorschemes", expected)
+
+
+def vim_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Vim
+
+{DESCRIPTION} {count} dark and light colour schemes in {len(families)} families; each family maps the named colours \
+of one tradition to syntax roles. For Neovim, use the [Neovim plugin](https://github.com/heritage-themes/\
+heritage-themes.nvim).
+
+## Install
+
+The schemes need Vim 9.0 or later.
+
+1. Unzip `heritage-themes-vim-<version>.zip` into `~/.vim/pack/heritage/start/` (`~/vimfiles/pack/heritage/start/` \
+on Windows), creating the folder if it does not exist:
+
+   ```bash
+   mkdir -p ~/.vim/pack/heritage/start
+   unzip heritage-themes-vim-<version>.zip -d ~/.vim/pack/heritage/start/
+   ```
+
+2. Choose a scheme in your `vimrc`, or try one with `:colorscheme heritage-` and `Tab`:
+
+   ```vim
+   set termguicolors
+   colorscheme heritage-holi-night
+   ```
+
+`termguicolors` draws the schemes in 24-bit colour, which most terminals have. Without it, a terminal draws them in \
+the nearest of 256 colours. gVim draws them in 24-bit colour either way. Each scheme sets `background` to its own \
+brightness.
+
+## What is coloured
+
+Each scheme colours the editor, the syntax groups of `:help group-name`, the status line, tab line, tab panel, popup \
+windows, the completion menu, diff mode, spelling, the GUI's menus and tooltips, and the terminal window.
+
+## Languages
+
+Vim's syntax files link their groups to the groups of `:help group-name`, so a construct takes the colour of the group \
+its syntax file links it to. Where that differs from the other editors, the scheme sets the language's own group: Java \
+annotations, Python decorators and Rust attributes take the annotation colour, Rust lifetimes the type parameter \
+colour, function names in declarations the declaration colour, and the methods of TypeScript's standard library the \
+call colour.
+
+Most of Vim's syntax files colour few function names. Python's and TypeScript's colour declarations, but calls only to \
+built-ins and the standard library. The Kotlin, C, C++ and C# syntax files colour none. Go's colours declarations when \
+`go_highlight_functions` is set and calls when `go_highlight_function_calls` is set; Java's colours declarations when \
+`java_highlight_functions` is set:
+
+```vim
+let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
+let g:java_highlight_functions = 'style'
+```
+
+To change a group, set it in a `ColorScheme` autocommand, so that it survives switching schemes:
+
+```vim
+autocmd ColorScheme heritage-* highlight Comment guifg=#808080 gui=italic
+```
+
+{readme_footer(families, "Vim", "Colour schemes", "the colour scheme, Vim version, terminal, language")}"""
+
+
+def validate_vim(directory, families):
+    """Fails the build when a file is missing, a highlight definition is malformed, a scheme does not set its
+    colors_name or a text colour is unreadable on the background it is drawn on."""
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            scheme, p = heritage.vim.name(t), t["palette"]
+            expected.add(f"{scheme}.vim")
+            label = f"Vim {scheme}"
+            groups = heritage.vim.highlights(p)
+            for group, definition in groups.items():
+                if not re.fullmatch(r"[A-Za-z0-9_]+", group):
+                    raise SystemExit(f"{label}: {group!r} is not a valid group name")
+                for key, value in definition.items():
+                    if not ((key in heritage.vim.COLOURS and NVIM_HEX.fullmatch(value)) or
+                            (key in heritage.vim.FLAGS and value is True)):
+                        raise SystemExit(f"{label}: {group} has {key} = {value!r}")
+            check_styles(label, groups, "fg", "bg", "Normal", heritage.vim.DECORATIVE, heritage.vim.LOW_CONTRAST, {})
+            with open(os.path.join(directory, "colors", f"{scheme}.vim"), encoding="utf-8") as f:
+                text = f.read()
+            if f"let g:colors_name = '{scheme}'" not in text:
+                raise SystemExit(f"Vim colors/{scheme}.vim does not set its colors_name")
+            for line in text.splitlines():
+                if line.startswith("hi ") and line != "hi clear" and not VIM_HIGHLIGHT.fullmatch(line):
+                    raise SystemExit(f"Vim colors/{scheme}.vim has {line!r}")
+    check_files("Vim colour schemes", directory, "colors", expected)
+
+
+def emacs_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for GNU Emacs
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+The themes need Emacs 29.1 or later.
+
+1. Copy the files in `themes` into a `themes` folder in your Emacs directory, `~/.emacs.d/themes` or \
+`~/.config/emacs/themes`, creating it if it does not exist:
+
+   ```bash
+   mkdir -p ~/.emacs.d/themes
+   cp themes/* ~/.emacs.d/themes/
+   ```
+
+2. Add the folder to the theme path and load a theme in your init file:
+
+   ```elisp
+   (add-to-list 'custom-theme-load-path (locate-user-emacs-file "themes/"))
+   (load-theme 'heritage-holi-night t)
+   ```
+
+Try a theme with `M-x load-theme RET heritage-` and `Tab`. In a terminal, Emacs draws the themes in 24-bit colour \
+when the terminal reports it in `COLORTERM`, and in the nearest colours it has otherwise.
+
+## What is coloured
+
+Each theme colours Emacs itself (the editor, mode line, header line, tab bar, tab line, minibuffer, search, \
+completion, menus and tooltips) and the packages that ship with Emacs: font-lock and the Tree-sitter modes, \
+compilation, Flymake, Flyspell, Eglot, diff, smerge and Ediff, Dired, Eshell, Org, outlines, Info, whitespace-mode, \
+which-key, xref, Ido, hi-lock, EWW, message composition, Customize and the terminal colours.
+
+## Languages
+
+Emacs colours a language once it has a major mode for it. Emacs 30 opens Kotlin, Groovy, Vue and Markdown as plain \
+text, and colours Go, Rust, TypeScript and YAML once you install their Tree-sitter grammars with \
+`M-x treesit-install-language-grammar`. Function calls take the call colour in the Tree-sitter modes when \
+`treesit-font-lock-level` is 4, and are plain in the other modes. The modes without Tree-sitter colour a declared name \
+in one face, so fields, HTML attribute names and local variables take the field colour where they are declared; HTML \
+tag names take the declaration colour.
+
+To change a face, set it after the theme in your init file:
+
+```elisp
+(custom-theme-set-faces 'heritage-holi-night
+ '(font-lock-comment-face ((t (:foreground "#808080" :slant italic)))))
+```
+
+{readme_footer(families, "Emacs", "Themes", "the theme, Emacs version, whether in a terminal or a window, language")}"""
+
+
+def validate_emacs(directory, families):
+    """Fails the build when a file is missing, a theme sets an attribute that heritage.emacs does not allow or a colour
+    that is not hex, its Lisp is unbalanced, or a text colour is unreadable on the background it is drawn on."""
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.emacs.name(t), t["palette"]
+            expected.add(f"{name}-theme.el")
+            label = f"Emacs {name}"
+            faces = heritage.emacs.faces(p)
+            for face, attributes in faces.items():
+                if not set(attributes) <= set(heritage.emacs.ATTRIBUTES):
+                    raise SystemExit(f"{label}: {face} has {attributes}")
+                for key in ("foreground", "background"):
+                    if key in attributes and not NVIM_HEX.fullmatch(attributes[key]):
+                        raise SystemExit(f"{label}: {face} has {key} {attributes[key]!r}")
+            check_styles(label, faces, "foreground", "background", "default", heritage.emacs.DECORATIVE,
+                         heritage.emacs.LOW_CONTRAST, heritage.emacs.DRAWN_ON)
+            with open(os.path.join(directory, "themes", f"{name}-theme.el"), encoding="utf-8") as f:
+                code = re.sub(r'"(\\.|[^"\\])*"|;[^\n]*', "", f.read())
+            depth = 0
+            for char in code:
+                depth += {"(": 1, ")": -1}.get(char, 0)
+                if depth < 0:
+                    break
+            if depth or f"(deftheme {name}" not in code or f"(provide-theme '{name})" not in code:
+                raise SystemExit(f"Emacs themes/{name}-theme.el is not a balanced theme definition of {name}")
+    check_files("Emacs themes", directory, "themes", expected)
+
+
+# Product → its themes' names in READMEs, the README writer, and the folder its theme files go in.
+TERMINAL_NAMES = {"Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name, "Vim": heritage.vim.name,
+                  "Emacs": heritage.emacs.name}
+TERMINAL_READMES = {"Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+
+
 def visualstudio_description(themes):
     """The extension's description in Visual Studio's Extension Manager."""
     return f"{DESCRIPTION} {len(themes)} dark and light themes, each drawn from the named colours of one tradition."
@@ -1228,7 +1773,8 @@ def pack_visualstudio(directory):
 def main():
     parser = argparse.ArgumentParser(description="Build the JetBrains plugin, the VS Code extension, the Visual Studio "
                                                  "extension, the Sublime Text package, the Zed extension, the Neovim "
-                                                 "plugin, the Notepad++ themes and the Xcode themes.")
+                                                 "plugin, and the Notepad++, Xcode, Helix, Kakoune, Micro, Vim and "
+                                                 "Emacs themes.")
     parser.add_argument("--vsix", action="store_true", help="also pack the VS Code extension with vsce")
     args = parser.parse_args()
     families = heritage.load_families()
@@ -1281,6 +1827,28 @@ def main():
     xcode_themes = build_xcode(families)
     validate_xcode(xcode_themes, families)
     print(f"{pack_xcode(xcode_themes)}: {len(themes)} themes", flush=True)
+    helix_themes = build_helix(families)
+    validate_helix(helix_themes, families)
+    print(f"{pack_helix(helix_themes)}: {len(themes)} themes", flush=True)
+    for editor, folder, files, validate_themes in (
+            ("Kakoune", "colors", lambda t, source: (f"{heritage.kakoune.name(t)}.kak",
+                                                      heritage.kakoune.colorscheme(t["palette"], source)),
+             validate_kakoune),
+            ("Micro", "colorschemes", lambda t, source: (f"{heritage.micro.name(t)}.micro",
+                                                          heritage.micro.colorscheme(t["palette"], source)),
+             validate_micro),
+            ("Vim", "colors", lambda t, source: (f"{heritage.vim.name(t)}.vim",
+                                                  heritage.vim.colorscheme(t["palette"], heritage.vim.name(t), source)),
+             validate_vim),
+            ("Emacs", "themes", lambda t, source: (f"{heritage.emacs.name(t)}-theme.el",
+                                                    heritage.emacs.theme(t["palette"], heritage.emacs.name(t), source,
+                                                                         VENDOR_URL)),
+             validate_emacs)):
+        directory = build_themes(families, editor, folder, files)
+        validate_themes(directory, families)
+        name = f"{VSCODE_NAME}-{editor.lower()}"
+        print(f"{pack_folder(directory, os.path.join(OUT, f'{name}-{VERSION}.zip'), name)}: {len(themes)} themes",
+              flush=True)
     if args.vsix:
         print(f"{pack_vsix(extension, themes)}: {len(themes)} themes")
 

@@ -35,13 +35,20 @@ The Xcode page shows the samples, with Swift and Objective-C first (XCODE_SAMPLE
 from heritage.xcode: captures of its editor (see scripts/xcode/screen.py), each at its size in points. Its chrome takes
 the palette roles that Xcode gives its window with the theme (XCODE_CHROME): the toolbar, jump bar and status bar in
 the editor background, and the navigator darker, as one window without islands.
+
+The Helix, Kakoune, Micro, Vim and Emacs pages take code colours from the screen that the editor draws in a terminal with
+the theme from heritage.helix, heritage.kakoune, heritage.micro, heritage.vim or heritage.emacs and the syntax
+highlighting it ships (see scripts/terminal/screen.py), and their chrome from the theme's own UI styles
+(TERMINAL_CHROME): the buffer line, tab bar or tab line on top and the editors split by window separators above the
+status line or mode line, with no side panel. Kakoune has no tab bar, so its file names show on the status line's
+colours.
 """
 import html, re
 
 from .samples import SAMPLES, XCODE_SAMPLES
 from .scheme import attributes, BOLD, ITALIC, BI, UNDER, WAVE, STRIKE, BOX, DOTTED
 from .ui import theme
-from . import notepadpp, nvim, sublime, vscode, zed
+from . import emacs, helix, kakoune, micro, notepadpp, nvim, sublime, vim, vscode, zed
 
 FONT_DIR = "fonts"
 FONTS = [("Regular", 400, "normal"), ("Italic", 400, "italic"), ("Bold", 700, "normal"), ("BoldItalic", 700, "italic")]
@@ -106,6 +113,30 @@ ZED_CHROME = {
 NVIM_CHROME = {
     "frame": ("TabLineFill", "bg"), "island": ("Normal", "bg"), "editor": ("WinBar", "bg"), "tabFg": ("WinBar", "fg"),
     "separator": ("WinSeparator", "fg"), "status": ("StatusLine", "bg"), "statusFg": ("StatusLine", "fg"),
+}
+# Terminal editor → its theme's styles, and CSS variable → (UI key, attribute) of them.
+TERMINAL_CHROME = {
+    "helix": (helix.styles, {
+        "frame": ("ui.bufferline.background", "bg"), "editor": ("ui.bufferline.background", "bg"),
+        "tab": ("ui.bufferline.active", "bg"), "tabFg": ("ui.bufferline.active", "fg"),
+        "separator": ("ui.window", "fg"), "status": ("ui.statusline", "bg"), "statusFg": ("ui.statusline", "fg")}),
+    "kakoune": (kakoune.styles, {
+        "frame": ("StatusLine", "bg"), "editor": ("StatusLine", "bg"), "tab": ("Default", "bg"),
+        "tabFg": ("Default", "fg"), "separator": ("StatusLine", "bg"), "status": ("StatusLine", "bg"),
+        "statusFg": ("StatusLine", "fg")}),
+    "micro": (micro.styles, {
+        "frame": ("tabbar", "bg"), "editor": ("tabbar", "bg"), "tab": ("tabbar.active", "bg"),
+        "tabFg": ("tabbar.active", "fg"), "separator": ("divider", "fg"), "status": ("statusline", "bg"),
+        "statusFg": ("statusline", "fg")}),
+    "vim": (vim.highlights, {
+        "frame": ("TabLineFill", "bg"), "editor": ("TabLineFill", "bg"), "tab": ("TabLineSel", "bg"),
+        "tabFg": ("TabLineSel", "fg"), "separator": ("VertSplit", "fg"), "status": ("StatusLine", "bg"),
+        "statusFg": ("StatusLine", "fg")}),
+    "emacs": (emacs.faces, {
+        "frame": ("tab-line", "background"), "editor": ("tab-line", "background"),
+        "tab": ("tab-line-tab-current", "background"), "tabFg": ("tab-line-tab-current", "foreground"),
+        "separator": ("vertical-border", "foreground"), "status": ("mode-line", "background"),
+        "statusFg": ("mode-line", "foreground")}),
 }
 # CSS variable → palette role for the Visual Studio page, as heritage.visualstudio gives them to the environment, tool
 # windows, document tabs and status bar.
@@ -221,6 +252,13 @@ def nvim_chrome(p):
     return ";".join(f"--{var}:{groups[group][key]}" for var, (group, key) in NVIM_CHROME.items())
 
 
+def terminal_chrome(p, kind):
+    """CSS variables for the window chrome, resolved from the UI styles of a terminal editor's theme."""
+    styles, chrome = TERMINAL_CHROME[kind]
+    resolved = styles(p)
+    return ";".join(f"--{var}:{resolved[key][attribute]}" for var, (key, attribute) in chrome.items())
+
+
 def notepadpp_chrome(p):
     """CSS variables for the window chrome: Notepad++'s own colours in Dark Mode for a dark theme and in Light Mode
     for a light one, with the theme's colours where Notepad++ takes them: the bar on the active tab and, in Light
@@ -254,8 +292,9 @@ def capture(name, image):
 
 def window(p, files=None, kind="vscode"):
     """One IDE window. files holds, per sample, the lines of tokens (text, colour, font style) for the VS Code,
-    Sublime Text, Zed, Neovim or Notepad++ page, or the capture (path, width, height, scale) for the Visual Studio or
-    Xcode page, as kind says; without it the window is the IntelliJ one, coloured from the editor scheme."""
+    Sublime Text, Zed, Neovim, Notepad++ page or a terminal editor's page, or the capture (path, width, height, scale)
+    for the Visual Studio or Xcode page, as kind says; without it the window is the IntelliJ one, coloured from the
+    editor scheme."""
     samples = XCODE_SAMPLES if kind == "xcode" else SAMPLES
     names = [name for name, _, _ in samples]
     variables = ";".join(f"--{k}:#{v}" for k, v in p.items() if isinstance(v, str) and re.fullmatch(r"[0-9A-F]{6}", v))
@@ -272,9 +311,11 @@ def window(p, files=None, kind="vscode"):
     else:
         editors = "".join(sample(name, caret, ["".join(token_html(*t) for t in line) for line in lines])
                           for (name, caret, _), lines in zip(SAMPLES, files))
-        colours = {"sublime": sublime_chrome, "zed": zed_chrome, "nvim": nvim_chrome,
-                   "notepadpp": notepadpp_chrome}.get(kind, vscode_chrome)(p)
-    return (f'<section class="ide {kind}" style="{variables};{colours};--caret:#{p.get("caret", p["gold"])}">'
+        colours = (terminal_chrome(p, kind) if kind in TERMINAL_CHROME else
+                   {"sublime": sublime_chrome, "zed": zed_chrome, "nvim": nvim_chrome,
+                    "notepadpp": notepadpp_chrome}.get(kind, vscode_chrome)(p))
+    classes = f"{kind} term" if kind in TERMINAL_CHROME else kind
+    return (f'<section class="ide {classes}" style="{variables};{colours};--caret:#{p.get("caret", p["gold"])}">'
             f'<header class="bar"><b>{html.escape(p["name"])}</b><span class="swatches">{swatches}</span></header>'
             f'<div class="body"><div class="stripe"><i class="on"></i><i></i><i></i></div>'
             f'<nav class="side"><div class="root">orders</div>{tree}</nav>'
@@ -289,8 +330,8 @@ def vscode_samples():
 
 def page(family, tokens=None, kind="vscode"):
     """The preview page for every theme in the family: the IntelliJ page, or with tokens (per theme, one list of
-    token lines per sample) the VS Code page or, as kind says, the Sublime Text, Zed, Neovim or Notepad++ page, or with
-    captures instead of token lines the Visual Studio or Xcode page."""
+    token lines per sample) the VS Code page or, as kind says, the Sublime Text, Zed, Neovim or Notepad++ page or a
+    terminal editor's page, or with captures instead of token lines the Visual Studio or Xcode page."""
     faces = "".join(
         f'@font-face{{font-family:"JetBrains Mono";font-weight:{w};font-style:{s};'
         f'src:url("{FONT_DIR}/JetBrainsMono-{n}.woff2") format("woff2"),local("JetBrains Mono")}}' for n, w, s in FONTS)
@@ -322,7 +363,7 @@ body{{margin:0;padding:24px;font-family:system-ui,sans-serif}}
 .status{{padding:5px 12px;font-size:12px;color:var(--muted);background:var(--status)}}
 .vscode .tab{{border:0;border-radius:0;border-bottom:2px solid var(--tabBorder)}}
 .vscode .stripe .on{{border-radius:0;box-shadow:inset 2px 0 var(--stripeMark)}}
-.vscode .status,.sublime .status,.zed .status,.nvim .status{{color:var(--statusFg)}}
+.vscode .status,.sublime .status,.zed .status,.nvim .status,.term .status{{color:var(--statusFg)}}
 .sublime .body{{gap:0;padding:0}} .sublime .stripe{{display:none}} .sublime .side{{border-radius:0}}
 .sublime .files{{gap:2px}} .sublime .file{{border-radius:0}}
 .sublime .tabs{{padding:5px 0 0 6px;border:0}} .sublime .tab{{padding:5px 12px;border:0;border-radius:6px 6px 0 0}}
@@ -344,6 +385,11 @@ body{{margin:0;padding:24px;font-family:system-ui,sans-serif}}
 .notepadpp .tabs{{padding:2px 0 0 2px;border:0}} .notepadpp .tab{{padding:3px 12px;border:0;border-radius:0;
   border-top:3px solid var(--tabBorder);color:var(--tabFg)}}
 .notepadpp .status{{color:var(--statusFg)}}
+.term .body{{gap:0;padding:0}} .term .stripe,.term .side{{display:none}}
+.term .files{{gap:1px;background:var(--separator)}} .term .file{{border-radius:0}}
+.term .tabs{{padding:0;border:0}} .term .tab{{padding:0 1ch;border:0;border-radius:0;color:var(--tabFg);
+  font:700 12px/1.55 "JetBrains Mono",ui-monospace,monospace}}
+.term .status{{font-family:"JetBrains Mono",ui-monospace,monospace}}
 .visualstudio .status{{color:var(--statusFg)}} .visualstudio .tab{{border-radius:6px 6px 0 0;border-width:1px 1px 0}}
 .visualstudio .file img,.xcode .file img{{display:block;max-width:100%;height:auto}}
 .xcode .body{{gap:0;padding:0}} .xcode .stripe{{display:none}}

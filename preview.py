@@ -1,7 +1,7 @@
 """Writes the preview page of each theme family and, with --png, renders it to PNG.
 
-Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode] [--png]
-                         [THEME ...]
+Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
+                          | --kakoune | --micro | --vim | --emacs] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --visualstudio  write the Visual Studio preview instead of the IntelliJ one; needs Windows and Visual Studio 2026
@@ -10,6 +10,11 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --nvim       write the Neovim preview instead of the IntelliJ one; needs Neovim and a C compiler (cc)
   --notepadpp  write the Notepad++ preview instead of the IntelliJ one; needs a C++ compiler (c++)
   --xcode      write the Xcode preview instead of the IntelliJ one; needs macOS and Xcode 27 or later, closed
+  --helix      write the Helix preview instead of the IntelliJ one; needs Linux or macOS
+  --kakoune    write the Kakoune preview instead of the IntelliJ one; needs Linux or macOS, and Kakoune
+  --micro      write the Micro preview instead of the IntelliJ one; needs Linux or macOS, and Micro
+  --vim        write the Vim preview instead of the IntelliJ one; needs Linux or macOS, and Vim
+  --emacs      write the Emacs preview instead of the IntelliJ one; needs Linux or macOS, Emacs and a C compiler (cc)
   --png        also render the page to PNG; needs Google Chrome or Chromium, and ImageMagick
 
 The IntelliJ page goes to themes/<theme>/build/preview.html and its PNG to themes/<theme>/preview.png, the
@@ -29,8 +34,11 @@ with the captures it shows in themes/<theme>/build/visualstudio. scripts/visuals
 Studio 2026 itself, in an instance of its own with the family's themes installed. The Xcode page goes to
 themes/<theme>/build/preview-xcode.html, with the captures it shows in themes/<theme>/build/xcode.
 scripts/xcode/screen.py takes them in Xcode itself, which it runs with the family's themes while restoring Xcode's
-settings afterwards; Xcode must be closed. All pages use JetBrains Mono, downloaded once from the pinned release below
-into ~/.cache/heritage-themes.
+settings afterwards; Xcode must be closed. The Helix, Kakoune, Micro, Vim and Emacs pages go to
+themes/<theme>/build/preview-<editor>.html. They are drawn by the editor itself through scripts/terminal/screen.py,
+which runs in scripts/terminal/.venv in the same way as the Zed one and keeps the pinned Helix release and the grammars
+it builds for Emacs in ~/.cache/heritage-themes. All pages use JetBrains Mono, downloaded once from the pinned release
+below into ~/.cache/heritage-themes.
 """
 import argparse, hashlib, json, os, pathlib, plistlib, re, shutil, subprocess, sys, tempfile, urllib.request, zipfile
 
@@ -46,6 +54,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 SHIKI = os.path.join(ROOT, "scripts", "shiki")
 ZED = os.path.join(ROOT, "scripts", "zed")
 NVIM = os.path.join(ROOT, "scripts", "nvim")
+TERMINAL = os.path.join(ROOT, "scripts", "terminal")
 NOTEPADPP = os.path.join(ROOT, "scripts", "notepadpp")
 VISUALSTUDIO = os.path.join(ROOT, "scripts", "visualstudio")
 XCODE = os.path.join(ROOT, "scripts", "xcode")
@@ -231,6 +240,42 @@ def nvim_tokens(family):
     return json.loads(result.stdout)
 
 
+# Terminal editor → its theme file for a theme dict of a theme.py and the URL of its folder, as (name, file name, text).
+TERMINAL_THEMES = {
+    "helix": lambda t, source: (heritage.helix.name(t), f"{heritage.helix.name(t)}.toml",
+                                heritage.helix.theme(t["palette"], source)),
+    "kakoune": lambda t, source: (heritage.kakoune.name(t), f"{heritage.kakoune.name(t)}.kak",
+                                  heritage.kakoune.colorscheme(t["palette"], source)),
+    "micro": lambda t, source: (heritage.micro.name(t), f"{heritage.micro.name(t)}.micro",
+                                heritage.micro.colorscheme(t["palette"], source)),
+    "vim": lambda t, source: (heritage.vim.name(t), f"{heritage.vim.name(t)}.vim",
+                              heritage.vim.colorscheme(t["palette"], heritage.vim.name(t), source)),
+    "emacs": lambda t, source: (heritage.emacs.name(t), f"{heritage.emacs.name(t)}-theme.el",
+                                heritage.emacs.theme(t["palette"], heritage.emacs.name(t), source, source)),
+}
+
+
+def terminal_tokens(family, editor):
+    """Per theme of the family, the samples as a terminal editor draws them with its theme, through
+    scripts/terminal/screen.py, in the shape that vscode_tokens returns."""
+    if os.name == "nt":
+        raise SystemExit(f"preview: --{editor} needs Linux or macOS")
+    python = venv_python(TERMINAL, "pyte")
+    names = []
+    with tempfile.TemporaryDirectory() as themes:
+        for t in family.THEMES:
+            name, filename, text = TERMINAL_THEMES[editor](t, f"themes/{heritage.folder(family)}")
+            names.append(name)
+            with open(os.path.join(themes, filename), "w", encoding="utf-8", newline="\n") as f:
+                f.write(text)
+        request = dict(themes=names, samples=[dict(name=name, code=plain(code)) for name, _, code in SAMPLES])
+        result = subprocess.run([python, "-I", os.path.join(TERMINAL, "screen.py"), editor, CACHE, themes],
+                                input=json.dumps(request), capture_output=True, text=True, encoding="utf-8")
+    if result.returncode:
+        raise SystemExit(f"preview: screen.py failed:\n{result.stderr}")
+    return json.loads(result.stdout)
+
+
 def notepadpp_tokens(family):
     """Per theme of the family, the samples coloured by scripts/notepadpp/tokens.py with its Notepad++ theme, in the
     shape that vscode_tokens returns."""
@@ -341,6 +386,9 @@ def main():
     kind.add_argument("--nvim", action="store_true", help="write the Neovim preview")
     kind.add_argument("--notepadpp", action="store_true", help="write the Notepad++ preview")
     kind.add_argument("--xcode", action="store_true", help="write the Xcode preview")
+    for editor, title in (("helix", "Helix"), ("kakoune", "Kakoune"), ("micro", "Micro"), ("vim", "Vim"),
+                          ("emacs", "Emacs")):
+        kind.add_argument(f"--{editor}", action="store_true", help=f"write the {title} preview")
     parser.add_argument("--png", action="store_true", help="also render the page to PNG")
     parser.add_argument("themes", nargs="*", metavar="THEME", help="theme folders; default: all")
     args = parser.parse_args()
@@ -354,10 +402,13 @@ def main():
         family = families[name]
         target = ("vscode" if args.vscode else "visualstudio" if args.visualstudio else "sublime" if args.sublime
                   else "zed" if args.zed else "nvim" if args.nvim else "notepadpp" if args.notepadpp
-                  else "xcode" if args.xcode else None)
+                  else "xcode" if args.xcode
+                  else next((editor for editor in TERMINAL_THEMES if getattr(args, editor)), None))
         page_path = os.path.join(out, f"preview-{target}.html" if target else "preview.html")
         tokens = {"vscode": vscode_tokens, "sublime": sublime_tokens, "zed": zed_tokens, "nvim": nvim_tokens,
-                  "notepadpp": notepadpp_tokens, "visualstudio": lambda f: visualstudio_captures(f, out),
+                  "notepadpp": notepadpp_tokens,
+                  **{editor: lambda f, e=editor: terminal_tokens(f, e) for editor in TERMINAL_THEMES},
+                  "visualstudio": lambda f: visualstudio_captures(f, out),
                   "xcode": lambda f: xcode_captures(f, out)}.get(target, lambda family: None)(family)
         with open(page_path, "w", encoding="utf-8") as f:
             f.write(page(family, tokens, target))
