@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.7.2] - 2026-11-05
+
 ### Changed
 
 - No change to the themes beyond 1.7.0, which was not published. This version publishes them.
