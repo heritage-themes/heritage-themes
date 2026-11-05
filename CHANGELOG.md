@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- No change to the themes. Version 1.7.0 did not get a GitHub release, and 1.7.1 publishes the same themes there.
+
 ## [1.7.0] - 2026-11-05
 
 ### Fixed
