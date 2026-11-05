@@ -307,7 +307,10 @@ jobs:
           curl --fail --silent --show-error --location --output "$package" \
             "https://api.nuget.org/v3-flatcontainer/microsoft.vssdk.buildtools/$VSSDK_VERSION/microsoft.vssdk.buildtools.$VSSDK_VERSION.nupkg"
           echo "$VSSDK_SHA256  $package" | sha256sum --check -
-          unzip -q "$package" 'tools/vssdk/bin/*' -d "$RUNNER_TEMP/vssdk"
+          # The whole package: the unzip of Git for Windows does not match a wildcard across folders, so
+          # tools/vssdk/bin/* would leave out bin/lib, which holds the assemblies VsixPublisher loads.
+          unzip -q "$package" -d "$RUNNER_TEMP/vssdk"
+          "$RUNNER_TEMP/vssdk/tools/vssdk/bin/VsixPublisher.exe" version
           echo "VSIX_PUBLISHER=$RUNNER_TEMP/vssdk/tools/vssdk/bin/VsixPublisher.exe" >> "$GITHUB_ENV"
 
       - uses: azure/login@v3
