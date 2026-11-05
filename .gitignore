@@ -19,7 +19,6 @@ themes/*/docs/
 # Local release and theme-authoring notes, not part of the repository
 docs/releasing.md
 docs/adding-a-theme.md
-scripts/release.sh
 
 # Local agent instructions, not part of the repository
 CLAUDE.md
