@@ -40,7 +40,7 @@ def attributes(p):
     s("DEFAULT_OPERATION_SIGN JAVA_OPERATION_SIGN DEFAULT_BRACES JAVA_BRACES DEFAULT_PARENTHS JAVA_PARENTH DEFAULT_BRACKETS JAVA_BRACKETS DEFAULT_DOT JAVA_DOT DEFAULT_COMMA JAVA_COMMA DEFAULT_SEMICOLON JAVA_SEMICOLON",
       attr(p["op"]))
     s("DEFAULT_VALID_STRING_ESCAPE JAVA_VALID_STRING_ESCAPE", attr(p["gold"], font=BOLD))
-    s("DEFAULT_INVALID_STRING_ESCAPE JAVA_INVALID_STRING_ESCAPE", attr(p["error"], effect=p["error"], etype=WAVE))
+    s("DEFAULT_INVALID_STRING_ESCAPE JAVA_INVALID_STRING_ESCAPE", attr(p["ansiRed"], effect=p["error"], etype=WAVE))
     s("DEFAULT_TAG", attr(p["keyword"])); s("DEFAULT_ATTRIBUTE", attr(p["field"]))
     s("DEFAULT_ENTITY", attr(p["gold"])); s("DEFAULT_PREDEFINED_SYMBOL", attr(p["typeParam"], font=ITALIC))
     s("DEFAULT_IDENTIFIER", attr(p["fg"])); s("DEFAULT_DOC_COMMENT_TAG_VALUE", attr(p["docTag"]))
@@ -106,7 +106,7 @@ def attributes(p):
     s("org.rust.GENERATED_ITEM", attr(p["muted"])); s("org.rust.UNSAFE_CODE", attr(bg=p["writeCaret"]))
     # properties, YAML
     s("PROPERTIES.KEY", attr(p["field"])); s("PROPERTIES.KEY_VALUE_SEPARATOR", attr(p["op"]))
-    s("PROPERTIES.INVALID_STRING_ESCAPE", attr(p["error"], effect=p["error"], etype=WAVE))
+    s("PROPERTIES.INVALID_STRING_ESCAPE", attr(p["ansiRed"], effect=p["error"], etype=WAVE))
     s("YAML_ANCHOR", attr(p["annotation"]))
     # shell
     s("BASH.SHEBANG", attr(p["comment"], font=BI))
@@ -123,10 +123,10 @@ def attributes(p):
     s("CUSTOM_STRING_ATTRIBUTES", attr(p["string"])); s("CUSTOM_NUMBER_ATTRIBUTES", attr(p["number"]))
     s("CUSTOM_LINE_COMMENT_ATTRIBUTES CUSTOM_MULTI_LINE_COMMENT_ATTRIBUTES", attr(p["comment"], font=ITALIC))
     s("CUSTOM_VALID_STRING_ESCAPE_ATTRIBUTES", attr(p["gold"], font=BOLD))
-    s("CUSTOM_INVALID_STRING_ESCAPE_ATTRIBUTES", attr(p["error"], effect=p["error"], etype=WAVE))
+    s("CUSTOM_INVALID_STRING_ESCAPE_ATTRIBUTES", attr(p["ansiRed"], effect=p["error"], etype=WAVE))
     # highlighting
     s("ERRORS_ATTRIBUTES", attr(effect=p["error"], etype=WAVE, stripe=p["error"]))
-    s("WRONG_REFERENCES_ATTRIBUTES", attr(p["error"], font=BOLD))
+    s("WRONG_REFERENCES_ATTRIBUTES", attr(p["ansiRed"], font=BOLD))
     s("WARNING_ATTRIBUTES", attr(effect=p["warning"], etype=WAVE, stripe=p["warning"]))
     s("WEAK_WARNING_ATTRIBUTES", attr(effect=p["weak"], etype=WAVE, stripe=p["weak"]))
     s("DEPRECATED_ATTRIBUTES MARKED_FOR_REMOVAL_ATTRIBUTES", attr(effect=p["muted"], etype=STRIKE))
@@ -154,8 +154,8 @@ def attributes(p):
     s("BREADCRUMBS_HOVERED", attr(p["fg"], p["hover"])); s("BREADCRUMBS_CURRENT", attr(p["gold"], p["selInactive"]))
     # console & logs
     s("CONSOLE_NORMAL_OUTPUT", attr(p["fg"])); s("CONSOLE_SYSTEM_OUTPUT", attr(p["muted"]))
-    s("CONSOLE_ERROR_OUTPUT LOG_ERROR_OUTPUT", attr(p["error"]))
-    s("LOG_WARNING_OUTPUT", attr(p["warning"])); s("CONSOLE_USER_INPUT", attr(p["string"], font=ITALIC))
+    s("CONSOLE_ERROR_OUTPUT LOG_ERROR_OUTPUT", attr(p["ansiRed"]))
+    s("LOG_WARNING_OUTPUT", attr(p["ansiYellow"])); s("CONSOLE_USER_INPUT", attr(p["string"], font=ITALIC))
     s("LOG_INFO_OUTPUT", attr(p["string"])); s("LOG_DEBUG_OUTPUT LOG_VERBOSE_OUTPUT", attr(p["muted"]))
     s("LOG_EXPIRED_ENTRY", attr(p["disabled"]))
     for k in "RED GREEN YELLOW BLUE MAGENTA CYAN".split():

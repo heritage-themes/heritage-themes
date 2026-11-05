@@ -29,18 +29,18 @@ KASAVU = dict(
     name="Kerala Kasavu (Light)", dark=False, parent="Default",
     bg="F9F5E8", bgUi="EFE9D6", bgTool="F4EFDE", frame="E2D9BF", surface="FCF9EE", hover="E7DFC6",
     border="DACEAC", fg="1F2420", muted="5A615A", disabled="A5A797",
-    caretRow="F2ECD9", selection="D4E8DA", selInactive="E2E5D8", lineNo="AAA58D", lineNoCaret="A07000",
+    caretRow="F2ECD9", selection="D4E8DA", selInactive="E2E5D8", lineNo="AAA58D", lineNoCaret="8E6300",
     guide="EAE3CE", guideSel="D5C8A4",
     keyword="AE2D2F", string="745903", number="974C02", type="00736C", method="01791E", call="4D7544",
     field="983E6E", constant="0667AA", annotation="6E519D", label="6E5402",
-    comment="6F766E", doc="72664A", docTag="5A4E32", op="565C56", param="1F2420", typeParam="79702E",
-    gold="8B6C05", red="B0203A", redText="FFF8F2", azure="1060A8", caret="B0203A",
+    comment="6F766E", doc="72664A", docTag="5A4E32", op="565C56", param="1F2420", typeParam="756C2D",
+    gold="856705", red="B0203A", redText="FFF8F2", azure="1060A8", caret="B0203A",
     error="D01E2E", warning="A86A00", weak="A8975E",
     searchBg="F5DE8E", searchBorder="B8900E", underCaret="D4E4F2", writeCaret="F5D3D6",
     braceBg="CDE8CF", todo="7A5A00",
     added="5FA060", modified="5A8CC8", deleted="C85A5A",
     diffIns="E0F0DA", diffMod="DCE8F4", diffDel="F8DCDC", diffConf="F5E8C4", fileYellow="F7EBC4",
-    ansiRed="B0203A", ansiGreen="3A7A1E", ansiYellow="7A5A00", ansiBlue="1060A8", ansiMagenta="9C3A8A", ansiCyan="007A78",
+    ansiRed="B0203A", ansiGreen="3A791E", ansiYellow="7A5A00", ansiBlue="1060A8", ansiMagenta="9C3A8A", ansiCyan="007876",
 )
 
 FAMILY = "Kerala"

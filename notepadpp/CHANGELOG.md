@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Code keeps WCAG AA contrast on the current line's highlight. In 33 themes, the code colours that fell just below 4.5:1 on it are a shade darker in light themes or lighter in dark ones.
+- The current line's number in Kerala Kasavu (Light) reaches 4.5:1.
+
 ## [1.4.0] - 2026-10-24
 
 ### Added

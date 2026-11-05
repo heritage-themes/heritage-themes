@@ -42,6 +42,10 @@ highlighting it ships (see scripts/terminal/screen.py), and their chrome from th
 (TERMINAL_CHROME): the buffer line, tab bar or tab line on top and the editors split by window separators above the
 status line or mode line, with no side panel. Kakoune has no tab bar, so its file names show on the status line's
 colours.
+
+The terminals page (terminals_page) shows, per theme, each terminal emulator's window as the app draws it with the
+theme from heritage.terminals (see scripts/terminals/shoot.py), and the screen of each shell, prompt and multiplexer
+as it draws it in a terminal (see scripts/terminals/shells.py), on the theme's background.
 """
 import html, re
 
@@ -407,4 +411,72 @@ pre div{{padding:0 12px 0 0;white-space:pre}}
   border-left:2px solid var(--caret)}}
 @media (max-width:900px){{.side,.stripe{{display:none}} .body{{padding-left:5px}} .files{{grid-template-columns:1fr}}}}
 </style></head><body>{windows}</body></html>
+"""
+
+
+def screen_html(rows, p):
+    """A terminal screen that scripts/terminals/shells.py read, as HTML: the terminal's default colours stand for the
+    theme's text and background, as in a terminal that runs the theme. Trailing empty rows are left out."""
+    while rows and not "".join(cell[0] for cell in rows[-1]).strip():
+        rows = rows[:-1]
+    out = []
+    for row in rows:
+        spans, last = [], None
+        for char, fg, bg, bold, italic, underline in row:
+            fg = "#" + p["fg"] if fg == "default" else fg
+            bg = "#" + p["bg"] if bg == "default" else bg
+            css = (f"color:{fg};background:{bg}" + (";font-weight:700" if bold else "")
+                   + (";font-style:italic" if italic else "") + (";text-decoration:underline" if underline else ""))
+            if css == last:
+                spans[-1][1] += char
+            else:
+                spans.append([css, char])
+                last = css
+        out.append("".join(f'<span style="{css}">{html.escape(text)}</span>' for css, text in spans))
+    return "\n".join(out)
+
+
+def terminals_page(family, results, title="Terminals", wide=True):
+    """The terminals preview page, or with title another app's page drawn the same way: per theme, (app, image path
+    relative to the page, or screen rows) per app or sample. Screens span the page when wide, and share a row of two
+    otherwise, as an editor's narrower screens do."""
+    faces = "".join(
+        f'@font-face{{font-family:"JetBrains Mono";font-weight:{w};font-style:{s};'
+        f'src:url("{FONT_DIR}/JetBrainsMono-{n}.woff2") format("woff2"),local("JetBrains Mono")}}' for n, w, s in FONTS)
+    faces += (f'@font-face{{font-family:"Symbols Nerd Font Mono";'
+              f'src:url("{FONT_DIR}/SymbolsNerdFontMono-Regular.ttf") format("truetype")}}')
+    sections = []
+    for t, apps in zip(family.THEMES, results):
+        p = t["palette"]
+        swatches = "".join(f'<span style="background:#{p[k]}" title="{k}"></span>' for k in SWATCHES)
+        cards = []
+        for app, image, rows in apps:
+            body = (f'<img src="{html.escape(image)}" alt="{html.escape(app)} with {html.escape(p["name"])}">'
+                    if image else f'<pre style="background:#{p["bg"]};color:#{p["fg"]}">{screen_html(rows, p)}</pre>')
+            kind = "" if image or not wide else ' class="screen"'
+            cards.append(f'<figure{kind}><figcaption>{html.escape(app)}</figcaption>{body}</figure>')
+        sections.append(f"""<section style="--frame:#{p['frame']};--fg:#{p['fg']};--muted:#{p['muted']};\
+--border:#{p['border']}"><div class="bar"><b>{html.escape(p['name'])}</b><span class="swatches">{swatches}</span>\
+</div><div class="grid">{''.join(cards)}</div></section>""")
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">\
+<title>{html.escape(family.FAMILY)} {html.escape(title)} Preview</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><style>
+{faces}
+body{{margin:0;padding:24px;font-family:system-ui,sans-serif}}
+section{{max-width:1280px;margin:0 auto 24px;border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  background:var(--frame);color:var(--fg);padding:0 12px 12px}}
+.bar{{display:flex;gap:14px;align-items:center;padding:10px 0;font-size:13px;color:var(--muted)}}
+.bar b{{color:var(--fg)}}
+.swatches span{{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:3px;vertical-align:middle;
+  box-shadow:0 0 0 1px #0003}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(580px,1fr));gap:12px}}
+figure{{margin:0;min-width:0}}
+figcaption{{font-size:12px;color:var(--muted);margin:0 0 4px}}
+img{{display:block;max-width:100%;height:auto;border-radius:6px}}
+pre{{margin:0;padding:8px;border-radius:6px;overflow:hidden;width:max-content;max-width:100%;box-sizing:border-box;
+  font:12px/1.4 "JetBrains Mono","Symbols Nerd Font Mono",ui-monospace,monospace}}
+figure.screen{{grid-column:1/-1}}
+</style></head><body>
+{''.join(sections)}
+</body></html>
 """

@@ -34,7 +34,7 @@ KODRA = dict(
     keyword="AE4A00", string="3C7412", number="C0281A", type="00775A", method="7230B8", call="5E3A94",
     field="806200", constant="C0281A", annotation="A8287A", label="C0281A",
     comment="837E75", doc="6E6650", docTag="524B38", op="55524C", param="1E1D1B", typeParam="1A7058",
-    gold="8F6C04", red="B04A00", redText="FFF9F2", azure="1F64B4", caret="AE4A00",
+    gold="896704", red="B04A00", redText="FFF9F2", azure="1F64B4", caret="AE4A00",
     error="C42020", warning="A86800", weak="A8955E",
     searchBg="F0DC8A", searchBorder="9A7400", underCaret="D4E2F0", writeCaret="F2D4CC",
     braceBg="D2E6CC", todo="8A5A00",

@@ -29,13 +29,21 @@ body:
         - Micro
         - Vim
         - GNU Emacs
+        - Nano
+        - Textadept
+        - Lapce
+        - Qt Creator
+        - Amp
+        - Eclipse
+        - Nova
+        - Terminal emulator, shell, prompt or multiplexer
     validations:
       required: true
   - type: input
     id: editor-version
     attributes:
       label: Editor name and version
-      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Visual Studio 2026 18.11, Sublime Text 4200, Zed 1.25, Neovim 0.12, Notepad++ 8.9.8, Xcode 27.1, Helix 25.07, Kakoune 2026.04.12, Micro 2.0.15, Vim 9.2 or Emacs 30.2.
+      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Visual Studio 2026 18.11, Sublime Text 4200, Zed 1.25, Neovim 0.12, Notepad++ 8.9.8, Xcode 27.1, Helix 25.07, Kakoune 2026.04.12, Micro 2.0.15, Vim 9.2, Emacs 30.2, Qt Creator 20.0, Eclipse 2026-09, kitty 0.48 with fish 4.6 or tmux 3.8.
     validations:
       required: true
   - type: input

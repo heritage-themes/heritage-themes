@@ -32,7 +32,7 @@ DAY = dict(
     keyword="B00373", string="944F02", number="6D5D01", type="01791E", method="005DC9", call="316CA5",
     field="7D3BB6", constant="086B6C", annotation="AB042B", label="665800",
     comment="7D7580", doc="7A6650", docTag="5F4D38", op="5B5560", param="2A2430", typeParam="036F4F",
-    gold="946C05", red="C2185B", redText="FFF6F9", azure="1A5FB4", caret="E0600F",
+    gold="8D6705", red="C2185B", redText="FFF6F9", azure="1A5FB4", caret="E0600F",
     error="D0213A", warning="B86A00", weak="B3A06A",
     searchBg="FBE29A", searchBorder="D4A017", underCaret="D9E4F5", writeCaret="F7D6E1",
     braceBg="CDEBCF", todo="855800",

@@ -10,7 +10,7 @@ Usage: python3 build.py [--vsix]
 
 Output goes to build/.
 """
-import argparse, html, json, os, plistlib, re, shutil, subprocess, tomllib, zipfile
+import argparse, configparser, html, json, os, plistlib, re, shutil, subprocess, tomllib, zipfile
 import xml.etree.ElementTree as ET
 
 import heritage
@@ -63,6 +63,7 @@ HELIX_HEX = re.compile(r"#[0-9A-F]{6}")
 # :highlight command with the attributes that heritage.vim sets.
 KAKOUNE_FACE = re.compile(r"(default|rgb:[0-9A-F]{6})(,(default|rgb:[0-9A-F]{6})){0,2}(\+[bicudrsFf]+)?")
 MICRO_STYLE = re.compile(r"((bold|italic|underline|reverse) )*#[0-9A-F]{6}(,#[0-9A-F]{6})?")
+TERMINALS_NAME = "heritage-themes-terminals"  # the folder in the zip
 VIM_HIGHLIGHT = re.compile(r"hi \w+( (guifg|guibg|guisp)=(#[0-9A-F]{6}|NONE)"
                            r"| (ctermfg|ctermbg|ctermul)=(1[6-9]|[2-9]\d|1\d\d|2[0-4]\d|25[0-5]|NONE)"
                            r"| (gui|cterm)=(NONE|[a-z]+(,[a-z]+)*)| term=NONE)+")
@@ -77,7 +78,7 @@ VISUALSTUDIO_NAME = "Heritage Themes for Visual Studio"
 VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
-           "Helix", "Kakoune", "Micro", "Vim", "Emacs")
+           "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Amp", "Eclipse", "Nova", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -85,9 +86,11 @@ ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "
 # (foreground roles, background roles, minimum)
 CONTRAST = (
     (("fg", "muted"), ("bg", "bgTool", "bgUi", "surface", "caretRow", "frame"), 4.5),
+    # code shows on the editor's background and on the current line
     (("keyword", "string", "number", "type", "method", "call", "field", "constant", "annotation", "doc", "docTag",
-      "op", "param", "typeParam", "label", "gold", "azure") + ANSI, ("bg",), 4.5),
-    (("comment",), ("bg",), 3),
+      "op", "param", "typeParam", "label", "gold", "azure") + ANSI, ("bg", "caretRow"), 4.5),
+    (("comment",), ("bg", "caretRow"), 3),
+    (("lineNoCaret",), ("bg", "caretRow"), 4.5),  # the current line's number, on the gutter and on the current line
     (ANSI, ("bgTool",), 4.5),  # console and terminal
     (("fg",), ("hover", "selection", "selInactive", "searchBg"), 4.5),
     (("ansiBlue",), ("selection",), 4.5),  # VS Code match highlights in a selected list row
@@ -1654,10 +1657,672 @@ def validate_emacs(directory, families):
     check_files("Emacs themes", directory, "themes", expected)
 
 
+def nano_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Nano
+
+{DESCRIPTION} {count} dark and light colour schemes in {len(families)} families; each family maps the named colours \
+of one tradition to syntax roles.
+
+## Install
+
+The schemes need GNU nano 7.0 or later in a terminal with 256 colours, which runs the matching theme of the \
+[Heritage Themes for terminals]({VENDOR_URL}/releases/latest).
+
+Nano reads interface colours only from the nanorc file itself, not from files it includes, so a scheme's lines go \
+into `~/.config/nano/nanorc`, after the syntax files. In a terminal, from the unzipped folder:
+
+```bash
+mkdir -p ~/.config/nano
+echo 'include "/usr/share/nano/*.nanorc"' >> ~/.config/nano/nanorc
+cat schemes/heritage-holi-night.nanorc >> ~/.config/nano/nanorc
+```
+
+Many systems include the syntax files in `/etc/nanorc` already; the `echo` line is needed where they do not. To \
+change schemes, replace the scheme's `set` lines in the nanorc file with another scheme's.
+
+## What is coloured
+
+Each scheme colours nano's interface: the title bar, the mini bar, the status bar, error messages, prompts, the \
+selection, search matches, the guide stripe, the scroll indicator, line numbers and the help lines. Nano's syntax \
+files colour code with the terminal's 16 colours by name, so code takes the palette's ANSI colours from the matching \
+terminal theme, in the roles that each syntax file gives them, as do the scheme's text colours. The surfaces that are \
+no terminal colour, such as the title bar, take the nearest of the 256 colours that nano reaches, on which their text \
+stays readable. A few syntax files, such as those for SQL, YAML and Lua, also name nano's own extended colours, such \
+as `sky` and `lagoon`, which keep their colours in every theme.
+
+{readme_footer(families, "Nano", "Colour schemes", "the colour scheme, nano version, terminal, language")}"""
+
+
+def validate_nano(directory, families):
+    """Fails the build when a file is missing, a scheme leaves out an option of heritage.nano.OPTIONS or differs from
+    heritage.nano.options, or text is unreadable on the colour it is drawn on."""
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.nano.name(t), t["palette"]
+            expected.add(f"{name}.nanorc")
+            label = f"Nano {name}"
+            with open(os.path.join(directory, "schemes", f"{name}.nanorc"), encoding="utf-8") as f:
+                found = heritage.nano.parse(f.read())
+            if found != {option: heritage.nano.value(*spec) for option, spec in heritage.nano.options(p).items()}:
+                raise SystemExit(f"{label}: differs from heritage.nano.options")
+            if set(found) != set(heritage.nano.OPTIONS):
+                raise SystemExit(f"{label}: does not set exactly the options of heritage.nano.OPTIONS")
+            check_styles(label, heritage.nano.styles(p), "fg", "bg", "functioncolor", heritage.nano.DECORATIVE,
+                         set(), {})
+    check_files("Nano colour schemes", directory, "schemes", expected)
+
+
+def textadept_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Textadept
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+The themes need Textadept 12 or later.
+
+1. Copy the files in `themes` into `~/.textadept/themes`, creating the folder if it does not exist. In a terminal, \
+from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.textadept/themes
+   cp themes/* ~/.textadept/themes/
+   ```
+
+2. Choose a theme in `~/.textadept/init.lua`, with the font of your choice:
+
+   ```lua
+   if UI ~= 'terminal' then
+   \tview:set_theme('heritage-holi-night', {{font = 'Monospace', size = 11}})
+   end
+   ```
+
+Try a theme without restarting with `reset()` in the Lua command entry after changing `init.lua`.
+
+## What is coloured
+
+Each theme colours the editor: code in every language that Textadept's lexers highlight, the line numbers and fold \
+margin, the caret and caret line, selections, brace matches, call tips, bookmarks, warning and error markers, search \
+and highlight indicators, the long line marker and ANSI output. Textadept draws its menus, tabs, status bar and \
+dialogs with Qt or GTK in the system's colours, which a theme cannot change.
+
+## Languages
+
+Textadept's lexers give a construct one tag in every language, so preprocessor directives such as C's `#include` take \
+the keyword colour, and attributes take the annotation colour, which covers HTML attribute names and Java annotations \
+alike. Function calls take the call colour where a lexer tags them, and a function's name where it is declared takes \
+the text colour.
+
+{readme_footer(families, "Textadept", "Themes", "the theme, Textadept version, Qt, GTK or terminal, language")}"""
+
+
+def validate_textadept(directory, families):
+    """Fails the build when a file is missing, a theme leaves out a lexer tag of heritage.textadept.TAGS, its colours
+    differ from heritage.textadept.colours, or a text colour is unreadable on the background it is drawn on."""
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.textadept.name(t), t["palette"]
+            expected.add(f"{name}.lua")
+            label = f"Textadept {name}"
+            with open(os.path.join(directory, "themes", f"{name}.lua"), encoding="utf-8") as f:
+                text = f.read()
+            if heritage.textadept.parse_colours(text) != heritage.textadept.colours(p):
+                raise SystemExit(f"{label}: colours differ from heritage.textadept.colours")
+            tags = set(re.findall(r"^styles\[lexer\.(\w+)\] = ", text, re.M))
+            if tags != set(heritage.textadept.TAGS):
+                raise SystemExit(f"{label}: sets the tags {sorted(tags ^ set(heritage.textadept.TAGS))} wrongly")
+            if text.count("{") != text.count("}") or not text.endswith("ui.find.entry_font = font .. ' ' .. size\n"):
+                raise SystemExit(f"{label}: is not a complete theme")
+            check_styles(label, heritage.textadept.styles(p), "fg", "bg", "STYLE_DEFAULT", set(),
+                         {"lexer.COMMENT"}, {})
+    check_files("Textadept themes", directory, "themes", expected)
+
+
+def lapce_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Lapce
+
+{DESCRIPTION} {count} dark and light colour themes in {len(families)} families; each family maps the named colours \
+of one tradition to syntax roles.
+
+## Install
+
+The themes come as one plugin and need Lapce 0.4 or later.
+
+1. Copy the `{heritage.lapce.PLUGIN}` folder into Lapce's `plugins` folder: \
+`~/.local/share/lapce-stable/plugins` on Linux, `~/Library/Application Support/dev.lapce.Lapce-Stable/plugins` on \
+macOS and `%LocalAppData%\\lapce\\Lapce-Stable\\data\\plugins` on Windows. On Linux, from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.local/share/lapce-stable/plugins
+   cp -r {heritage.lapce.PLUGIN} ~/.local/share/lapce-stable/plugins/
+   ```
+
+2. Restart Lapce and choose a theme, for example **Holi Night**, with **Settings | Color Theme**, or in \
+`settings.toml`:
+
+   ```toml
+   [core]
+   color-theme = "Holi Night"
+   ```
+
+## What is coloured
+
+Each theme colours the editor, the tab bar, panels, the activity bar, the status bar with its modal modes, the \
+palette, completion, hover and inlay hints, error lens, source control marks, the debugger, the plugin list and the \
+terminal.
+
+## Languages
+
+Lapce matches the captures of its Tree-sitter grammars to a fixed list of scopes, so numbers, booleans and named \
+constants share the number colour, and function declarations and calls the call colour; a language server's semantic \
+tokens tell more constructs apart. Lapce draws code in colour only, without bold or italic. It colours code once it \
+has its grammars, which it downloads from the release of `lapce/tree-sitter-grammars` that matches its version.
+
+{readme_footer(families, "Lapce", "Themes", "the theme, Lapce version, language, whether a language server runs")}"""
+
+
+def build_lapce(families):
+    """Writes the plugin to build/lapce/<plugin>, with the README, changelog and licence beside it, and returns
+    build/lapce."""
+    directory = os.path.join(OUT, "lapce")
+    plugin = os.path.join(directory, heritage.lapce.PLUGIN)
+    os.makedirs(os.path.join(plugin, "themes"))
+    themes = [t for f in families for t in f.THEMES]
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            write_text(os.path.join(plugin, "themes", f"{heritage.lapce.name(t)}.toml"),
+                       heritage.lapce.theme(t["palette"], source))
+    write_text(os.path.join(plugin, "volt.toml"), heritage.lapce.volt(themes, VERSION, VENDOR_URL))
+    write_text(os.path.join(directory, "README.md"), lapce_readme(families))
+    shutil.copy(os.path.join(ROOT, "lapce", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_lapce(directory, families):
+    """Fails the build when volt.toml does not list exactly the theme files, a theme does not parse, its keys or
+    colours differ from heritage.lapce, or a text colour is unreadable on the background it is drawn on."""
+    plugin = os.path.join(directory, heritage.lapce.PLUGIN)
+    with open(os.path.join(plugin, "volt.toml"), "rb") as f:
+        volt = tomllib.load(f)
+    themes = [t for f in families for t in f.THEMES]
+    listed = [f"themes/{heritage.lapce.name(t)}.toml" for t in themes]
+    if volt["color-themes"] != listed or volt["name"] != heritage.lapce.PLUGIN or volt["version"] != VERSION:
+        raise SystemExit("Lapce volt.toml does not name the plugin, its version and every theme file")
+    if set(os.listdir(os.path.join(plugin, "themes"))) != {os.path.basename(path) for path in listed}:
+        raise SystemExit("Lapce themes: the themes folder holds other files than volt.toml lists")
+    names = set()
+    for t in themes:
+        p, label = t["palette"], f"Lapce {heritage.lapce.name(t)}"
+        with open(os.path.join(plugin, "themes", f"{heritage.lapce.name(t)}.toml"), "rb") as f:
+            data = tomllib.load(f)["color-theme"]
+        names.add(data["name"])
+        if data["base"] != heritage.lapce.base(p) or data["ui"] != heritage.lapce.ui(p) or \
+                data["syntax"] != {key: "#" + p[role] for key, role in heritage.lapce.syntax(p).items()}:
+            raise SystemExit(f"{label}: differs from heritage.lapce")
+        for value in [*data["base"].values(), *data["ui"].values(), *data["syntax"].values()]:
+            if not re.fullmatch(r"#[0-9A-F]{6}([0-9A-F]{2})?", value):
+                raise SystemExit(f"{label}: {value!r} is not a colour")
+        check_styles(label, heritage.lapce.styles(p), "fg", "bg", "syntax none", set(), {"syntax comment"}, {})
+    if len(names) != len(themes):
+        raise SystemExit("Lapce themes: two themes have the same name")
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Lapce themes: {name} is missing")
+
+
+def qtcreator_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Qt Creator
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families, each with an editor colour scheme of the \
+same name; each family maps the named colours of one tradition to syntax roles.
+
+## Install
+
+The themes need Qt Creator 20 or later.
+
+1. Copy the files in `themes` into the `themes` folder and the files in `styles` into the `styles` folder of Qt \
+Creator's settings, creating the folders if they do not exist: `~/.config/QtProject/qtcreator` on Linux and macOS, \
+`%AppData%\\QtProject\\qtcreator` on Windows. On Linux and macOS, from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.config/QtProject/qtcreator/themes ~/.config/QtProject/qtcreator/styles
+   cp themes/* ~/.config/QtProject/qtcreator/themes/
+   cp styles/* ~/.config/QtProject/qtcreator/styles/
+   ```
+
+2. Choose a theme, for example **Holi Night**, under **Preferences | Environment | Interface | Theme**, and restart \
+Qt Creator.
+
+3. Choose the colour scheme of the same name under **Preferences | Text Editor | Font & Colors | Color Scheme**. Qt \
+Creator keeps a colour scheme for each theme, so it comes back with the theme.
+
+## What is coloured
+
+Each theme colours Qt Creator's window: the mode bar, panels, tool bars, tabs, menus, the locator, output panes, the \
+terminal, version control, the debugger, the profiler's timeline, icons of the code model, Qt Quick Designer and Qt \
+Design Studio's panels. The colour scheme colours the editor: code, the line numbers and current line, selections, \
+search results, parenthesis matches, occurrences, diagnostics, diffs, version control logs and code coverage.
+
+## Languages
+
+Qt Creator colours C++ and QML with its code models, which tell declarations, fields, parameters, globals, statics and \
+virtual methods apart, and the other languages with KSyntaxHighlighting's definitions, which give fewer roles: a \
+language's keywords, types, strings, numbers and comments.
+
+{readme_footer(families, "Qt Creator", "Themes", "the theme, Qt Creator version, language")}"""
+
+
+def build_qtcreator(families):
+    """Writes the themes and colour schemes to build/qtcreator, with the README, changelog and licence, and returns
+    build/qtcreator."""
+    directory = os.path.join(OUT, "qtcreator")
+    for folder in ("themes", "styles"):
+        os.makedirs(os.path.join(directory, folder))
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            name = heritage.qtcreator.name(t)
+            write_text(os.path.join(directory, "themes", f"{name}.creatortheme"), heritage.qtcreator.theme(t, source))
+            write_text(os.path.join(directory, "styles", f"{name}.xml"), heritage.qtcreator.scheme(t, source))
+    write_text(os.path.join(directory, "README.md"), qtcreator_readme(families))
+    shutil.copy(os.path.join(ROOT, "qtcreator", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_qtcreator(directory, families):
+    """Fails the build when a theme leaves out a colour role of Qt Creator or names a colour that its palette lacks,
+    a colour scheme leaves out a text style or does not parse, or a text colour is unreadable on its background."""
+    themes, schemes = set(), set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.qtcreator.name(t), t["palette"]
+            label = f"Qt Creator {name}"
+            themes.add(f"{name}.creatortheme")
+            schemes.add(f"{name}.xml")
+            parser = configparser.ConfigParser(interpolation=None, comment_prefixes=(";",))
+            parser.optionxform = str
+            parser.read(os.path.join(directory, "themes", f"{name}.creatortheme"), encoding="utf-8")
+            palette = dict(parser["Palette"])
+            for value in palette.values():
+                if not re.fullmatch(r"[0-9a-f]{8}", value):
+                    raise SystemExit(f"{label}: palette colour {value!r} is not aarrggbb")
+            colours = dict(parser["Colors"])
+            if set(colours) != set(heritage.qtcreator.ROLES):
+                raise SystemExit(f"{label}: sets {len(colours)} of the {len(heritage.qtcreator.ROLES)} colour roles")
+            for role, value in colours.items():
+                if value not in palette and not re.fullmatch(r"[0-9a-f]{8}", value):
+                    raise SystemExit(f"{label}: {role} names {value!r}, which the palette lacks")
+            if parser["General"]["DefaultTextEditorColorScheme"] != f"{name}.xml" or \
+                    parser["General"]["ThemeName"] != p["name"]:
+                raise SystemExit(f"{label}: does not name its colour scheme and the theme")
+            root = ET.parse(os.path.join(directory, "styles", f"{name}.xml")).getroot()
+            styles = {element.get("name") for element in root.iter("style")}
+            if styles != set(heritage.qtcreator.STYLES) or root.get("name") != p["name"]:
+                raise SystemExit(f"{label}: the colour scheme does not set exactly the text styles of Qt Creator")
+            for element in root.iter("style"):
+                for key in ("foreground", "background", "underlineColor"):
+                    if element.get(key) is not None and not re.fullmatch(r"#[0-9a-f]{6}", element.get(key)):
+                        raise SystemExit(f"{label}: {element.get('name')} has {key} {element.get(key)!r}")
+            check_styles(label, heritage.qtcreator.styles(p), "fg", "bg", "Text", set(), {"Comment"}, {})
+    for folder, expected in (("themes", themes), ("styles", schemes)):
+        check_files("Qt Creator themes", directory, folder, expected)
+
+
+def amp_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Amp
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+The themes need Amp 0.7 or later in a terminal with 24-bit colour, which runs the matching theme of the \
+[Heritage Themes for terminals]({VENDOR_URL}/releases/latest).
+
+1. Copy the files in `themes` into the `themes` folder of Amp's configuration folder, `~/.config/amp` on Linux, \
+creating it if it does not exist. In a terminal, from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.config/amp/themes
+   cp themes/* ~/.config/amp/themes/
+   ```
+
+2. Name a theme in `~/.config/amp/config.yml`, which `Ctrl-A` then **application::display_preferences** opens:
+
+   ```yaml
+   theme: heritage-holi-night
+   ```
+
+## What is coloured
+
+Each theme colours code, the current line and the status bar. Amp draws text on the terminal's own background, which \
+the matching terminal theme gives the theme's background, and its mode indicators in colours of its own.
+
+## Languages
+
+Amp highlights code with the Sublime Text syntaxes it bundles, which tell constructs apart as Sublime Text does, so \
+the themes take the rules of the Sublime Text colour schemes. It has no syntax for Kotlin, TypeScript, TSX, Vue or \
+TOML, which open as plain text.
+
+{readme_footer(families, "Amp", "Themes", "the theme, Amp version, terminal, language")}"""
+
+
+def validate_amp(directory, families):
+    """Fails the build when a file is missing, a theme does not parse or differs from heritage.amp, or a rule's colour
+    is unreadable on the background."""
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.amp.name(t), t["palette"]
+            expected.add(f"{name}.tmTheme")
+            label = f"Amp {name}"
+            with open(os.path.join(directory, "themes", f"{name}.tmTheme"), "rb") as f:
+                data = plistlib.load(f)
+            if data["settings"][0]["settings"] != heritage.amp.settings(p) or data["name"] != p["name"]:
+                raise SystemExit(f"{label}: the global settings differ from heritage.amp.settings")
+            found = [(r["scope"], r["settings"]["foreground"], r["settings"]["fontStyle"]) for r in data["settings"][1:]]
+            if found != [(scope, colour, font) for _, scope, colour, font in heritage.amp.rules(p)]:
+                raise SystemExit(f"{label}: the rules differ from heritage.amp.rules")
+            check_styles(label, heritage.amp.styles(p), "fg", "bg", None, set(),
+                         {k for k in heritage.amp.styles(p) if "comment" in k.split(" (")[0]}, {})
+    check_files("Amp themes", directory, "themes", expected)
+
+
+def eclipse_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Eclipse
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families, in one plugin; each family maps the named \
+colours of one tradition to syntax roles.
+
+## Install
+
+The plugin needs Eclipse 2026-09 (4.41) or later.
+
+1. Copy `{heritage.eclipse.jar_name(VERSION)}` into the `dropins` folder of your Eclipse installation, beside \
+`plugins`, and restart Eclipse.
+
+2. Choose a theme, for example **Holi Night**, under **Window | Preferences | General | Appearance | Theme** (on \
+macOS, **Eclipse | Settings…**), and restart Eclipse.
+
+3. For the languages that open in the generic editor, such as Python, Go, Rust or YAML, choose the TextMate theme of \
+the same name under **Window | Preferences | TextMate | Theme**, as the default for dark or light appearance as the \
+theme is.
+
+## What is coloured
+
+Each theme colours the window, tool bars, views, tabs, forms, dialogs and the status line, and the editors: text, \
+the current line, selections, line numbers, occurrences, search results, annotations and hovers; Java, with JDT's \
+semantic highlighting, Javadoc and properties files; Ant files; the console; EGit's diffs, history and staging; \
+compare; Mylyn's tasks and its markup editors with their preview, which opens README files; and EclEmma's coverage. \
+The TextMate theme colours every language that TM4E highlights. Eclipse draws scroll bars, buttons and the selection \
+in lists and trees with the system's widgets.
+
+## Languages
+
+JDT colours Java with its semantic highlighting, which tells classes, interfaces, fields, static fields, constants, \
+parameters, locals and method declarations apart in a Java project. TM4E colours the other languages with TextMate \
+grammars and the TextMate theme, which take the rules of the Sublime Text colour schemes.
+
+{readme_footer(families, "Eclipse", "Themes", "the theme, Eclipse version and package, language")}"""
+
+
+def build_eclipse(families):
+    """Writes the plugin jar to build/eclipse, with the README, changelog and licence, and returns build/eclipse."""
+    directory = os.path.join(OUT, "eclipse")
+    os.makedirs(directory)
+    themes = [t for f in families for t in f.THEMES]
+    sources = {t["slug"]: f"{VENDOR_URL}/tree/master/themes/{heritage.folder(f)}" for f in families for t in f.THEMES}
+    with open(os.path.join(directory, heritage.eclipse.jar_name(VERSION)), "wb") as f:
+        f.write(heritage.eclipse.jar(themes, VERSION, "Heritage Themes", sources))
+    write_text(os.path.join(directory, "README.md"), eclipse_readme(families))
+    shutil.copy(os.path.join(ROOT, "eclipse", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_eclipse(directory, families):
+    """Fails the build when the jar's manifest, plugin.xml, stylesheets or TextMate themes are missing or malformed,
+    a stylesheet sets a colour its palette lacks or leaves a brace open, or a text colour is unreadable."""
+    themes = [t for f in families for t in f.THEMES]
+    with zipfile.ZipFile(os.path.join(directory, heritage.eclipse.jar_name(VERSION))) as z:
+        names = set(z.namelist())
+        expected = {"META-INF/MANIFEST.MF", "plugin.xml"} | \
+            {f"css/{heritage.eclipse.name(t)}.css" for t in themes} | \
+            {f"textmate/{heritage.eclipse.name(t)}.tmTheme" for t in themes}
+        if names != expected:
+            raise SystemExit(f"Eclipse plugin: holds {sorted(names ^ expected)[:5]} wrongly")
+        manifest = z.read("META-INF/MANIFEST.MF").decode()
+        if f"Bundle-SymbolicName: {heritage.eclipse.BUNDLE};singleton:=true" not in manifest or \
+                f"Bundle-Version: {VERSION}" not in manifest:
+            raise SystemExit("Eclipse plugin: the manifest does not name the bundle and its version")
+        root = ET.fromstring(z.read("plugin.xml"))
+        css = {e.get("id"): e.get("basestylesheeturi") for e in root.iter("theme") if e.get("basestylesheeturi")}
+        tm = {e.get("id"): e.get("path") for e in root.iter("theme") if e.get("path")}
+        if css != {heritage.eclipse.theme_id(t): f"css/{heritage.eclipse.name(t)}.css" for t in themes} or \
+                tm != {heritage.eclipse.tm4e_id(t): f"textmate/{heritage.eclipse.name(t)}.tmTheme" for t in themes}:
+            raise SystemExit("Eclipse plugin: plugin.xml does not contribute every theme")
+        for t in themes:
+            p, label = t["palette"], f"Eclipse {heritage.eclipse.name(t)}"
+            text = z.read(f"css/{heritage.eclipse.name(t)}.css").decode()
+            code = re.sub(r"/\*.*?\*/|'[^']*'|\"[^\"]*\"", "", text, flags=re.S)
+            if code.count("{") != code.count("}"):
+                raise SystemExit(f"{label}: the stylesheet's braces do not balance")
+            colours = {v.upper() for v in heritage.eclipse.hexes(p).values()}
+            # Eclipse splits a preference at its last "=", and a value runs to the end of its line
+            for preference in re.findall(r"^\s*'([^'\n]*)'$", text, flags=re.M):
+                if preference.count("=") != 1:
+                    raise SystemExit(f"{label}: the preference {preference[:60]!r} has no single '='")
+            for colour in re.findall(r"#[0-9A-Fa-f]{6}\b", re.sub(r"/\*.*?\*/", "", text, flags=re.S)):
+                if colour.upper() not in colours:
+                    raise SystemExit(f"{label}: the stylesheet sets {colour}, which the palette lacks")
+            for value in re.findall(r"=(\d+,\d+,\d+)'", text):
+                if "#" + "".join(f"{int(v):02X}" for v in value.split(",")) not in colours:
+                    raise SystemExit(f"{label}: a preference sets {value}, which the palette lacks")
+            plistlib.loads(z.read(f"textmate/{heritage.eclipse.name(t)}.tmTheme"))
+            check_styles(label, heritage.eclipse.styles(p), "fg", "bg", "editor text", set(), {"Java comment"}, {})
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Eclipse plugin: {name} is missing")
+
+
+def nova_readme(families):
+    """The README in the zip, which is also the extension's README in Nova. Links are absolute."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Nova
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families, in one extension; each family maps the \
+named colours of one tradition to syntax roles.
+
+## Install
+
+Double-click `{heritage.nova.FOLDER}` in the unzipped folder, which installs the extension in Nova, then choose a \
+theme, for example **Holi Night**, under **Nova | Settings | Themes**, for the light or dark appearance or both.
+
+## What is coloured
+
+Each theme colours the window, the title bar, buttons, text fields, the editor with its gutter, cursor, selection and \
+indent guides, code in every language that Nova's grammars highlight, and the terminal.
+
+{readme_footer(families, "Nova", "Themes", "the theme, Nova version, language")}"""
+
+
+def build_nova(families):
+    """Writes the extension to build/nova/<extension>, with the README, changelog and licence in it and beside it,
+    and returns build/nova."""
+    directory = os.path.join(OUT, "nova")
+    extension = os.path.join(directory, heritage.nova.FOLDER)
+    os.makedirs(os.path.join(extension, "Themes"))
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            write_text(os.path.join(extension, heritage.nova.file_name(t)), heritage.nova.theme(t, source))
+    write_text(os.path.join(extension, "extension.json"), heritage.nova.manifest(VERSION, VENDOR_URL, DESCRIPTION))
+    for folder in (directory, extension):
+        write_text(os.path.join(folder, "README.md"), nova_readme(families))
+        shutil.copy(os.path.join(ROOT, "nova", "CHANGELOG.md"), os.path.join(folder, "CHANGELOG.md"))
+        shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(folder, "LICENSE"))
+    return directory
+
+
+def validate_nova(directory, families):
+    """Fails the build when a theme is missing, a stylesheet differs from heritage.nova or names a colour that is not
+    #RRGGBB, the manifest is malformed, or a text colour is unreadable on its background."""
+    extension = os.path.join(directory, heritage.nova.FOLDER)
+    with open(os.path.join(extension, "extension.json"), encoding="utf-8") as f:
+        manifest = json.load(f)
+    if manifest["identifier"] != heritage.nova.IDENTIFIER or manifest["version"] != VERSION or \
+            manifest["categories"] != ["themes"]:
+        raise SystemExit("Nova extension: extension.json does not name the extension, its version and category")
+    themes = [t for f in families for t in f.THEMES]
+    expected = {os.path.basename(heritage.nova.file_name(t)) for t in themes}
+    if len(expected) != len(themes):
+        raise SystemExit("Nova themes: two themes have the same file name")
+    for t in themes:
+        p, label = t["palette"], f"Nova {t['palette']['name']}"
+        if not WINDOWS_NAME.fullmatch(p["name"]):
+            raise SystemExit(f"{label}: the name is no file name")
+        with open(os.path.join(extension, heritage.nova.file_name(t)), encoding="utf-8") as f:
+            parsed = heritage.nova.parse(f.read())
+        if len(parsed) != len(heritage.nova.ui(p)) + len(heritage.nova.syntax(p)) + 16:
+            raise SystemExit(f"{label}: the stylesheet does not set every selector of heritage.nova")
+        for selector, properties in parsed.items():
+            for prop, value in properties.items():
+                if prop.endswith("color") and not prop.startswith("-theme-") and \
+                        not re.fullmatch(r"#[0-9A-F]{6}", value):
+                    raise SystemExit(f"{label}: {selector} has {prop} {value!r}")
+        check_styles(label, heritage.nova.styles(p), "fg", "bg", "meta.text", set(), {"comment"}, {})
+    check_files("Nova themes", extension, "Themes", expected)
+
+
 # Product → its themes' names in READMEs, the README writer, and the folder its theme files go in.
-TERMINAL_NAMES = {"Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name, "Vim": heritage.vim.name,
+TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.name, "Lapce": heritage.lapce.name,
+                  "Qt Creator": heritage.qtcreator.name, "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
+                  "Nova": lambda t: t["palette"]["name"],
+                  "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
+                  "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+
+
+def terminals_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    modules = heritage.terminals.modules()
+    # the examples name Holi's themes, as the other products' READMEs do
+    dark, light = (next(t for f in families for t in f.THEMES if t["slug"] == slug) for slug in ("HoliNight", "HoliDay"))
+    def install(module):
+        text = module.INSTALL
+        for key, value in (("{stem}", heritage.terminals.name(dark)), ("{label}", dark["palette"]["name"]),
+                           ("{light_stem}", heritage.terminals.name(light)),
+                           ("{light_label}", light["palette"]["name"])):
+            text = text.replace(key, value)
+        return text
+    sections = []
+    for category in heritage.terminals.CATEGORIES:
+        sections.append(f"## {category}")
+        sections += [f"### {m.APP}\n\n{install(m)}" for m in modules if m.CATEGORY == category]
+    sections = "\n\n".join(sections)
+    contents = ", ".join(f"[{m.APP}](#{re.sub(r'[^a-z0-9 -]', '', m.APP.lower()).replace(' ', '-')})"
+                         for m in modules)
+    return f"""# Heritage Themes for terminals
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families, for {len(modules)} terminal emulators, \
+shells, prompts and multiplexers: {contents}.
+
+Each app has a folder of its own. A theme's file takes the name that the table at the end gives it, \
+`{heritage.terminals.name(dark)}` for **{dark["palette"]["name"]}**, or the theme's name where the app lists a theme \
+by its file name.
+
+The shells, prompts and multiplexers set text colours over the terminal's own background, so they read as \
+intended in a terminal that runs the same theme, and need a terminal with 24-bit colour.
+
+{sections}
+
+## The terminal colours
+
+Every terminal emulator theme gives the 16 ANSI colours the same values, as the terminals of the editor themes do. \
+Red, green, yellow, blue, magenta and cyan are the theme's ANSI colours, alike in their normal and bright forms. \
+Black is the theme's faint text colour and bright black its muted text; white is the operator colour and bright \
+white the text colour. In a light theme, black is therefore light and white dark, so that every colour reads on \
+the light background, as the colours of the dark theme do on the dark one.
+
+{readme_footer(families, "terminals", "Themes", "the theme, the app and its version, the terminal")}"""
+
+
+def build_terminals(families):
+    """Writes every app's files to build/terminals/<folder>, with the README, changelog and licence, and returns
+    build/terminals."""
+    directory = os.path.join(OUT, "terminals")
+    themes = [t for f in families for t in f.THEMES]
+    sources = {t["slug"]: f"{VENDOR_URL}/tree/master/themes/{heritage.folder(f)}" for f in families for t in f.THEMES}
+    for module in heritage.terminals.modules():
+        os.makedirs(os.path.join(directory, module.FOLDER))
+        files = [entry for t in themes for entry in module.files(t, sources[t["slug"]])]
+        if hasattr(module, "combined"):
+            files += module.combined(themes, VENDOR_URL)
+        for filename, text in files:
+            path = os.path.join(directory, module.FOLDER, filename)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            write_text(path, text)
+    write_text(os.path.join(directory, "README.md"), terminals_readme(families))
+    shutil.copy(os.path.join(ROOT, "terminals", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_terminals(directory, families):
+    """Fails the build when an app's folder holds other files than its module writes, a file does not parse or differs
+    from the colours its module gives, or a text colour of an app is below its minimum contrast on its background."""
+    themes = [t for f in families for t in f.THEMES]
+    for module in heritage.terminals.modules():
+        folder = os.path.join(directory, module.FOLDER)
+        found = {os.path.relpath(os.path.join(root, name), folder) for root, _, names in os.walk(folder)
+                 for name in names}
+        expected = {filename for t in themes for filename, _ in module.files(t, "")}
+        if hasattr(module, "combined"):
+            expected |= {filename for filename, _ in module.combined(themes, "")}
+        if found != expected:
+            raise SystemExit(f"{module.APP}: {len(found)} files in {module.FOLDER} for {len(expected)} expected")
+        def read(filename):
+            with open(os.path.join(folder, filename), encoding="utf-8") as f:
+                return f.read()
+        try:
+            if hasattr(module, "combined"):
+                module.validate_combined(themes, {filename: read(filename)
+                                                  for filename, _ in module.combined(themes, "")})
+            else:
+                for t in themes:
+                    (filename, _), = module.files(t, "")
+                    module.validate(t, read(filename))
+        except (ValueError, KeyError) as error:
+            raise SystemExit(f"{module.APP}: {error}")
+        for t in themes:
+            for element, text, background, minimum in module.pairs(t["palette"]):
+                ratio = contrast(text[1:], background[1:])
+                if ratio < minimum:
+                    raise SystemExit(f"{module.APP} {t['palette']['name']}: {element} is {ratio:.2f}:1 "
+                                     f"({text} on {background}), needs {minimum}:1")
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Terminals: {name} is missing")
 
 
 def visualstudio_description(themes):
@@ -1843,12 +2508,42 @@ def main():
             ("Emacs", "themes", lambda t, source: (f"{heritage.emacs.name(t)}-theme.el",
                                                     heritage.emacs.theme(t["palette"], heritage.emacs.name(t), source,
                                                                          VENDOR_URL)),
-             validate_emacs)):
+             validate_emacs),
+            ("Nano", "schemes", lambda t, source: (f"{heritage.nano.name(t)}.nanorc",
+                                                    heritage.nano.colorscheme(t["palette"], source)),
+             validate_nano),
+            ("Textadept", "themes", lambda t, source: (f"{heritage.textadept.name(t)}.lua",
+                                                        heritage.textadept.theme(t["palette"], source)),
+             validate_textadept),
+            ("Amp", "themes", lambda t, source: (f"{heritage.amp.name(t)}.tmTheme",
+                                                  heritage.amp.theme(t["palette"], source)),
+             validate_amp)):
         directory = build_themes(families, editor, folder, files)
         validate_themes(directory, families)
         name = f"{VSCODE_NAME}-{editor.lower()}"
         print(f"{pack_folder(directory, os.path.join(OUT, f'{name}-{VERSION}.zip'), name)}: {len(themes)} themes",
               flush=True)
+    nova = build_nova(families)
+    validate_nova(nova, families)
+    print(f"{pack_folder(nova, os.path.join(OUT, f'{VSCODE_NAME}-nova-{VERSION}.zip'), f'{VSCODE_NAME}-nova')}: "
+          f"{len(themes)} themes", flush=True)
+    eclipse = build_eclipse(families)
+    validate_eclipse(eclipse, families)
+    print(f"{pack_folder(eclipse, os.path.join(OUT, f'{VSCODE_NAME}-eclipse-{VERSION}.zip'), f'{VSCODE_NAME}-eclipse')}: "
+          f"{len(themes)} themes", flush=True)
+    qtcreator = build_qtcreator(families)
+    validate_qtcreator(qtcreator, families)
+    print(f"{pack_folder(qtcreator, os.path.join(OUT, f'{VSCODE_NAME}-qtcreator-{VERSION}.zip'), f'{VSCODE_NAME}-qtcreator')}: "
+          f"{len(themes)} themes", flush=True)
+    lapce = build_lapce(families)
+    validate_lapce(lapce, families)
+    print(f"{pack_folder(lapce, os.path.join(OUT, f'{VSCODE_NAME}-lapce-{VERSION}.zip'), f'{VSCODE_NAME}-lapce')}: "
+          f"{len(themes)} themes", flush=True)
+    terminals = build_terminals(families)
+    validate_terminals(terminals, families)
+    package = os.path.join(OUT, f"{TERMINALS_NAME}-{VERSION}.zip")
+    print(f"{pack_folder(terminals, package, TERMINALS_NAME)}: {len(themes)} themes for "
+          f"{len(heritage.terminals.APPS)} apps", flush=True)
     if args.vsix:
         print(f"{pack_vsix(extension, themes)}: {len(themes)} themes")
 

@@ -1,0 +1,51 @@
+# The editors that the previews of Nano, Qt Creator, Eclipse, Lapce, Textadept and Amp run their themes in: Nano and
+# Qt Creator as Fedora 45 packages them, and pinned upstream releases of the others, each checked against its
+# published checksum. GUI editors draw on Xvfb with Mesa's software OpenGL and Vulkan; Nano and Amp run in a
+# pseudo-terminal.
+FROM registry.fedoraproject.org/fedora:45
+
+RUN dnf -y install --setopt=install_weak_deps=False \
+        xorg-x11-server-Xvfb xdotool xwininfo ImageMagick dbus-x11 dbus-daemon \
+        mesa-dri-drivers mesa-vulkan-drivers vulkan-loader mesa-libEGL mesa-libGL libglvnd-glx \
+        python3 python3-pyte git findutils procps-ng which jetbrains-mono-fonts-all google-noto-sans-fonts \
+        nano qt-creator qt6-qtbase-gui qt6-qtsvg qt5-qtbase qt5-qtbase-gui \
+        java-25-openjdk gtk3 webkit2gtk4.1 libsecret \
+        libxkbcommon-x11 xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm \
+        fontconfig ncurses zstd python3-pyqt6-base \
+    && dnf clean all
+
+WORKDIR /opt
+# fetch URL SHA256 FILE: downloads URL to FILE and stops the build when it does not match SHA256.
+RUN printf '#!/bin/sh\nset -e\ncurl -fsSL -o "$3" "$1"\necho "$2  $3" | sha256sum -c -\n' > /usr/local/bin/fetch \
+    && chmod +x /usr/local/bin/fetch
+
+# Eclipse IDE for Java Developers, checked against the SHA-512 that eclipse.org publishes
+RUN curl -fsSL -o eclipse.tar.gz \
+        https://download.eclipse.org/technology/epp/downloads/release/2026-09/R/eclipse-java-2026-09-R-linux-gtk-x86_64.tar.gz \
+    && echo "483af23506520a37e96857dbafc74e36194152b10471c558b1c2a31b34053f5f20af4a5d88509acb7cfa38bd2aff3fa7e6e45159ff827260cdf8838c46bd73a4  eclipse.tar.gz" \
+        | sha512sum -c - \
+    && tar --no-same-owner -xzf eclipse.tar.gz && rm eclipse.tar.gz
+RUN fetch https://github.com/lapce/lapce/releases/download/v0.4.6/lapce-linux-amd64.tar.gz \
+        7a0945e6862bbe207316ba05ac5d634fc8a55069b61e4ec8989af632250d0984 lapce.tar.gz \
+    && mkdir lapce && tar --no-same-owner -xzf lapce.tar.gz -C lapce --strip-components=1 && rm lapce.tar.gz
+# Lapce 0.4.6 looks for grammars released for its own version and finds none, so the preview gives it those of the
+# newest release, 0.4.5, as a user installs them into Lapce's grammars and queries folders.
+RUN fetch "https://github.com/lapce/tree-sitter-grammars/releases/download/v0.4.5%2B1f9f9dd/grammars-linux-x86_64.tar.zst" \
+        e4a21c43801e53b20c080532d9d21227e113f3e525b9cc72ae03ad1e715bc955 grammars.tar.zst \
+    && fetch "https://github.com/lapce/tree-sitter-grammars/releases/download/v0.4.5%2B1f9f9dd/queries.tar.zst" \
+        ce9364104fe91b9eb9b5963330b386d762cf1404e1d74ac32c0ca99965566806 queries.tar.zst \
+    && mkdir -p lapce-data/grammars lapce-data/queries \
+    && tar --no-same-owner --zstd -xf grammars.tar.zst -C lapce-data/grammars \
+    && tar --no-same-owner --zstd -xf queries.tar.zst -C lapce-data/queries \
+    && echo "v0.4.5+1f9f9dd" > lapce-data/grammars/version && echo "v0.4.5+1f9f9dd" > lapce-data/queries/version \
+    && rm grammars.tar.zst queries.tar.zst && chmod -R a+rX lapce-data
+RUN fetch https://github.com/orbitalquark/textadept/releases/download/textadept_13.1/textadept_13.1.linux.tgz \
+        3e2a10b50163ba5ffc930e7d65a4cf8ebd4c6ef3940611269e86f886dacd321e textadept.tgz \
+    && mkdir textadept && tar --no-same-owner -xzf textadept.tgz -C textadept --strip-components=1 && rm textadept.tgz
+RUN fetch https://github.com/jmacdonald/amp/releases/download/0.7.1/amp-x86_64-unknown-linux-musl \
+        b9d3a1fcbdc683ce680a7c7f4f36570ba6772329fe02232a517659fecab56db3 /usr/local/bin/amp \
+    && chmod +x /usr/local/bin/amp
+
+RUN useradd -m -s /bin/bash heritage
+USER heritage
+WORKDIR /home/heritage

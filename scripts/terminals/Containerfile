@@ -1,0 +1,89 @@
+# The apps that preview.py --terminals runs the Terminals themes in: the terminal emulators, shells, multiplexers and
+# prompts that Fedora 45 packages, and pinned upstream releases of the others, each checked against its SHA-256.
+# X11 apps draw on Xvfb with Mesa's software OpenGL and Vulkan; foot draws on a headless Sway.
+FROM registry.fedoraproject.org/fedora:45
+
+RUN dnf -y install dnf-plugins-core \
+    && dnf -y copr enable scottames/ghostty \
+    && dnf -y install --setopt=install_weak_deps=False \
+        xorg-x11-server-Xvfb xrdb xwd xdotool xwininfo ImageMagick dbus-x11 dbus-daemon \
+        mesa-dri-drivers mesa-vulkan-drivers vulkan-loader mesa-libEGL mesa-libGL libglvnd-glx \
+        sway grim jq python3 python3-pyte python3-pyyaml git findutils procps-ng which less \
+        jetbrains-mono-fonts-all google-noto-sans-fonts google-noto-emoji-fonts \
+        kitty kitty-terminfo alacritty foot foot-terminfo terminator konsole xterm contour-terminal st \
+        fish zsh tmux nano ghostty \
+        gtk3 libXScrnSaver nss alsa-lib at-spi2-atk libdrm mesa-libgbm libxkbcommon-x11 xcb-util-cursor \
+        xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm fontconfig libsecret gobject-introspection \
+        gcc make libX11-devel libXft-devel fontconfig-devel freetype-devel \
+    && dnf clean all \
+    && cp /usr/bin/sway /usr/local/bin/sway
+# The copy of sway drops its cap_sys_nice file capability, which a rootless container cannot grant, so it can run.
+
+WORKDIR /opt
+# fetch URL SHA256 FILE: downloads URL to FILE and stops the build when it does not match SHA256.
+RUN printf '#!/bin/sh\nset -e\ncurl -fsSL -o "$3" "$1"\necho "$2  $3" | sha256sum -c -\n' > /usr/local/bin/fetch \
+    && chmod +x /usr/local/bin/fetch
+
+# Terminal emulators
+RUN fetch https://github.com/wezterm/wezterm/releases/download/20240203-110809-5046fc22/WezTerm-20240203-110809-5046fc22-Ubuntu20.04.AppImage \
+        34010a07076d2272c4d4f94b5e0dae608a679599e8d729446323f88f956c60f0 wezterm.AppImage \
+    && chmod +x wezterm.AppImage && ./wezterm.AppImage --appimage-extract >/dev/null && mv squashfs-root wezterm \
+    && rm wezterm.AppImage && ln -s /opt/wezterm/usr/bin/wezterm /usr/local/bin/wezterm
+RUN fetch https://github.com/vercel/hyper/releases/download/v3.4.1/Hyper-3.4.1.AppImage \
+        5050be667fe56d6871ed6f86b3b03a023b2b75aa91329a82c2f15ff7ed66b63c hyper.AppImage \
+    && chmod +x hyper.AppImage && ./hyper.AppImage --appimage-extract >/dev/null && mv squashfs-root hyper \
+    && chmod -R a+rX hyper && chmod 4755 hyper/chrome-sandbox \
+    && rm hyper.AppImage
+RUN fetch https://github.com/Eugeny/tabby/releases/download/v1.0.238/tabby-1.0.238-linux-x64.tar.gz \
+        36436de2c2f8651ebed4a222e759583d6fedf3f62904b13d7c9599a084859309 tabby.tar.gz \
+    && mkdir tabby && tar -xzf tabby.tar.gz -C tabby --strip-components=1 && rm tabby.tar.gz
+RUN fetch https://github.com/raphamorim/rio/releases/download/v0.5.29/rioterm-0.5.29-1.x86_64_x11.rpm \
+        176c8df4b8e44d0d5f956345d785acdb93233145e320c97d1aafcc685b2f272a rio.rpm \
+    && rpm -i --replacefiles --nosignature rio.rpm && rm rio.rpm
+RUN fetch https://releases.warp.dev/stable/v0.2026.10.21.08.25.stable_02/warp-terminal-v0.2026.10.21.08.25.stable_02-1.x86_64.rpm \
+        e4fe7d81d92496b26d00995b70ae324892720e09d41220615de13642b87e6064 warp.rpm \
+    && dnf -y install ./warp.rpm && rm warp.rpm && dnf clean all
+
+# st compiles its colours in, so the preview builds it from source with each theme's colours.
+RUN fetch https://dl.suckless.org/st/st-0.9.3.tar.gz \
+        9ed9feabcded713d4ded38c8cebf36a3b08f0042ef7934a0e2b2409da56e649b st.tar.gz \
+    && mkdir st-src && tar -xzf st.tar.gz -C st-src --strip-components=1 && rm st.tar.gz
+
+# Shells and prompts
+RUN fetch https://github.com/starship/starship/releases/download/v1.27.0/starship-x86_64-unknown-linux-musl.tar.gz \
+        10c8eb4cb3b761d9bf59ea828444c2dab36c900b7d69a69e08814b286969df89 starship.tar.gz \
+    && tar -xzf starship.tar.gz -C /usr/local/bin starship && rm starship.tar.gz
+RUN fetch https://github.com/JanDeDobbeleer/oh-my-posh/releases/download/v31.9.1/posh-linux-amd64 \
+        574074a4e84797180e0bda0d133da5f01fbda89ecdb450134c7e566b9a389212 /usr/local/bin/oh-my-posh \
+    && chmod +x /usr/local/bin/oh-my-posh
+RUN fetch https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-x64.tar.gz \
+        1da6d6d6035d651f20e70ddee7c4c15ac6ab8b9fb40ee92240d91263f28a884b pwsh.tar.gz \
+    && mkdir pwsh && tar -xzf pwsh.tar.gz -C pwsh && rm pwsh.tar.gz && chmod +x pwsh/pwsh \
+    && ln -s /opt/pwsh/pwsh /usr/local/bin/pwsh
+RUN fetch https://github.com/nushell/nushell/releases/download/0.116.1/nu-0.116.1-x86_64-unknown-linux-gnu.tar.gz \
+        d6d8ace4be491ed8abba4026e73b60c0470b4671d7039307e7d772282ef863da nu.tar.gz \
+    && tar -xzf nu.tar.gz --strip-components=1 -C /usr/local/bin nu-0.116.1-x86_64-unknown-linux-gnu/nu \
+    && rm nu.tar.gz
+RUN fetch https://github.com/zellij-org/zellij/releases/download/v0.45.1/zellij-x86_64-unknown-linux-musl.tar.gz \
+        40bcc2e03f5d5ae8e054e39f676081fe12ab70871506996ba595834c3718eefc zellij.tar.gz \
+    && tar -xzf zellij.tar.gz -C /usr/local/bin zellij && rm zellij.tar.gz
+RUN fetch https://github.com/romkatv/powerlevel10k/archive/refs/tags/v1.20.0.tar.gz \
+        d8187d44b697b3a37a8c4896678b4380e717cbf2850179529358348780a2d3d7 p10k.tar.gz \
+    && mkdir powerlevel10k && tar -xzf p10k.tar.gz -C powerlevel10k --strip-components=1 && rm p10k.tar.gz \
+    && GITSTATUS_CACHE_DIR=/opt/gitstatus powerlevel10k/gitstatus/install -f && chmod -R a+rX /opt/gitstatus
+# gitstatusd, which Powerlevel10k's Git segment needs, from the release that its install script pins with checksums
+ENV GITSTATUS_CACHE_DIR=/opt/gitstatus
+RUN fetch https://github.com/zsh-users/zsh-syntax-highlighting/archive/refs/tags/0.8.0.tar.gz \
+        5981c19ebaab027e356fe1ee5284f7a021b89d4405cc53dc84b476c3aee9cc32 zsh-syntax-highlighting.tar.gz \
+    && mkdir zsh-syntax-highlighting \
+    && tar -xzf zsh-syntax-highlighting.tar.gz -C zsh-syntax-highlighting --strip-components=1 \
+    && rm zsh-syntax-highlighting.tar.gz
+RUN fetch https://github.com/zsh-users/zsh-autosuggestions/archive/refs/tags/v0.7.1.tar.gz \
+        0df7affff21cd87ed298e6a3970ed08a1dd66a6efa676454ee5b091ad503badf zsh-autosuggestions.tar.gz \
+    && mkdir zsh-autosuggestions \
+    && tar -xzf zsh-autosuggestions.tar.gz -C zsh-autosuggestions --strip-components=1 \
+    && rm zsh-autosuggestions.tar.gz
+
+RUN useradd -m -s /bin/bash heritage
+USER heritage
+WORKDIR /home/heritage

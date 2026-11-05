@@ -34,7 +34,7 @@ CAMISA = dict(
     keyword="8A5600", string="B0261C", number="A3365A", type="141210", method="1F4A9C", call="34599E",
     field="734634", constant="A3365A", annotation="A3365A", label="8A5600",
     comment="847C70", doc="6E6450", docTag="524A38", op="57514A", param="2B2724", typeParam="6E4E00",
-    gold="966702", red="A41E14", redText="FBF6EC", azure="1F4A9C", caret="8A5600",
+    gold="8F6202", red="A41E14", redText="FBF6EC", azure="1F4A9C", caret="8A5600",
     error="C42020", warning="A86800", weak="A8955E",
     searchBg="F2DC8A", searchBorder="9A6A00", underCaret="D4E0F2", writeCaret="F2D4CC",
     braceBg="D0DCF0", todo="8A5600",

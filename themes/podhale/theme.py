@@ -34,7 +34,7 @@ SUKNO = dict(
     keyword="B0102E", string="223A92", number="B03C1C", type="06648A", method="7A5800", call="6A5420",
     field="2C6A22", constant="B03C1C", annotation="A02878", label="B0102E",
     comment="857C70", doc="6E6450", docTag="524A38", op="55504A", param="1C1A18", typeParam="1A6E8E",
-    gold="8C6901", red="A0102A", redText="FBF6EC", azure="223A92", caret="B0102E",
+    gold="866401", red="A0102A", redText="FBF6EC", azure="223A92", caret="B0102E",
     error="C42020", warning="A86800", weak="A8955E",
     searchBg="F0DC8A", searchBorder="9A7400", underCaret="D4E2F0", writeCaret="F2D4CC",
     braceBg="D2E6CC", todo="8A5A00",

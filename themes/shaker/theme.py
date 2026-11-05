@@ -31,7 +31,7 @@ PLASTER = dict(
     border="D5D0C5", fg="34302C", muted="625E58", disabled="ABA69C",
     caretRow="EEEBE4", selection="D4DEEA", selInactive="E4E2DC", lineNo="A8A398", lineNoCaret="1F3F7A",
     guide="E6E3DC", guideSel="CBC6BA",
-    keyword="1F3F7A", string="B02A22", number="0E6E5A", type="2E6A1A", method="A85A00", call="9A4E10",
+    keyword="1F3F7A", string="B02A22", number="0E6E5A", type="2E6A1A", method="A25700", call="9A4E10",
     field="856000", constant="0E6E5A", annotation="2E6A1A", label="B02A22",
     comment="7A766C", doc="66625A", docTag="48443E", op="5E5A54", param="34302C", typeParam="245414",
     gold="856000", red="B02A22", redText="FFF5F0", azure="1F5A9A", caret="1F3F7A",

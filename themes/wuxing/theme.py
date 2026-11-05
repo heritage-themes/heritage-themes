@@ -29,15 +29,15 @@ DAY = dict(
     caretRow="EFE6D1", selection="D3DBEE", selInactive="E0E2E6", lineNo="B3AA94", lineNoCaret="8A5F00",
     guide="E6DDC8", guideSel="CDBF9F",
     keyword="B0362B", string="2A7244", number="7B3FA6", type="6E5A10", method="2456B4", call="3A64B8",
-    field="0A7480", constant="6A2F96", annotation="A04A15", label="7A5200",
-    comment="7E7C72", doc="7D6845", docTag="6E5A3A", op="5A5A5A", param="2B3040", typeParam="7E6418",
-    gold="936501", red="B0362B", redText="FBF3E4", azure="2456B4",
+    field="0A727E", constant="6A2F96", annotation="A04A15", label="7A5200",
+    comment="7E7C72", doc="796543", docTag="6E5A3A", op="5A5A5A", param="2B3040", typeParam="7E6418",
+    gold="8B5F01", red="B0362B", redText="FBF3E4", azure="2456B4",
     error="D0283E", warning="9A5F00", weak="B3A06A",
     searchBg="F3D98A", searchBorder="C8962A", underCaret="D6E2F2", writeCaret="F2D6D0",
     braceBg="CFE6CF", todo="8A5E00",
     added="6AA672", modified="6C8CC4", deleted="C46A60",
     diffIns="E2F0DC", diffMod="DDE6F4", diffDel="F5DCD8", diffConf="F3E6C4", fileYellow="F0E9D6",
-    ansiRed="B0362B", ansiGreen="2A7244", ansiYellow="7A5200", ansiBlue="2456B4", ansiMagenta="7B3FA6", ansiCyan="0A7480",
+    ansiRed="B0362B", ansiGreen="2A7244", ansiYellow="7A5200", ansiBlue="2456B4", ansiMagenta="7B3FA6", ansiCyan="0A727E",
 )
 
 FAMILY = "Wuxing"

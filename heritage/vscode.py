@@ -55,7 +55,7 @@ def token_rules(p):
     s("constant.character.escape, constant.other.placeholder, punctuation.definition.interpolation, "
       "string.regexp keyword, string.regexp punctuation.definition.group", "gold", "bold")
     s("constant.other.character-class.regexp, punctuation.definition.character-class.regexp", "number", "bold")
-    s("invalid, invalid.illegal", "error")
+    s("invalid, invalid.illegal", "ansiRed")
     s("constant.numeric", "number")
     s("constant.language, variable.language", "keyword", kw)
     s("constant.other.caps, variable.other.enummember, support.constant, entity.name.function.preprocessor", "constant",
@@ -137,9 +137,9 @@ def token_rules(p):
     s("meta.link.inline.markdown punctuation.definition.metadata", "fg")
     s("markup.quote", "doc", "italic")
     # diff files
-    s("markup.inserted", "added")
-    s("markup.deleted", "deleted")
-    s("markup.changed", "modified")
+    s("markup.inserted", "ansiGreen")
+    s("markup.deleted", "ansiRed")
+    s("markup.changed", "ansiBlue")
     s("meta.diff.header, meta.diff.range", "keyword")
     return rules
 

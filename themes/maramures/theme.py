@@ -17,7 +17,7 @@ ZADIE = dict(
     guide="201E1C", guideSel="3A3632",
     keyword="EE6A5E", string="EBAA4C", number="88AAEA", type="7CBE8A", method="EE96B2", call="F2B0C6",
     field="C9A27C", constant="88AAEA", annotation="88AAEA", label="EE6A5E",
-    comment="776F68", doc="898079", docTag="ACA398", op="9F988E", param="C2BCB0", typeParam="A8D8B2",
+    comment="776F68", doc="89817A", docTag="ACA398", op="9F988E", param="C2BCB0", typeParam="A8D8B2",
     gold="EBAA4C", red="B2302A", redText="FFF4EE", azure="88AAEA", caret="EBAA4C",
     error="FF6B5E", warning="E8A33A", weak="8A8460",
     searchBg="4A3A12", searchBorder="EBAA4C", underCaret="27303E", writeCaret="4A2622",

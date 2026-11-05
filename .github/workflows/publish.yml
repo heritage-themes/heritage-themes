@@ -34,6 +34,14 @@ jobs:
       micro: ${{ steps.check.outputs.micro }}
       vim: ${{ steps.check.outputs.vim }}
       emacs: ${{ steps.check.outputs.emacs }}
+      terminals: ${{ steps.check.outputs.terminals }}
+      nano: ${{ steps.check.outputs.nano }}
+      textadept: ${{ steps.check.outputs.textadept }}
+      lapce: ${{ steps.check.outputs.lapce }}
+      qtcreator: ${{ steps.check.outputs.qtcreator }}
+      amp: ${{ steps.check.outputs.amp }}
+      eclipse: ${{ steps.check.outputs.eclipse }}
+      nova: ${{ steps.check.outputs.nova }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -53,7 +61,8 @@ jobs:
             exit 1
           fi
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
-            kakoune=false micro=false vim=false emacs=false
+            kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
+            qtcreator=false amp=false eclipse=false nova=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" visualstudio/CHANGELOG.md && visualstudio=true
@@ -67,10 +76,20 @@ jobs:
           grep -q "^## \[$version\]" micro/CHANGELOG.md && micro=true
           grep -q "^## \[$version\]" vim/CHANGELOG.md && vim=true
           grep -q "^## \[$version\]" emacs/CHANGELOG.md && emacs=true
+          grep -q "^## \[$version\]" terminals/CHANGELOG.md && terminals=true
+          grep -q "^## \[$version\]" nano/CHANGELOG.md && nano=true
+          grep -q "^## \[$version\]" textadept/CHANGELOG.md && textadept=true
+          grep -q "^## \[$version\]" lapce/CHANGELOG.md && lapce=true
+          grep -q "^## \[$version\]" qtcreator/CHANGELOG.md && qtcreator=true
+          grep -q "^## \[$version\]" amp/CHANGELOG.md && amp=true
+          grep -q "^## \[$version\]" eclipse/CHANGELOG.md && eclipse=true
+          grep -q "^## \[$version\]" nova/CHANGELOG.md && nova=true
           if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$visualstudio" = false ] && [ "$sublime" = false ] \
               && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ] && [ "$xcode" = false ] \
               && [ "$helix" = false ] && [ "$kakoune" = false ] && [ "$micro" = false ] && [ "$vim" = false ] \
-              && [ "$emacs" = false ]; then
+              && [ "$emacs" = false ] && [ "$terminals" = false ] && [ "$nano" = false ] && [ "$textadept" = false ] \
+              && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$amp" = false ] \
+              && [ "$eclipse" = false ] && [ "$nova" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -89,6 +108,14 @@ jobs:
             echo "micro=$micro"
             echo "vim=$vim"
             echo "emacs=$emacs"
+            echo "terminals=$terminals"
+            echo "nano=$nano"
+            echo "textadept=$textadept"
+            echo "lapce=$lapce"
+            echo "qtcreator=$qtcreator"
+            echo "amp=$amp"
+            echo "eclipse=$eclipse"
+            echo "nova=$nova"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -691,9 +718,185 @@ jobs:
           path: build/heritage-themes-emacs-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # Terminal emulators, shells, prompts and multiplexers read their themes from files, so users install the
+  # Terminals themes from the zip that the GitHub release attaches.
+  terminals:
+    needs: check
+    if: needs.check.outputs.terminals == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: terminals
+          path: build/heritage-themes-terminals-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  # Nano has no theme registry: users copy a scheme into their nanorc from the zip that the GitHub
+  # release attaches.
+  nano:
+    needs: check
+    if: needs.check.outputs.nano == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nano
+          path: build/heritage-themes-nano-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  # Textadept has no theme registry: users install the themes from the zip that the GitHub release
+  # attaches.
+  textadept:
+    needs: check
+    if: needs.check.outputs.textadept == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: textadept
+          path: build/heritage-themes-textadept-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  # Users install the Lapce plugin from the zip that the GitHub release attaches; Lapce's plugin registry
+  # needs an account that this release does not publish with.
+  lapce:
+    needs: check
+    if: needs.check.outputs.lapce == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: lapce
+          path: build/heritage-themes-lapce-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  # Qt Creator has no theme registry: users install the themes and colour schemes from the zip that the
+  # GitHub release attaches.
+  qtcreator:
+    needs: check
+    if: needs.check.outputs.qtcreator == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: qtcreator
+          path: build/heritage-themes-qtcreator-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  # Amp has no theme registry: users install the themes from the zip that the GitHub release attaches.
+  amp:
+    needs: check
+    if: needs.check.outputs.amp == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: amp
+          path: build/heritage-themes-amp-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  # Users drop the Eclipse plugin from the zip that the GitHub release attaches into Eclipse; the Eclipse
+  # Marketplace needs an update site that this release does not publish.
+  eclipse:
+    needs: check
+    if: needs.check.outputs.eclipse == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: eclipse
+          path: build/heritage-themes-eclipse-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  # Users install the Nova extension from the zip that the GitHub release attaches; Nova's extension
+  # library publishes from Nova on a Mac.
+  nova:
+    needs: check
+    if: needs.check.outputs.nova == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nova
+          path: build/heritage-themes-nova-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
-            emacs]
+            emacs, terminals, nano, textadept, lapce, qtcreator,
+            amp, eclipse, nova]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -709,7 +912,15 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.kakoune.result)
       && contains(fromJSON('["success", "skipped"]'), needs.micro.result)
       && contains(fromJSON('["success", "skipped"]'), needs.vim.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.emacs.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.emacs.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.terminals.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.nano.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.textadept.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.lapce.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.qtcreator.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.amp.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.eclipse.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.nova.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -728,6 +939,14 @@ jobs:
       MICRO: ${{ needs.check.outputs.micro }}
       VIM: ${{ needs.check.outputs.vim }}
       EMACS: ${{ needs.check.outputs.emacs }}
+      TERMINALS: ${{ needs.check.outputs.terminals }}
+      NANO: ${{ needs.check.outputs.nano }}
+      TEXTADEPT: ${{ needs.check.outputs.textadept }}
+      LAPCE: ${{ needs.check.outputs.lapce }}
+      QTCREATOR: ${{ needs.check.outputs.qtcreator }}
+      AMP: ${{ needs.check.outputs.amp }}
+      ECLIPSE: ${{ needs.check.outputs.eclipse }}
+      NOVA: ${{ needs.check.outputs.nova }}
     steps:
       - uses: actions/checkout@v7
 
@@ -793,6 +1012,14 @@ jobs:
             notes "Micro colour schemes" "$MICRO" micro/CHANGELOG.md "heritage-themes-micro-<version>.zip"
             notes "Vim colour schemes" "$VIM" vim/CHANGELOG.md "heritage-themes-vim-<version>.zip"
             notes "Emacs themes" "$EMACS" emacs/CHANGELOG.md "heritage-themes-emacs-<version>.zip"
+            notes "Terminals themes" "$TERMINALS" terminals/CHANGELOG.md "heritage-themes-terminals-<version>.zip"
+            notes "Nano colour schemes" "$NANO" nano/CHANGELOG.md "heritage-themes-nano-<version>.zip"
+            notes "Textadept themes" "$TEXTADEPT" textadept/CHANGELOG.md "heritage-themes-textadept-<version>.zip"
+            notes "Lapce themes" "$LAPCE" lapce/CHANGELOG.md "heritage-themes-lapce-<version>.zip"
+            notes "Qt Creator themes" "$QTCREATOR" qtcreator/CHANGELOG.md "heritage-themes-qtcreator-<version>.zip"
+            notes "Amp themes" "$AMP" amp/CHANGELOG.md "heritage-themes-amp-<version>.zip"
+            notes "Eclipse plugin" "$ECLIPSE" eclipse/CHANGELOG.md "heritage-themes-eclipse-<version>.zip"
+            notes "Nova themes" "$NOVA" nova/CHANGELOG.md "heritage-themes-nova-<version>.zip"
           } > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \

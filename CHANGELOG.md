@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Code keeps WCAG AA contrast on the current line's highlight. In 33 themes, the code colours that fell just below 4.5:1 on it are a shade darker in light themes or lighter in dark ones.
+- The current line's number in Kerala Kasavu (Light) reaches 4.5:1.
+- Unresolved references, invalid string escapes, console error output and log warnings use the theme's terminal red or yellow, which reach 4.5:1 in every theme.
+
 ## [1.2.2] - 2026-10-22
 
 ### Fixed

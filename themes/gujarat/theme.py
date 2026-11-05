@@ -33,7 +33,7 @@ RANN = dict(
     keyword="2E7A1E", string="B0206A", number="00756E", type="B0202A", method="7A5800", call="6B5418",
     field="1A5FA8", constant="B04A00", annotation="7A3AB0", label="3A5A78",
     comment="67707A", doc="6E6248", docTag="564A2E", op="525A62", param="1E2226", typeParam="8A5530",
-    gold="8C6D06", red="B0202A", redText="FFF6F4", azure="1A5FA8", caret="B0202A",
+    gold="876906", red="B0202A", redText="FFF6F4", azure="1A5FA8", caret="B0202A",
     error="D01E2E", warning="A86A00", weak="A8955E",
     searchBg="F5DC8C", searchBorder="B08A10", underCaret="D6E4F5", writeCaret="F7D6DC",
     braceBg="CDE8CF", todo="7A5800",

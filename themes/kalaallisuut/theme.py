@@ -18,7 +18,7 @@ QERNERTOQ = dict(
     guide="1E242C", guideSel="343D48",
     keyword="EE6E6E", string="F2A6C6", number="E6C462", type="8AB2EE", method="8ED292", call="A6DCA8",
     field="EEF0F2", constant="E6C462", annotation="8AB2EE", label="EE6E6E",
-    comment="68717C", doc="7A8591", docTag="A0AAB5", op="959DA7", param="A3AAB3", typeParam="B6CFF4",
+    comment="68717C", doc="7C8792", docTag="A0AAB5", op="959DA7", param="A3AAB3", typeParam="B6CFF4",
     gold="E6C462", red="B8323A", redText="FFF2F2", azure="8AB2EE", caret="F2F3F5",
     error="FF6B6B", warning="E8A33A", weak="8A8460",
     searchBg="483E10", searchBorder="E6C462", underCaret="263446", writeCaret="4A2228",

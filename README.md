@@ -1,6 +1,6 @@
 # Heritage Themes
 
-Colour themes for IntelliJ-based IDEs, VS Code, Visual Studio, Sublime Text, Zed, Neovim, Notepad++, Xcode, Helix, Kakoune, Micro, Vim and GNU Emacs, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Visual Studio extension (`heritage-themes.heritage-themes-visualstudio`), one Sublime Text package (`Heritage Themes`), one Zed extension (`heritage-theme`), one Neovim plugin (`heritage-themes/heritage-themes.nvim`), one zip of Notepad++ themes (`heritage-themes-notepadpp-<version>.zip`), one zip of Xcode themes (`heritage-themes-xcode-<version>.zip`), one zip of Helix themes (`heritage-themes-helix-<version>.zip`), one zip each of Kakoune, Micro and Vim colour schemes (`heritage-themes-kakoune-<version>.zip`, `heritage-themes-micro-<version>.zip`, `heritage-themes-vim-<version>.zip`) and one zip of Emacs themes (`heritage-themes-emacs-<version>.zip`).
+Colour themes for IntelliJ-based IDEs, VS Code, Visual Studio, Sublime Text, Zed, Neovim, Notepad++, Xcode, Helix, Kakoune, Micro, Vim, GNU Emacs, Nano, Textadept, Lapce, Qt Creator, Amp, Eclipse and Nova, and for 26 terminal emulators, shells, prompts and multiplexers, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Visual Studio extension (`heritage-themes.heritage-themes-visualstudio`), one Sublime Text package (`Heritage Themes`), one Zed extension (`heritage-theme`), one Neovim plugin (`heritage-themes/heritage-themes.nvim`) and a zip for each other app on the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), named `heritage-themes-<app>-<version>.zip`: `notepadpp`, `xcode`, `helix`, `kakoune`, `micro`, `vim`, `emacs`, `nano`, `textadept`, `lapce`, `qtcreator`, `amp`, `eclipse`, `nova` and `terminals`.
 
 | Folder | Themes | Country |
 | --- | --- | --- |
@@ -131,6 +131,47 @@ Download `heritage-themes-emacs-<version>.zip` from the [latest GitHub release](
 ```
 
 The themes need Emacs 29.1 or later. Each theme colours Emacs itself (the editor, mode line, header line, tab bar, tab line, minibuffer, search, completion, menus and tooltips) and the packages that ship with Emacs: font-lock and the Tree-sitter modes, compilation, Flymake, Flyspell, Eglot, diff, smerge and Ediff, Dired, Eshell, Org, outlines, Info, whitespace-mode, which-key, xref, Ido, hi-lock, EWW, message composition, Customize and the terminal colours. Emacs 30 opens Kotlin, Groovy, Vue and Markdown as plain text, and colours Go, Rust, TypeScript and YAML once their Tree-sitter grammars are installed with `M-x treesit-install-language-grammar`. The modes without Tree-sitter colour a declared name in one face, so fields, HTML attribute names and local variables take the field colour where they are declared.
+
+### Nano
+
+Download `heritage-themes-nano-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest) and add a scheme's lines to `~/.config/nano/nanorc`, after the syntax files, as the zip's README shows; nano reads interface colours only from that file, not from files it includes. The schemes need GNU nano 7.0 or later in a terminal with 256 colours that runs the matching Terminals theme. Each scheme colours nano's title bar, mini bar, status bar, prompts, selection, search matches, line numbers and help lines; code takes the palette's ANSI colours from the terminal theme, in the roles that nano's syntax files give them. A few syntax files, such as those for SQL and YAML, also name nano's own extended colours, which keep their colours in every theme.
+
+### Textadept
+
+Download `heritage-themes-textadept-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), copy the files in its `themes` folder into `~/.textadept/themes`, and choose a theme in `~/.textadept/init.lua` with `view:set_theme('heritage-holi-night')`. The themes need Textadept 12 or later. Each theme colours the editor: code, line numbers, the fold margin, the caret and current line, selections, brace matches, call tips, markers and indicators. Textadept draws its menus, tabs and status bar with Qt or GTK in the system's colours.
+
+### Lapce
+
+Download `heritage-themes-lapce-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), copy the `heritage-themes` folder into Lapce's `plugins` folder (`~/.local/share/lapce-stable/plugins` on Linux), restart Lapce and choose a theme with **Settings | Color Theme**. The themes need Lapce 0.4 or later. Each theme colours the editor, tab bar, panels, activity bar, status bar, palette, completion, hover, inlay hints, source control marks and the terminal. Lapce matches its grammars' captures to a fixed list of scopes, so numbers, booleans and named constants share the number colour, and it draws code without bold or italic.
+
+### Qt Creator
+
+Download `heritage-themes-qtcreator-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), copy its `themes` and `styles` folders into `~/.config/QtProject/qtcreator` (`%AppData%\QtProject\qtcreator` on Windows), choose a theme under **Preferences | Environment | Interface | Theme**, restart Qt Creator, and choose the colour scheme of the same name under **Preferences | Text Editor | Font & Colors**. The themes need Qt Creator 20 or later. Each theme colours the window, panels, output panes, the terminal, version control and the debugger; the colour scheme colours the editor, with C++ and QML from Qt Creator's code models and other languages from KSyntaxHighlighting, which downloads the definitions it lacks, such as C#'s, when asked.
+
+### Amp
+
+Download `heritage-themes-amp-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), copy the files in its `themes` folder into `~/.config/amp/themes`, and name a theme in `~/.config/amp/config.yml` with `theme: heritage-holi-night`. The themes need Amp 0.7 or later. Amp draws text on the terminal's background, so run it in a terminal with 24-bit colour that runs the matching Terminals theme. Each theme colours code, the current line and the status bar, with the rules of the Sublime Text colour schemes; Amp has no syntax for Kotlin, TypeScript, TSX, Vue or TOML.
+
+### Eclipse
+
+Download `heritage-themes-eclipse-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), copy the plugin jar into the `dropins` folder of your Eclipse installation, restart Eclipse, choose a theme under **Window | Preferences | General | Appearance | Theme** and restart again. For the languages that open in the generic editor, such as Python, Go or YAML, choose the TextMate theme of the same name under **Window | Preferences | TextMate | Theme**. The plugin needs Eclipse 2026-09 or later. Each theme colours the window, views, tabs, forms and status line, and the editors: Java with JDT's semantic highlighting, Ant, the console, EGit, compare, Mylyn's tasks and markup editors with their preview, and EclEmma. Eclipse draws scroll bars, buttons and selections in lists and trees with the system's widgets.
+
+### Nova
+
+Download `heritage-themes-nova-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), double-click `Heritage Themes.novaextension` to install it, and choose a theme under **Nova | Settings | Themes**. Each theme colours the window, title bar, buttons, text fields, the editor, code and the terminal.
+
+### Terminals
+
+Download `heritage-themes-terminals-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest). It has a folder for each app and a README with each app's install steps:
+
+| Kind | Apps |
+| --- | --- |
+| Terminal emulators | kitty, Alacritty, WezTerm, Ghostty, iTerm2, Windows Terminal, foot, Konsole, Terminator, XTerm, st, Rio, Contour, Warp, Tabby, Hyper, Termux |
+| Shells | fish, zsh (with zsh-syntax-highlighting and zsh-autosuggestions), Nushell, PowerShell |
+| Prompts | Starship, Oh My Posh, Powerlevel10k |
+| Multiplexers | tmux, Zellij |
+
+The terminal emulator themes give the 16 ANSI colours the values of the editors' terminals, with tab bars, cursors, selections and search matches in the palette's colours. The shells, prompts and multiplexers set text colours over the terminal's background, so use them in a terminal with 24-bit colour that runs the same theme. The shells colour the command line in the syntax roles of the editor themes; the prompts recolour Starship's palette, an Oh My Posh prompt and a Powerlevel10k configuration from `p10k configure`.
 
 ## Report an issue
 
