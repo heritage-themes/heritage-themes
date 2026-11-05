@@ -2376,7 +2376,7 @@ def build_visualstudio(families):
     <License>LICENSE.txt</License>
     <ReleaseNotes>{VENDOR_URL}/blob/master/visualstudio/CHANGELOG.md</ReleaseNotes>
     <Icon>icon.png</Icon>
-    <Tags>theme, color theme, dark theme, light theme, culture, heritage</Tags>
+    <Tags>theme;color theme;dark theme;light theme;culture;heritage</Tags>
 """
     heritage.visualstudio.package(directory, VISUALSTUDIO_ID, VERSION, VISUALSTUDIO_NAME,
                                   visualstudio_description(themes), themes, metadata)
@@ -2399,6 +2399,18 @@ def validate_visualstudio(directory, listing, families):
         element = root.find(f"v:Metadata/v:{tag}", namespace)
         if element is None or not (element.text or "").strip():
             raise SystemExit(f"Visual Studio extension.vsixmanifest: <{tag}> is missing or empty")
+    # the limits of the VSIX schema 2.0 reference, and of VsixPublisher for a single tag
+    metadata = {tag: root.find(f"v:Metadata/v:{tag}", namespace).text for tag in ("DisplayName", "Description", "Tags")}
+    limits = {"Id": (identity.get("Id"), 100), "Publisher": (identity.get("Publisher") or "", 100),
+              "DisplayName": (metadata["DisplayName"], 50), "Description": (metadata["Description"], 1000),
+              "Tags": (metadata["Tags"], 100)}
+    for name, (value, limit) in limits.items():
+        if len(value) > limit:
+            raise SystemExit(f"Visual Studio extension.vsixmanifest: {name} has {len(value)} characters, the limit is {limit}")
+    for tag in metadata["Tags"].split(";"):
+        if not tag.strip() or len(tag) > 50 or "," in tag:
+            raise SystemExit(f"Visual Studio extension.vsixmanifest: the tag {tag!r} is not one tag of 1 to 50 characters; "
+                             "<Tags> separates tags with semicolons")
     for tag in ("License", "Icon"):
         if not os.path.isfile(os.path.join(directory, root.find(f"v:Metadata/v:{tag}", namespace).text)):
             raise SystemExit(f"Visual Studio extension: the {tag} file is missing")
