@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Cuts a release from dev: sets the version, stamps the changelogs, builds, commits and pushes dev,
 # fast-forwards master to it, waits for Build to pass, then pushes the release tag, which starts the
-# publish workflow.
+# publish workflow, and waits for that to finish: a failed Publish run ends the script with the failed jobs and
+# the run's URL.
 #
 # The JetBrains plugin, the VS Code extension, the Visual Studio extension, the Sublime Text package,
 # the Zed extension, the Neovim plugin, and the themes for every other app
@@ -158,4 +159,18 @@ gh run watch "$run" --exit-status || fail "Build failed; tag not pushed"
 git tag -a "$tag" -m "Release $version"
 git push origin "$tag"
 git switch dev
-echo "Pushed $tag. Publish: gh run list --workflow Publish --limit 1"
+
+echo "Pushed $tag. Waiting for Publish..."
+run=""
+for _ in $(seq 1 60); do
+  run=$(gh run list --workflow Publish --branch "$tag" --json databaseId -q '.[0].databaseId')
+  [ -n "$run" ] && break
+  sleep 10
+done
+[ -n "$run" ] || fail "no Publish run appeared for $tag; see gh run list --workflow Publish"
+if ! gh run watch "$run" --exit-status; then
+  echo "release: Publish failed for $tag. Failed jobs:" >&2
+  gh run view "$run" --json jobs -q '.jobs[] | select(.conclusion == "failure") | "  " + .name' >&2
+  fail "$(gh run view "$run" --json url -q .url)"
+fi
+echo "Published $tag: $(gh release view "$tag" --json url -q .url)"
