@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-11-05
+
 ### Fixed
 
 - In 33 themes, some code colours are a shade darker in light themes or lighter in dark ones, matching the Heritage themes for other editors, which keep WCAG AA contrast on the current line's highlight.
