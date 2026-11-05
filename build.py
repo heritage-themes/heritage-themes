@@ -2294,8 +2294,8 @@ def validate_terminals(directory, families):
     themes = [t for f in families for t in f.THEMES]
     for module in heritage.terminals.modules():
         folder = os.path.join(directory, module.FOLDER)
-        found = {os.path.relpath(os.path.join(root, name), folder) for root, _, names in os.walk(folder)
-                 for name in names}
+        found = {os.path.relpath(os.path.join(root, name), folder).replace(os.sep, "/")
+                 for root, _, names in os.walk(folder) for name in names}
         expected = {filename for t in themes for filename, _ in module.files(t, "")}
         if hasattr(module, "combined"):
             expected |= {filename for filename, _ in module.combined(themes, "")}
