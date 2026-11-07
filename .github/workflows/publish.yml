@@ -984,45 +984,57 @@ jobs:
             for pattern in "$@"; do patterns+=(--pattern "$pattern"); done
             gh release download "${tags%%$'\n'*}" --repo "$GITHUB_REPOSITORY" "${patterns[@]}" --dir dist
           }
-          # Writes a product's part of the release notes and attaches its last build if it is left out.
+          # Sorts a product into the release notes: its changelog section when it is in this release, otherwise a line
+          # in the list of unchanged products, with its last build attached.
+          changed="$RUNNER_TEMP/changed.md"; unchanged="$RUNNER_TEMP/unchanged.md"; titles="$RUNNER_TEMP/titles.txt"
+          : > "$changed"; : > "$unchanged"; : > "$titles"
           notes() {
             local title=$1 included=$2 changelog=$3 file=$4
             shift 4
-            echo "## $title"
             if [ "$included" = true ]; then
-              section "$changelog" "$VERSION"
+              { echo "## $title"; section "$changelog" "$VERSION"; } >> "$changed"
+              echo "$title" >> "$titles"
             else
               local previous
               previous=$(sed -n '/^## \[[0-9]/{s/^## \[\([^]]*\)\].*/\1/p;q}' "$changelog")
-              echo
-              echo "No changes. The attached build is version $previous."
-              echo
+              echo "- $title $previous" >> "$unchanged"
               attach "${file/<version>/$previous}" "$@" >&2
             fi
           }
+          notes "JetBrains plugin" "$JETBRAINS" CHANGELOG.md "heritage-themes-<version>-signed.zip" '*.icls'
+          notes "VS Code extension" "$VSCODE" vscode/CHANGELOG.md "heritage-themes-vscode-<version>.vsix"
+          notes "Visual Studio extension" "$VISUALSTUDIO" visualstudio/CHANGELOG.md \
+            "heritage-themes-visualstudio-<version>.vsix"
+          notes "Sublime Text package" "$SUBLIME" sublime/CHANGELOG.md "heritage-themes-sublime-<version>.sublime-package"
+          notes "Zed extension" "$ZED" zed/CHANGELOG.md "heritage-themes-zed-<version>.zip"
+          notes "Neovim plugin" "$NVIM" nvim/CHANGELOG.md "heritage-themes-nvim-<version>.zip"
+          notes "Notepad++ themes" "$NOTEPADPP" notepadpp/CHANGELOG.md "heritage-themes-notepadpp-<version>.zip"
+          notes "Xcode themes" "$XCODE" xcode/CHANGELOG.md "heritage-themes-xcode-<version>.zip"
+          notes "Helix themes" "$HELIX" helix/CHANGELOG.md "heritage-themes-helix-<version>.zip"
+          notes "Kakoune colour schemes" "$KAKOUNE" kakoune/CHANGELOG.md "heritage-themes-kakoune-<version>.zip"
+          notes "Micro colour schemes" "$MICRO" micro/CHANGELOG.md "heritage-themes-micro-<version>.zip"
+          notes "Vim colour schemes" "$VIM" vim/CHANGELOG.md "heritage-themes-vim-<version>.zip"
+          notes "Emacs themes" "$EMACS" emacs/CHANGELOG.md "heritage-themes-emacs-<version>.zip"
+          notes "Terminals themes" "$TERMINALS" terminals/CHANGELOG.md "heritage-themes-terminals-<version>.zip"
+          notes "Nano colour schemes" "$NANO" nano/CHANGELOG.md "heritage-themes-nano-<version>.zip"
+          notes "Textadept themes" "$TEXTADEPT" textadept/CHANGELOG.md "heritage-themes-textadept-<version>.zip"
+          notes "Lapce themes" "$LAPCE" lapce/CHANGELOG.md "heritage-themes-lapce-<version>.zip"
+          notes "Qt Creator themes" "$QTCREATOR" qtcreator/CHANGELOG.md "heritage-themes-qtcreator-<version>.zip"
+          notes "Amp themes" "$AMP" amp/CHANGELOG.md "heritage-themes-amp-<version>.zip"
+          notes "Eclipse plugin" "$ECLIPSE" eclipse/CHANGELOG.md "heritage-themes-eclipse-<version>.zip"
+          notes "Nova themes" "$NOVA" nova/CHANGELOG.md "heritage-themes-nova-<version>.zip"
           {
-            notes "JetBrains plugin" "$JETBRAINS" CHANGELOG.md "heritage-themes-<version>-signed.zip" '*.icls'
-            notes "VS Code extension" "$VSCODE" vscode/CHANGELOG.md "heritage-themes-vscode-<version>.vsix"
-            notes "Visual Studio extension" "$VISUALSTUDIO" visualstudio/CHANGELOG.md \
-              "heritage-themes-visualstudio-<version>.vsix"
-            notes "Sublime Text package" "$SUBLIME" sublime/CHANGELOG.md "heritage-themes-sublime-<version>.sublime-package"
-            notes "Zed extension" "$ZED" zed/CHANGELOG.md "heritage-themes-zed-<version>.zip"
-            notes "Neovim plugin" "$NVIM" nvim/CHANGELOG.md "heritage-themes-nvim-<version>.zip"
-            notes "Notepad++ themes" "$NOTEPADPP" notepadpp/CHANGELOG.md "heritage-themes-notepadpp-<version>.zip"
-            notes "Xcode themes" "$XCODE" xcode/CHANGELOG.md "heritage-themes-xcode-<version>.zip"
-            notes "Helix themes" "$HELIX" helix/CHANGELOG.md "heritage-themes-helix-<version>.zip"
-            notes "Kakoune colour schemes" "$KAKOUNE" kakoune/CHANGELOG.md "heritage-themes-kakoune-<version>.zip"
-            notes "Micro colour schemes" "$MICRO" micro/CHANGELOG.md "heritage-themes-micro-<version>.zip"
-            notes "Vim colour schemes" "$VIM" vim/CHANGELOG.md "heritage-themes-vim-<version>.zip"
-            notes "Emacs themes" "$EMACS" emacs/CHANGELOG.md "heritage-themes-emacs-<version>.zip"
-            notes "Terminals themes" "$TERMINALS" terminals/CHANGELOG.md "heritage-themes-terminals-<version>.zip"
-            notes "Nano colour schemes" "$NANO" nano/CHANGELOG.md "heritage-themes-nano-<version>.zip"
-            notes "Textadept themes" "$TEXTADEPT" textadept/CHANGELOG.md "heritage-themes-textadept-<version>.zip"
-            notes "Lapce themes" "$LAPCE" lapce/CHANGELOG.md "heritage-themes-lapce-<version>.zip"
-            notes "Qt Creator themes" "$QTCREATOR" qtcreator/CHANGELOG.md "heritage-themes-qtcreator-<version>.zip"
-            notes "Amp themes" "$AMP" amp/CHANGELOG.md "heritage-themes-amp-<version>.zip"
-            notes "Eclipse plugin" "$ECLIPSE" eclipse/CHANGELOG.md "heritage-themes-eclipse-<version>.zip"
-            notes "Nova themes" "$NOVA" nova/CHANGELOG.md "heritage-themes-nova-<version>.zip"
+            echo "This release changes: $(paste -sd, "$titles" | sed 's/,/, /g')."
+            echo "Every other product is unchanged: its file keeps the version of its last release, which its file name shows."
+            echo
+            cat "$changed"
+            if [ -s "$unchanged" ]; then
+              echo "## Unchanged products"
+              echo
+              echo "The attached builds are those of the versions listed."
+              echo
+              cat "$unchanged"
+            fi
           } > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \
