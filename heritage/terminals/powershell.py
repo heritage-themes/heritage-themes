@@ -72,27 +72,40 @@ def psstyle(p):
 
 
 def files(theme, source):
+    """Each colour is set on its own, inside try, because PowerShell and PSReadLine versions differ in which keys and
+    properties they have, and one unknown name would otherwise stop the whole block. The errors of unknown names are
+    removed from $Error again."""
     p = theme["palette"]
     lines = [
         *header(p, APP, source),
         "$e = [char]27",
-        "Set-PSReadLineOption -Colors @{",
+        "$errors = $Error.Count",
+        "$readLine = @{",
         *(f"    {key} = {value}" for key, value in psreadline(p).items()),
         "}",
-        "if ($PSStyle) {",
-        *(f"    $PSStyle.{key} = {value}" for key, value in psstyle(p).items()),
+        "foreach ($key in $readLine.Keys) {",
+        "    try { Set-PSReadLineOption -Colors @{ $key = $readLine[$key] } -ErrorAction Stop } catch {}",
         "}",
-        "Remove-Variable e",
+        "if ($PSStyle) {",
+        *(f"    try {{ $PSStyle.{key} = {value} }} catch {{}}" for key, value in psstyle(p).items()),
+        "}",
+        "while ($Error.Count -gt $errors) { $Error.RemoveAt(0) }",
+        "Remove-Variable e, errors, readLine",
     ]
     return [(f"{name(theme)}.ps1", "\n".join(lines) + "\n")]
 
 
 def validate(theme, text):
-    check_lines(text, r'\$e = \[char\]27|Set-PSReadLineOption -Colors @\{|\}|if \(\$PSStyle\) \{|Remove-Variable e|'
-                      r'    (?:\$PSStyle\.[\w.]+|\w+) = "\$\{e\}\[[\d;]+m"')
+    check_lines(text, r'\$e = \[char\]27|\$errors = \$Error\.Count|\$readLine = @\{|\}|'
+                      r'foreach \(\$key in \$readLine\.Keys\) \{|'
+                      r'    try \{ Set-PSReadLineOption -Colors @\{ \$key = \$readLine\[\$key\] \} '
+                      r'-ErrorAction Stop \} catch \{\}|'
+                      r'if \(\$PSStyle\) \{|    try \{ \$PSStyle\.[\w.]+ = "\$\{e\}\[[\d;]+m" \} catch \{\}|'
+                      r'while \(\$Error\.Count -gt \$errors\) \{ \$Error\.RemoveAt\(0\) \}|'
+                      r'Remove-Variable e, errors, readLine|    \w+ = "\$\{e\}\[[\d;]+m"')
     p = theme["palette"]
     found = dict(re.findall(r"^    (\w+) = (.*)$", text, re.M))
-    styles = dict(re.findall(r"^    \$PSStyle\.([\w.]+) = (.*)$", text, re.M))
+    styles = dict(re.findall(r'^    try \{ \$PSStyle\.([\w.]+) = (.*) \} catch \{\}$', text, re.M))
     if found != psreadline(p) or styles != psstyle(p):
         raise ValueError("differs from heritage.terminals.powershell.psreadline and psstyle")
 
