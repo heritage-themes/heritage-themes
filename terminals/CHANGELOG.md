@@ -6,6 +6,10 @@
 
 - A powerline prompt for Oh My Posh, `<theme>-powerline.omp.json`, with a filled segment in an ANSI colour for the folder, the Git branch and status, the duration of a slow command and the exit status of a failed one, joined by arrows.
 
+### Fixed
+
+- PowerShell: a colour name that a version of PowerShell or PSReadLine does not know no longer stops the theme from setting the colours after it, and leaves no errors in `$Error`.
+
 ## [1.7.3] - 2026-11-05
 
 ### Changed
