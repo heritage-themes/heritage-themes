@@ -171,7 +171,7 @@ Download `heritage-themes-terminals-<version>.zip` from the [latest GitHub relea
 | Prompts | Starship, Oh My Posh, Powerlevel10k |
 | Multiplexers | tmux, Zellij |
 
-The terminal emulator themes give the 16 ANSI colours the values of the editors' terminals, with tab bars, cursors, selections and search matches in the palette's colours. The shells, prompts and multiplexers set text colours over the terminal's background, so use them in a terminal with 24-bit colour that runs the same theme. The shells colour the command line in the syntax roles of the editor themes; the prompts recolour Starship's palette, an Oh My Posh prompt and a Powerlevel10k configuration from `p10k configure`.
+The terminal emulator themes give the 16 ANSI colours the values of the editors' terminals, with tab bars, cursors, selections and search matches in the palette's colours. The shells, prompts and multiplexers set text colours over the terminal's background, so use them in a terminal with 24-bit colour that runs the same theme. The shells colour the command line in the syntax roles of the editor themes; the prompts recolour Starship's palette, give Oh My Posh a plain prompt and a powerline prompt with filled segments (which needs a Nerd Font), and recolour a Powerlevel10k configuration from `p10k configure`.
 
 ## Report an issue
 

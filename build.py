@@ -2308,6 +2308,9 @@ def validate_terminals(directory, families):
             if hasattr(module, "combined"):
                 module.validate_combined(themes, {filename: read(filename)
                                                   for filename, _ in module.combined(themes, "")})
+            elif hasattr(module, "validate_files"):
+                for t in themes:
+                    module.validate_files(t, {filename: read(filename) for filename, _ in module.files(t, "")})
             else:
                 for t in themes:
                     (filename, _), = module.files(t, "")

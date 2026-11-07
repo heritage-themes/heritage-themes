@@ -3,9 +3,10 @@
 Usage: python3 shells.py APP THEME FILES OUT.json [VARIANT]
 
 APP is a module name of heritage/terminals, THEME the theme's file name stem, FILES the folder of the app's generated
-files. VARIANT picks a Powerlevel10k configuration that the wizard writes (lean, classic or rainbow). The app starts in a
-pseudo-terminal that reports 24-bit colour, in a fresh HOME with the theme installed as its README says, and the
-sample command line is typed in without running it, so the shell highlights it. The output is the screen as rows of
+files. VARIANT picks a Powerlevel10k configuration that the wizard writes (lean, classic or rainbow), or Oh My
+Posh's powerline configuration. The app starts in a pseudo-terminal that reports 24-bit colour, in a fresh HOME with
+the theme installed as its README says, and the sample
+command line is typed in without running it, so the shell highlights it. The output is the screen as rows of
 cells [character, foreground, background, bold, italic, underline], read through the pyte terminal emulator once the
 app has been quiet for QUIET seconds. A colour is #RRGGBB, "default" for the terminal's own colour, or the name pyte
 gives one of the 16 ANSI colours, such as "brightgreen", which shows where an app uses the terminal's palette.
@@ -118,6 +119,7 @@ def starship(home, stem, files, variant):
 
 
 def oh_my_posh(home, stem, files, variant):
+    stem = f"{stem}-{variant}" if variant else stem  # the powerline configuration has its own file
     copy(f"{files}/{stem}.omp.json", f"{home}/.config/oh-my-posh/{stem}.omp.json")
     return bash_prompt(home, f'eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/{stem}.omp.json)"')
 

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- A powerline prompt for Oh My Posh, `<theme>-powerline.omp.json`, with a filled segment in an ANSI colour for the folder, the Git branch and status, the duration of a slow command and the exit status of a failed one, joined by arrows.
+
 ## [1.7.3] - 2026-11-05
 
 ### Changed

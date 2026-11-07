@@ -82,13 +82,13 @@ ANSI_NAMES = ("black", "red", "green", "brown", "blue", "magenta", "cyan", "whit
               "brightgreen", "brightbrown", "brightblue", "brightmagenta", "brightcyan", "brightwhite")
 TERMINALS_IMAGE = "localhost/heritage-terminals"
 # The terminal emulators that shoot.py screenshots, and the shells, prompts and multiplexers whose screens shells.py
-# reads, with the Powerlevel10k style and the rows that the check covers, all when None.
+# reads, with the Powerlevel10k style or Oh My Posh's powerline and the rows that the check covers, all when None.
 TERMINALS_SHOTS = ("kitty", "alacritty", "wezterm", "ghostty", "foot", "konsole", "terminator", "xterm", "st", "rio",
                    "contour", "warp", "tabby", "hyper")
 TERMINALS_SCREENS = (("fish", None, None), ("zsh", None, None), ("nushell", None, None), ("powershell", None, None),
-                     ("starship", None, None), ("oh_my_posh", None, None), ("powerlevel10k", "lean", None),
-                     ("powerlevel10k", "classic", None), ("powerlevel10k", "rainbow", None), ("tmux", None, None),
-                     ("zellij", None, None))
+                     ("starship", None, None), ("oh_my_posh", None, None), ("oh_my_posh", "powerline", None),
+                     ("powerlevel10k", "lean", None), ("powerlevel10k", "classic", None),
+                     ("powerlevel10k", "rainbow", None), ("tmux", None, None), ("zellij", None, None))
 VISUALSTUDIO_ID = "heritage-themes-preview"  # the identity of the VSIX that the preview installs
 FONT_URL = "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip"
 FONT_SHA256 = "6f6376c6ed2960ea8a963cd7387ec9d76e3f629125bc33d1fdcd7eb7012f7bbf"

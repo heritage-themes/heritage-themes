@@ -16,6 +16,9 @@ Each module in this package writes one app's files. A module defines:
     validate(theme, text) raises ValueError when the text that files gave is malformed or differs from the colours
     pairs(p)  (element, text colour, background, minimum contrast) for every text the app draws in the theme's colours
 
+A module that writes several files for a theme defines validate_files(theme, files) in place of validate, with files a
+dict of file name to text for the theme's files.
+
 A module whose app reads one file for every theme returns no files from files() and defines combined(themes, source),
 which returns that file's (file name, text) for the theme dicts, and validate_combined(themes, files), with files a
 dict of file name to text.
