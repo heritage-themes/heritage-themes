@@ -2237,11 +2237,14 @@ colours of one tradition to syntax roles.
 The extension needs JupyterLab {heritage.jupyterlab.JUPYTERLAB} or later and Python {heritage.jupyterlab.PYTHON} or \
 later.
 
-1. Install the wheel into the environment that JupyterLab runs in:
+1. Install the extension into the environment that JupyterLab runs in:
 
    ```bash
-   pip install {wheel}
+   pip install {heritage.jupyterlab.DISTRIBUTION}
    ```
+
+   To install a particular build, download `{VSCODE_NAME}-jupyterlab-<version>.zip` from the \
+[GitHub releases]({VENDOR_URL}/releases) and run `pip install` on the wheel in it, such as `{wheel}`.
 
 2. Restart JupyterLab and reload it in the browser.
 

@@ -899,12 +899,17 @@ jobs:
           path: build/heritage-themes-nova-${{ env.VERSION }}.zip
           if-no-files-found: error
 
-  # Users install the JupyterLab extension with pip from the wheel in the zip that the GitHub release attaches. The
-  # build compiles the extension with the builder pinned in scripts/jupyterlab, which needs Node.js.
+  # Publishes the wheel to PyPI, where pip installs it from, and attaches it in a zip to the GitHub release. The build
+  # compiles the extension with the builder pinned in scripts/jupyterlab, which needs Node.js.
   jupyterlab:
     needs: check
     if: needs.check.outputs.jupyterlab == 'true'
     runs-on: ubuntu-latest
+    # PyPI's trusted publisher names this environment.
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write # sign in to PyPI through trusted publishing
     env:
       VERSION: ${{ needs.check.outputs.version }}
     steps:
@@ -917,6 +922,16 @@ jobs:
           node-version: 22
 
       - run: python3 build.py --jupyterlab
+
+      # The action uploads every file in its folder, and build/jupyterlab also holds the README and the licence.
+      - name: Collect the wheel
+        run: mkdir pypi && cp build/jupyterlab/*.whl pypi/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: pypi
+          # A re-run of a failed release must not fail on the version that this job already uploaded.
+          skip-existing: true
 
       - uses: actions/upload-artifact@v7
         with:

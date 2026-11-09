@@ -16,8 +16,8 @@ and a light theme the light ink, as JupyterLab's own themes do; the fills are mo
 it takes to read at 4.5:1 on that ink.
 
 The extension is a JupyterLab federated extension: a small plugin that registers each theme with the theme manager,
-built with JupyterLab's own builder, and the stylesheets as files beside it. It ships as a Python wheel, which pip
-installs into the environment that JupyterLab runs in.
+built with JupyterLab's own builder, and the stylesheets as files beside it. It ships as a Python wheel on PyPI, which
+pip installs into the environment that JupyterLab runs in.
 """
 import base64, hashlib, io, json, re, zipfile
 
@@ -436,6 +436,7 @@ def metadata(version, vendor_url, description):
                "Classifier: Framework :: Jupyter", "Classifier: Framework :: Jupyter :: JupyterLab",
                "Classifier: Framework :: Jupyter :: JupyterLab :: 4",
                "Classifier: Framework :: Jupyter :: JupyterLab :: Extensions",
+               "Classifier: Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
                "Classifier: Framework :: Jupyter :: JupyterLab :: Extensions :: Themes",
                "Classifier: Programming Language :: Python :: 3", f"Project-URL: Issues, {vendor_url}/issues",
                f"Requires-Python: >={PYTHON}", f"Requires-Dist: jupyterlab>={JUPYTERLAB}", "Requires-Dist: jupyterlab<5",
