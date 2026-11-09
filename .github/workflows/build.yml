@@ -14,13 +14,14 @@ jobs:
     # build.py is pure standard-library Python that writes the same bytes on every OS, and it validates the
     # plugin descriptor, theme files and icons itself. It also runs on Windows, where Publish builds the
     # Visual Studio extension, so a Windows-only failure stops a release before its tag is pushed.
-    # --vsix also packs the VS Code extension with the vsce pinned in scripts/vscode.
+    # --vsix also packs the VS Code extension with the vsce pinned in scripts/vscode, and --jupyterlab builds the
+    # JupyterLab extension with the builder pinned in scripts/jupyterlab; both need Node.js.
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
-            command: python3 build.py --vsix
+            command: python3 build.py --vsix --jupyterlab
           - os: windows-latest
             command: python build.py
     runs-on: ${{ matrix.os }}

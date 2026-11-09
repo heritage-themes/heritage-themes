@@ -1,6 +1,6 @@
 # Heritage Themes
 
-Colour themes for IntelliJ-based IDEs, VS Code, Visual Studio, Sublime Text, Zed, Neovim, Notepad++, Xcode, Helix, Kakoune, Micro, Vim, GNU Emacs, Nano, Textadept, Lapce, Qt Creator, Amp, Eclipse and Nova, and for 26 terminal emulators, shells, prompts and multiplexers, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Visual Studio extension (`heritage-themes.heritage-themes-visualstudio`), one Sublime Text package (`Heritage Themes`), one Zed extension (`heritage-theme`), one Neovim plugin (`heritage-themes/heritage-themes.nvim`) and a zip for each other app on the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), named `heritage-themes-<app>-<version>.zip`: `notepadpp`, `xcode`, `helix`, `kakoune`, `micro`, `vim`, `emacs`, `nano`, `textadept`, `lapce`, `qtcreator`, `amp`, `eclipse`, `nova` and `terminals`. Every GitHub release carries the current build of every product, and a file name shows the version of its build, so a release can hold builds of different versions; the release notes list the products that the release changes.
+Colour themes for IntelliJ-based IDEs, VS Code, Visual Studio, Sublime Text, Zed, Neovim, Notepad++, Xcode, Helix, Kakoune, Micro, Vim, GNU Emacs, Nano, Textadept, Lapce, Qt Creator, Amp, Eclipse, Nova and JupyterLab, and for 26 terminal emulators, shells, prompts and multiplexers, each drawn from a culture's colour tradition. All themes ship in one JetBrains plugin (plugin ID `heritage.themes`), one VS Code extension (`heritage-themes.heritage-themes`), one Visual Studio extension (`heritage-themes.heritage-themes-visualstudio`), one Sublime Text package (`Heritage Themes`), one Zed extension (`heritage-theme`), one Neovim plugin (`heritage-themes/heritage-themes.nvim`) and a zip for each other app on the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), named `heritage-themes-<app>-<version>.zip`: `notepadpp`, `xcode`, `helix`, `kakoune`, `micro`, `vim`, `emacs`, `nano`, `textadept`, `lapce`, `qtcreator`, `amp`, `eclipse`, `nova`, `jupyterlab` and `terminals`. Every GitHub release carries the current build of every product, and a file name shows the version of its build, so a release can hold builds of different versions; the release notes list the products that the release changes.
 
 | Folder | Themes | Country |
 | --- | --- | --- |
@@ -159,6 +159,10 @@ Download `heritage-themes-eclipse-<version>.zip` from the [latest GitHub release
 ### Nova
 
 Download `heritage-themes-nova-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), double-click `Heritage Themes.novaextension` to install it, and choose a theme under **Nova | Settings | Themes**. Each theme colours the window, title bar, buttons, text fields, the editor, code and the terminal.
+
+### JupyterLab
+
+Download `heritage-themes-jupyterlab-<version>.zip` from the [latest GitHub release](https://github.com/heritage-themes/heritage-themes/releases/latest), install the wheel in it with `pip install` in the environment that JupyterLab runs in, restart JupyterLab, reload it in the browser and choose a theme under **Settings | Theme**. The extension needs JupyterLab 4.6 or later. Each theme colours the menu bar, tabs, side panels, dialogs and menus, notebooks with their cells and outputs, including the ANSI colours of tracebacks, and the code of notebooks, consoles and text editors.
 
 ### Terminals
 

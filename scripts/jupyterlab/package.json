@@ -1,0 +1,16 @@
+{
+  "name": "heritage-themes-jupyterlab-tools",
+  "private": true,
+  "description": "Compiles and packs the JupyterLab extension for build.py --jupyterlab",
+  "dependencies": {
+    "@jupyter/builder": "1.2.3",
+    "@jupyterlab/application": "4.6.0",
+    "@jupyterlab/apputils": "4.7.0",
+    "@jupyterlab/core-meta": "4.6.6",
+    "@jupyterlab/theme-dark-extension": "4.6.0",
+    "typescript": "5.8.3"
+  },
+  "overrides": {
+    "@jupyterlab/apputils": "4.7.0"
+  }
+}

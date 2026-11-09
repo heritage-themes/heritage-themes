@@ -42,6 +42,7 @@ jobs:
       amp: ${{ steps.check.outputs.amp }}
       eclipse: ${{ steps.check.outputs.eclipse }}
       nova: ${{ steps.check.outputs.nova }}
+      jupyterlab: ${{ steps.check.outputs.jupyterlab }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -62,7 +63,7 @@ jobs:
           fi
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
             kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
-            qtcreator=false amp=false eclipse=false nova=false
+            qtcreator=false amp=false eclipse=false nova=false jupyterlab=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" visualstudio/CHANGELOG.md && visualstudio=true
@@ -84,12 +85,13 @@ jobs:
           grep -q "^## \[$version\]" amp/CHANGELOG.md && amp=true
           grep -q "^## \[$version\]" eclipse/CHANGELOG.md && eclipse=true
           grep -q "^## \[$version\]" nova/CHANGELOG.md && nova=true
+          grep -q "^## \[$version\]" jupyterlab/CHANGELOG.md && jupyterlab=true
           if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$visualstudio" = false ] && [ "$sublime" = false ] \
               && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ] && [ "$xcode" = false ] \
               && [ "$helix" = false ] && [ "$kakoune" = false ] && [ "$micro" = false ] && [ "$vim" = false ] \
               && [ "$emacs" = false ] && [ "$terminals" = false ] && [ "$nano" = false ] && [ "$textadept" = false ] \
               && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$amp" = false ] \
-              && [ "$eclipse" = false ] && [ "$nova" = false ]; then
+              && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -116,6 +118,7 @@ jobs:
             echo "amp=$amp"
             echo "eclipse=$eclipse"
             echo "nova=$nova"
+            echo "jupyterlab=$jupyterlab"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -896,10 +899,35 @@ jobs:
           path: build/heritage-themes-nova-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # Users install the JupyterLab extension with pip from the wheel in the zip that the GitHub release attaches. The
+  # build compiles the extension with the builder pinned in scripts/jupyterlab, which needs Node.js.
+  jupyterlab:
+    needs: check
+    if: needs.check.outputs.jupyterlab == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - run: python3 build.py --jupyterlab
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: jupyterlab
+          path: build/heritage-themes-jupyterlab-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
             emacs, terminals, nano, textadept, lapce, qtcreator,
-            amp, eclipse, nova]
+            amp, eclipse, nova, jupyterlab]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -923,7 +951,8 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.qtcreator.result)
       && contains(fromJSON('["success", "skipped"]'), needs.amp.result)
       && contains(fromJSON('["success", "skipped"]'), needs.eclipse.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.nova.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.nova.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.jupyterlab.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -950,6 +979,7 @@ jobs:
       AMP: ${{ needs.check.outputs.amp }}
       ECLIPSE: ${{ needs.check.outputs.eclipse }}
       NOVA: ${{ needs.check.outputs.nova }}
+      JUPYTERLAB: ${{ needs.check.outputs.jupyterlab }}
     steps:
       - uses: actions/checkout@v7
 
@@ -1023,6 +1053,7 @@ jobs:
           notes "Amp themes" "$AMP" amp/CHANGELOG.md "heritage-themes-amp-<version>.zip"
           notes "Eclipse plugin" "$ECLIPSE" eclipse/CHANGELOG.md "heritage-themes-eclipse-<version>.zip"
           notes "Nova themes" "$NOVA" nova/CHANGELOG.md "heritage-themes-nova-<version>.zip"
+          notes "JupyterLab themes" "$JUPYTERLAB" jupyterlab/CHANGELOG.md "heritage-themes-jupyterlab-<version>.zip"
           {
             echo "This release changes: $(paste -sd, "$titles" | sed 's/,/, /g')."
             echo "Every other product is unchanged: its file keeps the version of its last release, which its file name shows."

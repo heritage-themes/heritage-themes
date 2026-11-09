@@ -4,13 +4,16 @@ folder.
 
 A theme folder is any directory in themes/ containing a theme.py (see heritage/__init__.py).
 
-Usage: python3 build.py [--vsix]
-  --vsix  also pack the VS Code extension into a .vsix with vsce, pinned in scripts/vscode and installed there
-          with npm ci on first use; needs Node.js 22 or later and npm
+Usage: python3 build.py [--vsix] [--jupyterlab]
+  --vsix         also pack the VS Code extension into a .vsix with vsce, pinned in scripts/vscode and installed
+                 there with npm ci on first use; needs Node.js 22 or later and npm
+  --jupyterlab   also build the JupyterLab extension, which JupyterLab's builder compiles, pinned in
+                 scripts/jupyterlab and installed there with npm ci on first use, into a wheel and a zip; needs
+                 Node.js 22 or later and npm. Without it the build checks the JupyterLab stylesheets only
 
 Output goes to build/.
 """
-import argparse, configparser, html, json, os, plistlib, re, shutil, subprocess, tomllib, zipfile
+import argparse, base64, configparser, hashlib, html, json, os, plistlib, re, shutil, subprocess, tomllib, zipfile
 import xml.etree.ElementTree as ET
 
 import heritage
@@ -36,6 +39,7 @@ VSCODE_SCREENSHOTS = [("holi-night", "Holi Night"), ("kalamkari-cotton", "Kalamk
                       ("sardinia-orbace", "Sardinia Orbace (Dark)"), ("wixarika-wirikuta", "Wixárika Wirikuta (Light)")]
 VSCODE_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")  # the Marketplace needs a PNG of 128x128 or more
 VSCODE_TOOLS = os.path.join(ROOT, "scripts", "vscode")
+JUPYTERLAB_TOOLS = os.path.join(ROOT, "scripts", "jupyterlab")
 SUBLIME_CHANGELOG = os.path.join(ROOT, "sublime", "CHANGELOG.md")
 SUBLIME_NAME = "Heritage Themes"  # the package's folder in Packages/, so the colour_scheme paths contain it
 SUBLIME_REPOSITORY_URL = "https://github.com/heritage-themes/heritage-themes-sublime"
@@ -78,7 +82,8 @@ VISUALSTUDIO_NAME = "Heritage Themes for Visual Studio"
 VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
-           "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Amp", "Eclipse", "Nova", "terminals")
+           "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Amp", "Eclipse", "Nova",
+           "JupyterLab", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -2212,10 +2217,229 @@ def validate_nova(directory, families):
     check_files("Nova themes", extension, "Themes", expected)
 
 
+# The values that a JupyterLab stylesheet gives its colour variables: a colour, or another variable, and the shadows
+# that carry one.
+JUPYTERLAB_COLOUR = re.compile(r"#[0-9A-Fa-f]{3}|#[0-9A-Fa-f]{6}|rgba\(\d+,\d+,\d+,[\d.]+\)|var\(--jp-[a-z0-9-]+\)")
+JUPYTERLAB_SHADOWS = {"cell-editor-box-shadow", "input-box-shadow", "toolbar-box-shadow"}
+
+
+def jupyterlab_readme(families):
+    """The README in the zip, which is also the wheel's description. Links are absolute."""
+    count = sum(len(f.THEMES) for f in families)
+    wheel = heritage.jupyterlab.wheel_name(VERSION)
+    return f"""# Heritage Themes for JupyterLab
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families, in one extension; each family maps the named \
+colours of one tradition to syntax roles.
+
+## Install
+
+The extension needs JupyterLab {heritage.jupyterlab.JUPYTERLAB} or later and Python {heritage.jupyterlab.PYTHON} or \
+later.
+
+1. Install the wheel into the environment that JupyterLab runs in:
+
+   ```bash
+   pip install {wheel}
+   ```
+
+2. Restart JupyterLab and reload it in the browser.
+
+3. Choose a theme, for example **Holi Night**, under **Settings | Theme**.
+
+To remove the extension, run `pip uninstall {heritage.jupyterlab.DISTRIBUTION}`.
+
+## What is coloured
+
+Each theme colours the whole of JupyterLab: the menu bar, tabs, tool bars, side panels, file browser, status bar, \
+dialogs, menus and fields; notebooks, with their cells, prompts, selections and outputs, including the ANSI colours \
+of tracebacks and of text that programs print in colour; rendered Markdown; and the code of notebooks, consoles and \
+text editors, in every language that JupyterLab highlights. Scroll bars follow the theme.
+
+{readme_footer(families, "JupyterLab", "Themes", "the theme, JupyterLab version, language")}"""
+
+
+def build_jupyterlab(families, pack):
+    """Writes the README, changelog and licence to build/jupyterlab, with the wheel when pack is set, and returns
+    build/jupyterlab."""
+    directory = os.path.join(OUT, "jupyterlab")
+    os.makedirs(directory)
+    write_text(os.path.join(directory, "README.md"), jupyterlab_readme(families))
+    shutil.copy(os.path.join(ROOT, "jupyterlab", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    if pack:
+        themes = [t for f in families for t in f.THEMES]
+        with open(os.path.join(ROOT, "LICENSE"), "rb") as f:
+            licence = f.read()
+        with open(os.path.join(directory, "README.md"), encoding="utf-8") as f:
+            description = f.read()
+        sources = {t["slug"]: f"{VENDOR_URL}/tree/master/themes/{heritage.folder(f)}" for f in families
+                   for t in f.THEMES}
+        files = jupyterlab_extension(themes, sources)
+        with open(os.path.join(directory, heritage.jupyterlab.wheel_name(VERSION)), "wb") as f:
+            f.write(heritage.jupyterlab.wheel(files, VERSION, VENDOR_URL, description, licence))
+    return directory
+
+
+def run_node(command, **kwargs):
+    """Runs a Node.js tool and stops the build with its output when it fails; its output is not shown otherwise."""
+    result = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", **kwargs)
+    if result.returncode:
+        raise SystemExit(f"{' '.join(os.path.basename(c) for c in command[:3])}: exit {result.returncode}\n"
+                         f"{result.stdout}{result.stderr}")
+
+
+def jupyterlab_extension(themes, sources):
+    """Compiles the extension's plugin with the pinned TypeScript and builds it with JupyterLab's builder, and returns
+    the extension's files as path → bytes: the builder's output, install.json and each theme's stylesheet."""
+    node, npm = shutil.which("node"), shutil.which("npm")
+    if not node or not npm:
+        raise SystemExit("build: --jupyterlab needs Node.js and npm")
+    modules = os.path.join(JUPYTERLAB_TOOLS, "node_modules")
+    if not os.path.isdir(modules):
+        subprocess.run([npm, "ci", "--no-audit", "--no-fund"], cwd=JUPYTERLAB_TOOLS, check=True)
+    stage = os.path.join(JUPYTERLAB_TOOLS, "build", "extension")
+    shutil.rmtree(stage, ignore_errors=True)
+    os.makedirs(os.path.join(stage, "src"))
+    write_text(os.path.join(stage, "package.json"), heritage.jupyterlab.package_json(VERSION, VENDOR_URL))
+    write_text(os.path.join(stage, "tsconfig.json"), heritage.jupyterlab.tsconfig())
+    write_text(os.path.join(stage, "src", "index.ts"), heritage.jupyterlab.plugin_source(themes))
+    run_node([node, os.path.join(modules, "typescript", "bin", "tsc"), "-p", stage])
+    run_node([node, os.path.join(modules, "@jupyter", "builder", "lib", "build-labextension.js"),
+              "--core-package-file", os.path.join(modules, "@jupyterlab", "core-meta", "core.package.json"), stage])
+    files = {}
+    output = os.path.join(stage, "labextension")
+    for root, folders, names in os.walk(output):
+        for filename in names:
+            path = os.path.join(root, filename)
+            with open(path, "rb") as f:
+                files[os.path.relpath(path, output).replace(os.sep, "/")] = f.read()
+    files["install.json"] = heritage.jupyterlab.install_json().encode("utf-8")
+    for t in themes:
+        files[f"themes/{heritage.jupyterlab.EXTENSION}/{heritage.jupyterlab.name(t)}.css"] = \
+            heritage.jupyterlab.stylesheet(t, sources[t["slug"]]).encode("utf-8")
+    return files
+
+
+def stock_jupyterlab_variables():
+    """The --jp- variables that JupyterLab's own dark theme declares, from the pinned package, or None before the
+    tools are installed."""
+    path = os.path.join(JUPYTERLAB_TOOLS, "node_modules", "@jupyterlab", "theme-dark-extension", "style",
+                        "variables.css")
+    if not os.path.isfile(path):
+        return None
+    with open(path, encoding="utf-8") as f:
+        return set(re.findall(r"^\s*--jp-([a-z0-9-]+)\s*:", f.read(), flags=re.M))
+
+
+def validate_jupyterlab(directory, families, packed):
+    """Fails the build when a stylesheet declares other variables than JupyterLab's dark theme, leaves a brace open or
+    sets a colour that is no colour, or a text colour is unreadable; and, with the wheel, when the wheel's records,
+    metadata, extension or stylesheets are wrong, or the extension would not share the host's apputils."""
+    themes = [t for f in families for t in f.THEMES]
+    stock = stock_jupyterlab_variables()
+    for t in themes:
+        p, label = t["palette"], f"JupyterLab {t['palette']['name']}"
+        text = heritage.jupyterlab.stylesheet(t, "")
+        code = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+        if code.count("{") != code.count("}"):
+            raise SystemExit(f"{label}: the stylesheet's braces do not balance")
+        declared = set(re.findall(r"^\s*--jp-([a-z0-9-]+)\s*:", code, flags=re.M))
+        expected = stock if stock is not None else set(heritage.jupyterlab.variables(p)) | {
+            f"completer-type-background{i}" for i in range(11)}
+        if declared != expected:
+            raise SystemExit(f"{label}: the stylesheet declares {sorted(declared ^ expected)[:5]} unlike "
+                             "JupyterLab's dark theme")
+        for key, value in re.findall(r"^\s*--jp-([a-z0-9-]+)\s*:\s*(.*?);$", code, flags=re.M):
+            if key in JUPYTERLAB_SHADOWS:
+                valid = re.fullmatch(r"(inset )?0 0 2px( 0)? rgba\(\d+,\d+,\d+,[\d.]+\)", value)
+            elif key == "scrollbar-thumb-color":
+                valid = re.fullmatch(r"\d+, \d+, \d+", value)
+            elif key == "shadow-base-lightness":
+                valid = re.fullmatch(r"\d+", value)
+            elif key in heritage.jupyterlab.colours(p):
+                valid = JUPYTERLAB_COLOUR.fullmatch(value)
+            else:
+                valid = value
+            if not valid:
+                raise SystemExit(f"{label}: --jp-{key} is {value!r}")
+        check_styles(label, heritage.jupyterlab.styles(p), "fg", "bg", "editor text", set(),
+                     {"code comment", "red text on an error output"}, {})
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"JupyterLab: {name} is missing")
+    wheel = os.path.join(directory, heritage.jupyterlab.wheel_name(VERSION))
+    if not packed:
+        if os.path.exists(wheel):
+            raise SystemExit("JupyterLab: the wheel exists without --jupyterlab")
+        return
+    validate_jupyterlab_wheel(wheel, themes)
+
+
+def validate_jupyterlab_wheel(wheel, themes):
+    """Checks the wheel's entries against its RECORD, its metadata, the extension's manifest and the stylesheets."""
+    stem = f"{heritage.jupyterlab.DISTRIBUTION.replace('-', '_')}-{VERSION}"
+    data = f"{stem}.data/data/share/jupyter/labextensions/{heritage.jupyterlab.EXTENSION}"
+    with zipfile.ZipFile(wheel) as z:
+        names = set(z.namelist())
+        stylesheets = {f"{data}/themes/{heritage.jupyterlab.EXTENSION}/{heritage.jupyterlab.name(t)}.css"
+                       for t in themes}
+        required = {f"{stem}.dist-info/{n}" for n in ("METADATA", "WHEEL", "RECORD", "LICENSE")} | stylesheets | \
+            {f"{data}/package.json", f"{data}/install.json"}
+        if not required <= names or not any(n.startswith(f"{data}/static/remoteEntry.") for n in names):
+            raise SystemExit(f"JupyterLab wheel: {sorted(required - names)[:5]} missing")
+        stray = {n for n in names if n not in required and not n.startswith(f"{data}/static/")}
+        if stray:
+            raise SystemExit(f"JupyterLab wheel: holds {sorted(stray)[:5]} unexpectedly")
+        record = z.read(f"{stem}.dist-info/RECORD").decode().splitlines()
+        if sorted(line.split(",")[0] for line in record) != sorted(names):
+            raise SystemExit("JupyterLab wheel: RECORD does not list the entries")
+        for line in record:
+            path, digest, size = line.split(",")
+            if path.endswith("/RECORD"):
+                continue
+            content = z.read(path)
+            sha256 = base64.urlsafe_b64encode(hashlib.sha256(content).digest()).rstrip(b"=").decode()
+            if digest != f"sha256={sha256}" or int(size) != len(content):
+                raise SystemExit(f"JupyterLab wheel: RECORD is wrong for {path}")
+        metadata = z.read(f"{stem}.dist-info/METADATA").decode()
+        if f"Name: {heritage.jupyterlab.DISTRIBUTION}\nVersion: {VERSION}\n" not in metadata or \
+                f"Requires-Dist: jupyterlab>={heritage.jupyterlab.JUPYTERLAB}\n" not in metadata:
+            raise SystemExit("JupyterLab wheel: METADATA does not name the project, its version and JupyterLab")
+        for t in themes:
+            # the first line of a stylesheet names its source, which the wheel's builder knows and this check does not
+            shipped = z.read(f"{data}/themes/{heritage.jupyterlab.EXTENSION}/{heritage.jupyterlab.name(t)}.css")
+            if shipped.decode("utf-8").split("\n", 1)[1] != heritage.jupyterlab.stylesheet(t, "").split("\n", 1)[1]:
+                raise SystemExit(f"JupyterLab wheel: the stylesheet of {t['palette']['name']} differs from the generated one")
+        manifest = json.loads(z.read(f"{data}/package.json"))
+        entry = f"{data}/{manifest['jupyterlab']['_build']['load']}"
+        if manifest["name"] != heritage.jupyterlab.EXTENSION or manifest["version"] != VERSION or \
+                not manifest["jupyterlab"].get("extension") or entry not in names:
+            raise SystemExit("JupyterLab wheel: the extension's package.json does not name the extension, its "
+                             "version and its entry point")
+        # `jupyter labextension list` marks an extension incompatible when the host's apputils does not satisfy the
+        # range that the extension declares, so an exact version would fail on every other JupyterLab release
+        if manifest.get("dependencies") != {"@jupyterlab/apputils": heritage.jupyterlab.APPUTILS_RANGE}:
+            raise SystemExit("JupyterLab wheel: the extension does not declare the apputils range "
+                             f"{heritage.jupyterlab.APPUTILS_RANGE}")
+        scripts = "".join(z.read(n).decode("utf-8") for n in sorted(names) if n.startswith(f"{data}/static/")
+                          and n.endswith(".js"))
+        # the minifier writes the characters of Latin-1 as \xHH and may escape others as \uHHHH
+        decoded = re.sub(r"\\(?:x([0-9a-fA-F]{2})|u([0-9a-fA-F]{4}))", lambda m: chr(int(m[1] or m[2], 16)), scripts)
+        # JupyterLab provides apputils as a singleton; a range that its version does not satisfy leaves the plugin
+        # with a copy of its own, whose theme manager token no host provides.
+        apputils = heritage.jupyterlab.APPUTILS_RANGE
+        if not re.search(r'"@jupyterlab/apputils"[^}]*requiredVersion:\s*"' + re.escape(apputils) + '"', scripts):
+            raise SystemExit(f"JupyterLab wheel: the extension does not require apputils {apputils}")
+        for t in themes:
+            if t["palette"]["name"] not in decoded:
+                raise SystemExit(f"JupyterLab wheel: the plugin does not register {t['palette']['name']}")
+
+
 # Product → its themes' names in READMEs, the README writer, and the folder its theme files go in.
 TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.name, "Lapce": heritage.lapce.name,
                   "Qt Creator": heritage.qtcreator.name, "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
-                  "Nova": lambda t: t["palette"]["name"],
+                  "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
@@ -2456,6 +2680,8 @@ def main():
                                                  "plugin, and the Notepad++, Xcode, Helix, Kakoune, Micro, Vim and "
                                                  "Emacs themes.")
     parser.add_argument("--vsix", action="store_true", help="also pack the VS Code extension with vsce")
+    parser.add_argument("--jupyterlab", action="store_true",
+                        help="also build the JupyterLab extension into a wheel and a zip with JupyterLab's builder")
     args = parser.parse_args()
     families = heritage.load_families()
     themes = [t for f in families for t in heritage.generate(f)]
@@ -2554,6 +2780,14 @@ def main():
     validate_lapce(lapce, families)
     print(f"{pack_folder(lapce, os.path.join(OUT, f'{VSCODE_NAME}-lapce-{VERSION}.zip'), f'{VSCODE_NAME}-lapce')}: "
           f"{len(themes)} themes", flush=True)
+    jupyterlab = build_jupyterlab(families, args.jupyterlab)
+    validate_jupyterlab(jupyterlab, families, args.jupyterlab)
+    if args.jupyterlab:
+        name = f"{VSCODE_NAME}-jupyterlab"
+        print(f"{pack_folder(jupyterlab, os.path.join(OUT, f'{name}-{VERSION}.zip'), name)}: {len(themes)} themes",
+              flush=True)
+    else:
+        print(f"JupyterLab: {len(themes)} stylesheets checked; --jupyterlab builds the wheel and the zip", flush=True)
     terminals = build_terminals(families)
     validate_terminals(terminals, families)
     package = os.path.join(OUT, f"{TERMINALS_NAME}-{VERSION}.zip")
