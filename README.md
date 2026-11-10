@@ -162,7 +162,7 @@ Download `heritage-themes-nova-<version>.zip` from the [latest GitHub release](h
 
 ### JupyterLab
 
-Run `pip install jupyterlab-heritage-themes` in the environment that JupyterLab runs in, restart JupyterLab, reload it in the browser and choose a theme under **Settings | Theme**. The extension needs JupyterLab 4.6 or later. Each theme colours the menu bar, tabs, side panels, dialogs and menus, notebooks with their cells and outputs, including the ANSI colours of tracebacks, and the code of notebooks, consoles and text editors.
+Run `pip install jupyterlab-heritage-themes` in the environment that JupyterLab runs in, restart JupyterLab, reload it in the browser and choose a theme under **Settings | Theme**. The extension needs JupyterLab 4.6 or later, or Notebook 7.6 or later, which installs it the same way. Each theme colours the menu bar, tabs, side panels, dialogs and menus, notebooks with their cells and outputs, including the ANSI colours of tracebacks, and the code of notebooks, consoles and text editors.
 
 ### Terminals
 

@@ -298,11 +298,12 @@ def ansi_rules(p):
 ICON_COLOURS = ("#FFFFFF", "#000000", "#FFD43B", "#306998", "#E4D1A7")
 
 
-def pixel_palette(p, dimmed=False):
+def pixel_palette(p, dimmed=False, page="bgTool"):
     """What scripts/editors/pixels.py checks a screenshot of JupyterLab against: every colour the stylesheet sets, which
     is every colour JupyterLab draws, ICON_COLOURS, and the layers that text sits on, among them the fills of the
     dialogs' buttons and ICON_COLOURS, which the edges of icons and shadows blend with. The notebook, the editor and the
-    menu are drawn on bgTool. With dimmed, the page is drawn under a dialog's backdrop, so each colour also appears
+    menu are drawn on bgTool, and Notebook 7's file page on surface, which is the page layer that most of a screenshot
+    shows. With dimmed, the page is drawn under a dialog's backdrop, so each colour also appears
     blended with it."""
     hexes = {value.upper() for value in colours(p).values() if re.fullmatch(r"#[0-9A-Fa-f]{6}", value)}
     hexes |= {"#" + c.upper() for c in ansi_fills(p)} | {"#" + p[k] for k in ("bg", "fg")} | set(ICON_COLOURS)
@@ -310,7 +311,7 @@ def pixel_palette(p, dimmed=False):
     layers += [colours(p)["rendermime-error-background"], *ICON_COLOURS]
     layers += [value.upper() for key, value in colours(p).items()
                if re.fullmatch(r"(accept|warn|reject)-color-(normal|hover|active)", key)]
-    background = "#" + p["bgTool"]
+    background = "#" + p[page]
     if dimmed:
         red, green, blue, alpha = re.fullmatch(r"rgba\((\d+),(\d+),(\d+),([\d.]+)\)",
                                               colours(p)["dialog-background"]).groups()

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support for Notebook 7.6 and later: the themes colour its file page and notebooks, and the extension installs the same way.
+
 ## [1.8.1] - 2026-11-10
 
 ### Added

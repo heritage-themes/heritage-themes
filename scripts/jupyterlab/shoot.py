@@ -1,10 +1,12 @@
-"""Screenshots JupyterLab showing a notebook, a text editor, a menu and a dialog with each Heritage theme.
+"""Screenshots JupyterLab showing a notebook, a text editor, a menu and a dialog, and Notebook 7 showing its file page
+and a notebook, with each Heritage theme.
 
 Usage: python3 shoot.py REQUEST.json
 
-Runs in the virtual environment that preview.py creates in scripts/jupyterlab/.venv, where JupyterLab, ipykernel and the
-extension's wheel are installed. REQUEST.json holds {"themes": [{"stem", "label"}], "samples": {file name: text},
-"fonts": folder of JetBrains Mono's web fonts, "out": folder, "chrome": the browser's command, "workers": number}.
+Runs in the virtual environment that preview.py creates in scripts/jupyterlab/.venv, where JupyterLab, Notebook,
+ipykernel and the extension's wheel are installed. REQUEST.json holds {"themes": [{"stem", "label"}], "samples":
+{file name: text}, "fonts": folder of JetBrains Mono's web fonts, "out": folder, "chrome": the browser's command,
+"workers": number}.
 Each worker runs a JupyterLab server of its own, with a home folder, settings and workspaces in a temporary folder, so
 nothing of the user's JupyterLab is read or changed, and a headless Chrome that it drives over the DevTools protocol.
 The theme is chosen in the settings, as a user chooses it in Settings | Theme, and the PNGs go to
@@ -22,6 +24,8 @@ FONT_FILES = (("Regular", 400, "normal"), ("Italic", 400, "italic"), ("Bold", 70
 READY_SECONDS = 90
 # The screens, in the order they are taken: the notebook, a menu and a dialog on its page, then the editor.
 SCREENS = ("Notebook", "Settings menu", "Delete dialog", "Editor")
+# Notebook 7 is served by the same server, at /tree and /notebooks, and takes the same themes.
+NOTEBOOK7_SCREENS = ("Notebook 7 files", "Notebook 7 notebook")
 EDITOR_FILE = "orders.py"
 NOTEBOOK_FILE = "analysis.ipynb"
 
@@ -112,6 +116,7 @@ def start_server(home, root, port):
     log = open(os.path.join(home, "server.log"), "w")
     command = [os.path.join(os.path.dirname(sys.executable), "jupyter"), "lab", "--no-browser", "--ip=127.0.0.1",
                f"--port={port}", "--IdentityProvider.token=", f"--ServerApp.root_dir={root}", "--ServerApp.password=",
+               "--ServerApp.jpserver_extensions={'notebook': True}",
                "--LabApp.check_for_updates_class=jupyterlab.NeverCheckForUpdate"]
     server = subprocess.Popen(command, env=env, stdout=log, stderr=subprocess.STDOUT)
     for _ in range(READY_SECONDS * 5):
@@ -231,6 +236,21 @@ async def load(browser, port, path, label, ready):
     await asyncio.sleep(2)  # fonts, icons and the kernel's status settle
 
 
+async def shoot_notebook7(browser, port, theme, folder):
+    """Notebook 7's file page and a notebook, in the theme called theme["label"]."""
+    for screen, path, ready in (
+            (NOTEBOOK7_SCREENS[0], "tree", "document.querySelectorAll('.jp-DirListing-item').length >= 2"),
+            (NOTEBOOK7_SCREENS[1], f"notebooks/{NOTEBOOK_FILE}",
+             "document.querySelectorAll('.jp-Notebook .jp-Cell').length >= 5 && "
+             "document.querySelectorAll('.jp-Notebook .cm-lineNumbers').length >= 1")):
+        await browser.call("Page.navigate", url=f"http://127.0.0.1:{port}/{path}?reset")
+        await browser.wait_for(f"document.body.dataset.jpThemeName === {json.dumps(theme['label'])}",
+                               f"the theme {theme['label']}")
+        await browser.wait_for(ready, f"{path} to open")
+        await asyncio.sleep(2)
+        await browser.shot(os.path.join(folder, f"{screen}.png"))
+
+
 async def shoot_theme(browser, port, theme, out):
     folder = os.path.join(out, theme["stem"])
     os.makedirs(folder, exist_ok=True)
@@ -257,6 +277,7 @@ async def shoot_theme(browser, port, theme, out):
     await browser.shot(os.path.join(folder, f"{SCREENS[3]}.png"))
     await browser.call("Emulation.setDeviceMetricsOverride", width=WIDTH, height=HEIGHT, deviceScaleFactor=1,
                        mobile=False)
+    await shoot_notebook7(browser, port, theme, folder)
 
 
 def worker(request, themes, index):

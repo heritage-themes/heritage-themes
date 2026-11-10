@@ -56,7 +56,7 @@ minimum (scripts/terminals/cells.py). iTerm2, Windows Terminal and Termux do not
 of their files are all they get. All pages use JetBrains Mono, downloaded once from the pinned release
 below into ~/.cache/heritage-themes. The JupyterLab page goes to themes/<theme>/build/preview-jupyterlab.html, with
 the screenshots it shows in themes/<theme>/build/jupyterlab. scripts/jupyterlab/shoot.py takes them in JupyterLab
-itself, in the virtual environment that preview.py creates in scripts/jupyterlab/.venv from the pinned
+itself and in Notebook 7, in the virtual environment that preview.py creates in scripts/jupyterlab/.venv from the pinned
 requirements.txt, with the wheel in build/jupyterlab installed, driving a headless Chrome; each theme is chosen in the
 settings as a user chooses it, and the run fails when a screenshot shows a colour that is no colour of the theme.
 """
@@ -631,8 +631,11 @@ def gui_results(family, out, editor):
 
 # The screens that scripts/jupyterlab/shoot.py takes, as the names of their files; the dialog is dimmed by JupyterLab's
 # backdrop, so the colours it shows are blends with that.
-JUPYTERLAB_SCREENS = ("Notebook", "Settings menu", "Delete dialog", "Editor")
+JUPYTERLAB_SCREENS = ("Notebook", "Settings menu", "Delete dialog", "Editor", "Notebook 7 files",
+                      "Notebook 7 notebook")
 JUPYTERLAB_DIMMED = ("Delete dialog",)
+# The palette layer that most of a screen shows, when it is not bgTool.
+JUPYTERLAB_PAGES = {"Notebook 7 files": "surface"}
 
 
 def jupyterlab_results(family, out):
@@ -665,17 +668,18 @@ def jupyterlab_results(family, out):
         for t in family.THEMES:
             stem = heritage.nvim.name(t)
             palettes = {}
-            for dimmed in (False, True):
-                palettes[dimmed] = os.path.join(tmp, f"{stem}-{int(dimmed)}.json")
-                with open(palettes[dimmed], "w", encoding="utf-8") as f:
-                    json.dump(heritage.jupyterlab.pixel_palette(t["palette"], dimmed), f)
+            for dimmed, page in {(screen in JUPYTERLAB_DIMMED, JUPYTERLAB_PAGES.get(screen, "bgTool"))
+                                 for screen in JUPYTERLAB_SCREENS}:
+                palettes[dimmed, page] = os.path.join(tmp, f"{stem}-{int(dimmed)}-{page}.json")
+                with open(palettes[dimmed, page], "w", encoding="utf-8") as f:
+                    json.dump(heritage.jupyterlab.pixel_palette(t["palette"], dimmed, page), f)
             present, theme_results = set(), []
             for screen in JUPYTERLAB_SCREENS:
                 image = os.path.join(shots, stem, f"{screen}.png")
                 if not os.path.isfile(image):
                     continue
                 check = subprocess.run([sys.executable, "-I", os.path.join(EDITORS, "pixels.py"), image,
-                                        palettes[screen in JUPYTERLAB_DIMMED]],
+                                        palettes[screen in JUPYTERLAB_DIMMED, JUPYTERLAB_PAGES.get(screen, "bgTool")]],
                                        capture_output=True, text=True)
                 report = json.loads(check.stdout)
                 problems += [f"jupyterlab {stem} {screen}: {problem}" for problem in report["problems"]]
