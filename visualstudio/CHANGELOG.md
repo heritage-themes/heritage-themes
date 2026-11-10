@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- C++ enum members take the constant colour, as in C#, instead of the type colour, so they stand apart from the enum's name.
+
 ## [1.7.3] - 2026-11-05
 
 ### Changed

@@ -422,11 +422,12 @@ CODE = [
     (r"Excluded Code|VBExcludedCodeClassificationFormat|Stale Code", None, "muted"),
     (r"User Types(\((Value types|Delegates|Enums|Interfaces)\))?|Type|class name|struct name|delegate name|"
      r"module name|enum name|interface name|VBUserTypeClassificationFormat|"
-     r"Cpp(ClassTemplate|Enum|GenericType|RefType|Type|ValueType)SemanticTokenFormat", "bg", "type"),
+     r"Cpp(ClassTemplate|GenericType|RefType|Type|ValueType)SemanticTokenFormat", "bg", "type"),
     (r"User Types\(Type parameters\)|type parameter name", None, "typeParam"),
     (r"Method|method name|extension method name|"
      r"Cpp(Function|FunctionTemplate|MemberFunction|StaticMemberFunction)SemanticTokenFormat", None, "call"),
     (r"Cpp(MemberField|StaticMemberField|Property|Event)SemanticTokenFormat", None, "field"),
+    (r"CppEnumSemanticTokenFormat", None, "constant"),  # C++ Enumerator: an enum's members; the enum is a value type
     (r"parameter name|CppParameterSemanticTokenFormat", None, "param"),
     (r"CppLabelSemanticTokenFormat", None, "label"),
     (r"CppMacroSemanticTokenFormat|CppAttributesSyntacticTokenFormat", None, "annotation"),
