@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.8.2] - 2026-11-10
+
 ### Fixed
 
 - C++ enum members take the constant colour, as in C#, instead of the type colour, so they stand apart from the enum's name.
