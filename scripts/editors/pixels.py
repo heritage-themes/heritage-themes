@@ -3,13 +3,15 @@
 Usage: python3 pixels.py SHOT.png PALETTE.json
 
 PALETTE.json holds {"background": #RRGGBB, "backgrounds": [...], "foregrounds": [...], "crop": [top, bottom, left,
-right], "allowed": [...]}: the editor's background, the other backgrounds the theme draws text on, every colour the
-theme draws, the pixels at each edge of the window that the editor draws itself, in its toolkit's colours, which the
-check leaves out, and colours that the editor draws itself inside, such as a text cursor that inverts the background. A colour that covers at least MIN_PIXELS pixels must be one of the theme's colours, or lie between a
-foreground and a background, as antialiased text does, within TOLERANCE, blended in sRGB or, as toolkits that correct
-text for gamma blend it, in linear light. The background must be the most common
-colour. Prints {"problems": [...], "present": [...]}, with present the foregrounds that cover at least REQUIRED_PIXELS
-pixels, which the caller checks across samples.
+right], "allowed": [...], "rounding": N}: the editor's background, the other backgrounds the theme draws text
+on, every colour the theme draws, the pixels at each edge of the window that the editor draws itself, in its toolkit's
+colours, which the check leaves out, colours that the editor draws itself inside, such as a text cursor that inverts
+the background, and how far per channel the background may differ from the most common colour (default 0), for a
+screenshot whose background the toolkit blends itself. A colour that covers at least MIN_PIXELS pixels must be one of
+the theme's colours, or lie between a foreground and a background, as antialiased text does, within TOLERANCE, blended
+in sRGB or, as toolkits that correct text for gamma blend it, in linear light. The background must be the most common
+colour. Prints {"problems": [...], "present": [...]}, with present the foregrounds that cover at least
+REQUIRED_PIXELS pixels, which the caller checks across samples.
 """
 import json, re, subprocess, sys
 
@@ -63,7 +65,7 @@ def main():
     counts = histogram(path, *palette.get("crop", (0, 0, 0, 0)))
     problems = []
     most = max(counts, key=counts.get)
-    if most != palette["background"].upper():
+    if max(abs(a - b) for a, b in zip(rgb(most), rgb(palette["background"]))) > palette.get("rounding", 0):
         problems.append(f"background is {most}, not {palette['background']}")
     backgrounds = [rgb(c) for c in [palette["background"], *palette["backgrounds"]]]
     foregrounds = [rgb(c) for c in palette["foregrounds"]]

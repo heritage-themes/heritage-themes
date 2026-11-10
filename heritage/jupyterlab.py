@@ -292,6 +292,41 @@ def ansi_rules(p):
     return rules
 
 
+# The colours that JupyterLab draws and no theme sets: the Python file icon in the file browser, white, which the logo
+# and the buttons' text use, and black, which the logo uses and the shadows of menus and dialogs, translucent black,
+# blend with every colour.
+ICON_COLOURS = ("#FFFFFF", "#000000", "#FFD43B", "#306998", "#E4D1A7")
+
+
+def pixel_palette(p, dimmed=False):
+    """What scripts/editors/pixels.py checks a screenshot of JupyterLab against: every colour the stylesheet sets, which
+    is every colour JupyterLab draws, ICON_COLOURS, and the layers that text sits on, among them the fills of the
+    dialogs' buttons and ICON_COLOURS, which the edges of icons and shadows blend with. The notebook, the editor and the
+    menu are drawn on bgTool. With dimmed, the page is drawn under a dialog's backdrop, so each colour also appears
+    blended with it."""
+    hexes = {value.upper() for value in colours(p).values() if re.fullmatch(r"#[0-9A-Fa-f]{6}", value)}
+    hexes |= {"#" + c.upper() for c in ansi_fills(p)} | {"#" + p[k] for k in ("bg", "fg")} | set(ICON_COLOURS)
+    layers = ["#" + p[k] for k in ("bg", "frame", "surface", "caretRow", "selection", "hover")]
+    layers += [colours(p)["rendermime-error-background"], *ICON_COLOURS]
+    layers += [value.upper() for key, value in colours(p).items()
+               if re.fullmatch(r"(accept|warn|reject)-color-(normal|hover|active)", key)]
+    background = "#" + p["bgTool"]
+    if dimmed:
+        red, green, blue, alpha = re.fullmatch(r"rgba\((\d+),(\d+),(\d+),([\d.]+)\)",
+                                              colours(p)["dialog-background"]).groups()
+        backdrop, alpha = (int(red), int(green), int(blue)), float(alpha)
+
+        def under(colour):
+            return "#%02X%02X%02X" % tuple(round(int(colour[i:i + 2], 16) * (1 - alpha) + c * alpha)
+                                           for i, c in zip((1, 3, 5), backdrop))
+        hexes |= {under(c) for c in hexes}
+        layers += [under(c) for c in layers] + [under(background)]
+        background = under(background)
+    # Chrome rounds each blend with the backdrop by itself, so the dimmed background is within 2 of the computed one
+    return dict(background=background, backgrounds=layers, foregrounds=sorted(hexes), crop=[0, 0, 0, 0],
+                rounding=2 if dimmed else 0)
+
+
 def stylesheet(t, source):
     """The stylesheet of a theme dict. source is the URL of the theme folder."""
     p = t["palette"]

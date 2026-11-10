@@ -2,7 +2,7 @@
 
 Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
                           | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --textadept
-                          | --lapce | --qtcreator | --eclipse] [--png] [THEME ...]
+                          | --lapce | --qtcreator | --eclipse | --jupyterlab] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --visualstudio  write the Visual Studio preview instead of the IntelliJ one; needs Windows and Visual Studio 2026
@@ -23,6 +23,8 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --lapce      write the Lapce preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --qtcreator  write the Qt Creator preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --eclipse    write the Eclipse preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
+  --jupyterlab write the JupyterLab preview instead of the IntelliJ one; needs python3 build.py --jupyterlab run
+               first, Python 3.10 or later, Google Chrome or Chromium, and ImageMagick
   --png        also render the page to PNG; needs Google Chrome or Chromium, and ImageMagick
 
 The IntelliJ page goes to themes/<theme>/build/preview.html and its PNG to themes/<theme>/preview.png, the
@@ -52,7 +54,11 @@ Podman, through scripts/terminals/shoot.py and shells.py, and fails when a scree
 colours (scripts/terminals/check.py) or a screen shows a colour the theme does not set or text below its contrast
 minimum (scripts/terminals/cells.py). iTerm2, Windows Terminal and Termux do not run on Linux, so the build's checks
 of their files are all they get. All pages use JetBrains Mono, downloaded once from the pinned release
-below into ~/.cache/heritage-themes.
+below into ~/.cache/heritage-themes. The JupyterLab page goes to themes/<theme>/build/preview-jupyterlab.html, with
+the screenshots it shows in themes/<theme>/build/jupyterlab. scripts/jupyterlab/shoot.py takes them in JupyterLab
+itself, in the virtual environment that preview.py creates in scripts/jupyterlab/.venv from the pinned
+requirements.txt, with the wheel in build/jupyterlab installed, driving a headless Chrome; each theme is chosen in the
+settings as a user chooses it, and the run fails when a screenshot shows a colour that is no colour of the theme.
 """
 import argparse, concurrent.futures, hashlib, json, os, pathlib, plistlib, re, shutil, subprocess, sys, tempfile
 import urllib.request, zipfile
@@ -76,6 +82,7 @@ VISUALSTUDIO = os.path.join(ROOT, "scripts", "visualstudio")
 XCODE = os.path.join(ROOT, "scripts", "xcode")
 TERMINALS = os.path.join(ROOT, "scripts", "terminals")
 EDITORS = os.path.join(ROOT, "scripts", "editors")
+JUPYTERLAB = os.path.join(ROOT, "scripts", "jupyterlab")
 EDITORS_IMAGE = "localhost/heritage-editors"
 # The names that pyte gives the terminal's 16 colours, in order.
 ANSI_NAMES = ("black", "red", "green", "brown", "blue", "magenta", "cyan", "white", "brightblack", "brightred",
@@ -622,6 +629,66 @@ def gui_results(family, out, editor):
     return results
 
 
+# The screens that scripts/jupyterlab/shoot.py takes, as the names of their files; the dialog is dimmed by JupyterLab's
+# backdrop, so the colours it shows are blends with that.
+JUPYTERLAB_SCREENS = ("Notebook", "Settings menu", "Delete dialog", "Editor")
+JUPYTERLAB_DIMMED = ("Delete dialog",)
+
+
+def jupyterlab_results(family, out):
+    """Per theme of the family, (screen, screenshot path relative to out, None) per screen as JupyterLab draws it with
+    the theme, in out/jupyterlab. Fails when a screenshot shows a colour that is no colour of the theme nor a blend of
+    one with a background (scripts/editors/pixels.py), or a role of GUI_ROLES shows in no screen."""
+    wheel = os.path.join(ROOT, "build", "jupyterlab", heritage.jupyterlab.wheel_name(VERSION))
+    if not os.path.isfile(wheel):
+        raise SystemExit("preview: --jupyterlab needs the wheel: run python3 build.py --jupyterlab first")
+    python = venv_python(JUPYTERLAB, "jupyterlab")
+    subprocess.run([python, "-m", "pip", "install", "--quiet", "--disable-pip-version-check", "--no-index", "--no-deps",
+                    "--force-reinstall", wheel], check=True)
+    chrome = os.environ.get("CHROME") or tool(*CHROMES)
+    tool("magick")
+    shots = os.path.join(out, "jupyterlab")
+    shutil.rmtree(shots, ignore_errors=True)
+    request = dict(themes=[dict(stem=heritage.nvim.name(t), label=t["palette"]["name"]) for t in family.THEMES],
+                   samples={name: plain(code) + "\n" for name, *_, code in SAMPLES if name == "orders.py"},
+                   fonts=os.path.join(out, FONT_DIR), out=shots, chrome=chrome, workers=min(4, os.cpu_count() or 1))
+    with tempfile.TemporaryDirectory() as tmp:
+        request_path = os.path.join(tmp, "request.json")
+        with open(request_path, "w", encoding="utf-8") as f:
+            json.dump(request, f)
+        run = subprocess.run([python, "-I", os.path.join(JUPYTERLAB, "shoot.py"), request_path],
+                             capture_output=True, text=True, encoding="utf-8")
+        if run.returncode:
+            raise SystemExit(f"preview: shoot.py failed:\n{run.stderr[-2000:]}")
+        problems = [f"jupyterlab {failure}" for failure in json.loads(run.stdout)["failures"]]
+        results = []
+        for t in family.THEMES:
+            stem = heritage.nvim.name(t)
+            palettes = {}
+            for dimmed in (False, True):
+                palettes[dimmed] = os.path.join(tmp, f"{stem}-{int(dimmed)}.json")
+                with open(palettes[dimmed], "w", encoding="utf-8") as f:
+                    json.dump(heritage.jupyterlab.pixel_palette(t["palette"], dimmed), f)
+            present, theme_results = set(), []
+            for screen in JUPYTERLAB_SCREENS:
+                image = os.path.join(shots, stem, f"{screen}.png")
+                if not os.path.isfile(image):
+                    continue
+                check = subprocess.run([sys.executable, "-I", os.path.join(EDITORS, "pixels.py"), image,
+                                        palettes[screen in JUPYTERLAB_DIMMED]],
+                                       capture_output=True, text=True)
+                report = json.loads(check.stdout)
+                problems += [f"jupyterlab {stem} {screen}: {problem}" for problem in report["problems"]]
+                present |= set(report["present"])
+                theme_results.append((screen, f"jupyterlab/{stem}/{screen}.png", None))
+            problems += [f"jupyterlab {stem}: the {role} colour shows in no screen" for role in GUI_ROLES
+                         if "#" + t["palette"][role] not in present]
+            results.append(theme_results)
+    if problems:
+        raise SystemExit("preview: JupyterLab shows problems:\n" + "\n".join(problems))
+    return results
+
+
 def render_png(page_path, png_path):
     chrome = os.environ.get("CHROME") or tool(*CHROMES)
     # Windows has a convert command of its own, which converts file systems, so ImageMagick 6's name is not looked up.
@@ -658,6 +725,7 @@ def main():
         kind.add_argument(f"--{editor}", action="store_true", help=f"write the {title} preview")
     for editor, (title, *_) in GUI_EDITORS.items():
         kind.add_argument(f"--{editor}", action="store_true", help=f"write the {title} preview")
+    kind.add_argument("--jupyterlab", action="store_true", help="write the JupyterLab preview")
     parser.add_argument("--png", action="store_true", help="also render the page to PNG")
     parser.add_argument("themes", nargs="*", metavar="THEME", help="theme folders; default: all")
     args = parser.parse_args()
@@ -670,7 +738,7 @@ def main():
         install_fonts(os.path.join(out, FONT_DIR), symbols=args.terminals)
         family = families[name]
         target = next((name for name in ("vscode", "visualstudio", "sublime", "zed", "nvim", "notepadpp", "xcode",
-                                          *TERMINAL_THEMES, "terminals", *SCREEN_EDITORS, *GUI_EDITORS)
+                                          *TERMINAL_THEMES, "terminals", *SCREEN_EDITORS, *GUI_EDITORS, "jupyterlab")
                        if getattr(args, name)), None)
         page_path = os.path.join(out, f"preview-{target}.html" if target else "preview.html")
         tokens = {"vscode": vscode_tokens, "sublime": sublime_tokens, "zed": zed_tokens, "nvim": nvim_tokens,
@@ -684,6 +752,7 @@ def main():
                                         wide=False) if target in SCREEN_EDITORS
                     else terminals_page(family, gui_results(family, out, target), GUI_EDITORS[target][0])
                     if target in GUI_EDITORS
+                    else terminals_page(family, jupyterlab_results(family, out), "JupyterLab") if target == "jupyterlab"
                     else page(family, tokens, target))
         print(page_path)
         if args.png:
