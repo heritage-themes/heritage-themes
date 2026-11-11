@@ -19,11 +19,12 @@ The extension is a JupyterLab federated extension: a small plugin that registers
 built with JupyterLab's own builder, and the stylesheets as files beside it. It ships as a Python wheel on PyPI, which
 pip installs into the environment that JupyterLab runs in.
 """
-import base64, hashlib, io, json, re, zipfile
+import json, re
 
 from .nvim import name  # noqa: F401 - the files take the names of Neovim's schemes
 from .terminals import colours as terminal_colours, contrast
 from .vscode import mix
+from .wheel import pack
 
 EXTENSION = "jupyterlab-heritage-themes"  # the extension's npm name and its folder in share/jupyter/labextensions
 DISTRIBUTION = "jupyterlab-heritage-themes"  # the wheel's project name on PyPI
@@ -482,30 +483,7 @@ def metadata(version, vendor_url, description):
 
 def wheel(files, version, vendor_url, description, licence):
     """The wheel as bytes. files maps a path in the extension's folder to its bytes; pip installs the extension under
-    share/jupyter/labextensions, where JupyterLab looks for it. The entries are sorted and dated as the other zips
-    date theirs, so the same sources give the same bytes."""
-    stem = f"{DISTRIBUTION.replace('-', '_')}-{version}"
-    dist_info, data = f"{stem}.dist-info", f"{stem}.data/data/share/jupyter/labextensions/{EXTENSION}"
-    entries = {f"{data}/{path}": content for path, content in files.items()}
-    entries[f"{dist_info}/METADATA"] = metadata(version, vendor_url, description).encode("utf-8")
-    entries[f"{dist_info}/WHEEL"] = (f"Wheel-Version: 1.0\nGenerator: heritage-themes build.py\n"
-                                      "Root-Is-Purelib: true\nTag: py3-none-any\n").encode("utf-8")
-    entries[f"{dist_info}/LICENSE"] = licence
-    entries[f"{dist_info}/RECORD"] = record(entries, f"{dist_info}/RECORD").encode("utf-8")
-    out = io.BytesIO()
-    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
-        for path in sorted(entries):
-            info = zipfile.ZipInfo(path, (2020, 1, 1, 0, 0, 0))
-            info.compress_type, info.external_attr, info.create_system = zipfile.ZIP_DEFLATED, 0o644 << 16, 3
-            z.writestr(info, entries[path])
-    return out.getvalue()
-
-
-def record(entries, own_path):
-    """The wheel's RECORD: each entry's path, SHA-256 and size, and its own path without them."""
-    lines = []
-    for path in sorted(entries):
-        digest = base64.urlsafe_b64encode(hashlib.sha256(entries[path]).digest()).rstrip(b"=").decode()
-        lines.append(f"{path},sha256={digest},{len(entries[path])}")
-    lines.append(f"{own_path},,")
-    return "\n".join(lines) + "\n"
+    share/jupyter/labextensions, where JupyterLab looks for it."""
+    data = f"{DISTRIBUTION.replace('-', '_')}-{version}.data/data/share/jupyter/labextensions/{EXTENSION}"
+    return pack(DISTRIBUTION, version, {f"{data}/{path}": content for path, content in files.items()},
+                metadata(version, vendor_url, description), licence)

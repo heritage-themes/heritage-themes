@@ -26,6 +26,10 @@ the theme from heritage.notepadpp (see scripts/notepadpp/tokens.py), and its chr
 and status bar in the colours Notepad++ draws itself in, with the editors side by side and no side panel, as
 Notepad++ opens.
 
+The Pygments page takes code colours from the tokens that Pygments' lexers give the samples, coloured by the style that
+the installed package registers (see scripts/pygments/tokens.py). The page shows each sample as the code block that
+Pygments' formatters draw, with the caret row standing for a highlighted line, on the tool background.
+
 The Visual Studio page shows the samples as Visual Studio 2026 draws them with the theme from heritage.visualstudio:
 captures of its editor (see scripts/visualstudio/screen.ps1), each at half its size, as Visual Studio draws them at
 twice the default font size. Its chrome takes the palette roles that the theme gives Visual Studio's surfaces
@@ -150,6 +154,9 @@ VISUALSTUDIO_CHROME = {
 }
 # CSS variable → palette role for the Xcode page. Xcode draws its window in the theme's background and the navigator
 # darker, as bgTool is in dark themes.
+# CSS variable → palette role for the Pygments page: the code blocks on the tool background, with the file name above.
+PYGMENTS_CHROME = {"frame": "bgTool", "island": "bgTool", "editor": "bgTool", "underTabs": "bgTool", "tab": "bgTool",
+                   "tabBorder": "bgTool", "status": "bgTool", "statusFg": "muted"}
 XCODE_CHROME = {"frame": "bg", "island": "bgTool", "editor": "bg", "tab": "bg", "status": "bg", "statusFg": "muted"}
 # The width of an editor on the page in CSS pixels, which Xcode's editors are sized to in the captures so that they fill
 # it: the window's 1280 less its two borders, the side panel's 180 and its border, and the 1 between the two editors,
@@ -281,6 +288,11 @@ def visualstudio_chrome(p):
     return ";".join(f"--{var}:#{p[role]}" for var, role in VISUALSTUDIO_CHROME.items())
 
 
+def pygments_chrome(p):
+    """CSS variables for the page, taken from the palette."""
+    return ";".join(f"--{var}:#{p[role]}" for var, role in PYGMENTS_CHROME.items())
+
+
 def xcode_chrome(p):
     """CSS variables for the window chrome, taken from the palette."""
     return ";".join(f"--{var}:#{p[role]}" for var, role in XCODE_CHROME.items())
@@ -317,7 +329,7 @@ def window(p, files=None, kind="vscode"):
                           for (name, caret, _), lines in zip(SAMPLES, files))
         colours = (terminal_chrome(p, kind) if kind in TERMINAL_CHROME else
                    {"sublime": sublime_chrome, "zed": zed_chrome, "nvim": nvim_chrome,
-                    "notepadpp": notepadpp_chrome}.get(kind, vscode_chrome)(p))
+                    "notepadpp": notepadpp_chrome, "pygments": pygments_chrome}.get(kind, vscode_chrome)(p))
     classes = f"{kind} term" if kind in TERMINAL_CHROME else kind
     return (f'<section class="ide {classes}" style="{variables};{colours};--caret:#{p.get("caret", p["gold"])}">'
             f'<header class="bar"><b>{html.escape(p["name"])}</b><span class="swatches">{swatches}</span></header>'
@@ -394,6 +406,10 @@ body{{margin:0;padding:24px;font-family:system-ui,sans-serif}}
 .term .tabs{{padding:0;border:0}} .term .tab{{padding:0 1ch;border:0;border-radius:0;color:var(--tabFg);
   font:700 12px/1.55 "JetBrains Mono",ui-monospace,monospace}}
 .term .status{{font-family:"JetBrains Mono",ui-monospace,monospace}}
+.pygments .body{{gap:0;padding:0 5px 5px}} .pygments .stripe,.pygments .side,.pygments .status{{display:none}}
+.pygments .tabs{{padding:5px 0 5px 6px;border:0}}
+.pygments .tab{{padding:0 6px;border:0;background:none;color:var(--statusFg)}}
+.pygments .caret{{display:none}} .pygments .caret-row .gutter{{color:var(--lineNo)}}
 .visualstudio .status{{color:var(--statusFg)}} .visualstudio .tab{{border-radius:6px 6px 0 0;border-width:1px 1px 0}}
 .visualstudio .file img,.xcode .file img{{display:block;max-width:100%;height:auto}}
 .xcode .body{{gap:0;padding:0}} .xcode .stripe{{display:none}}

@@ -1,6 +1,6 @@
 """Builds the Heritage Themes JetBrains plugin, VS Code extension, Visual Studio extension, Sublime Text package, Zed
-extension, Neovim plugin, and the Notepad++, Xcode, Helix, Kakoune, Micro, Vim and Emacs themes from every theme
-folder.
+extension, Neovim plugin, Pygments styles, and the Notepad++, Xcode, Helix, Kakoune, Micro, Vim and Emacs themes from
+every theme folder.
 
 A theme folder is any directory in themes/ containing a theme.py (see heritage/__init__.py).
 
@@ -13,7 +13,8 @@ Usage: python3 build.py [--vsix] [--jupyterlab]
 
 Output goes to build/.
 """
-import argparse, base64, configparser, hashlib, html, json, os, plistlib, re, shutil, subprocess, tomllib, zipfile
+import argparse, ast, base64, configparser, hashlib, html, json, os, plistlib, re, shutil, subprocess, tomllib, \
+    zipfile
 import xml.etree.ElementTree as ET
 
 import heritage
@@ -83,7 +84,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Amp", "Eclipse", "Nova",
-           "JupyterLab", "terminals")
+           "JupyterLab", "Pygments", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -2379,6 +2380,30 @@ def validate_jupyterlab(directory, families, packed):
     validate_jupyterlab_wheel(wheel, themes)
 
 
+def check_wheel_files(label, z, stem, required, allowed=()):
+    """Fails the build when the wheel lacks a required entry or holds one that is neither required nor under an allowed
+    prefix, or when its RECORD does not list each entry with its SHA-256 and size, and returns the METADATA."""
+    names = set(z.namelist())
+    required = set(required) | {f"{stem}.dist-info/{n}" for n in ("METADATA", "WHEEL", "RECORD", "LICENSE")}
+    if not required <= names:
+        raise SystemExit(f"{label}: {sorted(required - names)[:5]} missing")
+    stray = {n for n in names if n not in required and not n.startswith(tuple(allowed))}
+    if stray:
+        raise SystemExit(f"{label}: holds {sorted(stray)[:5]} unexpectedly")
+    record = z.read(f"{stem}.dist-info/RECORD").decode().splitlines()
+    if sorted(line.split(",")[0] for line in record) != sorted(names):
+        raise SystemExit(f"{label}: RECORD does not list the entries")
+    for line in record:
+        path, digest, size = line.split(",")
+        if path.endswith("/RECORD"):
+            continue
+        content = z.read(path)
+        sha256 = base64.urlsafe_b64encode(hashlib.sha256(content).digest()).rstrip(b"=").decode()
+        if digest != f"sha256={sha256}" or int(size) != len(content):
+            raise SystemExit(f"{label}: RECORD is wrong for {path}")
+    return z.read(f"{stem}.dist-info/METADATA").decode()
+
+
 def validate_jupyterlab_wheel(wheel, themes):
     """Checks the wheel's entries against its RECORD, its metadata, the extension's manifest and the stylesheets."""
     stem = f"{heritage.jupyterlab.DISTRIBUTION.replace('-', '_')}-{VERSION}"
@@ -2387,25 +2412,11 @@ def validate_jupyterlab_wheel(wheel, themes):
         names = set(z.namelist())
         stylesheets = {f"{data}/themes/{heritage.jupyterlab.EXTENSION}/{heritage.jupyterlab.name(t)}.css"
                        for t in themes}
-        required = {f"{stem}.dist-info/{n}" for n in ("METADATA", "WHEEL", "RECORD", "LICENSE")} | stylesheets | \
-            {f"{data}/package.json", f"{data}/install.json"}
-        if not required <= names or not any(n.startswith(f"{data}/static/remoteEntry.") for n in names):
-            raise SystemExit(f"JupyterLab wheel: {sorted(required - names)[:5]} missing")
-        stray = {n for n in names if n not in required and not n.startswith(f"{data}/static/")}
-        if stray:
-            raise SystemExit(f"JupyterLab wheel: holds {sorted(stray)[:5]} unexpectedly")
-        record = z.read(f"{stem}.dist-info/RECORD").decode().splitlines()
-        if sorted(line.split(",")[0] for line in record) != sorted(names):
-            raise SystemExit("JupyterLab wheel: RECORD does not list the entries")
-        for line in record:
-            path, digest, size = line.split(",")
-            if path.endswith("/RECORD"):
-                continue
-            content = z.read(path)
-            sha256 = base64.urlsafe_b64encode(hashlib.sha256(content).digest()).rstrip(b"=").decode()
-            if digest != f"sha256={sha256}" or int(size) != len(content):
-                raise SystemExit(f"JupyterLab wheel: RECORD is wrong for {path}")
-        metadata = z.read(f"{stem}.dist-info/METADATA").decode()
+        if not any(n.startswith(f"{data}/static/remoteEntry.") for n in names):
+            raise SystemExit("JupyterLab wheel: the extension's remote entry is missing")
+        metadata = check_wheel_files("JupyterLab wheel", z, stem,
+                                     stylesheets | {f"{data}/package.json", f"{data}/install.json"},
+                                     (f"{data}/static/",))
         if f"Name: {heritage.jupyterlab.DISTRIBUTION}\nVersion: {VERSION}\n" not in metadata or \
                 f"Requires-Dist: jupyterlab>={heritage.jupyterlab.JUPYTERLAB}\n" not in metadata:
             raise SystemExit("JupyterLab wheel: METADATA does not name the project, its version and JupyterLab")
@@ -2439,10 +2450,155 @@ def validate_jupyterlab_wheel(wheel, themes):
                 raise SystemExit(f"JupyterLab wheel: the plugin does not register {t['palette']['name']}")
 
 
+def pygments_readme(families):
+    """The README in the zip, which is also the wheel's description. Links are absolute."""
+    count = sum(len(f.THEMES) for f in families)
+    wheel = heritage.pygments.wheel_name(VERSION)
+    example = heritage.pygments.name(next(t for f in families for t in f.THEMES if t["slug"] == "HoliNight"))
+    return f"""# Heritage Themes for Pygments
+
+{DESCRIPTION} {count} dark and light styles in {len(families)} families, in one package; each family maps the named \
+colours of one tradition to syntax roles.
+
+## Install
+
+The package needs Pygments {heritage.pygments.PYGMENTS} or later and Python {heritage.pygments.PYTHON} or later.
+
+```bash
+pip install {heritage.pygments.DISTRIBUTION}
+```
+
+To install a particular build, download `{VSCODE_NAME}-pygments-<version>.zip` from the \
+[GitHub releases]({VENDOR_URL}/releases) and run `pip install` on the wheel in it, such as `{wheel}`.
+
+To remove the package, run `pip uninstall {heritage.pygments.DISTRIBUTION}`.
+
+## Use
+
+The package registers each style under its name, which the table at the end gives, so every program that takes the \
+name of a Pygments style takes these. In the command line tool:
+
+```bash
+pygmentize -O style={example} -f terminal16m script.py
+pygmentize -S {example} -f html > {example}.css
+```
+
+In Python:
+
+```python
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import PythonLexer
+
+print(highlight(code, PythonLexer(), HtmlFormatter(style="{example}", full=True)))
+```
+
+In a Sphinx project's `conf.py`:
+
+```python
+pygments_style = "{example}"
+```
+
+To pass the class instead of the name, import it with `from {heritage.pygments.MODULE} import {heritage.pygments.class_name(next(t for f in families for t in f.THEMES if t["slug"] == "HoliNight"))}`.
+
+## What is coloured
+
+A style colours the tokens that Pygments' lexers produce, the background, the highlighted lines and the line \
+numbers. A lexer gives a construct one token type in every language, so preprocessor directives such as C's \
+`#include` take the keyword colour, HTML attribute names the field colour and decorators the annotation colour. A \
+highlighted line takes the background of the theme's current line.
+
+{readme_footer(families, "Pygments", "Styles", "the style, Pygments version, language")}"""
+
+
+def build_pygments(families):
+    """Writes the README, changelog, licence and wheel to build/pygments, and returns build/pygments."""
+    directory = os.path.join(OUT, "pygments")
+    os.makedirs(directory)
+    write_text(os.path.join(directory, "README.md"), pygments_readme(families))
+    shutil.copy(os.path.join(ROOT, "pygments", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    themes = [(t, f"{VENDOR_URL}/tree/master/themes/{heritage.folder(f)}") for f in families for t in f.THEMES]
+    with open(os.path.join(ROOT, "LICENSE"), "rb") as f:
+        licence = f.read()
+    with open(os.path.join(directory, "README.md"), encoding="utf-8") as f:
+        description = f.read()
+    with open(os.path.join(directory, heritage.pygments.wheel_name(VERSION)), "wb") as f:
+        f.write(heritage.pygments.wheel(themes, VERSION, VENDOR_URL, description, licence))
+    return directory
+
+
+def pygments_classes(source):
+    """The style classes of the module's source as name → (docstring, attributes, styles), where attributes maps each
+    class attribute that is a string to it and styles maps each token type, as written, to its style string."""
+    tree = ast.parse(source)
+    imported = {alias.name for node in tree.body if isinstance(node, ast.ImportFrom) for alias in node.names}
+    if imported != {"Style", *heritage.pygments.IMPORTS}:
+        raise SystemExit(f"Pygments module: imports {sorted(imported)}")
+    classes = {}
+    for node in tree.body:
+        if not isinstance(node, ast.ClassDef):
+            continue
+        attributes, styles = {}, {}
+        for statement in node.body[1:]:
+            target = statement.targets[0].id if isinstance(statement, ast.Assign) else None
+            if target == "styles":
+                styles = {ast.unparse(k): v.value for k, v in zip(statement.value.keys, statement.value.values)}
+            elif target:
+                attributes[target] = statement.value.value
+        if [ast.unparse(base) for base in node.bases] != ["Style"]:
+            raise SystemExit(f"Pygments module: {node.name} is not a Style")
+        classes[node.name] = (ast.get_docstring(node), attributes, styles)
+    return classes
+
+
+def validate_pygments(directory, families):
+    """Fails the build when a style's colour is unreadable on the background it is drawn on, or the wheel's records,
+    metadata, entry points or module are wrong: a class that is missing or differs from its palette, or a style string
+    that is not one that the generator writes."""
+    themes = [t for f in families for t in f.THEMES]
+    for t in themes:
+        p = t["palette"]
+        comments = {token for token, role, _ in heritage.pygments.rules(p) if role == "comment"}
+        check_styles(f"Pygments {p['name']}", heritage.pygments.styles(p), "fg", "bg", "Token", set(),
+                     comments | {f"{token} on a highlighted line" for token in comments}, {})
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Pygments: {name} is missing")
+    stem = f"{heritage.pygments.DISTRIBUTION.replace('-', '_')}-{VERSION}"
+    with zipfile.ZipFile(os.path.join(directory, heritage.pygments.wheel_name(VERSION))) as z:
+        module = f"{heritage.pygments.MODULE}.py"
+        metadata = check_wheel_files("Pygments wheel", z, stem, {module, f"{stem}.dist-info/entry_points.txt"})
+        required = (f"Name: {heritage.pygments.DISTRIBUTION}\nVersion: {VERSION}\n",
+                    f"Requires-Dist: Pygments>={heritage.pygments.PYGMENTS}\n",
+                    f"Requires-Python: >={heritage.pygments.PYTHON}\n")
+        if not all(line in metadata for line in required):
+            raise SystemExit("Pygments wheel: METADATA does not name the project, its version and its requirements")
+        points = z.read(f"{stem}.dist-info/entry_points.txt").decode()
+        if points != heritage.pygments.entry_points(themes):
+            raise SystemExit("Pygments wheel: entry_points.txt does not register each style under its name")
+        classes = pygments_classes(z.read(module).decode("utf-8"))
+    if list(classes) != [heritage.pygments.class_name(t) for t in themes]:
+        raise SystemExit("Pygments wheel: the module's classes are not the themes' styles")
+    for t in themes:
+        p, label = t["palette"], f"Pygments {t['palette']['name']}"
+        docstring, attributes, styles = classes[heritage.pygments.class_name(t)]
+        if not docstring.startswith(f"{p['name']}: {VENDOR_URL}/tree/master/themes/"):
+            raise SystemExit(f"{label}: the docstring does not name the theme and its folder")
+        if attributes != {"name": heritage.pygments.name(t), **dict(heritage.pygments.attributes(p))}:
+            raise SystemExit(f"{label}: the class attributes differ from the palette's")
+        if styles != {token: heritage.pygments.style_string(p, role, font)
+                      for token, role, font in heritage.pygments.rules(p)}:
+            raise SystemExit(f"{label}: the styles differ from the palette's")
+        if not all(heritage.pygments.STYLE.fullmatch(value) for value in styles.values()):
+            raise SystemExit(f"{label}: a style string is not one that Pygments reads")
+
+
 # Product → its themes' names in READMEs, the README writer, and the folder its theme files go in.
 TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.name, "Lapce": heritage.lapce.name,
                   "Qt Creator": heritage.qtcreator.name, "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
+                  "Pygments": heritage.pygments.name,
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
@@ -2791,6 +2947,10 @@ def main():
               flush=True)
     else:
         print(f"JupyterLab: {len(themes)} stylesheets checked; --jupyterlab builds the wheel and the zip", flush=True)
+    pygments = build_pygments(families)
+    validate_pygments(pygments, families)
+    name = f"{VSCODE_NAME}-pygments"
+    print(f"{pack_folder(pygments, os.path.join(OUT, f'{name}-{VERSION}.zip'), name)}: {len(themes)} themes", flush=True)
     terminals = build_terminals(families)
     validate_terminals(terminals, families)
     package = os.path.join(OUT, f"{TERMINALS_NAME}-{VERSION}.zip")

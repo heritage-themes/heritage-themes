@@ -2,7 +2,7 @@
 
 Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
                           | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --textadept
-                          | --lapce | --qtcreator | --eclipse | --jupyterlab] [--png] [THEME ...]
+                          | --lapce | --qtcreator | --eclipse | --jupyterlab | --pygments] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --visualstudio  write the Visual Studio preview instead of the IntelliJ one; needs Windows and Visual Studio 2026
@@ -25,6 +25,8 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --eclipse    write the Eclipse preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --jupyterlab write the JupyterLab preview instead of the IntelliJ one; needs python3 build.py --jupyterlab run
                first, Python 3.10 or later, Google Chrome or Chromium, and ImageMagick
+  --pygments   write the Pygments preview instead of the IntelliJ one; needs python3 build.py run first and Python 3.8
+               or later
   --png        also render the page to PNG; needs Google Chrome or Chromium, and ImageMagick
 
 The IntelliJ page goes to themes/<theme>/build/preview.html and its PNG to themes/<theme>/preview.png, the
@@ -58,7 +60,11 @@ below into ~/.cache/heritage-themes. The JupyterLab page goes to themes/<theme>/
 the screenshots it shows in themes/<theme>/build/jupyterlab. scripts/jupyterlab/shoot.py takes them in JupyterLab
 itself and in Notebook 7, in the virtual environment that preview.py creates in scripts/jupyterlab/.venv from the pinned
 requirements.txt, with the wheel in build/jupyterlab installed, driving a headless Chrome; each theme is chosen in the
-settings as a user chooses it, and the run fails when a screenshot shows a colour that is no colour of the theme.
+settings as a user chooses it, and the run fails when a screenshot shows a colour that is no colour of the theme. The
+Pygments page goes to themes/<theme>/build/preview-pygments.html. scripts/pygments/tokens.py tokenises the samples with
+Pygments' lexers and colours them with the styles that Pygments finds by name once the wheel in build/pygments is
+installed, in the virtual environment that preview.py creates in scripts/pygments/.venv from the pinned
+requirements.txt; it fails when a style differs from its palette.
 """
 import argparse, concurrent.futures, hashlib, json, os, pathlib, plistlib, re, shutil, subprocess, sys, tempfile
 import urllib.request, zipfile
@@ -83,6 +89,7 @@ XCODE = os.path.join(ROOT, "scripts", "xcode")
 TERMINALS = os.path.join(ROOT, "scripts", "terminals")
 EDITORS = os.path.join(ROOT, "scripts", "editors")
 JUPYTERLAB = os.path.join(ROOT, "scripts", "jupyterlab")
+PYGMENTS = os.path.join(ROOT, "scripts", "pygments")
 EDITORS_IMAGE = "localhost/heritage-editors"
 # The names that pyte gives the terminal's 16 colours, in order.
 ANSI_NAMES = ("black", "red", "green", "brown", "blue", "magenta", "cyan", "white", "brightblack", "brightred",
@@ -248,7 +255,9 @@ def venv_python(folder, module):
     python = os.path.join(venv, "Scripts" if os.name == "nt" else "bin", "python")
     if not os.path.isfile(python):
         subprocess.run([sys.executable, "-m", "venv", venv], check=True)
-    if subprocess.run([python, "-c", f"import {module}"], capture_output=True).returncode:
+    # -I keeps the working directory off the path: the product folders of this repository, such as pygments/, would
+    # import as namespace packages
+    if subprocess.run([python, "-I", "-c", f"import {module}"], capture_output=True).returncode:
         subprocess.run([python, "-m", "pip", "install", "--quiet", "--disable-pip-version-check", "-r",
                         os.path.join(folder, "requirements.txt")], check=True)
     return python
@@ -286,6 +295,30 @@ def nvim_tokens(family):
                                 input=json.dumps(request), capture_output=True, text=True, encoding="utf-8")
     if result.returncode:
         raise SystemExit(f"preview: screen.py failed:\n{result.stderr}")
+    return json.loads(result.stdout)
+
+
+def pygments_tokens(family):
+    """Per theme of the family, the samples coloured by scripts/pygments/tokens.py with the Pygments style that the
+    installed wheel registers for the theme, in the shape that vscode_tokens returns."""
+    wheel = os.path.join(ROOT, "build", "pygments", heritage.pygments.wheel_name(VERSION))
+    if not os.path.isfile(wheel):
+        raise SystemExit("preview: --pygments needs the wheel: run python3 build.py first")
+    python = venv_python(PYGMENTS, "pygments")
+    subprocess.run([python, "-m", "pip", "install", "--quiet", "--disable-pip-version-check", "--no-index", "--no-deps",
+                    "--force-reinstall", wheel], check=True)
+    themes = []
+    for t in family.THEMES:
+        p = t["palette"]
+        themes.append(dict(name=heritage.pygments.name(t), attributes=dict(heritage.pygments.attributes(p)),
+                           rules={token: ["#" + p[role], heritage.pygments.style_string(p, role, font)
+                                          .rsplit("#", 1)[0].strip()]
+                                  for token, role, font in heritage.pygments.rules(p)}))
+    request = dict(themes=themes, samples=[dict(name=name, code=plain(code)) for name, _, code in SAMPLES])
+    result = subprocess.run([python, "-I", os.path.join(PYGMENTS, "tokens.py")], input=json.dumps(request),
+                            capture_output=True, text=True, encoding="utf-8")
+    if result.returncode:
+        raise SystemExit(f"preview: tokens.py failed:\n{result.stderr}")
     return json.loads(result.stdout)
 
 
@@ -730,6 +763,7 @@ def main():
     for editor, (title, *_) in GUI_EDITORS.items():
         kind.add_argument(f"--{editor}", action="store_true", help=f"write the {title} preview")
     kind.add_argument("--jupyterlab", action="store_true", help="write the JupyterLab preview")
+    kind.add_argument("--pygments", action="store_true", help="write the Pygments preview")
     parser.add_argument("--png", action="store_true", help="also render the page to PNG")
     parser.add_argument("themes", nargs="*", metavar="THEME", help="theme folders; default: all")
     args = parser.parse_args()
@@ -742,11 +776,12 @@ def main():
         install_fonts(os.path.join(out, FONT_DIR), symbols=args.terminals)
         family = families[name]
         target = next((name for name in ("vscode", "visualstudio", "sublime", "zed", "nvim", "notepadpp", "xcode",
-                                          *TERMINAL_THEMES, "terminals", *SCREEN_EDITORS, *GUI_EDITORS, "jupyterlab")
+                                          *TERMINAL_THEMES, "terminals", *SCREEN_EDITORS, *GUI_EDITORS, "jupyterlab",
+                                          "pygments")
                        if getattr(args, name)), None)
         page_path = os.path.join(out, f"preview-{target}.html" if target else "preview.html")
         tokens = {"vscode": vscode_tokens, "sublime": sublime_tokens, "zed": zed_tokens, "nvim": nvim_tokens,
-                  "notepadpp": notepadpp_tokens,
+                  "notepadpp": notepadpp_tokens, "pygments": pygments_tokens,
                   **{editor: lambda f, e=editor: terminal_tokens(f, e) for editor in TERMINAL_THEMES},
                   "visualstudio": lambda f: visualstudio_captures(f, out),
                   "xcode": lambda f: xcode_captures(f, out)}.get(target, lambda family: None)(family)
