@@ -38,6 +38,7 @@ body:
         - Nova
         - JupyterLab
         - Pygments
+        - Spyder
         - Terminal emulator, shell, prompt or multiplexer
     validations:
       required: true

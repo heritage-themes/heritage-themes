@@ -13,8 +13,8 @@ Usage: python3 build.py [--vsix] [--jupyterlab]
 
 Output goes to build/.
 """
-import argparse, ast, base64, configparser, hashlib, html, json, os, plistlib, re, shutil, subprocess, tomllib, \
-    zipfile
+import argparse, ast, base64, configparser, contextlib, hashlib, html, importlib.util, io, json, os, plistlib, re, \
+    shutil, subprocess, sys, tempfile, tomllib, zipfile
 import xml.etree.ElementTree as ET
 
 import heritage
@@ -84,7 +84,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Amp", "Eclipse", "Nova",
-           "JupyterLab", "Pygments", "terminals")
+           "JupyterLab", "Pygments", "Spyder", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -1320,6 +1320,10 @@ def check_files(label, directory, folder, expected):
         raise SystemExit(f"{label}: {len(found)} files in {folder} for {len(expected)} themes")
 
 
+# The files that a product's folder holds beside its README, changelog and licence.
+EXTRA_FILES = {"Spyder": ("install.py",)}
+
+
 def build_themes(families, editor, folder, files):
     """Writes each theme's file to build/<editor>/<folder>, with the README, changelog and licence, and returns
     build/<editor>. files gives a theme dict and the URL of its family's folder as (file name, text)."""
@@ -1331,7 +1335,8 @@ def build_themes(families, editor, folder, files):
             filename, text = files(t, source)
             write_text(os.path.join(directory, folder, filename), text)
     write_text(os.path.join(directory, "README.md"), TERMINAL_READMES[editor](families))
-    shutil.copy(os.path.join(ROOT, editor.lower(), "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    for name in ("CHANGELOG.md", *EXTRA_FILES.get(editor, ())):
+        shutil.copy(os.path.join(ROOT, editor.lower(), name), os.path.join(directory, name))
     shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
     return directory
 
@@ -1789,6 +1794,152 @@ def validate_textadept(directory, families):
             check_styles(label, heritage.textadept.styles(p), "fg", "bg", "STYLE_DEFAULT", set(),
                          {"lexer.COMMENT"}, {})
     check_files("Textadept themes", directory, "themes", expected)
+
+
+def spyder_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    dark, light = (heritage.spyder.name(next(t for f in families for t in f.THEMES if t["slug"] == slug))
+                   for slug in ("HoliNight", "HoliDay"))
+    return f"""# Heritage Themes for Spyder
+
+{DESCRIPTION} {count} dark and light syntax highlighting themes in {len(families)} families, for Spyder 6. \
+`install.py` adds them to Spyder's settings.
+
+## Install
+
+1. Close Spyder. It rewrites its settings when it closes and would discard the change.
+2. Run the installer from the unzipped folder. On Windows, run `py install.py`.
+
+   ```bash
+   python3 install.py
+   ```
+
+   It changes the `spyder.ini` of Spyder from your package manager, pip or conda, and of the Flatpak, and saves the \
+previous file beside it as `spyder.ini.bak`. Name another file with `--config <path>`.
+3. Start Spyder and choose a theme under **Preferences | Appearance | Syntax highlighting theme**. The themes follow \
+Spyder's own, under a line.
+
+To install only some themes, name them. To remove themes, add `--remove`; with no names it removes every Heritage \
+theme.
+
+```bash
+python3 install.py {dark} {light}
+python3 install.py --remove
+python3 install.py --list
+```
+
+## What is coloured
+
+Each theme colours the editor and the IPython console: code, the current line and current cell, the other \
+occurrences of the word under the caret, matching and unmatched brackets, links under the pointer, and the side \
+areas. Spyder draws its menus, tabs, panes and icons in one light or one dark interface theme, which a syntax \
+highlighting theme cannot change. With **Interface theme** set to **Automatic**, Spyder picks the one that matches the \
+theme and asks for a restart when they differ.
+
+Spyder gives each kind of text one colour: keywords, builtins, definitions, `self`, `cls` and decorators, comments, \
+strings and numbers. A function's name and a class's name share the definition colour.
+
+Spyder draws line numbers in a fixed grey, and its **Create new theme** button fails while any Heritage theme is \
+installed. Choose **Edit selected theme** to change a theme.
+
+{readme_footer(families, "Spyder", "Themes", "the theme, Spyder version, how you installed Spyder (package, pip, conda or Flatpak)")}"""
+
+
+def validate_spyder(directory, families):
+    """Fails the build when a theme file is missing, differs from heritage.spyder.options, holds a value that Spyder
+    cannot read, or has text below its contrast on the background it is drawn on, or when the installer in the zip does
+    not install, repeat and remove the themes in a spyder.ini as it should."""
+    expected, themes = set(), {}
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.spyder.name(t), t["palette"]
+            expected.add(f"{name}.ini")
+            label = f"Spyder {name}"
+            with open(os.path.join(directory, "themes", f"{name}.ini"), encoding="utf-8") as f:
+                text = f.read()
+            options = heritage.spyder.options(p)
+            if heritage.spyder.parse(text) != options:
+                raise SystemExit(f"{label}: options differ from heritage.spyder.options")
+            for key, value in options.items():
+                pattern = heritage.spyder.TEXT if key in heritage.spyder.TEXT_KEYS else heritage.spyder.COLOUR
+                if key != "name" and not pattern.fullmatch(value):
+                    raise SystemExit(f"{label}: {key} = {value} is not a value that Spyder reads")
+            parser = configparser.ConfigParser(interpolation=None)  # Spyder reads its settings so
+            parser.read_string(text)
+            if parser.sections() != ["appearance"] or {o.split("/")[0] for o in parser["appearance"]} != {name}:
+                raise SystemExit(f"{label}: is not one theme in [appearance]")
+            check_styles(label, heritage.spyder.styles(p), "fg", "bg", "normal", set(), heritage.spyder.LOW_CONTRAST, {})
+            themes[name] = {f"{name}/{key}": value for key, value in options.items()}
+    check_files("Spyder themes", directory, "themes", expected)
+    if sorted(os.listdir(directory)) != ["CHANGELOG.md", "LICENSE", "README.md", "install.py", "themes"]:
+        raise SystemExit("Spyder themes: the zip does not hold the README, changelog, licence, installer and themes")
+    with open(os.path.join(directory, "install.py"), "rb") as built, \
+            open(os.path.join(ROOT, "spyder", "install.py"), "rb") as source:
+        if built.read() != source.read():
+            raise SystemExit("Spyder themes: install.py is not spyder/install.py")
+    check_spyder_installer(directory, themes)
+
+
+def check_spyder_installer(directory, themes):
+    """Runs the installer of the built folder on a spyder.ini and checks what it writes, that a second run changes
+    nothing, and that removing the themes restores the settings, with the selected theme replaced by Spyder's own."""
+    spec = importlib.util.spec_from_file_location("heritage_spyder_install", os.path.join(directory, "install.py"))
+    installer = importlib.util.module_from_spec(spec)
+    write_bytecode, sys.dont_write_bytecode = sys.dont_write_bytecode, True  # no __pycache__ in the folder to zip
+    try:
+        spec.loader.exec_module(installer)
+    finally:
+        sys.dont_write_bytecode = write_bytecode
+    original = ("[main]\nopen_files_port = 21128\n\n[appearance]\nui_theme = automatic\n"
+                "names = ['emacs', 'zenburn']\nselected = spyder/dark\ncustom_names = ['custom-0']\n"
+                "custom-0/name = Mine\n\n[shortcuts]\neditor/code completion = Ctrl+Space\n")
+
+    def read(path):
+        parser = configparser.ConfigParser(interpolation=None)
+        parser.read(path, encoding="utf-8")
+        return {section: dict(parser[section]) for section in parser.sections()}
+
+    def run(*args):
+        with contextlib.redirect_stdout(io.StringIO()):
+            installer.main([*args, "--config", path])
+
+    with tempfile.TemporaryDirectory() as tmp:
+        path = os.path.join(tmp, "spyder.ini")
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            f.write(original)
+        before = read(path)
+        run()
+        after = read(path)
+        if ast.literal_eval(after["appearance"]["custom_names"]) != ["custom-0", *sorted(themes)]:
+            raise SystemExit("Spyder installer: custom_names is not the old names and then the themes by name")
+        if {o: v for o, v in after["appearance"].items() if "/" in o and not o.startswith("heritage-")} != \
+                {o: v for o, v in before["appearance"].items() if "/" in o}:
+            raise SystemExit("Spyder installer: changed an option that is not a Heritage theme's")
+        installed = {o: v for o, v in after["appearance"].items() if o.startswith("heritage-")}
+        if installed != {o: v for options in themes.values() for o, v in options.items()}:
+            raise SystemExit("Spyder installer: the options written differ from the theme files'")
+        if {s: o for s, o in after.items() if s != "appearance"} != {s: o for s, o in before.items() if s != "appearance"} \
+                or any(after["appearance"][o] != before["appearance"][o] for o in ("names", "selected", "ui_theme")):
+            raise SystemExit("Spyder installer: changed a setting that is not a Heritage theme's")
+        if read(path + ".bak") != before:
+            raise SystemExit("Spyder installer: the .bak file is not the file before the change")
+        run()
+        if read(path) != after:
+            raise SystemExit("Spyder installer: a second run changed the file")
+        first = next(iter(themes))
+        parser = configparser.ConfigParser(interpolation=None)
+        parser.read(path, encoding="utf-8")
+        parser.set("appearance", "selected", first)
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            parser.write(f)
+        run("--remove")
+        if read(path)["appearance"].pop("selected") not in ("spyder", "spyder/dark"):
+            raise SystemExit("Spyder installer: removing the selected theme leaves it selected")
+        restored = read(path)
+        restored["appearance"]["selected"] = before["appearance"]["selected"]
+        if restored != before:
+            raise SystemExit("Spyder installer: --remove does not restore the settings")
 
 
 def lapce_readme(families):
@@ -2598,11 +2749,11 @@ def validate_pygments(directory, families):
 TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.name, "Lapce": heritage.lapce.name,
                   "Qt Creator": heritage.qtcreator.name, "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
-                  "Pygments": heritage.pygments.name,
+                  "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name,
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Spyder": spyder_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
 
 
 def terminals_readme(families):
@@ -2917,7 +3068,11 @@ def main():
              validate_textadept),
             ("Amp", "themes", lambda t, source: (f"{heritage.amp.name(t)}.tmTheme",
                                                   heritage.amp.theme(t["palette"], source)),
-             validate_amp)):
+             validate_amp),
+            ("Spyder", "themes", lambda t, source: (f"{heritage.spyder.name(t)}.ini",
+                                                     heritage.spyder.theme(t["palette"], heritage.spyder.name(t),
+                                                                           source)),
+             validate_spyder)):
         directory = build_themes(families, editor, folder, files)
         validate_themes(directory, families)
         name = f"{VSCODE_NAME}-{editor.lower()}"

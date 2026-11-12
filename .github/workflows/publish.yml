@@ -44,6 +44,7 @@ jobs:
       nova: ${{ steps.check.outputs.nova }}
       jupyterlab: ${{ steps.check.outputs.jupyterlab }}
       pygments: ${{ steps.check.outputs.pygments }}
+      spyder: ${{ steps.check.outputs.spyder }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -64,7 +65,7 @@ jobs:
           fi
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
             kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
-            qtcreator=false amp=false eclipse=false nova=false jupyterlab=false pygments=false
+            qtcreator=false amp=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" visualstudio/CHANGELOG.md && visualstudio=true
@@ -88,13 +89,14 @@ jobs:
           grep -q "^## \[$version\]" nova/CHANGELOG.md && nova=true
           grep -q "^## \[$version\]" jupyterlab/CHANGELOG.md && jupyterlab=true
           grep -q "^## \[$version\]" pygments/CHANGELOG.md && pygments=true
+          grep -q "^## \[$version\]" spyder/CHANGELOG.md && spyder=true
           if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$visualstudio" = false ] && [ "$sublime" = false ] \
               && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ] && [ "$xcode" = false ] \
               && [ "$helix" = false ] && [ "$kakoune" = false ] && [ "$micro" = false ] && [ "$vim" = false ] \
               && [ "$emacs" = false ] && [ "$terminals" = false ] && [ "$nano" = false ] && [ "$textadept" = false ] \
               && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$amp" = false ] \
               && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
-              && [ "$pygments" = false ]; then
+              && [ "$pygments" = false ] && [ "$spyder" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -123,6 +125,7 @@ jobs:
             echo "nova=$nova"
             echo "jupyterlab=$jupyterlab"
             echo "pygments=$pygments"
+            echo "spyder=$spyder"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -980,10 +983,31 @@ jobs:
           path: build/heritage-themes-pygments-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # Spyder has no theme registry: users install the themes from the zip that the GitHub release attaches.
+  spyder:
+    needs: check
+    if: needs.check.outputs.spyder == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: spyder
+          path: build/heritage-themes-spyder-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
             emacs, terminals, nano, textadept, lapce, qtcreator,
-            amp, eclipse, nova, jupyterlab, pygments]
+            amp, eclipse, nova, jupyterlab, pygments, spyder]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -1009,7 +1033,8 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.eclipse.result)
       && contains(fromJSON('["success", "skipped"]'), needs.nova.result)
       && contains(fromJSON('["success", "skipped"]'), needs.jupyterlab.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.pygments.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.pygments.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.spyder.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -1038,6 +1063,7 @@ jobs:
       NOVA: ${{ needs.check.outputs.nova }}
       JUPYTERLAB: ${{ needs.check.outputs.jupyterlab }}
       PYGMENTS: ${{ needs.check.outputs.pygments }}
+      SPYDER: ${{ needs.check.outputs.spyder }}
     steps:
       - uses: actions/checkout@v7
 
@@ -1113,6 +1139,7 @@ jobs:
           notes "Nova themes" "$NOVA" nova/CHANGELOG.md "heritage-themes-nova-<version>.zip"
           notes "JupyterLab themes" "$JUPYTERLAB" jupyterlab/CHANGELOG.md "heritage-themes-jupyterlab-<version>.zip"
           notes "Pygments styles" "$PYGMENTS" pygments/CHANGELOG.md "heritage-themes-pygments-<version>.zip"
+          notes "Spyder themes" "$SPYDER" spyder/CHANGELOG.md "heritage-themes-spyder-<version>.zip"
           {
             echo "This release changes: $(paste -sd, "$titles" | sed 's/,/, /g')."
             echo "Every other product is unchanged: its file keeps the version of its last release, which its file name shows."
