@@ -46,6 +46,7 @@ jobs:
       pygments: ${{ steps.check.outputs.pygments }}
       spyder: ${{ steps.check.outputs.spyder }}
       thonny: ${{ steps.check.outputs.thonny }}
+      idle: ${{ steps.check.outputs.idle }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -66,7 +67,7 @@ jobs:
           fi
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
             kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
-            qtcreator=false amp=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false
+            qtcreator=false amp=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" visualstudio/CHANGELOG.md && visualstudio=true
@@ -92,13 +93,15 @@ jobs:
           grep -q "^## \[$version\]" pygments/CHANGELOG.md && pygments=true
           grep -q "^## \[$version\]" spyder/CHANGELOG.md && spyder=true
           grep -q "^## \[$version\]" thonny/CHANGELOG.md && thonny=true
+          grep -q "^## \[$version\]" idle/CHANGELOG.md && idle=true
           if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$visualstudio" = false ] && [ "$sublime" = false ] \
               && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ] && [ "$xcode" = false ] \
               && [ "$helix" = false ] && [ "$kakoune" = false ] && [ "$micro" = false ] && [ "$vim" = false ] \
               && [ "$emacs" = false ] && [ "$terminals" = false ] && [ "$nano" = false ] && [ "$textadept" = false ] \
               && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$amp" = false ] \
               && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
-              && [ "$pygments" = false ] && [ "$spyder" = false ] && [ "$thonny" = false ]; then
+              && [ "$pygments" = false ] && [ "$spyder" = false ] && [ "$thonny" = false ] \
+              && [ "$idle" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -129,6 +132,7 @@ jobs:
             echo "pygments=$pygments"
             echo "spyder=$spyder"
             echo "thonny=$thonny"
+            echo "idle=$idle"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -1044,10 +1048,31 @@ jobs:
           path: build/heritage-themes-thonny-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # IDLE has no theme registry: users install the themes from the zip that the GitHub release attaches.
+  idle:
+    needs: check
+    if: needs.check.outputs.idle == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: idle
+          path: build/heritage-themes-idle-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
             emacs, terminals, nano, textadept, lapce, qtcreator,
-            amp, eclipse, nova, jupyterlab, pygments, spyder, thonny]
+            amp, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -1075,7 +1100,8 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.jupyterlab.result)
       && contains(fromJSON('["success", "skipped"]'), needs.pygments.result)
       && contains(fromJSON('["success", "skipped"]'), needs.spyder.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.thonny.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.thonny.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.idle.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -1106,6 +1132,7 @@ jobs:
       PYGMENTS: ${{ needs.check.outputs.pygments }}
       SPYDER: ${{ needs.check.outputs.spyder }}
       THONNY: ${{ needs.check.outputs.thonny }}
+      IDLE: ${{ needs.check.outputs.idle }}
     steps:
       - uses: actions/checkout@v7
 
@@ -1183,6 +1210,7 @@ jobs:
           notes "Pygments styles" "$PYGMENTS" pygments/CHANGELOG.md "heritage-themes-pygments-<version>.zip"
           notes "Spyder themes" "$SPYDER" spyder/CHANGELOG.md "heritage-themes-spyder-<version>.zip"
           notes "Thonny themes" "$THONNY" thonny/CHANGELOG.md "heritage-themes-thonny-<version>.zip"
+          notes "IDLE themes" "$IDLE" idle/CHANGELOG.md "heritage-themes-idle-<version>.zip"
           {
             echo "This release changes: $(paste -sd, "$titles" | sed 's/,/, /g')."
             echo "Every other product is unchanged: its file keeps the version of its last release, which its file name shows."

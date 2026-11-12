@@ -84,7 +84,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Amp", "Eclipse", "Nova",
-           "JupyterLab", "Pygments", "Spyder", "Thonny", "terminals")
+           "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -1321,7 +1321,7 @@ def check_files(label, directory, folder, expected):
 
 
 # The files that a product's folder holds beside its README, changelog and licence.
-EXTRA_FILES = {"Spyder": ("install.py",)}
+EXTRA_FILES = {"Spyder": ("install.py",), "IDLE": ("install.py",)}
 
 
 def build_themes(families, editor, folder, files):
@@ -1940,6 +1940,154 @@ def check_spyder_installer(directory, themes):
         restored["appearance"]["selected"] = before["appearance"]["selected"]
         if restored != before:
             raise SystemExit("Spyder installer: --remove does not restore the settings")
+
+
+def idle_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    dark, light = (heritage.idle.name(next(t for f in families for t in f.THEMES if t["slug"] == slug))
+                   for slug in ("HoliNight", "HoliDay"))
+    return f"""# Heritage Themes for IDLE
+
+{DESCRIPTION} {count} dark and light highlighting themes in {len(families)} families, for IDLE, the editor and shell \
+that come with Python. `install.py` adds them to IDLE's settings.
+
+## Install
+
+1. Close IDLE. It keeps its settings in memory and would write them back over the change.
+2. Run the installer from the unzipped folder. On Windows, run `py install.py`.
+
+   ```bash
+   python3 install.py
+   ```
+
+   It adds the themes to `config-highlight.cfg` in the `.idlerc` folder of your home folder and saves the previous \
+file beside it as `config-highlight.cfg.bak`. Name another folder with `--config <folder>`.
+3. Start IDLE, choose **Options | Configure IDLE | Highlights**, select **a Custom Theme** and pick a theme from \
+the list.
+
+To install only some themes, name them. To remove themes, add `--remove`; with no names it removes every Heritage \
+theme.
+
+```bash
+python3 install.py "{dark}" "{light}"
+python3 install.py --remove
+python3 install.py --list
+```
+
+## What is coloured
+
+Each theme colours the editor, the shell and the code context: keywords, builtins, the names after `def` and \
+`class`, strings, comments, the selection, found text, lines with a breakpoint, syntax errors, line numbers, the \
+cursor, the shell's prompt, output and errors, and the code context bar. IDLE draws its menus, dialogs and scroll \
+bars with the platform's Tk theme.
+
+IDLE gives each kind of code one colour and has no bold or italic, so numbers, operators and other names take the \
+text colour.
+
+{readme_footer(families, "IDLE", "Themes", "the theme, the Python version that IDLE runs on and your operating system")}"""
+
+
+def validate_idle(directory, families):
+    """Fails the build when a theme file is missing, differs from heritage.idle.options, holds a value that IDLE
+    cannot read, or has text below its contrast on the background it is drawn on, or when the installer in the zip does
+    not install, repeat and remove the themes in a .idlerc folder as it should."""
+    expected, themes = set(), {}
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.idle.name(t), t["palette"]
+            expected.add(f"{name}.cfg")
+            label = f"IDLE {name}"
+            if not name.isascii():
+                raise SystemExit(f"{label}: the name is not ASCII")
+            with open(os.path.join(directory, "themes", f"{name}.cfg"), encoding="utf-8") as f:
+                text = f.read()
+            options = heritage.idle.options(p)
+            if heritage.idle.parse(text) != options:
+                raise SystemExit(f"{label}: options differ from heritage.idle.options")
+            for option, value in options.items():
+                if not heritage.idle.COLOUR.fullmatch(value):
+                    raise SystemExit(f"{label}: {option} = {value} is not a colour that IDLE reads")
+            parser = configparser.ConfigParser(delimiters=("=",), interpolation=None, strict=True)  # IDLE reads so
+            parser.read_string(text)
+            if parser.sections() != [name] or dict(parser[name]) != options:
+                raise SystemExit(f"{label}: is not one section with the theme's options")
+            check_styles(label, heritage.idle.styles(p), "fg", "bg", "normal", heritage.idle.DECORATIVE,
+                         heritage.idle.LOW_CONTRAST, {})
+            themes[name] = options
+    check_files("IDLE themes", directory, "themes", expected)
+    if sorted(os.listdir(directory)) != ["CHANGELOG.md", "LICENSE", "README.md", "install.py", "themes"]:
+        raise SystemExit("IDLE themes: the zip does not hold the README, changelog, licence, installer and themes")
+    with open(os.path.join(directory, "install.py"), "rb") as built, \
+            open(os.path.join(ROOT, "idle", "install.py"), "rb") as source:
+        if built.read() != source.read():
+            raise SystemExit("IDLE themes: install.py is not idle/install.py")
+    check_idle_installer(directory, themes)
+
+
+def check_idle_installer(directory, themes):
+    """Runs the installer of the built folder on a .idlerc folder and checks what it writes, that a second run changes
+    nothing, that removing the themes restores the settings with the selected theme replaced by IDLE's own, and that
+    a folder with nothing but Heritage themes ends up without a config-highlight.cfg, as IDLE leaves it."""
+    spec = importlib.util.spec_from_file_location("heritage_idle_install", os.path.join(directory, "install.py"))
+    installer = importlib.util.module_from_spec(spec)
+    write_bytecode, sys.dont_write_bytecode = sys.dont_write_bytecode, True  # no __pycache__ in the folder to zip
+    try:
+        spec.loader.exec_module(installer)
+    finally:
+        sys.dont_write_bytecode = write_bytecode
+    highlight = ("[Mine]\nnormal-foreground = #000000\nnormal-background = #ffffff\n")
+    main_settings = "[Theme]\ndefault = 0\nname = Mine\n\n[EditorWindow]\nline-numbers-default = 1\n"
+
+    def read(path):
+        parser = configparser.ConfigParser(delimiters=("=",), interpolation=None, strict=False)
+        parser.read(path, encoding="utf-8")
+        return {section: dict(parser[section]) for section in parser.sections()}
+
+    def run(folder, *args):
+        with contextlib.redirect_stdout(io.StringIO()):
+            installer.main([*args, "--config", folder])
+
+    with tempfile.TemporaryDirectory() as tmp:
+        for filename, text in (("config-highlight.cfg", highlight), ("config-main.cfg", main_settings)):
+            with open(os.path.join(tmp, filename), "w", encoding="utf-8", newline="\n") as f:
+                f.write(text)
+        path, main_path = os.path.join(tmp, "config-highlight.cfg"), os.path.join(tmp, "config-main.cfg")
+        before, main_before = read(path), read(main_path)
+        run(tmp)
+        after = read(path)
+        if list(after) != ["Mine", *sorted(themes)] or after["Mine"] != before["Mine"]:
+            raise SystemExit("IDLE installer: the file is not the user's themes and then the Heritage themes")
+        if {name: after[name] for name in themes} != themes:
+            raise SystemExit("IDLE installer: the options written differ from the theme files'")
+        if read(main_path) != main_before:
+            raise SystemExit("IDLE installer: changed config-main.cfg")
+        if read(path + ".bak") != before:
+            raise SystemExit("IDLE installer: the .bak file is not the file before the change")
+        run(tmp)
+        if read(path) != after:
+            raise SystemExit("IDLE installer: a second run changed the file")
+        first = next(iter(themes))
+        parser = configparser.ConfigParser(delimiters=("=",), interpolation=None)
+        parser.read(main_path, encoding="utf-8")
+        parser.set("Theme", "name", first)
+        with open(main_path, "w", encoding="utf-8", newline="\n") as f:
+            parser.write(f)
+        run(tmp, "--remove")
+        if read(path) != before:
+            raise SystemExit("IDLE installer: --remove does not restore the themes")
+        restored = read(main_path)
+        if restored["Theme"].get("default") != "1" or restored["Theme"].get("name2") not in ("IDLE Classic",
+                                                                                              "IDLE Dark"):
+            raise SystemExit("IDLE installer: removing the selected theme leaves it selected")
+        restored["Theme"] = main_before["Theme"]
+        if restored != main_before:
+            raise SystemExit("IDLE installer: --remove changed a setting that is not the selected theme")
+    with tempfile.TemporaryDirectory() as tmp:
+        run(tmp)
+        run(tmp, "--remove")
+        if os.path.exists(os.path.join(tmp, "config-highlight.cfg")):
+            raise SystemExit("IDLE installer: --remove leaves an empty config-highlight.cfg")
 
 
 def lapce_readme(families):
@@ -2880,11 +3028,11 @@ def validate_thonny(directory, families):
 TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.name, "Lapce": heritage.lapce.name,
                   "Qt Creator": heritage.qtcreator.name, "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
-                  "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name,
+                  "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Spyder": spyder_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Spyder": spyder_readme, "IDLE": idle_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
 
 
 def terminals_readme(families):
@@ -3203,7 +3351,10 @@ def main():
             ("Spyder", "themes", lambda t, source: (f"{heritage.spyder.name(t)}.ini",
                                                      heritage.spyder.theme(t["palette"], heritage.spyder.name(t),
                                                                            source)),
-             validate_spyder)):
+             validate_spyder),
+            ("IDLE", "themes", lambda t, source: (f"{heritage.idle.name(t)}.cfg",
+                                                   heritage.idle.theme(t["palette"], heritage.idle.name(t), source)),
+             validate_idle)):
         directory = build_themes(families, editor, folder, files)
         validate_themes(directory, families)
         name = f"{VSCODE_NAME}-{editor.lower()}"
