@@ -45,6 +45,7 @@ jobs:
       jupyterlab: ${{ steps.check.outputs.jupyterlab }}
       pygments: ${{ steps.check.outputs.pygments }}
       spyder: ${{ steps.check.outputs.spyder }}
+      thonny: ${{ steps.check.outputs.thonny }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -65,7 +66,7 @@ jobs:
           fi
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
             kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
-            qtcreator=false amp=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false
+            qtcreator=false amp=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" visualstudio/CHANGELOG.md && visualstudio=true
@@ -90,13 +91,14 @@ jobs:
           grep -q "^## \[$version\]" jupyterlab/CHANGELOG.md && jupyterlab=true
           grep -q "^## \[$version\]" pygments/CHANGELOG.md && pygments=true
           grep -q "^## \[$version\]" spyder/CHANGELOG.md && spyder=true
+          grep -q "^## \[$version\]" thonny/CHANGELOG.md && thonny=true
           if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$visualstudio" = false ] && [ "$sublime" = false ] \
               && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ] && [ "$xcode" = false ] \
               && [ "$helix" = false ] && [ "$kakoune" = false ] && [ "$micro" = false ] && [ "$vim" = false ] \
               && [ "$emacs" = false ] && [ "$terminals" = false ] && [ "$nano" = false ] && [ "$textadept" = false ] \
               && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$amp" = false ] \
               && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
-              && [ "$pygments" = false ] && [ "$spyder" = false ]; then
+              && [ "$pygments" = false ] && [ "$spyder" = false ] && [ "$thonny" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -126,6 +128,7 @@ jobs:
             echo "jupyterlab=$jupyterlab"
             echo "pygments=$pygments"
             echo "spyder=$spyder"
+            echo "thonny=$thonny"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -1004,10 +1007,47 @@ jobs:
           path: build/heritage-themes-spyder-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # Publishes the wheel to PyPI, where Thonny's plug-in manager finds it, and attaches it in a zip to the GitHub
+  # release. The wheel is pure Python, so the build needs nothing but Python.
+  thonny:
+    needs: check
+    if: needs.check.outputs.thonny == 'true'
+    runs-on: ubuntu-latest
+    # PyPI's trusted publisher names this environment.
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write # sign in to PyPI through trusted publishing
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      # The action uploads every file in its folder, and build/thonny also holds the README and the licence.
+      - name: Collect the wheel
+        run: mkdir pypi && cp build/thonny/*.whl pypi/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: pypi
+          # A re-run of a failed release must not fail on the version that this job already uploaded.
+          skip-existing: true
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: thonny
+          path: build/heritage-themes-thonny-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
             emacs, terminals, nano, textadept, lapce, qtcreator,
-            amp, eclipse, nova, jupyterlab, pygments, spyder]
+            amp, eclipse, nova, jupyterlab, pygments, spyder, thonny]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -1034,7 +1074,8 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.nova.result)
       && contains(fromJSON('["success", "skipped"]'), needs.jupyterlab.result)
       && contains(fromJSON('["success", "skipped"]'), needs.pygments.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.spyder.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.spyder.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.thonny.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -1064,6 +1105,7 @@ jobs:
       JUPYTERLAB: ${{ needs.check.outputs.jupyterlab }}
       PYGMENTS: ${{ needs.check.outputs.pygments }}
       SPYDER: ${{ needs.check.outputs.spyder }}
+      THONNY: ${{ needs.check.outputs.thonny }}
     steps:
       - uses: actions/checkout@v7
 
@@ -1140,6 +1182,7 @@ jobs:
           notes "JupyterLab themes" "$JUPYTERLAB" jupyterlab/CHANGELOG.md "heritage-themes-jupyterlab-<version>.zip"
           notes "Pygments styles" "$PYGMENTS" pygments/CHANGELOG.md "heritage-themes-pygments-<version>.zip"
           notes "Spyder themes" "$SPYDER" spyder/CHANGELOG.md "heritage-themes-spyder-<version>.zip"
+          notes "Thonny themes" "$THONNY" thonny/CHANGELOG.md "heritage-themes-thonny-<version>.zip"
           {
             echo "This release changes: $(paste -sd, "$titles" | sed 's/,/, /g')."
             echo "Every other product is unchanged: its file keeps the version of its last release, which its file name shows."

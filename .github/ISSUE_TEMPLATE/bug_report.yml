@@ -39,6 +39,7 @@ body:
         - JupyterLab
         - Pygments
         - Spyder
+        - Thonny
         - Terminal emulator, shell, prompt or multiplexer
     validations:
       required: true
@@ -46,14 +47,14 @@ body:
     id: editor-version
     attributes:
       label: Editor name and version
-      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Visual Studio 2026 18.11, Sublime Text 4200, Zed 1.25, Neovim 0.12, Notepad++ 8.9.8, Xcode 27.1, Helix 25.07, Kakoune 2026.04.12, Micro 2.0.15, Vim 9.2, Emacs 30.2, Qt Creator 20.0, Eclipse 2026-09, JupyterLab 4.6, Pygments 2.21, kitty 0.48 with fish 4.6 or tmux 3.8.
+      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Visual Studio 2026 18.11, Sublime Text 4200, Zed 1.25, Neovim 0.12, Notepad++ 8.9.8, Xcode 27.1, Helix 25.07, Kakoune 2026.04.12, Micro 2.0.15, Vim 9.2, Emacs 30.2, Qt Creator 20.0, Eclipse 2026-09, JupyterLab 4.6, Pygments 2.21, Thonny 5.0, kitty 0.48 with fish 4.6 or tmux 3.8.
     validations:
       required: true
   - type: input
     id: version
     attributes:
       label: Plugin or extension version
-      description: Shown in Settings | Plugins, in the Extensions view, in Visual Studio under Extensions | Manage Extensions, for Neovim in your plugin manager or the tag you installed, for JupyterLab in the output of pip show jupyterlab-heritage-themes, for Pygments in the output of pip show heritage-themes-pygments, or for Notepad++, Xcode, Helix, Kakoune, Micro, Vim and Emacs in the name of the release zip.
+      description: Shown in Settings | Plugins, in the Extensions view, in Visual Studio under Extensions | Manage Extensions, for Neovim in your plugin manager or the tag you installed, for JupyterLab in the output of pip show jupyterlab-heritage-themes, for Pygments in the output of pip show heritage-themes-pygments, for Thonny under Tools | Manage plug-ins, or for Notepad++, Xcode, Helix, Kakoune, Micro, Vim and Emacs in the name of the release zip.
     validations:
       required: true
   - type: input

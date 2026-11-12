@@ -14,7 +14,7 @@ Usage: python3 build.py [--vsix] [--jupyterlab]
 Output goes to build/.
 """
 import argparse, ast, base64, configparser, contextlib, hashlib, html, importlib.util, io, json, os, plistlib, re, \
-    shutil, subprocess, sys, tempfile, tomllib, zipfile
+    shutil, subprocess, sys, tempfile, tomllib, types, unittest.mock, zipfile
 import xml.etree.ElementTree as ET
 
 import heritage
@@ -84,7 +84,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Amp", "Eclipse", "Nova",
-           "JupyterLab", "Pygments", "Spyder", "terminals")
+           "JupyterLab", "Pygments", "Spyder", "Thonny", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -2745,11 +2745,142 @@ def validate_pygments(directory, families):
             raise SystemExit(f"{label}: a style string is not one that Pygments reads")
 
 
+def thonny_readme(families):
+    """The README in the zip, which is also the wheel's description. Links are absolute."""
+    count = sum(len(f.THEMES) for f in families)
+    wheel = heritage.thonny.wheel_name(VERSION)
+    example = heritage.thonny.name(next(t for f in families for t in f.THEMES if t["slug"] == "HoliNight"))
+    return f"""# Heritage Themes for Thonny
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families, in one plugin; each family maps the named \
+colours of one tradition to syntax roles. Each theme is a UI theme and a syntax theme of the same name.
+
+## Install
+
+The plugin needs Thonny {heritage.thonny.THONNY} or later.
+
+1. Choose **Tools | Manage plug-ins**, search for `{heritage.thonny.DISTRIBUTION}` and install it. To install a \
+particular build instead, download `{VSCODE_NAME}-thonny-<version>.zip` from the [GitHub releases]({VENDOR_URL}/releases) \
+and choose **Install from local file** for the wheel in it, `{wheel}`. In an environment where Thonny comes from pip, \
+`pip install {heritage.thonny.DISTRIBUTION}` does the same.
+2. Restart Thonny.
+3. Choose **Tools | Options | Theme & Font**, then the same theme as **UI theme** and as **Syntax theme**, such as \
+`{example}`, and restart Thonny again for the whole window to change.
+
+To remove the plugin, choose it under **Tools | Manage plug-ins** and uninstall it.
+
+## What is coloured
+
+The UI theme colours the window: menus, tabs, toolbars, buttons, scrollbars, entries and lists. The syntax theme \
+colours the editor and the shell: code, the line numbers, the current line, the selection, the other occurrences of \
+the name under the caret, found text, bracket matches, a string that is not closed, the shell's prompt, input, \
+output, errors and values, the colours of ANSI escape codes, and the debugger's boxes around the current statement.
+
+Thonny gives each kind of token one colour: keywords, builtins, numbers, comments, strings, the name after `def` and \
+`class`, and function and method calls. Every other name has the text colour. Thonny draws its toolbar icons and the \
+pages of its assistant itself.
+
+{readme_footer(families, "Thonny", "Themes", "the theme, Thonny version, how you installed Thonny")}"""
+
+
+def build_thonny(families):
+    """Writes the README, changelog, licence and wheel to build/thonny, and returns build/thonny."""
+    directory = os.path.join(OUT, "thonny")
+    os.makedirs(directory)
+    write_text(os.path.join(directory, "README.md"), thonny_readme(families))
+    shutil.copy(os.path.join(ROOT, "thonny", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    themes = [t for f in families for t in f.THEMES]
+    with open(os.path.join(ROOT, "LICENSE"), "rb") as f:
+        licence = f.read()
+    with open(os.path.join(directory, "README.md"), encoding="utf-8") as f:
+        description = f.read()
+    with open(os.path.join(directory, heritage.thonny.wheel_name(VERSION)), "wb") as f:
+        f.write(heritage.thonny.wheel(themes, VERSION, VENDOR_URL, description, licence))
+    return directory
+
+
+def thonny_registrations(source):
+    """What the plugin's source registers when Thonny loads it, as (UI themes, syntax themes). Each is a list of
+    (name, parent, settings) in the order registered, with settings called. The plugin runs against stand-ins for the
+    two Thonny modules it uses, so that no Tk display is needed: clean records its arguments and returns the two
+    entries that the plugin changes."""
+    ui, syntax, calls = [], [], []
+
+    def clean(**colours):
+        calls.append(colours)
+        return {"Menubar": {"configure": {}}, "Menu": {"configure": {}}}
+
+    workbench = types.SimpleNamespace(
+        add_ui_theme=lambda name, parent, settings: ui.append((name, parent, settings())),
+        add_syntax_theme=lambda name, parent, settings: syntax.append((name, parent, settings())))
+    modules = {"thonny": types.ModuleType("thonny"), "thonny.plugins": types.ModuleType("thonny.plugins"),
+               "thonny.plugins.clean_ui_themes": types.ModuleType("thonny.plugins.clean_ui_themes")}
+    modules["thonny"].get_workbench = lambda: workbench
+    modules["thonny.plugins.clean_ui_themes"].clean = clean
+    namespace = {"__name__": "heritage_thonny_plugin"}
+    with unittest.mock.patch.dict(sys.modules, modules):
+        exec(compile(source, "thonnycontrib/heritage_themes/__init__.py", "exec"), namespace)
+        namespace["load_plugin"]()
+    return ui, syntax, calls
+
+
+def validate_thonny(directory, families):
+    """Fails the build when a colour is unreadable on the background it is drawn on, or the wheel's records, metadata
+    or module are wrong: a theme that is not registered, or registered with settings that differ from the palette's, a
+    colour that Tk would not read, or syntax that Python 3.8 would not."""
+    themes = [t for f in families for t in f.THEMES]
+    for t in themes:
+        p = t["palette"]
+        check_styles(f"Thonny {p['name']}", heritage.thonny.styles(p), "fg", "bg", "TEXT", set(),
+                     heritage.thonny.LOW_CONTRAST, {})
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Thonny: {name} is missing")
+    stem = f"{heritage.thonny.DISTRIBUTION.replace('-', '_')}-{VERSION}"
+    module = f"thonnycontrib/{heritage.thonny.PACKAGE}/__init__.py"
+    with zipfile.ZipFile(os.path.join(directory, heritage.thonny.wheel_name(VERSION))) as z:
+        metadata = check_wheel_files("Thonny wheel", z, stem, {module})
+        source = z.read(module).decode("utf-8")
+    required = (f"Name: {heritage.thonny.DISTRIBUTION}\nVersion: {VERSION}\n",
+                f"Requires-Dist: thonny>={heritage.thonny.THONNY}\n", f"Requires-Python: >={heritage.thonny.PYTHON}\n")
+    if not all(line in metadata for line in required):
+        raise SystemExit("Thonny wheel: METADATA does not name the project, its version and its requirements")
+    try:
+        ast.parse(source, feature_version=tuple(int(n) for n in heritage.thonny.PYTHON.split(".")))
+    except SyntaxError as error:
+        raise SystemExit(f"Thonny wheel: the module is not Python {heritage.thonny.PYTHON} syntax: {error}")
+    ui, syntax, calls = thonny_registrations(source)
+    if [name for name, _, _ in ui] != [heritage.thonny.name(t) for t in themes] \
+            or [name for name, _, _ in syntax] != [name for name, _, _ in ui]:
+        raise SystemExit("Thonny wheel: the plugin does not register a UI theme and a syntax theme for each theme")
+    for t, (_, ui_parent, ui_settings), (_, syntax_parent, syntax_settings), colours in zip(themes, ui, syntax, calls):
+        p, label = t["palette"], f"Thonny {t['palette']['name']}"
+        if (ui_parent, syntax_parent) != (("Clean Dark", "Default Dark") if p["dark"]
+                                          else ("Enhanced Clam", "Default Light")):
+            raise SystemExit(f"{label}: the parents are not those of a {'dark' if p['dark'] else 'light'} theme")
+        frame, text, detail, high, low, foreground, low_foreground, menu = heritage.thonny.ui(p)
+        if colours != dict(frame_background=frame, text_background=text, normal_detail=detail, high_detail=high,
+                           low_detail=low, normal_foreground=foreground, high_foreground=foreground,
+                           low_foreground=low_foreground):
+            raise SystemExit(f"{label}: the UI colours differ from the palette's")
+        if ui_settings["Menu"]["configure"] != dict(background=menu, foreground=foreground, activebackground=high,
+                                                    activeforeground=foreground, selectcolor=foreground) \
+                or ui_settings["Menubar"]["configure"] != dict(activebackground=high, activeforeground=foreground):
+            raise SystemExit(f"{label}: the menu colours differ from the palette's")
+        if syntax_settings != heritage.thonny.syntax(p):
+            raise SystemExit(f"{label}: the syntax settings differ from the palette's")
+        values = [v for options in syntax_settings.values() for k, v in options.items() if k != "font"
+                  and isinstance(v, str)] + list(heritage.thonny.ui(p))
+        if not all(value == "" or heritage.thonny.HEX.fullmatch(value) for value in values):
+            raise SystemExit(f"{label}: a colour is not one that Tk reads")
+
+
 # Product → its themes' names in READMEs, the README writer, and the folder its theme files go in.
 TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.name, "Lapce": heritage.lapce.name,
                   "Qt Creator": heritage.qtcreator.name, "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
-                  "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name,
+                  "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name,
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
@@ -3106,6 +3237,10 @@ def main():
     validate_pygments(pygments, families)
     name = f"{VSCODE_NAME}-pygments"
     print(f"{pack_folder(pygments, os.path.join(OUT, f'{name}-{VERSION}.zip'), name)}: {len(themes)} themes", flush=True)
+    thonny = build_thonny(families)
+    validate_thonny(thonny, families)
+    name = f"{VSCODE_NAME}-thonny"
+    print(f"{pack_folder(thonny, os.path.join(OUT, f'{name}-{VERSION}.zip'), name)}: {len(themes)} themes", flush=True)
     terminals = build_terminals(families)
     validate_terminals(terminals, families)
     package = os.path.join(OUT, f"{TERMINALS_NAME}-{VERSION}.zip")
