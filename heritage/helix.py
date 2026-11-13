@@ -84,6 +84,7 @@ def syntax_rules(p):
     s("constant.character.escape", "gold", "bold")
     s("constant.numeric", "number")
     s("keyword constant.builtin type.builtin tag markup.heading.marker markup.list", "keyword", kw)
+    s("keyword.directive", "directive")  # preprocessor directives, such as C's #include
     s("constant type.enum.variant string.special.symbol", "constant", "bold italic")
     s("operator punctuation", "op")
     s("type constructor", "type")

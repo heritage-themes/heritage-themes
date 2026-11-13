@@ -3,7 +3,8 @@
 A colour scheme links groups to styles: the groups that Micro's syntax files highlight with and the UI groups of
 :help colors. Micro colours a group with the longest group of the scheme that is a dot-separated prefix of it, so
 "constant.string.url" takes "constant.string" unless the scheme sets it. The groups are named after Vim's syntax
-groups, and take the roles that the Vim scheme gives them: statement and preproc the keyword role, special gold. The
+groups, and take the roles that the Vim scheme gives them: statement the keyword role, special gold, and preproc, which
+marks C's #include as well as HTML's <script> and Perl's use, the directive role of Vim's C preprocessor groups. The
 syntax files use a group for whatever their language needs, so a group covers constructs that the other targets tell
 apart: identifier marks Python's built-in functions, Rust's function declarations and HTML attribute names alike, and
 takes the call role.
@@ -55,7 +56,8 @@ def syntax_rules(p):
     s("identifier.class", "type")
     s("identifier.var", "field")
     s("identifier.macro", "annotation")
-    s("statement preproc type.keyword symbol.tag", "keyword", kw)
+    s("statement type.keyword symbol.tag", "keyword", kw)
+    s("preproc", "directive")
     s("symbol symbol.operator symbol.brackets", "op")
     s("type", "type")
     s("special", "gold")

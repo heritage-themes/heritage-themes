@@ -25,9 +25,10 @@ def syntax(p):
     out = {}
     def s(scopes, role, font=""):
         out.update({scope: (role, font) for scope in scopes.split()})
-    s("keyword keyword.construct keyword.condition keyword.modifier keyword.operator processing declaration tag "
+    s("keyword keyword.construct keyword.condition keyword.modifier keyword.operator declaration tag "
       "style.at style.selector style.selector.element style.selector.pseudoclass style.selector.pseudoelement "
       "markup.list value.boolean value.null", "keyword", kw)
+    s("processing", "directive")  # preprocessor directives, such as C's #include
     s("keyword.self", "keyword", "italic")
     s("comment", "comment", "italic")
     s("bracket operator", "op")

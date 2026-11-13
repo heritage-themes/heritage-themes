@@ -58,6 +58,10 @@ def syntax_rules(p):
     s("Label", "label", "bold")
     s("Operator Delimiter", "op")
     s("Macro Debug", "annotation")
+    # The C syntax file's preprocessor directives, which it links to PreProc, Include, PreCondit and Macro, groups that
+    # other syntax files also link imports, keywords and macros to. Neovim highlights C with this syntax file unless
+    # Tree-sitter is started. #define and #undef colour the macro they name as well.
+    s("cPreProc cInclude cPreCondit cDefine", "directive")
     s("Type", "type")
     s("Special", "gold")
     s("SpecialChar", "gold", "bold")
@@ -93,8 +97,8 @@ def syntax_rules(p):
       "@punctuation.special", "op")
     s("@keyword @keyword.coroutine @keyword.function @keyword.operator @keyword.import @keyword.type "
       "@keyword.modifier @keyword.repeat @keyword.return @keyword.debug @keyword.exception @keyword.conditional "
-      "@keyword.directive @keyword.directive.define @markup.list @markup.list.checked @markup.list.unchecked "
-      "@tag @tag.builtin", "keyword", kw)
+      "@markup.list @markup.list.checked @markup.list.unchecked @tag @tag.builtin", "keyword", kw)
+    s("@keyword.directive @keyword.directive.define", "directive")
     s("@tag.attribute", "field")
     s("@tag.delimiter", "keyword")
     s("@comment", "comment", "italic")
@@ -120,6 +124,9 @@ def syntax_rules(p):
     s("@attribute.rust @attribute.builtin.rust", "typeParam", "italic")  # lifetimes
     s("@label.yaml", "annotation")  # anchors and aliases
     s("@label.markdown", "constant", "bold italic")  # the language of a code fence
+    # #include and #import, which the C query and the queries that inherit it capture as imports
+    s(" ".join(f"@keyword.import.{language}" for language in
+               ("c", "cpp", "objc", "cuda", "arduino", "glsl", "hlsl", "ispc", "nqc", "slang")), "directive")
     # :help lsp-semantic-highlight. A @lsp.typemod group outranks the @lsp.type group of its token, so declarations
     # take the declaration role over the call role, as in the VS Code theme.
     s("@lsp.type.namespace @lsp.type.variable", "fg")

@@ -38,8 +38,10 @@ def syntax_rules(p):
     s("number.quantifier.regex", "number", "bold")
     s("number float", "number")
     s("boolean constant.builtin type.builtin type.qualifier", "keyword", kw)
-    s("keyword preproc include import storageclass tag selector selector.pseudo "
+    s("keyword include import storageclass tag selector selector.pseudo "
       "punctuation.markup punctuation.list_marker charset keyframes media nested supports", "keyword", kw)
+    # preprocessor directives, such as C's #include, which the C and C++ queries capture as both
+    s("preproc keyword.preproc", "directive")
     s("constant variant enum.member string.special.symbol type.enum.member", "constant", "bold italic")
     # punctuation.special marks interpolation, decorators and type annotations alike, so it stays an operator
     s("operator punctuation punctuation.bracket punctuation.delimiter punctuation.special", "op")

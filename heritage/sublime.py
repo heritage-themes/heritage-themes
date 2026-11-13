@@ -85,6 +85,9 @@ def rules(p):
       "keyword", kw)
     s("storage.type.primitive, storage.type.numeric, storage.type.built-in", "keyword", kw)
     s("keyword.operator.word, punctuation.definition.keyword", "keyword", kw)
+    # preprocessor directives in Sublime Text 3's C and C++ syntaxes, which syntect bundles for Amp; Python's import
+    # takes keyword.control.import too, outside meta.preprocessor
+    s("meta.preprocessor keyword.control.import", "directive")
     s("punctuation.accessor, punctuation.separator, punctuation.terminator", "op")
     s("entity.name.namespace, entity.name.module, support.module", "fg")
     # JSON keys are plain strings under meta.mapping.key; Markdown names its raw text, lists and links differently

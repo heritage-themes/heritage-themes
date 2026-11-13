@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Preprocessor directives, such as C and C++ `#include` and `#define`, no longer take the keyword colour. They take a colour of their own, which also stands apart from comments. The same colour marks the other constructs that Micro's syntax files highlight as `preproc`, such as HTML's `<script>` and `<style>` tags.
+
 ## [1.7.3] - 2026-11-05
 
 ### Changed

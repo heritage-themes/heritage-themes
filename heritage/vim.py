@@ -86,9 +86,6 @@ def language_rules(p):
     # annotations, decorators and attributes, which the syntax files link to PreProc, Define or Identifier
     s("javaAnnotation javaAnnotationStart ktAnnotation pythonDecorator pythonDecoratorName rustAttribute rustDerive",
       "annotation")
-    # C and C++ preprocessor directives, which link to PreProc, Include, PreCondit and Macro, groups that other syntax
-    # files also link imports, keywords and macros to. #define and #undef colour the macro they name as well.
-    s("cPreProc cInclude cPreCondit cDefine", "directive")
     s("rustLifetime", "typeParam", "italic")  # Special
     s("rustSelf", "keyword", "italic")  # Constant
     s("rustSigil", "op")  # & and * before a type, StorageClass

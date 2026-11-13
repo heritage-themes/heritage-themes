@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Preprocessor directives, such as C and C++ `#include` and `#define`, no longer take the keyword colour. They take a colour of their own, which also stands apart from comments, in C, C++ and the other modes that use `font-lock-preprocessor-face`.
+
 ## [1.7.3] - 2026-11-05
 
 ### Changed

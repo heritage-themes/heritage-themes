@@ -264,7 +264,7 @@ def text_styles(p):
         "Namespace": f("fg"), "Local": f("fg"), "Parameter": f("param"), "Global": f("field", italic=True),
         "Field": f("field"), "Static": f("field", italic=True), "VirtualMethod": f(italic=True), "Function": f("call"),
         "Keyword": f("keyword", **kw), "PrimitiveType": f("keyword", **kw), "Operator": f("op"),
-        "Overloaded Operator": f("op"), "Punctuation": f("op"), "Preprocessor": f("keyword", **kw),
+        "Overloaded Operator": f("op"), "Punctuation": f("op"), "Preprocessor": f("directive"),
         "Macro": f("annotation"), "Label": f("label", bold=True), "Attribute": f("annotation"),
         "Comment": f("comment", italic=True), "Doxygen.Comment": f("doc", italic=True),
         "Doxygen.Tag": f("docTag", bold=True, italic=True), "VisualWhitespace": f("guide"),

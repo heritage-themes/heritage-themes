@@ -2,10 +2,10 @@
 
 A theme sets the styles of the lexers' tags and the colours of the view's elements. The tags map to the palette roles
 that heritage.zed gives the matching Tree-sitter captures: Textadept's lexers give a construct one tag in every
-language, so preprocessor directives take the keyword role, as Vim's PreProc does, and attributes the annotation role,
-as Zed's attribute capture does, which covers HTML attribute names and Java annotations alike. Textadept cannot colour
-its own Qt or GTK widgets, so the theme colours the editor: text, margins, the caret and caret line, selections, brace
-matches, call tips, markers and indicators.
+language, so preprocessor directives take the directive role, as Vim's C preprocessor groups do, and attributes the
+annotation role, as Zed's attribute capture does, which covers HTML attribute names and Java annotations alike.
+Textadept cannot colour its own Qt or GTK widgets, so the theme colours the editor: text, margins, the caret and caret
+line, selections, brace matches, call tips, markers and indicators.
 """
 import re
 
@@ -32,7 +32,8 @@ def syntax_rules(p):
     def s(tags, role, font=""):
         rules.extend((tag, role, font) for tag in tags.split())
     s("COMMENT", "comment", "italic")
-    s("KEYWORD PREPROCESSOR TAG LIST CONSTANT_BUILTIN", "keyword", kw)
+    s("KEYWORD TAG LIST CONSTANT_BUILTIN", "keyword", kw)
+    s("PREPROCESSOR", "directive")
     s("STRING REGEX CODE", "string")
     s("NUMBER", "number")
     s("TYPE CLASS", "type")

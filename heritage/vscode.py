@@ -36,14 +36,11 @@ def mix(a, b, t):
     return "".join(f"{round(x + (y - x) * t):02X}" for x, y in zip(rgb(a), rgb(b)))
 
 
-def token_rules(p, directives=False):
+def token_rules(p):
     """TextMate rules as (scope selectors, role, font style). The deepest matching scope wins, so a rule for a
     child scope, such as the quotes of a string, overrides the rule for its parent. heritage.sublime builds on
-    these, as Sublime Text's syntaxes follow the same scope naming. Preprocessor directives, such as C's #include,
-    take the directive role when directives is true, as in VS Code, and the keyword role otherwise, as in Sublime
-    Text."""
+    these, as Sublime Text's syntaxes follow the same scope naming."""
     kw = "bold" if p.get("kwBold", not p["dark"]) else ""
-    directive_scopes = "keyword.control.directive, punctuation.definition.directive"
     rules = []
     def s(scopes, role, font=""):
         rules.append((scopes, role, font))
@@ -66,11 +63,10 @@ def token_rules(p, directives=False):
     s("keyword, storage.type, storage.modifier, keyword.operator.new, keyword.operator.expression, "
       "keyword.operator.word, keyword.operator.wordlike, keyword.operator.logical.python, keyword.operator.sizeof, "
       "keyword.operator.instanceof, keyword.operator.typeof, keyword.operator.delete, keyword.operator.in, "
-      f"keyword.operator.of, {'' if directives else directive_scopes + ', '}support.type.primitive, "
-      "storage.type.primitive, storage.type.built-in, entity.name.type.primitive.rust, "
-      "entity.name.type.numeric.rust", "keyword", kw)
-    if directives:
-        s(directive_scopes, "directive")
+      "keyword.operator.of, support.type.primitive, storage.type.primitive, storage.type.built-in, "
+      "entity.name.type.primitive.rust, entity.name.type.numeric.rust", "keyword", kw)
+    # preprocessor directives, such as C's #include and its #
+    s("keyword.control.directive, punctuation.definition.directive", "directive")
     s("keyword.operator, punctuation, storage.type.function.arrow, meta.brace, storage.modifier.reference, "
       "storage.modifier.pointer", "op")
     s("variable.parameter.function.language.special.self, variable.language.special.self, "
@@ -152,7 +148,7 @@ def token_rules(p, directives=False):
 def token_colors(p):
     """The VS Code tokenColors for a palette."""
     return [{"scope": scopes, "settings": {"foreground": "#" + p[role], "fontStyle": font}}
-            for scopes, role, font in token_rules(p, directives=True)]
+            for scopes, role, font in token_rules(p)]
 
 
 def semantic_token_colors(p):

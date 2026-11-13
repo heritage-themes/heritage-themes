@@ -1781,9 +1781,9 @@ dialogs with Qt or GTK in the system's colours, which a theme cannot change.
 ## Languages
 
 Textadept's lexers give a construct one tag in every language, so preprocessor directives such as C's `#include` take \
-the keyword colour, and attributes take the annotation colour, which covers HTML attribute names and Java annotations \
-alike. Function calls take the call colour where a lexer tags them, and a function's name where it is declared takes \
-the text colour.
+a colour of their own, apart from keywords, and attributes take the annotation colour, which covers HTML attribute \
+names and Java annotations alike. Function calls take the call colour where a lexer tags them, and a function's name \
+where it is declared takes the text colour.
 
 {readme_footer(families, "Textadept", "Themes", "the theme, Textadept version, Qt, GTK or terminal, language")}"""
 
