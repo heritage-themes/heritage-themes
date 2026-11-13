@@ -4,8 +4,8 @@ A Pygments style sets a colour and a font style for each token type of its lexer
 that the formatters draw: the background, the highlighted lines and the line numbers. A token type takes the style of
 its parent unless it sets one, so the rules below name only the types that differ from their parent. The roles are
 those that heritage.vscode and heritage.textadept give the matching constructs: a lexer gives a construct one token
-type in every language, as Textadept's lexers do, so preprocessor directives take the keyword role and HTML attributes
-the field role, as in the other targets.
+type in every language, as Textadept's lexers do, so HTML attributes take the field role, as in the other targets.
+Preprocessor directives take the role that heritage.colour.directive gives them, as in VS Code.
 
 The module ships as a wheel on PyPI. It registers each style under the pygments.styles entry point, which is how
 Pygments finds a style by name in pygmentize, HtmlFormatter(style=...), Sphinx, MkDocs and every other program that
@@ -13,6 +13,7 @@ takes a Pygments style name. The wheel is pure Python, so it installs in any env
 """
 import re
 
+from .colour import directive
 from .nvim import name  # noqa: F401 - a style takes the name of Neovim's scheme, so one name serves every app
 from .wheel import pack
 
@@ -47,7 +48,7 @@ def rules(p):
         "Error": ("ansiRed", ""),
         "Comment": ("comment", "italic"),
         "Comment.Hashbang": ("comment", "bold italic"),
-        "Comment.Preproc": ("keyword", f"{kw}noitalic"),
+        "Comment.Preproc": (directive(p), "noitalic"),
         "Comment.PreprocFile": ("string", "noitalic"),
         "Comment.Special": ("todo", "bold italic"),
         "Keyword": ("keyword", kw.strip()),

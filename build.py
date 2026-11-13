@@ -2803,9 +2803,10 @@ To pass the class instead of the name, import it with `from {heritage.pygments.M
 ## What is coloured
 
 A style colours the tokens that Pygments' lexers produce, the background, the highlighted lines and the line \
-numbers. A lexer gives a construct one token type in every language, so preprocessor directives such as C's \
-`#include` take the keyword colour, HTML attribute names the field colour and decorators the annotation colour. A \
-highlighted line takes the background of the theme's current line.
+numbers. A lexer gives a construct one token type in every language, so HTML attribute names take the field colour \
+and decorators the annotation colour in each. Preprocessor directives such as C's `#include` take the annotation \
+colour, or the constant colour in a theme whose annotation colour is too near its keyword colour. A highlighted line \
+takes the background of the theme's current line.
 
 {readme_footer(families, "Pygments", "Styles", "the style, Pygments version, language")}"""
 

@@ -16,7 +16,8 @@ import re
 
 from .nvim import name  # noqa: F401 - Nano's schemes take the names of Neovim's
 from .terminals import colours as terminal_colours, contrast
-from .vim import lab, xterm_colours
+from .colour import lab
+from .vim import xterm_colours
 
 # The colours that nano names and the terminal's colours they stand for, as heritage.terminals gives them.
 NAMES = {"normal": "fg", "lightblack": 8, "red": 1, "green": 2, "yellow": 3, "blue": 4, "magenta": 5, "cyan": 6,

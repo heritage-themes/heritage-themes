@@ -15,6 +15,7 @@ beyond its 16 user-defined ones, for a terminal without 24-bit colour.
 import re
 
 from . import nvim
+from .colour import directive, lab
 from .nvim import name  # noqa: F401 - Vim lists a scheme by the same name as Neovim
 
 # Attributes of :highlight that the scheme uses.
@@ -85,6 +86,9 @@ def language_rules(p):
     # annotations, decorators and attributes, which the syntax files link to PreProc, Define or Identifier
     s("javaAnnotation javaAnnotationStart ktAnnotation pythonDecorator pythonDecoratorName rustAttribute rustDerive",
       "annotation")
+    # C and C++ preprocessor directives other than #define and #undef, which link to Macro: PreProc, Include and
+    # PreCondit, which other syntax files also link imports and keywords to
+    s("cPreProc cInclude cPreCondit", directive(p))
     s("rustLifetime", "typeParam", "italic")  # Special
     s("rustSelf", "keyword", "italic")  # Constant
     s("rustSigil", "op")  # & and * before a type, StorageClass
@@ -133,20 +137,6 @@ def highlights(p):
 def terminal(p):
     """The 16 colours of Vim's terminal window, as the Neovim scheme gives them."""
     return nvim.terminal(p)
-
-
-def lab(rgb):
-    """CIE L*a*b* of an sRGB colour given as (r, g, b) in 0-255."""
-    def linear(c):
-        c /= 255
-        return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
-    r, g, b = map(linear, rgb)
-    x = (0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047
-    y = 0.2126 * r + 0.7152 * g + 0.0722 * b
-    z = (0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883
-    def f(t):
-        return t ** (1 / 3) if t > 216 / 24389 else (24389 / 27 * t + 16) / 116
-    return 116 * f(y) - 16, 500 * (f(x) - f(y)), 200 * (f(y) - f(z))
 
 
 def xterm_colours():
