@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Preprocessor directives, such as C and C++ `#include` and `#define`, no longer take the keyword colour. They take the annotation colour, or the constant colour in the seven themes whose annotation colour is the keyword's or too near it, so a directive stands apart from `class` and `public`.
+- Preprocessor directives, such as C and C++ `#include` and `#define`, no longer take the keyword colour. They take a colour of their own, which also stands apart from the macro a `#define` names, from comments and from excluded code.
 
 ## [1.8.2] - 2026-11-10
 

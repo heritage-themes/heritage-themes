@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- C and C++ preprocessor directives, such as `#include`, `#if` and `#pragma`, no longer take the keyword colour. They take the annotation colour, as `#define` already did, or the constant colour in the seven themes whose annotation colour is the keyword's or too near it, so a directive stands apart from `class` and `public`.
+- C and C++ preprocessor directives, such as `#include`, `#if` and `#pragma`, no longer take the keyword colour, and `#define` and `#undef` no longer take the annotation colour. Every directive takes a colour of its own, which stands apart from keywords such as `class` and `public`, and from comments.
 
 ## [1.7.3] - 2026-11-05
 

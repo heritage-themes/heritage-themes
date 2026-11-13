@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Preprocessor directives, such as C and C++ `#include` and `#define`, no longer take the keyword colour. They take the annotation colour, or the constant colour in the seven themes whose annotation colour is the keyword's or too near it, so a directive stands apart from `class` and `public`. Assembler directives keep the keyword colour.
+- Preprocessor directives, such as C and C++ `#include` and `#define`, no longer take the keyword colour. They take a colour of their own, which also stands apart from macros and comments. Assembler directives keep the keyword colour.
 
 ## [1.7.3] - 2026-11-05
 

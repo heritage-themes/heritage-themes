@@ -16,7 +16,6 @@ the Fluent colours they are closest to.
 """
 import base64, functools, hashlib, json, os, re, struct, uuid, zipfile
 
-from .colour import DIRECTIVE_APART, directive, distance
 from .vscode import luminance, mix
 
 # The colour data version that Visual Studio reads.
@@ -153,7 +152,6 @@ def roles(p):
                   palette's surfaces as Fluent's tint its greys
     accentText    the button colour moved towards the text colour until it reads as text on every surface
     decorative*   the colour of each Decorative ramp, and its Alt with more contrast
-    directive     the colour of preprocessor directives, of the role that heritage.colour.directive gives them
     diff*Word     the changed words in a diff, the line's wash a third of the way to the change colour, as in
                   heritage.vscode
     heat1-5       the profiler's hot lines, washes of the terminal red that deepen with the heat
@@ -165,7 +163,6 @@ def roles(p):
     for hue, (role, other, share) in DECORATIVE.items():
         r[f"decorative{hue}"] = mix(r[role], r[other], share)
         r[f"decorative{hue}Alt"] = mix(r[f"decorative{hue}"], p["fg"], 0.3)
-    r["directive"] = p[directive(p)]
     r["diffInsWord"], r["diffDelWord"] = mix(p["diffIns"], p["added"], 0.35), mix(p["diffDel"], p["deleted"], 0.35)
     for i in range(1, 6):
         r[f"heat{i}"] = mix(p["bg"], p["ansiRed"], 0.06 * i)
@@ -713,8 +710,8 @@ NOT_TEXT = {"guide", "guideSel", "border", "caretRow", "lineNo", "lineNoCaret", 
 def check(text, p, guid):
     """Fails with SystemExit when the .pkgdef text of a palette's theme does not register the theme under guid with
     its name and fallback, does not hold exactly the colours that colours() gives it, sets a colour that
-    visualstudio.json lacks, colours preprocessor directives too near the keywords' colour, or draws code or tool
-    output in a colour that is unreadable on its background. Returns the theme's GUID."""
+    visualstudio.json lacks, or draws code or tool output in a colour that is unreadable on its background. Returns
+    the theme's GUID."""
     def fail(message):
         raise SystemExit(f"Visual Studio {p['name']}: {message}")
     key = f"$RootKey$\\Themes\\{{{guid}}}"
@@ -743,9 +740,6 @@ def check(text, p, guid):
                 if colour and colour[0] == CT_RAW and not ARGB.fullmatch(colour[1]):
                     fail(f"{category}/{name} has {colour[1]!r}")
     r = roles(p)
-    apart = distance(r["directive"], r["keyword"])
-    if apart < DIRECTIVE_APART:
-        fail(f"preprocessor directives are {apart:.1f} from keywords in colour, needs {DIRECTIVE_APART}")
     for category, background in READABLE.items():
         for colour in CATEGORIES[category]["colours"]:
             if default(colour, p, 1) is None:

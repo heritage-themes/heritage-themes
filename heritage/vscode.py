@@ -9,8 +9,6 @@ the side bar and panel, and the editor on bg.
 
 import math, re
 
-from .colour import directive
-
 TRANSPARENT = "#00000000"
 SHADOW = {True: "#00000059", False: "#00000024"}
 
@@ -42,8 +40,8 @@ def token_rules(p, directives=False):
     """TextMate rules as (scope selectors, role, font style). The deepest matching scope wins, so a rule for a
     child scope, such as the quotes of a string, overrides the rule for its parent. heritage.sublime builds on
     these, as Sublime Text's syntaxes follow the same scope naming. Preprocessor directives, such as C's #include,
-    take the role that heritage.colour.directive gives them when directives is true, as in VS Code, and the keyword
-    role otherwise, as in Sublime Text."""
+    take the directive role when directives is true, as in VS Code, and the keyword role otherwise, as in Sublime
+    Text."""
     kw = "bold" if p.get("kwBold", not p["dark"]) else ""
     directive_scopes = "keyword.control.directive, punctuation.definition.directive"
     rules = []
@@ -72,7 +70,7 @@ def token_rules(p, directives=False):
       "storage.type.primitive, storage.type.built-in, entity.name.type.primitive.rust, "
       "entity.name.type.numeric.rust", "keyword", kw)
     if directives:
-        s(directive_scopes, directive(p))
+        s(directive_scopes, "directive")
     s("keyword.operator, punctuation, storage.type.function.arrow, meta.brace, storage.modifier.reference, "
       "storage.modifier.pointer", "op")
     s("variable.parameter.function.language.special.self, variable.language.special.self, "

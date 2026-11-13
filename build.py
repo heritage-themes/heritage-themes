@@ -18,6 +18,7 @@ import argparse, ast, base64, configparser, contextlib, hashlib, html, importlib
 import xml.etree.ElementTree as ET
 
 import heritage
+from heritage.colour import distance
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "build")
@@ -93,8 +94,8 @@ ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "
 CONTRAST = (
     (("fg", "muted"), ("bg", "bgTool", "bgUi", "surface", "caretRow", "frame"), 4.5),
     # code shows on the editor's background and on the current line
-    (("keyword", "string", "number", "type", "method", "call", "field", "constant", "annotation", "doc", "docTag",
-      "op", "param", "typeParam", "label", "gold", "azure") + ANSI, ("bg", "caretRow"), 4.5),
+    (("keyword", "string", "number", "type", "method", "call", "field", "constant", "annotation", "directive", "doc",
+      "docTag", "op", "param", "typeParam", "label", "gold", "azure") + ANSI, ("bg", "caretRow"), 4.5),
     (("comment",), ("bg", "caretRow"), 3),
     (("lineNoCaret",), ("bg", "caretRow"), 4.5),  # the current line's number, on the gutter and on the current line
     (ANSI, ("bgTool",), 4.5),  # console and terminal
@@ -105,6 +106,11 @@ CONTRAST = (
     (("gold",), ("bgTool", "bgUi", "surface"), 3),  # IntelliJ focus ring
     (("caret",), ("bg", "caretRow"), 3),
 )
+# The least CIE76 distance between the directive colour and each colour that a preprocessor directive could be
+# taken for: keywords, macro names (annotation in Visual Studio and Notepad++, constant in VS Code), comments,
+# excluded code (muted in Visual Studio) and plain text.
+DIRECTIVE_APART = 20
+DIRECTIVE_NEIGHBOURS = ("keyword", "annotation", "constant", "comment", "muted", "fg")
 
 
 def elsewhere(editor):
@@ -146,6 +152,15 @@ def check_contrast(palette):
     p = dict(palette, caret=palette.get("caret", palette["gold"]))
     failures = [f"{fg} on {bg} is {contrast(p[fg], p[bg]):.2f}:1, needs {minimum}:1"
                 for fgs, bgs, minimum in CONTRAST for fg in fgs for bg in bgs if contrast(p[fg], p[bg]) < minimum]
+    if failures:
+        raise SystemExit(f"{palette['name']}: " + "; ".join(failures))
+
+
+def check_directive(palette):
+    """Fails the build when the directive colour is too near a colour that a preprocessor directive could be taken
+    for."""
+    failures = [f"directive is {apart:.1f} from {role}, needs {DIRECTIVE_APART}" for role in DIRECTIVE_NEIGHBOURS
+                if (apart := distance(palette["directive"], palette[role])) < DIRECTIVE_APART]
     if failures:
         raise SystemExit(f"{palette['name']}: " + "; ".join(failures))
 
@@ -2804,9 +2819,8 @@ To pass the class instead of the name, import it with `from {heritage.pygments.M
 
 A style colours the tokens that Pygments' lexers produce, the background, the highlighted lines and the line \
 numbers. A lexer gives a construct one token type in every language, so HTML attribute names take the field colour \
-and decorators the annotation colour in each. Preprocessor directives such as C's `#include` take the annotation \
-colour, or the constant colour in a theme whose annotation colour is too near its keyword colour. A highlighted line \
-takes the background of the theme's current line.
+and decorators the annotation colour in each. Preprocessor directives such as C's `#include` take a colour of \
+their own, apart from keywords and comments. A highlighted line takes the background of the theme's current line.
 
 {readme_footer(families, "Pygments", "Styles", "the style, Pygments version, language")}"""
 
@@ -3283,6 +3297,7 @@ def main():
         for t in f.THEMES:
             check_frame(t["palette"])
             check_contrast(t["palette"])
+            check_directive(t["palette"])
     for t in themes:
         check_references(t)
 

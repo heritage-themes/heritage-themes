@@ -16,7 +16,6 @@ theme does not carry; DARK_MODE and LIGHT_MODE hold its default colours, which t
 import json, os, re
 from xml.sax.saxutils import escape
 
-from .colour import directive
 from .vscode import mix
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "notepadpp.json")
@@ -49,8 +48,6 @@ ERROR_LIST_ANSI = {**{f"ANSI COLOR {c}": TERMINAL[c] for c in ("BLACK", "RED", "
                    "ANSI COLOR WHITE": BRIGHT["WHITE"]}
 # "kw" stands for the keyword font: bold where the palette's keywords are bold.
 KW = "kw"
-# "directive" stands for the role that heritage.colour.directive gives preprocessor directives in the palette.
-DIRECTIVE = "directive"
 
 # Rules by style name, in order: (pattern, role, font). They cover the names that many lexers share.
 NAMES = [(re.compile(pattern, re.I), role, font) for pattern, role, font in (
@@ -68,7 +65,7 @@ NAMES = [(re.compile(pattern, re.I), role, font) for pattern, role, font in (
     (r"STRING|CHARACTER|^CHARS?$|VERBATIM|TRIPLE|LITERAL|HEREDOC|^HERE |BACKTICKS|CDATA", "string", ""),
     (r"NUMBER|NUMERIC|HEX ?DIGIT|^HEXADECIMAL", "number", ""),
     (r"^OPERATORS?\b|OPERATOR2|DELIMITER|SYMBOLS$|BRACES", "op", ""),
-    (r"PREPROC", DIRECTIVE, ""),
+    (r"PREPROC", "directive", ""),
     (r"DIRECTIVE", "keyword", KW),  # assembler directives, such as .data
     (r"DECORATOR|ANNOTATION|MACRO", "annotation", ""),
     (r"LABEL", "label", "bold"),
@@ -224,7 +221,7 @@ def font(p, name):
 
 
 def rule(lexer, style):
-    """(role, font) for a style of notepadpp.json, or None when no rule covers it. The role can be DIRECTIVE."""
+    """(role, font) for a style of notepadpp.json, or None when no rule covers it."""
     for names, role, font_name in LEXERS.get(lexer, ()):
         if style["name"] in names.split("|"):
             return role, font_name
@@ -296,8 +293,6 @@ def lexer_styles(p):
                 missing.append(f"{lexer['name']}: {style['name']}")
                 continue
             role, font_name = found
-            if role == DIRECTIVE:
-                role = directive(p)
             out.append((lexer, style, p[role], p["bg"], font(p, font_name), COLORSTYLE_FOREGROUND))
     if missing:
         raise ValueError("no rule for the Notepad++ styles " + "; ".join(missing))
