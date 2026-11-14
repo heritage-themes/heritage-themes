@@ -89,7 +89,7 @@ def ui(p):
         "meta.document": {"background-color": "bg", "border-color": "border"},
         "meta.text": {"color": "fg"},
         "meta.text.selected": {"color": "fg", "background-color": "selection"},
-        "meta.cursor": {"background-color": "caret"},
+        "meta.cursor": {"background-color": "caretRow"},
         "meta.indentguide": {"border-color": "guide"},
         "meta.gutter": {"background-color": "bg", "color": "lineNo"},
         "meta.gutter.selected": {"background-color": "caretRow", "color": "lineNoCaret"},
@@ -98,7 +98,6 @@ def ui(p):
 
 def hexes(p):
     out = {k: "#" + v for k, v in p.items() if isinstance(v, str) and re.fullmatch(r"[0-9A-F]{6}", v)}
-    out["caret"] = "#" + p.get("caret", p["gold"])
     out.update({f"ansi{n.title()}": colour for n, colour in zip(ANSI_NAMES, terminal_colours(p)["ansi"])})
     return out
 

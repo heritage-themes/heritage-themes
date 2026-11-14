@@ -5,6 +5,7 @@
 ### Fixed
 
 - Preprocessor directives, such as C and C++ `#include` and `#define`, no longer take the keyword colour. They take a colour of their own, which also stands apart from comments.
+- The line that holds the cursor is no longer filled with the bright caret colour, which hid its text. It takes the colour that the current line has in the other editors.
 
 ## [1.7.3] - 2026-11-05
 
