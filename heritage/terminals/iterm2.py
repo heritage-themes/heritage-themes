@@ -9,6 +9,10 @@ CATEGORY = "Terminal emulators"
 INSTALL = """Open **Settings | Profiles | Colors**, choose **Color Presets… | Import…**, select the `.itermcolors` files \
 in `iterm2`, then choose a preset, for example **{label}**, from **Color Presets…**.
 
+When **Use separate colors for light and dark mode** is on, a preset sets only the mode chosen under **Editing**, \
+so a pair can follow the system's light or dark appearance: choose **{label}** with **Editing** set to \
+**Dark Mode** and **{light_label}** with it set to **Light Mode**.
+
 Each preset colours the terminal, the cursor, the cursor guide, selections, links, the badge and the tab."""
 
 

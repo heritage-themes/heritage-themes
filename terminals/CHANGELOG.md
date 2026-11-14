@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- iTerm2: the install instructions explain that, with **Use separate colors for light and dark mode** on, a preset sets only the mode chosen under **Editing**, and how to set a Night and Day pair that follows the system's appearance.
+
 ## [1.8.0] - 2026-11-07
 
 ### Added
