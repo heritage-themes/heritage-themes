@@ -7,11 +7,12 @@ CATEGORY = "Terminal emulators"
 INSTALL = """Copy a theme's file to `~/.termux/colors.properties` and reload the settings:
 
 ```bash
+mkdir -p ~/.termux
 cp termux/{stem}.properties ~/.termux/colors.properties
 termux-reload-settings
 ```
 
-Each theme colours the terminal and the cursor."""
+Each theme colours the terminal and the cursor. The extra keys row stays black in every theme."""
 
 
 def properties(p):
