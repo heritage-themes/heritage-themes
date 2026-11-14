@@ -78,6 +78,24 @@ re-run the failed jobs in GitHub Actions; the products that published are not up
 To withdraw a tag pushed by mistake, run `git push origin :refs/tags/<tag>` and
 `git tag -d <tag>`. The workflow may already be running; cancel it in GitHub Actions.
 
+## Update iTerm2-Color-Schemes
+
+[iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes) holds a copy of every theme. It generates
+them for Windows Terminal, Alacritty, kitty and many more apps, and windowsterminalthemes.dev lists them. After a
+release that adds a theme or changes a terminal colour, update the copy in a pull request to that repository. Use
+Linux or macOS: some of its file names contain colons, so Git for Windows cannot check it out.
+
+```bash
+gh repo fork mbadolato/iTerm2-Color-Schemes --clone && cd iTerm2-Color-Schemes
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python <heritage-themes>/scripts/iterm2_color_schemes.py .
+.venv/bin/python tools/check_licenses.py
+```
+
+`scripts/iterm2_color_schemes.py` writes `yaml/<theme name>.yml` for each theme with the colours of the iTerm2 preset,
+and an MIT entry in `licenses.yml`. Commit only `yaml/` and `licenses.yml`; their CI generates every other format.
+Their `AGENTS.md` asks pull requests to disclose AI agent involvement.
+
 ## One-time setup: JetBrains Marketplace
 
 The Marketplace accepts API uploads only for a plugin that already exists, so upload the first
