@@ -54,9 +54,10 @@ with the screenshots it shows in themes/<theme>/build/terminals. It runs each te
 multiplexer that runs on Linux in the container image of scripts/terminals/Containerfile, which preview.py builds with
 Podman, through scripts/terminals/shoot.py and shells.py, and fails when a screenshot lacks one of the theme's 16
 colours (scripts/terminals/check.py) or a screen shows a colour the theme does not set or text below its contrast
-minimum (scripts/terminals/cells.py). iTerm2, Windows Terminal and Termux do not run on Linux, so the build's checks
-of their files are all they get. All pages use JetBrains Mono, downloaded once from the pinned release
-below into ~/.cache/heritage-themes. The JupyterLab page goes to themes/<theme>/build/preview-jupyterlab.html, with
+minimum (scripts/terminals/cells.py). iTerm2 and Windows Terminal do not run on Linux, so the build's checks of their
+files are all they get. Termux runs in the Android emulator that scripts/termux/setup.sh starts, and
+scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. All pages use JetBrains
+Mono, downloaded once from the pinned release below into ~/.cache/heritage-themes. The JupyterLab page goes to themes/<theme>/build/preview-jupyterlab.html, with
 the screenshots it shows in themes/<theme>/build/jupyterlab. scripts/jupyterlab/shoot.py takes them in JupyterLab
 itself and in Notebook 7, in the virtual environment that preview.py creates in scripts/jupyterlab/.venv from the pinned
 requirements.txt, with the wheel in build/jupyterlab installed, driving a headless Chrome; each theme is chosen in the
