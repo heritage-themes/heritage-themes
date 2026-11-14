@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.11.1] - 2026-11-14
+
 ### Fixed
 
 - Preprocessor directives, such as C and C++ `#include` and `#define`, no longer take the keyword colour. They take a colour of their own, which also stands apart from comments, with Tree-sitter and with Neovim's own C syntax file.

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.11.1] - 2026-11-14
+
 ### Fixed
 
 - C and C++ preprocessor directives, such as `#include`, `#if` and `#pragma`, no longer take the keyword colour, and `#define` and `#undef` no longer take the annotation colour. Every directive takes a colour of its own, which stands apart from keywords such as `class` and `public`, and from comments.
