@@ -15,6 +15,3 @@ __pycache__/
 
 # Local reference material in each theme folder, not part of the repository
 themes/*/docs/
-
-# Local agent instructions, not part of the repository
-CLAUDE.md
