@@ -80,7 +80,7 @@ Constraints, all enforced by `build.py`:
 - `label` colours Spock labels (`given:`, `when:`, `then:`) as bold text with no background. It needs the same contrast against `bg` as the syntax roles.
 - The `ansi*` keys colour ANSI output in the console and terminals, and VCS file status in the Project view: `ansiGreen` added, `ansiBlue` modified, `ansiRed` unversioned, `ansiMagenta` merged. Each must read as the hue it names, whatever the family's syntax roles are.
 - Roles meet WCAG AA against the backgrounds they are drawn on: 4.5:1 for text, 3:1 for comments, the caret and `gold` as the focus ring. `CONTRAST` in `build.py` lists the pairs. `gold` also colours string escapes, so in a light theme it is a deep ochre rather than a bright yellow.
-- Avoid pure white and pure black for backgrounds and text, as the existing themes do.
+- Avoid pure white and pure black for backgrounds and text, as the existing themes do, unless the tradition's palette demands it.
 
 ## Check the result
 
