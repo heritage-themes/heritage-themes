@@ -117,6 +117,16 @@ Map the ones that affect code to a palette role in `heritage/scheme.py`, in the 
 
 A preview sample marks code with `«key:text»` in `heritage/samples.py`, using a key from the scheme or an alias from `ALIASES` in `heritage/preview.py`. A key the scheme does not set needs an entry in `FALLBACKS` there, following the plugin's own fallback chain.
 
+## Check the RStudio token rules
+
+RStudio colours code by Ace token types, which every language shares. `syntax()` in `heritage/rstudio.py` maps them to palette roles. List the token types of an installed RStudio that no rule colours, and the selectors that match no type:
+
+```bash
+scripts/rstudio/tokens.py <RStudio folder>
+```
+
+Add a selector only for a type that the script lists, and run `python3 build.py`: it resolves a table of token types in every theme (`cases()` in `heritage/rstudio.py`) and fails when a rule with more classes does not reset the font of one with fewer.
+
 ## Add the documentation
 
 Add these to the theme folder:

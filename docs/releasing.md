@@ -11,7 +11,7 @@ Neovim plugin and the themes for every other app share one version, `VERSION` in
 | Sublime Text package | `sublime/CHANGELOG.md` | Package repository, listed on Package Control |
 | Zed extension | `zed/CHANGELOG.md` | Extension repository, listed in Zed's extension registry by a pull request |
 | Neovim plugin | `nvim/CHANGELOG.md` | Plugin repository, which plugin managers install from |
-| Notepad++, Xcode, Helix, Kakoune, Micro, Vim, GNU Emacs, Nano, Textadept, Lapce, Qt Creator, Amp, Eclipse, Nova, Spyder and IDLE themes | `notepadpp/`, `xcode/`, `helix/`, `kakoune/`, `micro/`, `vim/`, `emacs/`, `nano/`, `textadept/`, `lapce/`, `qtcreator/`, `amp/`, `eclipse/`, `nova/`, `spyder/` and `idle/` `CHANGELOG.md`, one each | GitHub release only: these apps have no registry that Publish uses, and users install the files from the zip |
+| Notepad++, Xcode, Helix, Kakoune, Micro, Vim, GNU Emacs, Nano, Textadept, Lapce, Qt Creator, Amp, Eclipse, Nova, Spyder, IDLE and RStudio themes | `notepadpp/`, `xcode/`, `helix/`, `kakoune/`, `micro/`, `vim/`, `emacs/`, `nano/`, `textadept/`, `lapce/`, `qtcreator/`, `amp/`, `eclipse/`, `nova/`, `spyder/`, `idle/` and `rstudio/` `CHANGELOG.md`, one each | GitHub release only: these apps have no registry that Publish uses, and users install the files from the zip |
 | JupyterLab extension | `jupyterlab/CHANGELOG.md` | PyPI, as `jupyterlab-heritage-themes` |
 | Pygments styles | `pygments/CHANGELOG.md` | PyPI, as `heritage-themes-pygments` |
 | Thonny themes | `thonny/CHANGELOG.md` | PyPI, as `thonny-heritage-themes` |

@@ -14,7 +14,8 @@
 # themes, helix/CHANGELOG.md for the Helix themes, kakoune/CHANGELOG.md for the Kakoune colour schemes,
 # micro/CHANGELOG.md for the Micro colour schemes, vim/CHANGELOG.md for the Vim colour schemes,
 # emacs/CHANGELOG.md for the Emacs themes, terminals/CHANGELOG.md for the Terminals themes,
-# nano/, textadept/, lapce/, qtcreator/, amp/, eclipse/, nova/, jupyterlab/, pygments/, spyder/, thonny/ and idle/ CHANGELOG.md for those themes.
+# nano/, textadept/, lapce/, qtcreator/, amp/, eclipse/, nova/, jupyterlab/, pygments/, spyder/, thonny/, idle/ and
+# rstudio/ CHANGELOG.md for those themes.
 # A product without entries keeps its last published build, which the GitHub release attaches.
 #
 # Usage: scripts/release.sh [patch|minor|major|X.Y.Z] [--dry-run]
@@ -90,7 +91,7 @@ for product in "JetBrains plugin:CHANGELOG.md" "VS Code extension:vscode/CHANGEL
   "Eclipse themes:eclipse/CHANGELOG.md" "Nova themes:nova/CHANGELOG.md" \
   "JupyterLab themes:jupyterlab/CHANGELOG.md" "Pygments styles:pygments/CHANGELOG.md" \
   "Spyder themes:spyder/CHANGELOG.md" "Thonny themes:thonny/CHANGELOG.md" \
-  "IDLE themes:idle/CHANGELOG.md"; do
+  "IDLE themes:idle/CHANGELOG.md" "RStudio themes:rstudio/CHANGELOG.md"; do
   name=${product%%:*} changelog=${product#*:}
   previous=$(latest_release "$changelog")
   # The marketplaces reject a version that is not greater than the last one they received.

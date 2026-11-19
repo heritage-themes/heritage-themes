@@ -85,7 +85,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Amp", "Eclipse", "Nova",
-           "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE", "terminals")
+           "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE", "RStudio", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -2105,6 +2105,96 @@ def check_idle_installer(directory, themes):
             raise SystemExit("IDLE installer: --remove leaves an empty config-highlight.cfg")
 
 
+def rstudio_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for RStudio
+
+{DESCRIPTION} {count} dark and light editor themes in {len(families)} families, for the RStudio IDE; each family maps \
+the named colours of one tradition to syntax roles.
+
+## Install
+
+The themes are `.rstheme` files, which RStudio reads from the `themes` folder of its configuration folder.
+
+1. Copy the files in `themes` into that folder: `~/.config/rstudio/themes` on Linux and macOS, \
+`%APPDATA%\\RStudio\\themes` on Windows. In a terminal on Linux or macOS, from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.config/rstudio/themes
+   cp themes/* ~/.config/rstudio/themes/
+   ```
+
+2. Restart RStudio and choose a theme under **Tools | Global Options | Appearance | Editor theme**.
+
+To add one theme without copying files, choose **Add...** beside **Editor theme** and select its file in `themes`.
+
+## What is coloured
+
+Each theme colours the source editor, the console, the Terminal tab and the visual editor of R Markdown and Quarto \
+documents: code, the selection, the current line, matching brackets, found text, code chunks, line numbers, the \
+caret, the line that the debugger stops on and the colours of the terminal. RStudio draws its panes, toolbars and \
+menus itself, dark or light to match the theme.
+
+## Languages
+
+RStudio highlights code with Ace's modes, which give each construct a token type that every language shares, so a \
+construct takes the same colour in each: R's function calls take the colour of Python's built-in functions and a \
+shell's commands. RStudio colours R function calls only when **Highlight R function calls** is on under \
+**Tools | Global Options | Code | Display**. In R, roxygen tags, section headings (`# Section ----`) and `TODO` \
+comments have colours of their own.
+
+{readme_footer(families, "RStudio", "Themes", "the theme, RStudio version, operating system, language")}"""
+
+
+def validate_rstudio(directory, families):
+    """Fails the build when a theme file is missing, differs from heritage.rstudio, has a name or brightness that
+    RStudio would read differently, holds a colour that is not #RRGGBB or #RRGGBBAA, has text below its contrast on the
+    background it is drawn on, draws a token type in other colours or fonts than heritage.rstudio.cases gives it, or
+    leaves a code chunk too close to the editor's background to be seen."""
+    expected, names = set(), set()
+    for family in families:
+        for t in family.THEMES:
+            name, p, filename = heritage.rstudio.name(t), t["palette"], heritage.rstudio.filename(t)
+            expected.add(filename)
+            label = f"RStudio {name}"
+            with open(os.path.join(directory, "themes", filename), encoding="utf-8") as f:
+                text = f.read()
+            if name in names:
+                raise SystemExit(f"{label}: another theme has this name")
+            names.add(name)
+            found_name, dark, rules = heritage.rstudio.parse(text)
+            if found_name != name or dark != p["dark"]:
+                raise SystemExit(f"{label}: the header is not {name!r} and dark = {p['dark']}")
+            if text.count("{") != len(rules) or text.count("}") != len(rules):
+                raise SystemExit(f"{label}: a rule is not in the layout that heritage.rstudio.theme writes")
+            if rules != heritage.rstudio.blocks(p):
+                raise SystemExit(f"{label}: the rules differ from heritage.rstudio.blocks")
+            for selectors, declarations in rules:
+                for prop, value in declarations:
+                    for colour in re.findall(r"#\w+", value):
+                        if not heritage.rstudio.COLOUR.fullmatch(colour):
+                            raise SystemExit(f"{label}: {prop}: {value} holds {colour}, which is not #RRGGBB or "
+                                             f"#RRGGBBAA")
+            check_styles(label, heritage.rstudio.styles(p), "fg", "bg", None, heritage.rstudio.DECORATIVE,
+                         heritage.rstudio.low_contrast(p), {})
+            for token, role, font in heritage.rstudio.cases(p):
+                resolved = heritage.rstudio.resolve(p, token)
+                wanted = {"color": "#" + p[role], "font-style": "italic" if "italic" in font else "normal",
+                          "font-weight": "bold" if "bold" in font else "normal"}
+                if "underline" in font:
+                    wanted["text-decoration"] = "underline"
+                if {prop: resolved.get(prop) for prop in wanted} != wanted or \
+                        ("underline" not in font and "text-decoration" in resolved):
+                    raise SystemExit(f"{label}: the token type {token} is drawn as {resolved}, not as {wanted}")
+            if not heritage.rstudio.chunk_apart(p):
+                raise SystemExit(f"{label}: a code chunk is closer than {heritage.rstudio.CHUNK_APART} to the "
+                                 f"editor's background")
+    check_files("RStudio themes", directory, "themes", expected)
+    if sorted(os.listdir(directory)) != ["CHANGELOG.md", "LICENSE", "README.md", "themes"]:
+        raise SystemExit("RStudio themes: the zip does not hold the README, changelog, licence and themes")
+
+
 def lapce_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -3044,10 +3134,11 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "Qt Creator": heritage.qtcreator.name, "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
+                  "RStudio": heritage.rstudio.name,
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Spyder": spyder_readme, "IDLE": idle_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
 
 
 def terminals_readme(families):
@@ -3370,7 +3461,11 @@ def main():
              validate_spyder),
             ("IDLE", "themes", lambda t, source: (f"{heritage.idle.name(t)}.cfg",
                                                    heritage.idle.theme(t["palette"], heritage.idle.name(t), source)),
-             validate_idle)):
+             validate_idle),
+            ("RStudio", "themes", lambda t, source: (heritage.rstudio.filename(t),
+                                                      heritage.rstudio.theme(t["palette"], heritage.rstudio.name(t),
+                                                                             source)),
+             validate_rstudio)):
         directory = build_themes(families, editor, folder, files)
         validate_themes(directory, families)
         name = f"{VSCODE_NAME}-{editor.lower()}"
