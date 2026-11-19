@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-11-19
+
 ### Changed
 
 - Termux: the install instructions create `~/.termux` first and say that the extra keys row stays black.
