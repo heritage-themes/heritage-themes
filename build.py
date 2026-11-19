@@ -32,6 +32,8 @@ DESCRIPTION = "Colour themes drawn from the colour traditions of different cultu
 PLUGIN_ICONS = ("pluginIcon.svg", "pluginIcon_dark.svg")
 SINCE_BUILD = "253"  # 2025.3, the first release with the Islands Dark and Islands Light parent themes
 VSCODE_CHANGELOG = os.path.join(ROOT, "vscode", "CHANGELOG.md")
+GODOT_MINIMUM = "4.6"  # the first release with interface/theme/color_preset and the Modern style
+GODOT_DESCRIPTION = "Colour themes for the Godot editor, drawn from the colour traditions of different cultures."
 VSCODE_PUBLISHER = "heritage-themes"
 VSCODE_NAME = "heritage-themes"
 VSCODE_ENGINE = "^1.75.0"
@@ -85,7 +87,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Amp", "Eclipse", "Nova",
-           "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE", "RStudio", "terminals")
+           "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE", "RStudio", "Godot", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -2195,6 +2197,129 @@ def validate_rstudio(directory, families):
         raise SystemExit("RStudio themes: the zip does not hold the README, changelog, licence and themes")
 
 
+def godot_readme(families):
+    """The plugin's README. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Godot
+
+{DESCRIPTION} {count} dark and light editor themes in {len(families)} families, for the Godot editor; each family \
+maps the named colours of one tradition to syntax roles. The plugin applies a theme to the whole editor: the script \
+editor's colours and the colours of the docks, tabs and dialogs around it. It needs Godot {GODOT_MINIMUM} or later.
+
+## Install
+
+1. Install the plugin in a project:
+   - From the Asset Store: open the **Asset Store** tab, search for Heritage Themes and install it.
+   - From the zip: unzip it into the project's folder, so that the project holds `addons/{heritage.godot.FOLDER}`.
+2. Enable **Heritage Themes** under **Project | Project Settings | Plugins**.
+3. Choose **Project | Tools | Heritage Themes...**, select a theme and choose **Apply**.
+
+The theme is part of the editor's settings, so it applies to every project and stays when the plugin is disabled or \
+removed. To change it in another project, install the plugin there, or set the colours by hand as below. To go back to \
+Godot's colours, choose **Restore Godot's Theme** in the same dialog.
+
+## Without the plugin
+
+The script editor's colours are in `themes`, one `.tet` file for each theme. In the script editor, choose \
+**File | Theme | Import Theme...** and select a file. The editor's other colours are in `themes.cfg`: under \
+**Editor | Editor Settings | Interface | Theme**, set **Color Preset** to Custom, then **Base Color**, \
+**Accent Color**, **Contrast** and **Icon and Font Color** (1 is Dark, 2 is Light) to the values in the theme's \
+section.
+
+## What is coloured
+
+The script editor takes the theme's colours for code, the selection, the current line, found text, occurrences of the \
+word under the caret, brackets without a pair, lines with an error or a warning, folded regions, line numbers, the \
+caret, bookmarks, breakpoints, the line that the debugger stops on and the list of suggestions. GDScript's own \
+constructs have colours of their own: annotations, node paths, `$` and `%` node references, StringNames, and tags such \
+as `TODO` in comments. Godot draws the rest of the editor from the theme's base colour, accent colour and contrast, \
+with white or black text and icons. Godot has no bold or italic in the script editor.
+
+## Remove
+
+Choose **Restore Godot's Theme**, disable the plugin and delete `addons/{heritage.godot.FOLDER}`. The `.tet` files \
+stay in the `text_editor_themes` folder of Godot's configuration folder: `~/.config/godot` on Linux, \
+`~/Library/Application Support/Godot` on macOS and `%APPDATA%\\Godot` on Windows. Delete the files whose names \
+start with `{heritage.godot.PREFIX.strip()}` there.
+
+{readme_footer(families, "Godot", "Themes", "the theme, Godot version, operating system, language")}"""
+
+
+def build_godot(families):
+    """Writes the plugin to build/godot/addons/<FOLDER> and returns build/godot/addons, the folder that the zip
+    holds."""
+    addons = os.path.join(OUT, "godot", "addons")
+    plugin = os.path.join(addons, heritage.godot.FOLDER)
+    os.makedirs(os.path.join(plugin, "themes"))
+    themes = []
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            name = heritage.godot.name(t)
+            themes.append((name, t["palette"]))
+            write_text(os.path.join(plugin, "themes", f"{name}.tet"),
+                       heritage.godot.text_editor_theme(t["palette"], name, source))
+    write_text(os.path.join(plugin, "themes.cfg"), heritage.godot.themes_config(themes))
+    write_text(os.path.join(plugin, "plugin.cfg"), heritage.godot.plugin_config(VERSION, GODOT_DESCRIPTION))
+    write_text(os.path.join(plugin, "README.md"), godot_readme(families))
+    for name in ("CHANGELOG.md", "heritage_themes.gd"):
+        shutil.copy(os.path.join(ROOT, "godot", name), os.path.join(plugin, name))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(plugin, "LICENSE"))
+    return addons
+
+
+def validate_godot(addons, families):
+    """Fails the build when a text editor theme is missing, differs from heritage.godot.colours, holds a value that
+    Godot does not read as a colour, or has text below its contrast on the background it is drawn on; when themes.cfg
+    differs from heritage.godot.interface or gives a contrast that Godot would draw the wrong way round; or when the
+    plugin's files are not the ones it needs."""
+    plugin = os.path.join(addons, heritage.godot.FOLDER)
+    if os.listdir(addons) != [heritage.godot.FOLDER]:
+        raise SystemExit(f"Godot plugin: addons holds other files than {heritage.godot.FOLDER}")
+    with open(os.path.join(plugin, "themes.cfg"), encoding="utf-8") as f:
+        sections = heritage.godot.parse(f.read())
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.godot.name(t), t["palette"]
+            label = f"Godot {name}"
+            expected.add(f"{name}.tet")
+            if re.search(r"[,:\[\]]", name):  # Godot lists the names in an enum hint and as section names
+                raise SystemExit(f"{label}: the name holds a comma, colon or square bracket")
+            with open(os.path.join(plugin, "themes", f"{name}.tet"), encoding="utf-8") as f:
+                theme = heritage.godot.parse(f.read())
+            colours = heritage.godot.colours(p)
+            if theme != {"color_theme": colours}:
+                raise SystemExit(f"{label}: the .tet is not one color_theme section with heritage.godot.colours")
+            for key, value in colours.items():
+                if not heritage.godot.HEX.fullmatch(value):
+                    raise SystemExit(f"{label}: {key} = {value} is not a colour that Godot reads")
+            check_styles(label, heritage.godot.styles(p), "fg", "bg", None, heritage.godot.decorative(),
+                         heritage.godot.low_contrast(), {})
+            interface = heritage.godot.interface(p)
+            if sections.get(name) != interface:
+                raise SystemExit(f"{label}: themes.cfg differs from heritage.godot.interface")
+            if not (0 < interface["contrast"] <= 0.5 if p["dark"] else -0.1 <= interface["contrast"] < 0):
+                raise SystemExit(f"{label}: contrast {interface['contrast']} would not draw the window and tab bars "
+                                 f"{'darker' if p['dark'] else 'lighter'} than the docks within Godot's range")
+    if set(sections) != {name[:-len(".tet")] for name in expected}:
+        raise SystemExit("Godot plugin: themes.cfg has other sections than the themes")
+    check_files("Godot plugin", plugin, "themes", expected)
+    if sorted(os.listdir(plugin)) != ["CHANGELOG.md", "LICENSE", "README.md", "heritage_themes.gd", "plugin.cfg",
+                                      "themes", "themes.cfg"]:
+        raise SystemExit("Godot plugin: the folder does not hold the plugin, its settings, README, changelog, licence "
+                         "and themes")
+    with open(os.path.join(plugin, "plugin.cfg"), encoding="utf-8") as f:
+        config = heritage.godot.parse(f.read())
+    if config != {"plugin": {"name": "Heritage Themes", "description": GODOT_DESCRIPTION, "author": "Heritage Themes",
+                             "version": VERSION, "script": "heritage_themes.gd"}}:
+        raise SystemExit("Godot plugin: plugin.cfg is not the plugin's name, description, author, version and script")
+    with open(os.path.join(plugin, "heritage_themes.gd"), "rb") as built, \
+            open(os.path.join(ROOT, "godot", "heritage_themes.gd"), "rb") as source:
+        if built.read() != source.read():
+            raise SystemExit("Godot plugin: heritage_themes.gd is not godot/heritage_themes.gd")
+
+
 def lapce_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -3134,7 +3259,7 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "Qt Creator": heritage.qtcreator.name, "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
-                  "RStudio": heritage.rstudio.name,
+                  "RStudio": heritage.rstudio.name, "Godot": heritage.godot.name,
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
@@ -3471,6 +3596,11 @@ def main():
         name = f"{VSCODE_NAME}-{editor.lower()}"
         print(f"{pack_folder(directory, os.path.join(OUT, f'{name}-{VERSION}.zip'), name)}: {len(themes)} themes",
               flush=True)
+    godot = build_godot(families)
+    validate_godot(godot, families)
+    name = f"{VSCODE_NAME}-godot"
+    print(f"{pack_folder(godot, os.path.join(OUT, f'{name}-{VERSION}.zip'), 'addons')}: {len(themes)} themes",
+          flush=True)
     nova = build_nova(families)
     validate_nova(nova, families)
     print(f"{pack_folder(nova, os.path.join(OUT, f'{VSCODE_NAME}-nova-{VERSION}.zip'), f'{VSCODE_NAME}-nova')}: "

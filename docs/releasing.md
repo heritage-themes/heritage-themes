@@ -15,6 +15,7 @@ Neovim plugin and the themes for every other app share one version, `VERSION` in
 | JupyterLab extension | `jupyterlab/CHANGELOG.md` | PyPI, as `jupyterlab-heritage-themes` |
 | Pygments styles | `pygments/CHANGELOG.md` | PyPI, as `heritage-themes-pygments` |
 | Thonny themes | `thonny/CHANGELOG.md` | PyPI, as `thonny-heritage-themes` |
+| Godot plugin | `godot/CHANGELOG.md` | GitHub release; the Godot Asset Store by hand, see [Upload the Godot plugin](#upload-the-godot-plugin) |
 | Terminals themes (26 terminal emulators, shells, prompts and multiplexers) | `terminals/CHANGELOG.md` | GitHub release only, as one zip with a folder for each app |
 
 The GitHub-release-only products need no one-time setup: no account, token or repository beyond this one.
@@ -74,6 +75,21 @@ uploading if the tag differs from `VERSION` in `build.py`, the tagged commit is 
 no changelog has a section for the version, or a secret or variable of an included product is
 empty. It creates the GitHub release once every included product has published. If one fails,
 re-run the failed jobs in GitHub Actions; the products that published are not uploaded again.
+
+## Upload the Godot plugin
+
+The Asset Store takes new versions on its website only. After a release that includes the Godot plugin, download
+`heritage-themes-godot-<version>.zip` from the GitHub release, open the asset's management page at
+<https://store.godotengine.org>, and add a version on the **Versions** tab:
+
+| Field | Value |
+|---|---|
+| Files | The zip. It holds `addons/heritage_themes/`, which the editor installs into the project. |
+| Version name | `<version>` |
+| Changelog | The `[<version>]` section of `godot/CHANGELOG.md` |
+| Minimum Godot version | `GODOT_MINIMUM` in `build.py` |
+
+Submit it on the **Overview** tab. A version reaches users once the store's reviewers accept it.
 
 To withdraw a tag pushed by mistake, run `git push origin :refs/tags/<tag>` and
 `git tag -d <tag>`. The workflow may already be running; cancel it in GitHub Actions.
@@ -363,3 +379,21 @@ first upload of each creates its project, once a pending publisher names it.
 
 3. Cut a release that includes the product. PyPI refuses a version it already holds, even after its
    deletion, so every upload needs a new version.
+
+## One-time setup: Godot Asset Store
+
+1. Sign in at <https://store.godotengine.org> and choose **Upload Asset**. Create the publisher `Heritage Themes`
+   and the asset `Heritage Themes`, with the URL slugs `heritage-themes`.
+2. On the **Settings** tab, set:
+
+   | Field | Value |
+   |---|---|
+   | Asset Summary and description | `GODOT_DESCRIPTION` in `build.py`, and the opening paragraph of the README in the zip |
+   | Asset type | Addon |
+   | License | MIT, as `LICENSE` |
+   | Source code | <https://github.com/heritage-themes/heritage-themes> |
+   | AI usage | The store requires this disclosure for an asset made with AI tools |
+
+3. On the **Media** tab, add `assets/pluginIcon_dark.png` as the thumbnail and screenshots of the editor in a dark and
+   a light theme.
+4. Upload the first version as in [Upload the Godot plugin](#upload-the-godot-plugin) and submit the asset for review.

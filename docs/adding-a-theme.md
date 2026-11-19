@@ -127,6 +127,18 @@ scripts/rstudio/tokens.py <RStudio folder>
 
 Add a selector only for a type that the script lists, and run `python3 build.py`: it resolves a table of token types in every theme (`cases()` in `heritage/rstudio.py`) and fails when a rule with more classes does not reset the font of one with fewer.
 
+## Check the Godot settings
+
+A Godot text editor theme sets the colour settings under `text_editor/theme/highlighting/`. `ROLES` and `MIXES` in
+`heritage/godot.py` map them to palette roles. List the settings of an installed Godot that the map leaves out, and
+those it sets that Godot does not have:
+
+```bash
+scripts/godot/settings.py [<Godot executable>]
+```
+
+It runs the editor once without a window, in temporary folders, and exits with 1 when either list is not empty.
+
 ## Add the documentation
 
 Add these to the theme folder:
