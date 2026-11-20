@@ -2208,9 +2208,7 @@ editor's colours and the colours of the docks, tabs and dialogs around it. It ne
 
 ## Install
 
-1. Install the plugin in a project:
-   - From the Asset Store: open the **Asset Store** tab, search for Heritage Themes and install it.
-   - From the zip: unzip it into the project's folder, so that the project holds `addons/{heritage.godot.FOLDER}`.
+1. Unzip the plugin's zip into a project's folder, so that the project holds `addons/{heritage.godot.FOLDER}`.
 2. Enable **Heritage Themes** under **Project | Project Settings | Plugins**.
 3. Choose **Project | Tools | Heritage Themes...**, select a theme and choose **Apply**.
 
