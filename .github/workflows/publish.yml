@@ -49,6 +49,7 @@ jobs:
       idle: ${{ steps.check.outputs.idle }}
       rstudio: ${{ steps.check.outputs.rstudio }}
       godot: ${{ steps.check.outputs.godot }}
+      netbeans: ${{ steps.check.outputs.netbeans }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -70,7 +71,7 @@ jobs:
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
             kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
             qtcreator=false amp=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
-            godot=false
+            godot=false netbeans=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" visualstudio/CHANGELOG.md && visualstudio=true
@@ -99,6 +100,7 @@ jobs:
           grep -q "^## \[$version\]" idle/CHANGELOG.md && idle=true
           grep -q "^## \[$version\]" rstudio/CHANGELOG.md && rstudio=true
           grep -q "^## \[$version\]" godot/CHANGELOG.md && godot=true
+          grep -q "^## \[$version\]" netbeans/CHANGELOG.md && netbeans=true
           if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$visualstudio" = false ] && [ "$sublime" = false ] \
               && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ] && [ "$xcode" = false ] \
               && [ "$helix" = false ] && [ "$kakoune" = false ] && [ "$micro" = false ] && [ "$vim" = false ] \
@@ -106,7 +108,7 @@ jobs:
               && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$amp" = false ] \
               && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
               && [ "$pygments" = false ] && [ "$spyder" = false ] && [ "$thonny" = false ] \
-              && [ "$idle" = false ] && [ "$rstudio" = false ] && [ "$godot" = false ]; then
+              && [ "$idle" = false ] && [ "$rstudio" = false ] && [ "$godot" = false ] && [ "$netbeans" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -140,6 +142,7 @@ jobs:
             echo "idle=$idle"
             echo "rstudio=$rstudio"
             echo "godot=$godot"
+            echo "netbeans=$netbeans"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -1119,10 +1122,36 @@ jobs:
           path: build/heritage-themes-godot-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # NetBeans' Plugin Portal lists only plugins published to Maven Central: users add the NBM that the GitHub release
+  # attaches under Tools | Plugins | Downloaded.
+  netbeans:
+    needs: check
+    if: needs.check.outputs.netbeans == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - run: python3 build.py --netbeans
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: netbeans
+          path: build/heritage-themes-netbeans-${{ env.VERSION }}.nbm
+          if-no-files-found: error
+
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
             emacs, terminals, nano, textadept, lapce, qtcreator,
-            amp, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot]
+            amp, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot, netbeans]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -1153,7 +1182,8 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.thonny.result)
       && contains(fromJSON('["success", "skipped"]'), needs.idle.result)
       && contains(fromJSON('["success", "skipped"]'), needs.rstudio.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.godot.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.godot.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.netbeans.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -1187,6 +1217,7 @@ jobs:
       IDLE: ${{ needs.check.outputs.idle }}
       RSTUDIO: ${{ needs.check.outputs.rstudio }}
       GODOT: ${{ needs.check.outputs.godot }}
+      NETBEANS: ${{ needs.check.outputs.netbeans }}
     steps:
       - uses: actions/checkout@v7
 
@@ -1267,6 +1298,7 @@ jobs:
           notes "IDLE themes" "$IDLE" idle/CHANGELOG.md "heritage-themes-idle-<version>.zip"
           notes "RStudio themes" "$RSTUDIO" rstudio/CHANGELOG.md "heritage-themes-rstudio-<version>.zip"
           notes "Godot plugin" "$GODOT" godot/CHANGELOG.md "heritage-themes-godot-<version>.zip"
+          notes "NetBeans plugin" "$NETBEANS" netbeans/CHANGELOG.md "heritage-themes-netbeans-<version>.nbm"
           {
             echo "This release changes: $(paste -sd, "$titles" | sed 's/,/, /g')."
             echo "Every other product is unchanged: its file keeps the version of its last release, which its file name shows."

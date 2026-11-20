@@ -13,8 +13,8 @@ Usage: python3 build.py [--vsix] [--jupyterlab]
 
 Output goes to build/.
 """
-import argparse, ast, base64, configparser, contextlib, hashlib, html, importlib.util, io, json, os, plistlib, re, \
-    shutil, subprocess, sys, tempfile, tomllib, types, unittest.mock, zipfile
+import argparse, ast, base64, configparser, contextlib, datetime, hashlib, html, importlib.util, io, json, os, plistlib, \
+    re, shutil, subprocess, sys, tempfile, time, tomllib, types, unittest.mock, zipfile
 import xml.etree.ElementTree as ET
 
 import heritage
@@ -34,6 +34,14 @@ SINCE_BUILD = "253"  # 2025.3, the first release with the Islands Dark and Islan
 VSCODE_CHANGELOG = os.path.join(ROOT, "vscode", "CHANGELOG.md")
 GODOT_MINIMUM = "4.6"  # the first release with interface/theme/color_preset and the Modern style
 GODOT_DESCRIPTION = "Colour themes for the Godot editor, drawn from the colour traditions of different cultures."
+NETBEANS_RELEASE = "RELEASE320"  # the NetBeans APIs the module compiles against, and so the oldest NetBeans it runs on
+NETBEANS_JAVA = "17"  # the Java release of the module's classes: NetBeans 32 runs on JDK 17 or later
+NETBEANS_GROUP = "io.github.heritage-themes"  # the Maven groupId, a namespace that Maven Central verifies by GitHub
+NETBEANS_ARTIFACT = "heritage-themes-netbeans"
+NETBEANS_TOOLS = os.path.join(ROOT, "scripts", "netbeans")  # the Maven Wrapper, which pins Maven
+NETBEANS_SOURCES = os.path.join(ROOT, "netbeans", "src")  # the module's hand-written Java classes
+NETBEANS_DESCRIPTION = ("Look and feels and editor colour profiles for NetBeans, drawn from the colour traditions of "
+                        "different cultures.")
 VSCODE_PUBLISHER = "heritage-themes"
 VSCODE_NAME = "heritage-themes"
 VSCODE_ENGINE = "^1.75.0"
@@ -2318,6 +2326,321 @@ def validate_godot(addons, families):
             raise SystemExit("Godot plugin: heritage_themes.gd is not godot/heritage_themes.gd")
 
 
+def netbeans_pom(count, timestamp):
+    """The Maven project of the NetBeans module: nbm-maven-plugin writes its manifest and packs the NBM, and the
+    metadata is what Maven Central and the NetBeans Plugin Portal show. timestamp is the time of the files in the
+    module and the NBM's release date."""
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>{NETBEANS_GROUP}</groupId>
+    <artifactId>{NETBEANS_ARTIFACT}</artifactId>
+    <version>{VERSION}</version>
+    <packaging>nbm</packaging>
+    <name>Heritage Themes</name>
+    <description>{html.escape(NETBEANS_DESCRIPTION)} {count} dark and light themes.</description>
+    <url>{VENDOR_URL}</url>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/license/mit</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Heritage Themes</name>
+            <url>{VENDOR_URL}</url>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:{VENDOR_URL}.git</connection>
+        <url>{VENDOR_URL}</url>
+    </scm>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.outputTimestamp>{timestamp}</project.build.outputTimestamp>
+        <maven.compiler.release>{NETBEANS_JAVA}</maven.compiler.release>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-modules</artifactId>
+            <version>{NETBEANS_RELEASE}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-libs-flatlaf</artifactId>
+            <version>{NETBEANS_RELEASE}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-swing-laf-flatlaf</artifactId>
+            <version>{NETBEANS_RELEASE}</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.netbeans.utilities</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <version>14.5</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <codeNameBase>{heritage.netbeans.PACKAGE}</codeNameBase>
+                    <author>Heritage Themes</author>
+                    <homePageUrl>{VENDOR_URL}</homePageUrl>
+                    <licenseName>MIT License</licenseName>
+                    <licenseFile>LICENSE</licenseFile>
+                    <requiresRestart>true</requiresRestart>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <archive>
+                        <manifestFile>${{project.build.outputDirectory}}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.16.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.6.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>3.2.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.2.0</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+"""
+
+
+def source_date():
+    """The time of the commit that is built, as ISO 8601 in UTC, so that a build of the same commit writes the same
+    module; the current time outside a Git checkout."""
+    result = subprocess.run(["git", "log", "-1", "--format=%ct"], cwd=ROOT, capture_output=True, text=True)
+    seconds = int(result.stdout) if result.returncode == 0 and result.stdout.strip() else int(time.time())
+    return datetime.datetime.fromtimestamp(seconds, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def netbeans_manifest():
+    """The module's manifest source, which nbm-maven-plugin completes with the dependencies and versions."""
+    folder = heritage.netbeans.FOLDER
+    return (f"Manifest-Version: 1.0\n"
+            f"OpenIDE-Module-Localizing-Bundle: {folder}/Bundle.properties\n"
+            f"OpenIDE-Module-Layer: {folder}/layer.xml\n"
+            f"OpenIDE-Module-Install: {folder}/Installer.class\n")
+
+
+def netbeans_long_description(families):
+    """The module's description in NetBeans' Plugins dialog, which shows HTML."""
+    blurbs = "".join(f"<li><b>{html.escape(f.FAMILY)}</b>: {html.escape(f.BLURB)}</li>" for f in families)
+    return (f"<p>{html.escape(DESCRIPTION)}</p><p>Each theme is a look and feel with a matching editor colour "
+            f"profile. Choose one under Tools | Options | Appearance | Look and Feel, restart NetBeans and click "
+            f"<i>Switch to matching editor colors profile</i>, or pick the profile alone under Tools | Options | "
+            f"Fonts &amp; Colors.</p><ul>{blurbs}</ul>")
+
+
+def build_netbeans(families):
+    """Writes the module's Maven project to build/netbeans and returns its folder: the hand-written classes, a look
+    and feel class for each theme, and the resources: each theme's UI theme and profile, the layer and the bundle."""
+    project = os.path.join(OUT, "netbeans")
+    shutil.copytree(NETBEANS_SOURCES, os.path.join(project, "src"))
+    themes = [t for f in families for t in f.THEMES]
+    java = os.path.join(project, "src", "main", "java", *heritage.netbeans.PACKAGE.split("."))
+    resources = os.path.join(project, "src", "main", "resources", *heritage.netbeans.PACKAGE.split("."))
+    os.makedirs(os.path.join(project, "src", "main", "nbm"))
+    os.makedirs(os.path.join(resources, "themes"))
+    write_text(os.path.join(java, "Themes.java"), heritage.netbeans.java_themes(themes))
+    for t in themes:
+        write_text(os.path.join(java, f"{heritage.netbeans.look_and_feel(t)}.java"),
+                   heritage.netbeans.java_look_and_feel(t))
+        write_text(os.path.join(resources, "themes", f"{t['slug']}.theme.json"),
+                   json.dumps(heritage.theme(t["palette"], t["slug"]), indent=2))
+        folder = os.path.join(resources, "fontscolors", t["slug"])
+        os.makedirs(folder)
+        for filename, text in heritage.netbeans.files(t["palette"]).items():
+            write_text(os.path.join(folder, filename), text)
+    write_text(os.path.join(resources, "layer.xml"), heritage.netbeans.layer(themes))
+    write_text(os.path.join(resources, "Bundle.properties"),
+               heritage.netbeans.bundle(themes, "Heritage Themes", NETBEANS_DESCRIPTION,
+                                        netbeans_long_description(families), "Appearance"))
+    write_text(os.path.join(project, "src", "main", "nbm", "manifest.mf"), netbeans_manifest())
+    write_text(os.path.join(project, "pom.xml"), netbeans_pom(len(themes), source_date()))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(project, "LICENSE"))
+    return project
+
+
+def validate_netbeans(project, families):
+    """Fails the build when a theme's profile file, look and feel class or UI theme is missing or differs from
+    heritage.netbeans, when the layer names a file that the module lacks or misses one it has, when a colour is not one
+    that NetBeans reads, when a default names no colouring, or when text is below its contrast on a background that
+    code is drawn on."""
+    resources = os.path.join(project, "src", "main", "resources", *heritage.netbeans.PACKAGE.split("."))
+    with open(os.path.join(resources, "layer.xml"), encoding="utf-8") as f:
+        layer = ET.fromstring(re.sub(r"<!DOCTYPE[^>]*>", "", f.read()))
+    urls = set()
+    def walk(element, path):
+        for child in element:
+            if child.tag == "folder":
+                walk(child, path + [child.get("name")])
+            elif child.tag == "file":
+                urls.add(child.get("url"))
+    walk(layer, [])
+    found = {os.path.relpath(os.path.join(root, n), resources).replace(os.sep, "/")
+             for root, _, names in os.walk(os.path.join(resources, "fontscolors")) for n in names}
+    if urls != found:
+        raise SystemExit(f"NetBeans module: the layer names {len(urls)} files for {len(found)} profile files")
+    names = {}
+    for family in families:
+        for t in family.THEMES:
+            p, label = t["palette"], f"NetBeans {heritage.netbeans.name(t)}"
+            names.setdefault(heritage.netbeans.name(t), []).append(t["slug"])
+            for filename, text in heritage.netbeans.files(p).items():
+                path = os.path.join(resources, "fontscolors", t["slug"], filename)
+                with open(path, encoding="utf-8") as f:
+                    if f.read() != text:
+                        raise SystemExit(f"{label}: {filename} differs from heritage.netbeans.files")
+                root = ET.fromstring(re.sub(r"<!DOCTYPE[^>]*>", "", text))
+                for element in root.iter("fontcolor"):
+                    for _, attribute in heritage.netbeans.ATTRIBUTES:
+                        value = element.get(attribute)
+                        if value is not None and not heritage.netbeans.HEX.fullmatch(value):
+                            raise SystemExit(f"{label}: {filename} {element.get('name')} {attribute}={value} is not "
+                                             f"an opaque ARGB colour")
+                    font = element.find("font")
+                    if font is not None and font.get("style") not in heritage.netbeans.FONTS:
+                        raise SystemExit(f"{label}: {filename} {element.get('name')} has font style "
+                                         f"{font.get('style')}")
+            check_netbeans_reference(label, p)
+            check_netbeans_contrast(label, p)
+            with open(os.path.join(resources, "themes", f"{t['slug']}.theme.json"), encoding="utf-8") as f:
+                if json.load(f) != heritage.theme(p, t["slug"]):
+                    raise SystemExit(f"{label}: the UI theme differs from heritage.ui")
+            java = os.path.join(project, "src", "main", "java", *heritage.netbeans.PACKAGE.split("."),
+                                f"{heritage.netbeans.look_and_feel(t)}.java")
+            with open(java, encoding="utf-8") as f:
+                if f.read() != heritage.netbeans.java_look_and_feel(t):
+                    raise SystemExit(f"{label}: {os.path.basename(java)} differs from heritage.netbeans")
+    duplicates = [n for n, slugs in names.items() if len(slugs) > 1]
+    if duplicates:
+        raise SystemExit(f"NetBeans module: two themes share the name {duplicates[0]}")
+
+
+def check_netbeans_reference(label, p):
+    """Fails the build when a colouring names one that NetBeans' default profile does not define, which NetBeans drops,
+    or leaves out one that the default profile colours, which would keep its colour from a light profile. Annotations
+    are kept whatever their names, as NetBeans' debuggers define their own."""
+    reference = heritage.netbeans.REFERENCE
+    for kind, colourings in (("token", heritage.netbeans.tokens(p)), ("highlight", heritage.netbeans.highlights(p)),
+                             ("annotation", heritage.netbeans.annotations(p))):
+        names, own = {n for n, _, _ in reference["base"][kind]}, {n for n, _ in colourings}
+        unknown = sorted(own - names) if kind != "annotation" else []
+        uncoloured = sorted(n for n, _, coloured in reference["base"][kind] if coloured and n not in own)
+        if unknown or uncoloured:
+            raise SystemExit(f"{label}: base {kind} colourings unknown to NetBeans {unknown}, or that NetBeans colours "
+                             f"and the profile leaves out {uncoloured}")
+    roles = heritage.netbeans.overrides(p)
+    for mime, colourings in roles.items():
+        unknown = sorted(set(colourings) - {n for n, _, _ in reference["languages"].get(mime, [])})
+        if unknown:
+            raise SystemExit(f"{label}: {mime} colourings {unknown} are not in heritage/netbeans.json")
+    for mime, entries in reference["languages"].items():
+        uncoloured = [n for n, _, coloured in entries if coloured and n not in roles.get(mime, {})]
+        if uncoloured:
+            raise SystemExit(f"{label}: {mime} {uncoloured} take colours of NetBeans' own that heritage.netbeans does "
+                             f"not override")
+
+
+def check_netbeans_contrast(label, p):
+    """Fails the build when a colouring's text is below 4.5:1 (3:1 for comments) on its own background, or, without
+    one, on the editor's background and the current line, the backgrounds on which the palette holds every syntax
+    role; or when plain text is below 4.5:1 on a background that a highlight or annotation draws behind code."""
+    low = {"comment", "javadoc-first-sentence", "blockquote", "message"}
+    colourings = heritage.netbeans.tokens(p) + heritage.netbeans.highlights(p) + heritage.netbeans.annotations(p)
+    colourings += [c for language in heritage.netbeans.languages(p).values() for c in language]
+    behind = heritage.netbeans.backgrounds(p)
+    checks = [(n, style["fg"], [(n, style["bg"])] if "bg" in style else behind[:2])
+              for n, style in heritage.netbeans.styles(p, colourings).items()
+              if "fg" in style and n not in heritage.netbeans.DECORATIVE]
+    checks.append(("plain text", "#" + p["fg"], behind))
+    for n, fg, backgrounds in checks:
+        needed = 3 if n in low or fg == "#" + p["comment"] else 4.5
+        for where, background in backgrounds:
+            ratio = contrast(fg[1:], background[1:])
+            if ratio < needed:
+                raise SystemExit(f"{label}: {n} is {ratio:.2f}:1 on {where} {background}, needs {needed}:1")
+
+
+def pack_netbeans(project):
+    """Packs the module into an NBM with the Maven Wrapper in scripts/netbeans and returns its path."""
+    if not shutil.which("java") and not os.environ.get("JAVA_HOME"):
+        raise SystemExit("build: --netbeans needs a JDK 17 or later")
+    wrapper = os.path.join(NETBEANS_TOOLS, "mvnw.cmd" if os.name == "nt" else "mvnw")
+    result = subprocess.run([wrapper, "--batch-mode", "--no-transfer-progress", "-f",
+                             os.path.join(project, "pom.xml"), "package"],
+                            capture_output=True, text=True, encoding="utf-8")
+    if result.returncode:
+        raise SystemExit(f"mvnw package: exit {result.returncode}\n{result.stdout}{result.stderr}")
+    nbm = os.path.join(project, "target", "nbm", f"{NETBEANS_ARTIFACT}-{VERSION}.nbm")
+    package = os.path.join(OUT, os.path.basename(nbm))
+    shutil.copy(nbm, package)
+    validate_nbm(package, project)
+    return package
+
+
+def validate_nbm(package, project):
+    """Fails the build when the NBM's descriptor does not name the module, its version and its name, or the module's
+    jar lacks a file of the project's resources or a class that the project's sources declare."""
+    folder = heritage.netbeans.FOLDER
+    jar_name = "netbeans/modules/" + heritage.netbeans.PACKAGE.replace(".", "-") + ".jar"
+    with zipfile.ZipFile(package) as nbm:
+        info = ET.fromstring(re.sub(rb"<!DOCTYPE[^>]*>", b"", nbm.read("Info/info.xml")))
+        manifest = info.find("manifest")
+        expected = {"OpenIDE-Module": heritage.netbeans.PACKAGE, "OpenIDE-Module-Specification-Version": VERSION,
+                    "OpenIDE-Module-Name": "Heritage Themes"}
+        for key, value in expected.items():
+            if manifest is None or manifest.get(key) != value:
+                raise SystemExit(f"NetBeans plugin: Info/info.xml has {key}="
+                                 f"{None if manifest is None else manifest.get(key)}, expected {value}")
+        names = set(zipfile.ZipFile(io.BytesIO(nbm.read(jar_name))).namelist())
+    resources = os.path.join(project, "src", "main", "resources")
+    wanted = {os.path.relpath(os.path.join(root, n), resources).replace(os.sep, "/")
+              for root, _, files in os.walk(resources) for n in files}
+    java = os.path.join(project, "src", "main", "java")
+    wanted |= {os.path.relpath(os.path.join(root, n), java).replace(os.sep, "/")[:-len(".java")] + ".class"
+               for root, _, files in os.walk(java) for n in files if n.endswith(".java")}
+    missing = sorted(wanted - names)
+    if missing or f"{folder}/layer.xml" not in names:
+        raise SystemExit(f"NetBeans plugin: the module jar lacks {missing[:5]}")
+
+
 def lapce_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -3500,6 +3823,8 @@ def main():
     parser.add_argument("--vsix", action="store_true", help="also pack the VS Code extension with vsce")
     parser.add_argument("--jupyterlab", action="store_true",
                         help="also build the JupyterLab extension into a wheel and a zip with JupyterLab's builder")
+    parser.add_argument("--netbeans", action="store_true",
+                        help="also pack the NetBeans module into an NBM with the Maven Wrapper")
     args = parser.parse_args()
     families = heritage.load_families()
     themes = [t for f in families for t in heritage.generate(f)]
@@ -3599,6 +3924,12 @@ def main():
     name = f"{VSCODE_NAME}-godot"
     print(f"{pack_folder(godot, os.path.join(OUT, f'{name}-{VERSION}.zip'), 'addons')}: {len(themes)} themes",
           flush=True)
+    netbeans = build_netbeans(families)
+    validate_netbeans(netbeans, families)
+    if args.netbeans:
+        print(f"{pack_netbeans(netbeans)}: {len(themes)} themes", flush=True)
+    else:
+        print(f"NetBeans: {len(themes)} themes checked; --netbeans packs the NBM", flush=True)
     nova = build_nova(families)
     validate_nova(nova, families)
     print(f"{pack_folder(nova, os.path.join(OUT, f'{VSCODE_NAME}-nova-{VERSION}.zip'), f'{VSCODE_NAME}-nova')}: "

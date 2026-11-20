@@ -15,6 +15,7 @@ Neovim plugin and the themes for every other app share one version, `VERSION` in
 | JupyterLab extension | `jupyterlab/CHANGELOG.md` | PyPI, as `jupyterlab-heritage-themes` |
 | Pygments styles | `pygments/CHANGELOG.md` | PyPI, as `heritage-themes-pygments` |
 | Thonny themes | `thonny/CHANGELOG.md` | PyPI, as `thonny-heritage-themes` |
+| NetBeans plugin | `netbeans/CHANGELOG.md` | GitHub release only, as `heritage-themes-netbeans-<version>.nbm`, which users add under Tools \| Plugins \| Downloaded |
 | Godot plugin | `godot/CHANGELOG.md` | GitHub release; the Godot Asset Store by hand, see [Upload the Godot plugin](#upload-the-godot-plugin) |
 | Terminals themes (26 terminal emulators, shells, prompts and multiplexers) | `terminals/CHANGELOG.md` | GitHub release only, as one zip with a folder for each app |
 
@@ -41,11 +42,11 @@ Work on `dev`. `master` receives commits only when a release is cut.
 
 | Workflow | Runs on | Does |
 |---|---|---|
-| `build.yml` (Build) | Push to `master`, every pull request, manual run | `python3 build.py --vsix --jupyterlab` (on Windows, `python build.py`), which also validates every product and its theme files |
+| `build.yml` (Build) | Push to `master`, every pull request, manual run | `python3 build.py --vsix --jupyterlab --netbeans` (on Windows, `python build.py`), which also validates every product and its theme files |
 | `publish.yml` (Publish) | Push of a `v<digit>…` tag | Checks the tag; for each included product builds and publishes it (the plugin signed, the Sublime Text package, the Zed extension and the Neovim plugin pushed to their repositories, the Zed registry pull request opened, the zip-only products zipped); creates the GitHub release with every product's build |
 | `vscode-identity.yml` (VS Marketplace identity) | Manual run | Prints the Marketplace ID of the identity Publish signs in as |
 
-A push to `dev` runs nothing. Run the same check locally with `python3 build.py --vsix --jupyterlab`.
+A push to `dev` runs nothing. Run the same check locally with `python3 build.py --vsix --jupyterlab --netbeans`.
 
 ## Cut a release
 
@@ -63,7 +64,7 @@ A push to `dev` runs nothing. Run the same check locally with `python3 build.py 
 
    It prints the version and the included products and asks for confirmation. It then sets
    `VERSION` in `build.py`, stamps the changelogs of the included products, runs
-   `python3 build.py --vsix --jupyterlab`, commits and pushes `dev`, fast-forwards `master` to it and pushes it,
+   `python3 build.py --vsix --jupyterlab --netbeans`, commits and pushes `dev`, fast-forwards `master` to it and pushes it,
    waits for Build to pass on that commit, and pushes an annotated tag, which starts Publish. It
    stops before changing anything if no changelog has entries under `[Unreleased]`, the version
    is not greater than the last release in each changelog, it is not on `dev`, the working tree is

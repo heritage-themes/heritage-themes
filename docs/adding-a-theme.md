@@ -86,7 +86,7 @@ Constraints, all enforced by `build.py`:
 
 ```bash
 python3 build.py                     # builds and validates every product; prints each archive with its theme count
-python3 build.py --vsix --jupyterlab # also packs the VS Code extension and the JupyterLab wheel, as CI does
+python3 build.py --vsix --jupyterlab --netbeans # also packs the VS Code extension, the JupyterLab wheel and the NBM, as CI does
 python3 preview.py <theme>           # writes themes/<theme>/build/preview.html, the JetBrains preview
 python3 preview.py --<product> <theme>  # the preview of another product, for example --vscode or --helix
 python3 preview.py --help            # lists the products
@@ -138,6 +138,21 @@ scripts/godot/settings.py [<Godot executable>]
 ```
 
 It runs the editor once without a window, in temporary folders, and exits with 1 when either list is not empty.
+
+## Check the NetBeans colourings
+
+`heritage/netbeans.py` writes each language's colourings with the names and inheritance of NetBeans' default profile,
+which `heritage/netbeans.json` records; NetBeans ignores a colouring that its default profile does not define. After a
+NetBeans release, compare the record with an installation, and write it again when they differ:
+
+```bash
+scripts/netbeans/colorings.py <NetBeans folder>          # lists the differences, exit status 1 when there are any
+scripts/netbeans/colorings.py <NetBeans folder> --write  # writes heritage/netbeans.json
+```
+
+The NetBeans folder is the one with the `platform` and `ide` clusters, for example `files/netbeans` in the Flatpak's
+location (`flatpak info --show-location org.apache.netbeans`). `python3 build.py` then fails for every colouring that
+NetBeans colours itself and `overrides()` does not give a role.
 
 ## Add the documentation
 

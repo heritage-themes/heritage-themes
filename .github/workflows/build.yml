@@ -15,13 +15,14 @@ jobs:
     # plugin descriptor, theme files and icons itself. It also runs on Windows, where Publish builds the
     # Visual Studio extension, so a Windows-only failure stops a release before its tag is pushed.
     # --vsix also packs the VS Code extension with the vsce pinned in scripts/vscode, and --jupyterlab builds the
-    # JupyterLab extension with the builder pinned in scripts/jupyterlab; both need Node.js.
+    # JupyterLab extension with the builder pinned in scripts/jupyterlab; both need Node.js. --netbeans packs the
+    # NetBeans plugin with the Maven Wrapper in scripts/netbeans, which needs a JDK.
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
-            command: python3 build.py --vsix --jupyterlab
+            command: python3 build.py --vsix --jupyterlab --netbeans
           - os: windows-latest
             command: python build.py
     runs-on: ${{ matrix.os }}
@@ -34,4 +35,9 @@ jobs:
         if: runner.os == 'Linux'
         with:
           node-version: 22
+      - uses: actions/setup-java@v6
+        if: runner.os == 'Linux'
+        with:
+          distribution: temurin
+          java-version: 21
       - run: ${{ matrix.command }}

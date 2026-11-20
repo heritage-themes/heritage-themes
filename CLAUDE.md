@@ -4,7 +4,7 @@ Colour themes drawn from cultures' colour traditions, shipped to many apps and t
 repository. Each theme family is a folder in `themes/` with a `theme.py` that holds its palettes. Every colour
 mapping, the UI theme and the previews are shared code in `heritage/`, one module per product.
 
-- `python3 build.py` builds and validates every product. CI runs `python3 build.py --vsix --jupyterlab`.
+- `python3 build.py` builds and validates every product. CI runs `python3 build.py --vsix --jupyterlab --netbeans`.
 - Work on `dev`. `master` receives commits only when a release is cut; see `docs/releasing.md`.
 
 ## Palettes are the only source of colour
