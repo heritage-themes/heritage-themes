@@ -27,6 +27,7 @@ jobs:
       sublime: ${{ steps.check.outputs.sublime }}
       zed: ${{ steps.check.outputs.zed }}
       nvim: ${{ steps.check.outputs.nvim }}
+      drracket: ${{ steps.check.outputs.drracket }}
       notepadpp: ${{ steps.check.outputs.notepadpp }}
       xcode: ${{ steps.check.outputs.xcode }}
       helix: ${{ steps.check.outputs.helix }}
@@ -71,7 +72,7 @@ jobs:
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
             kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
             qtcreator=false amp=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
-            godot=false netbeans=false
+            godot=false netbeans=false drracket=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
           grep -q "^## \[$version\]" visualstudio/CHANGELOG.md && visualstudio=true
@@ -101,6 +102,7 @@ jobs:
           grep -q "^## \[$version\]" rstudio/CHANGELOG.md && rstudio=true
           grep -q "^## \[$version\]" godot/CHANGELOG.md && godot=true
           grep -q "^## \[$version\]" netbeans/CHANGELOG.md && netbeans=true
+          grep -q "^## \[$version\]" drracket/CHANGELOG.md && drracket=true
           if [ "$jetbrains" = false ] && [ "$vscode" = false ] && [ "$visualstudio" = false ] && [ "$sublime" = false ] \
               && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ] && [ "$xcode" = false ] \
               && [ "$helix" = false ] && [ "$kakoune" = false ] && [ "$micro" = false ] && [ "$vim" = false ] \
@@ -108,7 +110,8 @@ jobs:
               && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$amp" = false ] \
               && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
               && [ "$pygments" = false ] && [ "$spyder" = false ] && [ "$thonny" = false ] \
-              && [ "$idle" = false ] && [ "$rstudio" = false ] && [ "$godot" = false ] && [ "$netbeans" = false ]; then
+              && [ "$idle" = false ] && [ "$rstudio" = false ] && [ "$godot" = false ] && [ "$netbeans" = false ] \
+              && [ "$drracket" = false ]; then
             echo "::error::No product changelog has a [$version] section"
             exit 1
           fi
@@ -143,6 +146,7 @@ jobs:
             echo "rstudio=$rstudio"
             echo "godot=$godot"
             echo "netbeans=$netbeans"
+            echo "drracket=$drracket"
           } >> "$GITHUB_OUTPUT"
 
   jetbrains:
@@ -592,6 +596,65 @@ jobs:
         with:
           name: nvim
           path: build/heritage-themes-nvim-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
+  drracket:
+    needs: check
+    if: needs.check.outputs.drracket == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      # The Racket package catalog installs the package from this repository, which holds it at its root.
+      DRRACKET_REPOSITORY: heritage-themes/heritage-themes-drracket
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Check release secrets
+        shell: bash
+        env:
+          DRRACKET_REPO_TOKEN: ${{ secrets.DRRACKET_REPO_TOKEN }}
+        run: |
+          if [ -z "$DRRACKET_REPO_TOKEN" ]; then
+            echo "::error::Repository secret DRRACKET_REPO_TOKEN is empty or not set"
+            exit 1
+          fi
+
+      - run: python3 build.py
+
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ env.DRRACKET_REPOSITORY }}
+          token: ${{ secrets.DRRACKET_REPO_TOKEN }}
+          path: drracket-repository
+          fetch-depth: 0
+
+      # The catalog follows the default branch and updates its checksum on its own; the tag marks the release.
+      - name: Publish to the DrRacket package repository
+        shell: bash
+        run: |
+          cd drracket-repository
+          if git rev-parse -q --verify "refs/tags/v$VERSION" > /dev/null; then
+            echo "$DRRACKET_REPOSITORY is already tagged v$VERSION"
+            exit 0
+          fi
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -r ../build/drracket/. .
+          git add --all
+          if ! git diff --cached --quiet; then
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit --message "Release $VERSION" \
+              --message "Generated from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+          fi
+          git tag "v$VERSION"
+          git push origin HEAD "refs/tags/v$VERSION"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: drracket
+          path: build/heritage-themes-drracket-${{ env.VERSION }}.zip
           if-no-files-found: error
 
   # Notepad++ has no theme registry: users install the theme files from the zip that the GitHub release
@@ -1183,7 +1246,7 @@ jobs:
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
             emacs, terminals, nano, textadept, lapce, qtcreator,
-            amp, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot, netbeans]
+            amp, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot, netbeans, drracket]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -1215,7 +1278,8 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.idle.result)
       && contains(fromJSON('["success", "skipped"]'), needs.rstudio.result)
       && contains(fromJSON('["success", "skipped"]'), needs.godot.result)
-      && contains(fromJSON('["success", "skipped"]'), needs.netbeans.result) }}
+      && contains(fromJSON('["success", "skipped"]'), needs.netbeans.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.drracket.result) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release
@@ -1250,6 +1314,7 @@ jobs:
       RSTUDIO: ${{ needs.check.outputs.rstudio }}
       GODOT: ${{ needs.check.outputs.godot }}
       NETBEANS: ${{ needs.check.outputs.netbeans }}
+      DRRACKET: ${{ needs.check.outputs.drracket }}
     steps:
       - uses: actions/checkout@v7
 
@@ -1331,6 +1396,7 @@ jobs:
           notes "RStudio themes" "$RSTUDIO" rstudio/CHANGELOG.md "heritage-themes-rstudio-<version>.zip"
           notes "Godot plugin" "$GODOT" godot/CHANGELOG.md "heritage-themes-godot-<version>.zip"
           notes "NetBeans plugin" "$NETBEANS" netbeans/CHANGELOG.md "heritage-themes-netbeans-<version>.nbm"
+          notes "DrRacket package" "$DRRACKET" drracket/CHANGELOG.md "heritage-themes-drracket-<version>.zip"
           {
             echo "This release changes: $(paste -sd, "$titles" | sed 's/,/, /g')."
             echo "Every other product is unchanged: its file keeps the version of its last release, which its file name shows."

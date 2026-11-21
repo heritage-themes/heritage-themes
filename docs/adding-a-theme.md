@@ -154,6 +154,40 @@ The NetBeans folder is the one with the `platform` and `ide` clusters, for examp
 location (`flatpak info --show-location org.apache.netbeans`). `python3 build.py` then fails for every colouring that
 NetBeans colours itself and `overrides()` does not give a role.
 
+## Check the DrRacket colour names
+
+`COLOURS` and `styles()` in `heritage/drracket.py` map the colour and style names that DrRacket registers to palette
+roles; DrRacket ignores a name it does not register. After a DrRacket release, start it with the colour-scheme log on
+and compare the `color-names` and `style-names` that it prints with the map:
+
+```bash
+PLTSTDERR="info@color-scheme error" drracket                                   # a native installation
+flatpak run --env=PLTSTDERR="info@color-scheme error" org.racket_lang.Racket    # the Flatpak
+```
+
+## Test the DrRacket schemes locally
+
+Build the package, install the zip as a copy and pick a scheme in DrRacket:
+
+```bash
+python3 build.py
+raco pkg remove heritage-themes    # skip when it is not installed
+raco pkg install --copy --name heritage-themes build/heritage-themes-drracket-<version>.zip
+raco pkg show heritage-themes      # Source names the zip
+```
+
+Restart DrRacket and choose a scheme under **Edit | Preferences | Colors | Color Schemes**. DrRacket keeps one scheme
+for light mode and one for dark mode: set **Color Mode** to always light or always dark, or the scheme of the other
+mode stays on screen. Open a `.rkt` file, click **Run**, enter `(car 1)` in the REPL for an error, click
+**Check Syntax** and put the caret on an identifier.
+
+Install a copy, not a link: `raco` compiles a linked package inside its folder, and `build.py` deletes `build/` on
+every run. A link to a folder that the Flatpak mounts read-only fails to compile.
+
+With the Flatpak, `raco` is `flatpak run --command=raco org.racket_lang.Racket`, and the package reads only folders
+that it has been given. Add `--filesystem=<heritage-themes folder>:ro` to the command. Set `PLTUSERHOME=<empty folder>`
+on `raco` and on DrRacket to test without touching the installed preferences and packages.
+
 ## Add the documentation
 
 Add these to the theme folder:

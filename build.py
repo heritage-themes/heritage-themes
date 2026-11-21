@@ -65,6 +65,12 @@ NVIM_CHANGELOG = os.path.join(ROOT, "nvim", "CHANGELOG.md")
 NVIM_NAME = "heritage-themes.nvim"  # the plugin's repository, which plugin managers install from
 NVIM_REPOSITORY_URL = f"https://github.com/heritage-themes/{NVIM_NAME}"
 NVIM_HEX = re.compile(r"#[0-9A-F]{6}")
+DRRACKET_CHANGELOG = os.path.join(ROOT, "drracket", "CHANGELOG.md")
+DRRACKET_DESCRIPTION = "Colour schemes for DrRacket, drawn from the colour traditions of different cultures."
+# A version of three numbers at most that Racket's valid-version? accepts: a major number, a minor number below 100 and
+# a non-zero maintenance number below 1000.
+DRRACKET_VERSION = re.compile(r"(0|[1-9]\d*)\.(0|[1-9]\d?)(\.[1-9]\d{0,2})?")
+DRRACKET_HIGHLIGHT_APART = 3  # the least CIE76 distance between a highlight and the editor's background
 NOTEPADPP_CHANGELOG = os.path.join(ROOT, "notepadpp", "CHANGELOG.md")
 NOTEPADPP_NAME = "heritage-themes-notepadpp"  # the folder in the zip
 NOTEPADPP_PROLOG = '<?xml version="1.0" encoding="UTF-8" ?>'  # Notepad++'s Themes Collection requires it first
@@ -96,7 +102,8 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Amp", "Eclipse", "Nova",
-           "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE", "RStudio", "Godot", "terminals")
+           "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE", "RStudio", "Godot", "NetBeans", "DrRacket",
+           "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -2206,6 +2213,137 @@ def validate_rstudio(directory, families):
         raise SystemExit("RStudio themes: the zip does not hold the README, changelog, licence and themes")
 
 
+def drracket_readme(families):
+    """The package's README, in its repository and in the zip. Links are absolute, as both hold the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for DrRacket
+
+{DESCRIPTION} {count} dark and light colour schemes in {len(families)} families, for DrRacket; each family maps the \
+named colours of one tradition to syntax roles.
+
+This repository holds the Racket package that [Heritage Themes]({VENDOR_URL}) generates for each release. Report \
+problems and make changes there.
+
+## Install
+
+In DrRacket, choose **File | Install Package...**, enter `{heritage.drracket.PACKAGE}` and click **Install**. In a \
+terminal:
+
+```bash
+raco pkg install {heritage.drracket.PACKAGE}
+```
+
+Restart DrRacket and choose a scheme under **Edit | Preferences | Colors | Color Schemes**; on macOS, \
+**Preferences** is in the **DrRacket** menu. DrRacket lists the dark schemes and the light ones apart and keeps one of each: \
+**Color Mode** chooses whether it follows the system's dark mode or always uses one of them.
+
+Update with `raco pkg update {heritage.drracket.PACKAGE}` or in **File | Package Manager**, and restart DrRacket. \
+Remove with `raco pkg remove {heritage.drracket.PACKAGE}`.
+
+To install without the package catalog, download `heritage-themes-drracket-<version>.zip` from the \
+[latest release]({VENDOR_URL}/releases/latest) and install the file, naming the package:
+
+```bash
+raco pkg install --name {heritage.drracket.PACKAGE} heritage-themes-drracket-<version>.zip
+```
+
+## What is coloured
+
+Each scheme colours the definitions and interactions windows: code, the background, line numbers, matching \
+parentheses, the REPL's values, output and errors, error highlights, Check Syntax's identifiers, arrows and \
+highlights, test coverage and the stepper's highlights. DrRacket draws its window, toolbar, menus, dialogs and the \
+selection with the system's theme, and on Linux also the current line's number.
+
+Racket's lexer gives names the text colour and the forms that it indents specially, such as `define`, `lambda` and \
+`let`, the keyword colour. After **Check Syntax**, imported names take the colour of function calls, names bound in \
+the program keep the text colour, and mutated variables are underlined.
+
+## Colour schemes
+
+| Family | Colour schemes | Tradition |
+| --- | --- | --- |
+{theme_rows(families, heritage.drracket.name)}
+
+Each family's page describes its colour tradition. The same themes are available for {elsewhere("DrRacket")}: see \
+[Heritage Themes on GitHub]({VENDOR_URL}).
+
+Report a problem or suggest a tradition on the [issue tracker]({VENDOR_URL}/issues). Include the colour scheme, the \
+DrRacket version, your operating system and a screenshot.
+"""
+
+
+def build_drracket(families):
+    """Writes the Racket package to build/drracket and returns that folder. The package is one collection at its root,
+    whose info.rkt holds every colour scheme."""
+    directory = os.path.join(OUT, "drracket")
+    os.makedirs(directory)
+    themes = [(heritage.drracket.name(t), t["palette"]) for f in families for t in f.THEMES]
+    write_text(os.path.join(directory, "info.rkt"),
+               heritage.drracket.info(themes, VERSION, DRRACKET_DESCRIPTION, f"{VENDOR_URL}/tree/master/themes"))
+    write_text(os.path.join(directory, "README.md"), drracket_readme(families))
+    shutil.copy(DRRACKET_CHANGELOG, os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_drracket(directory, families):
+    """Fails the build when info.rkt does not read as the package's definitions and one scheme for each theme, a scheme
+    differs from heritage.drracket.entries, two schemes share a name, a style is below its contrast on the editor's
+    background or on a highlight that DrRacket paints behind code, text is below 4.5:1 on its background, or a
+    highlight is too close to the editor's background to be seen."""
+    if sorted(os.listdir(directory)) != ["CHANGELOG.md", "LICENSE", "README.md", "info.rkt"]:
+        raise SystemExit("DrRacket package: it does not hold the README, changelog, licence and info.rkt")
+    with open(os.path.join(directory, "info.rkt"), encoding="utf-8") as f:
+        text = f.read()
+    try:
+        definitions, schemes = heritage.drracket.parse(text)
+    except ValueError as e:
+        raise SystemExit(f"DrRacket info.rkt: {e}")
+    version = heritage.drracket.racket_version(VERSION)
+    expected = {"collection": heritage.drracket.PACKAGE, "pkg-desc": DRRACKET_DESCRIPTION, "version": version,
+                "license": ["quote", "MIT"], "deps": ["quote", ["base"]]}
+    if definitions != expected:
+        raise SystemExit(f"DrRacket info.rkt: the definitions are {definitions}, not {expected}")
+    if not DRRACKET_VERSION.fullmatch(version):
+        raise SystemExit(f"DrRacket info.rkt: {version} is not a version that Racket accepts")
+    names = [heritage.drracket.name(t) for f in families for t in f.THEMES]
+    if len(names) != len(set(names)) or set(names) != set(schemes):
+        raise SystemExit(f"DrRacket info.rkt: {len(schemes)} distinct schemes for {len(names)} themes")
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.drracket.name(t), t["palette"]
+            label = f"DrRacket {name}"
+            dark, entries = schemes[name]
+            if dark != p["dark"] or entries != heritage.drracket.entries(p):
+                raise SystemExit(f"{label}: the scheme differs from heritage.drracket.entries")
+            bg = entries["framework:basic-canvas-background"][0]
+            highlights = [entries[key][0] for key in heritage.drracket.HIGHLIGHTS]
+            for key, (colour, font, background) in entries.items():
+                if key in heritage.drracket.COLOURS:
+                    on = [bg] if key in heritage.drracket.TEXT_COLOURS else []
+                    minimum = 4.5
+                else:
+                    on = [background] if background else [bg, *highlights]
+                    minimum = 3 if key in heritage.drracket.LOW_CONTRAST else 4.5
+                for under in on:
+                    if (ratio := contrast(colour, under)) < minimum:
+                        raise SystemExit(f"{label}: {key} is {ratio:.2f}:1 on {under}, needs {minimum}:1")
+            for key, text_key in heritage.drracket.TEXT_ON.items():
+                if (ratio := contrast(entries[text_key][0], entries[key][0])) < 4.5:
+                    raise SystemExit(f"{label}: {text_key} is {ratio:.2f}:1 on {key}, needs 4.5:1")
+            for colour in highlights:
+                if (apart := distance(bg, colour)) < DRRACKET_HIGHLIGHT_APART:
+                    raise SystemExit(f"{label}: the highlight {colour} is {apart:.1f} from the editor's background, "
+                                     f"needs {DRRACKET_HIGHLIGHT_APART}")
+
+
+def pack_drracket(directory):
+    """Zips the package into a folder named after it, which raco pkg install takes as the package, and returns the
+    zip's path."""
+    return pack_folder(directory, os.path.join(OUT, f"{VSCODE_NAME}-drracket-{VERSION}.zip"),
+                       heritage.drracket.PACKAGE)
+
+
 def godot_readme(families):
     """The plugin's README. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -3885,10 +4023,7 @@ def pack_visualstudio(directory):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Build the JetBrains plugin, the VS Code extension, the Visual Studio "
-                                                 "extension, the Sublime Text package, the Zed extension, the Neovim "
-                                                 "plugin, and the Notepad++, Xcode, Helix, Kakoune, Micro, Vim and "
-                                                 "Emacs themes.")
+    parser = argparse.ArgumentParser(description="Build and validate every Heritage Themes product into build/.")
     parser.add_argument("--vsix", action="store_true", help="also pack the VS Code extension with vsce")
     parser.add_argument("--jupyterlab", action="store_true",
                         help="also build the JupyterLab extension into a wheel and a zip with JupyterLab's builder")
@@ -3940,6 +4075,9 @@ def main():
     nvim_plugin = build_nvim(families)
     validate_nvim(nvim_plugin, families)
     print(f"{pack_nvim(nvim_plugin)}: {len(themes)} themes", flush=True)
+    drracket = build_drracket(families)
+    validate_drracket(drracket, families)
+    print(f"{pack_drracket(drracket)}: {len(themes)} themes", flush=True)
     notepadpp_themes = build_notepadpp(families)
     validate_notepadpp(notepadpp_themes, families)
     print(f"{pack_notepadpp(notepadpp_themes)}: {len(themes)} themes", flush=True)

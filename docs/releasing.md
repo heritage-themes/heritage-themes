@@ -1,7 +1,7 @@
 # Releasing
 
 The JetBrains plugin, the VS Code extension, the Sublime Text package, the Zed extension, the
-Neovim plugin and the themes for every other app share one version, `VERSION` in `build.py`, and one
+Neovim plugin, the DrRacket package and the themes for every other app share one version, `VERSION` in `build.py`, and one
 `v<version>` tag. Each has its own changelog:
 
 | Product | Changelog | Publishes to |
@@ -11,6 +11,7 @@ Neovim plugin and the themes for every other app share one version, `VERSION` in
 | Sublime Text package | `sublime/CHANGELOG.md` | Package repository, listed on Package Control |
 | Zed extension | `zed/CHANGELOG.md` | Extension repository, listed in Zed's extension registry by a pull request |
 | Neovim plugin | `nvim/CHANGELOG.md` | Plugin repository, which plugin managers install from |
+| DrRacket package | `drracket/CHANGELOG.md` | Package repository, listed in the Racket package catalog as `heritage-themes` |
 | Notepad++, Xcode, Helix, Kakoune, Micro, Vim, GNU Emacs, Nano, Textadept, Lapce, Qt Creator, Amp, Eclipse, Nova, Spyder, IDLE and RStudio themes | `notepadpp/`, `xcode/`, `helix/`, `kakoune/`, `micro/`, `vim/`, `emacs/`, `nano/`, `textadept/`, `lapce/`, `qtcreator/`, `amp/`, `eclipse/`, `nova/`, `spyder/`, `idle/` and `rstudio/` `CHANGELOG.md`, one each | GitHub release only: these apps have no registry that Publish uses, and users install the files from the zip |
 | JupyterLab extension | `jupyterlab/CHANGELOG.md` | PyPI, as `jupyterlab-heritage-themes` |
 | Pygments styles | `pygments/CHANGELOG.md` | PyPI, as `heritage-themes-pygments` |
@@ -43,7 +44,7 @@ Work on `dev`. `master` receives commits only when a release is cut.
 | Workflow | Runs on | Does |
 |---|---|---|
 | `build.yml` (Build) | Push to `master`, every pull request, manual run | `python3 build.py --vsix --jupyterlab --netbeans` (on Windows, `python build.py`), which also validates every product and its theme files |
-| `publish.yml` (Publish) | Push of a `v<digit>…` tag | Checks the tag; for each included product builds and publishes it (the plugin signed, the Sublime Text package, the Zed extension and the Neovim plugin pushed to their repositories, the Zed registry pull request opened, the zip-only products zipped); creates the GitHub release with every product's build |
+| `publish.yml` (Publish) | Push of a `v<digit>…` tag | Checks the tag; for each included product builds and publishes it (the plugin signed, the Sublime Text package, the Zed extension, the Neovim plugin and the DrRacket package pushed to their repositories, the Zed registry pull request opened, the zip-only products zipped); creates the GitHub release with every product's build |
 | `vscode-identity.yml` (VS Marketplace identity) | Manual run | Prints the Marketplace ID of the identity Publish signs in as |
 
 A push to `dev` runs nothing. Run the same check locally with `python3 build.py --vsix --jupyterlab --netbeans`.
@@ -354,6 +355,35 @@ every publish replaces its contents. Neovim has no plugin registry to submit to.
    ```
 
 3. Cut a release that includes the plugin. Publish pushes the files and the tag `v<version>`.
+
+## One-time setup: DrRacket package
+
+The Racket package catalog at <https://pkgs.racket-lang.org> lists a package by a source URL, here a public
+repository that holds the package at its root. Publish pushes the generated package to a separate repository and tags
+it `v<version>`. That repository contains generated files only; every publish replaces its contents. The catalog
+checks the source's default branch regularly and offers the new commit to `raco pkg update` without another
+submission.
+
+1. Create the public repository `heritage-themes/heritage-themes-drracket` with a first commit on its default branch,
+   for example a README, which the first publish replaces.
+2. Create a fine-grained personal access token with **Contents: Read and write** on that repository only, and store
+   it as the repository secret `DRRACKET_REPO_TOKEN`:
+
+   ```bash
+   gh secret set DRRACKET_REPO_TOKEN -R heritage-themes/heritage-themes
+   ```
+
+3. Cut a release that includes the package. Publish pushes the files and the tag `v<version>`.
+4. Sign in at <https://pkgs.racket-lang.org> and add the package:
+
+   | Field | Value |
+   |---|---|
+   | Package name | `heritage-themes` |
+   | Description | `Colour schemes for DrRacket, drawn from the colour traditions of different cultures.` |
+   | Source | `https://github.com/heritage-themes/heritage-themes-drracket.git` |
+   | Tags | `color-scheme`, `drracket`, `theme` |
+
+   Check it with `raco pkg install heritage-themes` once the catalog shows a checksum for the package.
 
 ## One-time setup: PyPI
 

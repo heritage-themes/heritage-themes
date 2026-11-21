@@ -15,8 +15,8 @@
 # micro/CHANGELOG.md for the Micro colour schemes, vim/CHANGELOG.md for the Vim colour schemes,
 # emacs/CHANGELOG.md for the Emacs themes, terminals/CHANGELOG.md for the Terminals themes,
 # nano/, textadept/, lapce/, qtcreator/, amp/, eclipse/, nova/, jupyterlab/, pygments/, spyder/, thonny/, idle/ and
-# rstudio/ CHANGELOG.md for those themes, godot/CHANGELOG.md for the Godot plugin and netbeans/CHANGELOG.md for
-# the NetBeans plugin.
+# rstudio/ CHANGELOG.md for those themes, godot/CHANGELOG.md for the Godot plugin, netbeans/CHANGELOG.md for
+# the NetBeans plugin and drracket/CHANGELOG.md for the DrRacket package.
 # A product without entries keeps its last published build, which the GitHub release attaches.
 #
 # Usage: scripts/release.sh [patch|minor|major|X.Y.Z] [--dry-run]
@@ -93,7 +93,8 @@ for product in "JetBrains plugin:CHANGELOG.md" "VS Code extension:vscode/CHANGEL
   "JupyterLab themes:jupyterlab/CHANGELOG.md" "Pygments styles:pygments/CHANGELOG.md" \
   "Spyder themes:spyder/CHANGELOG.md" "Thonny themes:thonny/CHANGELOG.md" \
   "IDLE themes:idle/CHANGELOG.md" "RStudio themes:rstudio/CHANGELOG.md" \
-  "Godot plugin:godot/CHANGELOG.md" "NetBeans plugin:netbeans/CHANGELOG.md"; do
+  "Godot plugin:godot/CHANGELOG.md" "NetBeans plugin:netbeans/CHANGELOG.md" \
+  "DrRacket package:drracket/CHANGELOG.md"; do
   name=${product%%:*} changelog=${product#*:}
   previous=$(latest_release "$changelog")
   # The marketplaces reject a version that is not greater than the last one they received.
