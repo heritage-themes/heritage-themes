@@ -15,7 +15,7 @@ Neovim plugin and the themes for every other app share one version, `VERSION` in
 | JupyterLab extension | `jupyterlab/CHANGELOG.md` | PyPI, as `jupyterlab-heritage-themes` |
 | Pygments styles | `pygments/CHANGELOG.md` | PyPI, as `heritage-themes-pygments` |
 | Thonny themes | `thonny/CHANGELOG.md` | PyPI, as `thonny-heritage-themes` |
-| NetBeans plugin | `netbeans/CHANGELOG.md` | GitHub release only, as `heritage-themes-netbeans-<version>.nbm`, which users add under Tools \| Plugins \| Downloaded |
+| NetBeans plugin | `netbeans/CHANGELOG.md` | Maven Central, which the NetBeans Plugin Portal lists from; the GitHub release also carries `heritage-themes-netbeans-<version>.nbm`, which users add under Tools \| Plugins \| Downloaded |
 | Godot plugin | `godot/CHANGELOG.md` | GitHub release; the Godot Asset Store by hand, see [Upload the Godot plugin](#upload-the-godot-plugin) |
 | Terminals themes (26 terminal emulators, shells, prompts and multiplexers) | `terminals/CHANGELOG.md` | GitHub release only, as one zip with a folder for each app |
 
@@ -380,6 +380,41 @@ first upload of each creates its project, once a pending publisher names it.
 
 3. Cut a release that includes the product. PyPI refuses a version it already holds, even after its
    deletion, so every upload needs a new version.
+
+## One-time setup: NetBeans plugin
+
+The NetBeans Plugin Portal lists plugins that are on Maven Central. Publish deploys the signed module to Central
+as `io.github.heritage-themes:heritage-themes-netbeans`. The `central` profile of the generated
+`build/netbeans/pom.xml` adds the sources and Javadoc jars, the GPG signatures and the Central publishing plugin.
+
+1. Sign in at <https://central.sonatype.com> with GitHub. Under **Publishing Settings**, register the namespace
+   `io.github.heritage-themes`. Create a temporary public repository under the `heritage-themes` organisation, named
+   after the namespace's **Verification Key**, and choose **Verify Namespace**. Delete the repository once the
+   namespace shows **Verified**.
+2. Under **View Account**, generate a user token and store its username and password as repository secrets:
+
+   ```bash
+   gh secret set CENTRAL_TOKEN_USERNAME -R heritage-themes/heritage-themes
+   gh secret set CENTRAL_TOKEN_PASSWORD -R heritage-themes/heritage-themes
+   ```
+
+3. Create an RSA 4096 GPG key, publish its public key to a keyserver that Central reads, and store the private key
+   and its passphrase as repository secrets:
+
+   ```bash
+   gpg --full-generate-key
+   gpg --keyserver keyserver.ubuntu.com --send-keys <key-id>
+   gpg --armor --export-secret-keys <key-id> | gh secret set GPG_PRIVATE_KEY -R heritage-themes/heritage-themes
+   gh secret set GPG_PASSPHRASE -R heritage-themes/heritage-themes
+   ```
+
+   The workflow's "Check release secrets" step fails the run before building if any of the four secrets is empty.
+4. Cut a release that includes the plugin. With `NETBEANS_AUTO_PUBLISH = False` in `build.py`, the deployment stops
+   at Central's validation: check it under **Deployments** and choose **Publish**. Set the constant to `True` to
+   release every deployment without that click.
+5. Register the plugin at <https://plugins.netbeans.apache.org> with the group and artifact ID, then request
+   verification of each plugin version for the NetBeans versions it supports under **Version Management**. Central
+   refuses a version it already holds.
 
 ## One-time setup: Godot Asset Store
 

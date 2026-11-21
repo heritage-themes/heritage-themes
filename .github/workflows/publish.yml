@@ -1122,8 +1122,9 @@ jobs:
           path: build/heritage-themes-godot-${{ env.VERSION }}.zip
           if-no-files-found: error
 
-  # NetBeans' Plugin Portal lists only plugins published to Maven Central: users add the NBM that the GitHub release
-  # attaches under Tools | Plugins | Downloaded.
+  # NetBeans' Plugin Portal lists only plugins published to Maven Central, so the signed module is deployed there as
+  # well as attached to the GitHub release. The deployment is the last step: Central refuses a version it already
+  # holds, so a re-run of a job that deployed would fail.
   netbeans:
     needs: check
     if: needs.check.outputs.netbeans == 'true'
@@ -1135,10 +1136,32 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
+
+      - name: Check release secrets
+        shell: bash
+        env:
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          for name in CENTRAL_TOKEN_USERNAME CENTRAL_TOKEN_PASSWORD GPG_PRIVATE_KEY GPG_PASSPHRASE; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Repository secret $name is empty or not set"
+              exit 1
+            fi
+          done
+
+      # Writes the credentials of the `central` server into settings.xml and imports the signing key.
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
+          server-id: central
+          server-username: CENTRAL_TOKEN_USERNAME
+          server-password: CENTRAL_TOKEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - run: python3 build.py --netbeans
 
@@ -1147,6 +1170,15 @@ jobs:
           name: netbeans
           path: build/heritage-themes-netbeans-${{ env.VERSION }}.nbm
           if-no-files-found: error
+
+      - name: Deploy to Maven Central
+        env:
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: >
+          scripts/netbeans/mvnw --batch-mode --no-transfer-progress -f build/netbeans/pom.xml
+          -Pcentral clean deploy
 
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,

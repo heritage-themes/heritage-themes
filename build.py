@@ -38,6 +38,7 @@ NETBEANS_RELEASE = "RELEASE320"  # the NetBeans APIs the module compiles against
 NETBEANS_JAVA = "17"  # the Java release of the module's classes: NetBeans 32 runs on JDK 17 or later
 NETBEANS_GROUP = "io.github.heritage-themes"  # the Maven groupId, a namespace that Maven Central verifies by GitHub
 NETBEANS_ARTIFACT = "heritage-themes-netbeans"
+NETBEANS_AUTO_PUBLISH = False  # True releases a validated Maven Central deployment at once; False waits for a click
 NETBEANS_TOOLS = os.path.join(ROOT, "scripts", "netbeans")  # the Maven Wrapper, which pins Maven
 NETBEANS_SOURCES = os.path.join(ROOT, "netbeans", "src")  # the module's hand-written Java classes
 NETBEANS_DESCRIPTION = ("Look and feels and editor colour profiles for NetBeans, drawn from the colour traditions of "
@@ -2437,6 +2438,74 @@ def netbeans_pom(count, timestamp):
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>central</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.11.2</version>
+                        <configuration>
+                            <doclint>none</doclint>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.7</version>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.7.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>{str(NETBEANS_AUTO_PUBLISH).lower()}</autoPublish>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
 """
 
