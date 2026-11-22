@@ -1,0 +1,2633 @@
+{
+ "version": "5.22.0",
+ "languages": {
+  "r": {
+   "name": "R",
+   "styles": {
+    "keyword": "def:keyword",
+    "reserved-classes": "def:type",
+    "assignment-operator": "def:operator",
+    "delimiter": "def:operator",
+    "special-constant": "def:special-constant",
+    "boolean": "def:boolean",
+    "integer-number": "def:base-n-integer",
+    "floating-point": "def:floating-point",
+    "functions": "def:function"
+   }
+  },
+  "abnf": {
+   "name": "ABNF",
+   "styles": {
+    "comment": "def:comment",
+    "rulename": "def:type",
+    "binary": "def:base-n-integer",
+    "decimal": "def:decimal",
+    "hexadecimal": "def:base-n-integer",
+    "string": "def:string"
+   }
+  },
+  "actionscript": {
+   "name": "ActionScript",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "string": "def:string",
+    "external": "def:preprocessor",
+    "declaration": "def:type",
+    "storage-class": "def:type",
+    "scope-declaration": "def:type",
+    "keyword": "def:keyword",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "number": "def:decimal",
+    "reserved": "def:error",
+    "type": "def:type"
+   }
+  },
+  "ada": {
+   "name": "Ada",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "decimal": "def:decimal",
+    "boolean": "def:boolean",
+    "storage-class": "def:type",
+    "type": "def:type",
+    "preprocessor": "def:preprocessor",
+    "base-n-number": "def:base-n-integer",
+    "real": "def:floating-point",
+    "escaped-character": "def:special-char"
+   }
+  },
+  "ansforth94": {
+   "name": "ANS-Forth94",
+   "styles": {
+    "keyword": "def:keyword",
+    "obs-keyword": "def:keyword",
+    "comment": "def:comment",
+    "alert": "def:note",
+    "character": "def:character",
+    "word": "def:function",
+    "string": "def:string",
+    "constant": "def:constant",
+    "variable": "def:type",
+    "local-variable": "def:type",
+    "single-number": "def:base-n-integer",
+    "double-number": "def:base-n-integer",
+    "float": "def:floating-point"
+   }
+  },
+  "asciidoc": {
+   "name": "AsciiDoc",
+   "styles": {
+    "passthrough": "def:special-char",
+    "attribute": "def:preprocessor",
+    "markup-monospace": "def:inline-code",
+    "markup-emphasis": "def:emphasis",
+    "markup-strong": "def:strong-emphasis",
+    "markup-pass": "asciidoc:passthrough",
+    "markup-replace": "def:special-char",
+    "markup-linebreak": "def:special-char",
+    "markup-admonition": "def:note",
+    "markup-anchor": "asciidoc:attribute",
+    "markup-crosslink": "def:link-text",
+    "markup-url": "def:link-destination",
+    "markup-link-text": "def:link-text",
+    "markup-att-entry": "asciidoc:attribute",
+    "struct-title": "def:heading",
+    "struct-blocktitle": "def:heading",
+    "struct-style": "asciidoc:attribute",
+    "struct-ruler-line": "def:thematic-break",
+    "struct-page-break": "def:operator",
+    "par-literal": "def:preformatted-section",
+    "block-listing": "def:preformatted-section",
+    "block-pass": "asciidoc:passthrough",
+    "block-comment": "def:comment",
+    "block-boundary": "def:identifier",
+    "macro": "def:keyword",
+    "macro-arg": "def:string",
+    "macro-att-list": "asciidoc:attribute",
+    "preprocessor": "def:preprocessor",
+    "preprocessor-arg": "def:string",
+    "preprocessor-att-list": "asciidoc:attribute",
+    "list-identifier": "def:list-marker"
+   }
+  },
+  "asp": {
+   "name": "ASP",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "preprocessor": "def:preprocessor",
+    "keyword": "def:keyword",
+    "function": "def:function",
+    "operator": "def:operator",
+    "object": "def:type",
+    "constant": "def:constant",
+    "type": "def:type",
+    "special-constant": "def:special-constant",
+    "boolean": "def:boolean",
+    "number": "def:decimal"
+   }
+  },
+  "astro": {
+   "name": "Astro",
+   "styles": {}
+  },
+  "automake": {
+   "name": "Automake",
+   "styles": {
+    "lhs": "def:identifier",
+    "primary": "def:type",
+    "secondary": "def:statement",
+    "prefix": "def:statement",
+    "target": "def:statement",
+    "dirname": "def:statement",
+    "keyword": "def:statement",
+    "subst": "def:preprocessor"
+   }
+  },
+  "awk": {
+   "name": "awk",
+   "styles": {
+    "keyword": "def:keyword",
+    "pattern": "def:preprocessor",
+    "variable": "def:identifier",
+    "builtin-function": "def:builtin",
+    "regexpr": "def:string"
+   }
+  },
+  "bennugd": {
+   "name": "BennuGD",
+   "styles": {
+    "comment": "def:comment",
+    "preprocessor": "def:preprocessor",
+    "identifier": "def:identifier",
+    "operator": "def:operator",
+    "keywords": "def:keyword",
+    "types": "def:type",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "hexadecimal": "def:base-n-integer",
+    "boolean": "def:boolean"
+   }
+  },
+  "bibtex": {
+   "name": "BibTeX",
+   "styles": {
+    "entry-type": "def:keyword",
+    "field": "def:identifier",
+    "string": "def:string"
+   }
+  },
+  "blueprint": {
+   "name": "Blueprint",
+   "styles": {
+    "comment": "def:comment",
+    "translator": "def:emphasis",
+    "keyword": "def:keyword",
+    "namespace": "def:type",
+    "class": "def:type",
+    "function": "def:function",
+    "property": "def:identifier",
+    "identifier": "def:identifier",
+    "builtin": "def:builtin",
+    "child_type": "def:identifier",
+    "escape": "def:special-char",
+    "string": "def:string",
+    "boolean": "def:boolean",
+    "null": "def:special-constant",
+    "number": "def:number"
+   }
+  },
+  "bluespec": {
+   "name": "Bluespec SystemVerilog",
+   "styles": {
+    "system-task": "def:keyword",
+    "annotation": "def:function",
+    "attribute": "def:type",
+    "import-bvi": "def:keyword",
+    "keyword": "def:keyword",
+    "type": "def:type"
+   }
+  },
+  "boo": {
+   "name": "Boo",
+   "styles": {
+    "comment": "def:comment",
+    "multiline-string": "def:string",
+    "string": "def:string",
+    "regex": "def:string",
+    "namespace": "def:preprocessor",
+    "type": "def:type",
+    "definition": "def:keyword",
+    "keyword": "def:keyword",
+    "special-variable": "def:identifier",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "number": "def:number",
+    "builtin": "def:builtin"
+   }
+  },
+  "c": {
+   "name": "C",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "preprocessor": "def:preprocessor",
+    "common-defines": "def:special-constant",
+    "included-file": "def:string",
+    "included-relative-file": "c:included-file",
+    "char": "def:character",
+    "keyword": "def:keyword",
+    "type-keyword": "c:keyword",
+    "operator": "def:operator",
+    "type": "def:type",
+    "storage-class": "def:type",
+    "printf": "def:special-char",
+    "escaped-character": "def:special-char",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "binary": "def:base-n-integer",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer",
+    "boolean": "def:boolean",
+    "nullptr": "def:special-constant",
+    "standard-stream": "def:constant",
+    "signal-name": "def:constant",
+    "attribute": "def:preprocessor",
+    "error": "def:error"
+   }
+  },
+  "cg": {
+   "name": "CG Shader Language",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "preprocessor": "def:preprocessor",
+    "bindings": "def:special-constant",
+    "included-file": "def:string",
+    "keyword": "def:keyword",
+    "type": "def:type",
+    "storage-class": "def:builtin",
+    "escaped-character": "def:special-char",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer",
+    "boolean": "def:boolean",
+    "swizzle": "def:operator",
+    "function": "def:function",
+    "builtin": "def:preprocessor"
+   }
+  },
+  "changelog": {
+   "name": "ChangeLog",
+   "styles": {
+    "date": "def:number",
+    "name": "def:statement",
+    "email": "def:identifier",
+    "file": "def:comment",
+    "bullet": "def:type",
+    "function": "def:function",
+    "release": "def:statement"
+   }
+  },
+  "chdr": {
+   "name": "C/ObjC Header",
+   "styles": {}
+  },
+  "cmake": {
+   "name": "CMake",
+   "styles": {
+    "builtin-command": "def:function",
+    "deprecated-builtin-command": "def:warning",
+    "builtin-variable": "def:builtin",
+    "constant": "def:constant",
+    "operator": "def:operator",
+    "control": "def:keyword",
+    "variable": "makefile:variable",
+    "quoted-argument": "def:string",
+    "bracket-argument": "def:string",
+    "legacy-syntax": "def:warning"
+   }
+  },
+  "cobol": {
+   "name": "COBOL",
+   "styles": {
+    "comment": "def:comment",
+    "statement": "def:statement",
+    "variable": "def:type",
+    "keyword": "def:keyword",
+    "constant": "def:constant",
+    "string": "def:string",
+    "number": "def:decimal",
+    "operator": "def:operator",
+    "error": "def:error"
+   }
+  },
+  "commonlisp": {
+   "name": "Common Lisp",
+   "styles": {
+    "boolean": "def:boolean",
+    "builtin": "def:keyword",
+    "character": "def:character",
+    "comment": "def:comment",
+    "constant": "def:constant",
+    "error": "def:error",
+    "format-directive": "def:special-char",
+    "keyword": "def:type",
+    "lambda-list-keyword": "def:type",
+    "number": "def:number",
+    "operator": "def:operator",
+    "special": "def:type",
+    "string": "def:string",
+    "symbol": "def:identifier"
+   }
+  },
+  "cpp": {
+   "name": "C++",
+   "styles": {
+    "raw-string": "def:string",
+    "keyword": "c:keyword",
+    "type": "c:type",
+    "common-defines": "c:common-defines"
+   }
+  },
+  "cpphdr": {
+   "name": "C++ Header",
+   "styles": {}
+  },
+  "c-sharp": {
+   "name": "C#",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "type": "def:type",
+    "string": "def:string",
+    "char": "def:character",
+    "escaped-character": "def:special-char",
+    "format": "def:special-char",
+    "keyword": "def:keyword",
+    "preprocessor": "def:preprocessor",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "decimal": "def:decimal",
+    "hexadecimal": "def:base-n-integer",
+    "real": "def:floating-point"
+   }
+  },
+  "css": {
+   "name": "CSS",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "vendor-specific": "def:warning",
+    "keyword": "def:constant",
+    "namespace": "def:keyword",
+    "symbol": null,
+    "delimiter": null,
+    "block-delimiter": "css:delimiter",
+    "test-delimiter": "css:delimiter",
+    "name": null,
+    "escape": "def:special-char",
+    "string": "def:string",
+    "color": "def:base-n-integer",
+    "number": "def:number",
+    "integer": "def:decimal",
+    "dimension": "def:floating-point",
+    "expression": "def:complex",
+    "unicode-range": null,
+    "function": "def:function",
+    "property-name": "def:keyword",
+    "custom-property-name": "def:identifier",
+    "modifier": "def:keyword",
+    "at-rule": "def:preprocessor",
+    "at-rule-operator": "css:at-rule",
+    "at-rule-inner-selector": "def:identifier",
+    "media-query-operator": "css:at-rule-operator",
+    "media-type": "css:property-name",
+    "media-feature": "css:property-name",
+    "media-feature-value": "css:keyword",
+    "selector-symbol": "css:symbol",
+    "namespace-qualifier": "css:selector-symbol",
+    "id-selector": "def:statement",
+    "class-selector": "def:identifier",
+    "type-selector": "def:type",
+    "universal-selector": "css:selector-symbol",
+    "attribute-selector": "css:selector-symbol",
+    "attribute-selector-operator": "css:selector-symbol",
+    "attribute-selector-name": "def:type",
+    "combinator": "css:selector-symbol",
+    "pseudo-selector": "def:function",
+    "pseudo-selector-operator": "css:pseudo-selector",
+    "pseudo-element": "css:pseudo-selector",
+    "pseudo-class": "css:pseudo-selector"
+   }
+  },
+  "csv": {
+   "name": "CSV",
+   "styles": {
+    "decimal": "def:decimal",
+    "escaped-character": "def:special-char",
+    "floating-point": "def:floating-point",
+    "string": "def:string"
+   }
+  },
+  "cuda": {
+   "name": "CUDA",
+   "styles": {
+    "keyword": "def:keyword",
+    "data-type": "def:type",
+    "cuda-global": "def:function",
+    "cuda-device": "def:function",
+    "global-var": "def:identifier"
+   }
+  },
+  "d": {
+   "name": "D",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "type": "def:type",
+    "special-token": "def:preprocessor",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "binary": "def:base-n-integer",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer"
+   }
+  },
+  "dart": {
+   "name": "Dart",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "escaped": "def:special-char",
+    "string": "def:string",
+    "null-value": "def:special-constant",
+    "bool": "def:boolean",
+    "num": "def:decimal",
+    "external": "def:preprocessor",
+    "keyword": "def:keyword",
+    "type": "def:type"
+   }
+  },
+  "def": {
+   "name": "Defaults",
+   "styles": {
+    "comment": null,
+    "shebang": "def:comment",
+    "doc-comment": "def:comment",
+    "doc-comment-element": null,
+    "constant": null,
+    "character": "def:constant",
+    "string": "def:constant",
+    "special-char": null,
+    "number": "def:constant",
+    "floating-point": "def:number",
+    "decimal": "def:number",
+    "base-n-integer": "def:number",
+    "complex": "def:number",
+    "special-constant": "def:constant",
+    "boolean": "def:special-constant",
+    "identifier": null,
+    "function": "def:identifier",
+    "builtin": "def:identifier",
+    "statement": null,
+    "operator": "def:statement",
+    "keyword": "def:statement",
+    "type": null,
+    "emphasis": null,
+    "strong-emphasis": null,
+    "inline-code": null,
+    "insertion": null,
+    "deletion": null,
+    "link-text": null,
+    "link-symbol": null,
+    "link-destination": null,
+    "heading": null,
+    "thematic-break": null,
+    "preformatted-section": null,
+    "list-marker": null,
+    "preprocessor": null,
+    "error": null,
+    "warning": null,
+    "reserved": "def:error",
+    "note": null,
+    "net-address": null,
+    "underlined": "def:net-address",
+    "heading0": null,
+    "heading1": null,
+    "heading2": null,
+    "heading3": null,
+    "heading4": null,
+    "heading5": null,
+    "heading6": null
+   }
+  },
+  "desktop": {
+   "name": ".desktop",
+   "styles": {
+    "group": "def:keyword",
+    "key": "def:type",
+    "language": "def:decimal",
+    "number": "def:floating-point",
+    "boolean": "def:floating-point",
+    "exec-parameter": "def:floating-point",
+    "encoding": "def:floating-point",
+    "category-main": "def:reserved",
+    "category-additional": "def:identifier",
+    "category-reserved": "def:note"
+   }
+  },
+  "diff": {
+   "name": "Diff",
+   "styles": {
+    "added-line": null,
+    "removed-line": null,
+    "changed-line": null,
+    "special-case": null,
+    "location": null,
+    "ignore": "def:comment",
+    "diff-file": null
+   }
+  },
+  "docbook": {
+   "name": "DocBook",
+   "styles": {
+    "header-elements": "def:keyword",
+    "formatting-elements": "def:keyword",
+    "gui-elements": "def:keyword",
+    "structural-elements": "def:keyword"
+   }
+  },
+  "docker": {
+   "name": "Dockerfile",
+   "styles": {
+    "comment": "def:comment",
+    "keyword": "def:keyword",
+    "operator": "def:operator",
+    "string": "def:string",
+    "variable": "def:special-char",
+    "variable-definition": "docker:variable",
+    "user": "def:identifier",
+    "alias-definition": "def:identifier",
+    "number": "def:number"
+   }
+  },
+  "dosbatch": {
+   "name": "DOS Batch",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "commands": "def:keyword"
+   }
+  },
+  "dot": {
+   "name": "Graphviz Dot",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "keyword": "def:keyword",
+    "attribute": "def:type"
+   }
+  },
+  "dpatch": {
+   "name": "DPatch",
+   "styles": {
+    "patch-start": "def:keyword"
+   }
+  },
+  "dtd": {
+   "name": "DTD",
+   "styles": {
+    "entity": "xml:entity",
+    "decl": "xml:doctype",
+    "error": "xml:error",
+    "quoted-value": "xml:attribute-value"
+   }
+  },
+  "dtl": {
+   "name": "Django Template",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "escape": "def:special-char",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "filters": "def:function",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer"
+   }
+  },
+  "eiffel": {
+   "name": "Eiffel",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "debug": "def:preprocessor",
+    "assertion": "def:preprocessor",
+    "keyword": "def:keyword",
+    "type": "def:type",
+    "design-by-contract": "def:keyword",
+    "exception-handling": "def:keyword",
+    "predefined-variable": "def:builtin",
+    "escaped-character": "def:special-char",
+    "void": "def:special-constant",
+    "boolean": "def:boolean",
+    "decimal": "def:decimal",
+    "hexadecimal": "def:base-n-integer"
+   }
+  },
+  "elixir": {
+   "name": "Elixir",
+   "styles": {
+    "comment": "def:comment",
+    "atom": "def:type",
+    "keyword": "def:type",
+    "sigil": "def:type",
+    "charcode": "def:character",
+    "string": "def:string",
+    "string-interpolation": "def:special-char",
+    "codepoint": "def:special-char",
+    "character": "def:character",
+    "floating-point": "def:floating-point",
+    "base-n-integer": "def:base-n-integer",
+    "decimal": "def:decimal",
+    "boolean": "def:type",
+    "module": "def:preprocessor",
+    "builtin-name": "def:keyword",
+    "attribute": "def:builtin"
+   }
+  },
+  "erb-html": {
+   "name": "ERB (HTML)",
+   "styles": {}
+  },
+  "erb-js": {
+   "name": "ERB (JavaScript)",
+   "styles": {}
+  },
+  "erb": {
+   "name": "ERB",
+   "styles": {
+    "preprocessor": "def:preprocessor",
+    "erb-comment": "def:comment",
+    "erb-block": null
+   }
+  },
+  "erlang": {
+   "name": "Erlang",
+   "styles": {
+    "comment": "def:comment",
+    "keyword": "def:keyword",
+    "operator": "def:operator",
+    "atom": "def:type",
+    "string": "def:string",
+    "character": "def:character",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "base-n-integer": "def:base-n-integer",
+    "builtin": "def:builtin",
+    "compiler-directive": "def:preprocessor"
+   }
+  },
+  "fcl": {
+   "name": "FCL",
+   "styles": {
+    "comment": "def:comment",
+    "floating-point": "def:floating-point",
+    "keyword": "def:keyword",
+    "block": "def:function",
+    "decimal": "def:decimal",
+    "reserved-constant": "def:special-constant"
+   }
+  },
+  "fish": {
+   "name": "Fish",
+   "styles": {
+    "comment": "def:comment",
+    "function": "def:function",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "variable": "def:type",
+    "variable-definition": "fish:variable",
+    "others": "def:keyword",
+    "common-command": "def:keyword",
+    "here-doc-bound": "def:keyword",
+    "subshell": "def:preprocessor"
+   }
+  },
+  "forth": {
+   "name": "Forth",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "preprocessor": "def:preprocessor",
+    "keyword": "def:statement",
+    "type": "def:type",
+    "number": "def:decimal",
+    "debugs": "def:comment",
+    "error": "def:error",
+    "compiler": "def:identifier"
+   }
+  },
+  "fortran": {
+   "name": "Fortran 95",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "floating-point": "def:floating-point",
+    "keyword": "def:keyword",
+    "intrinsic": "def:builtin",
+    "boz-literal": "def:base-n-integer",
+    "decimal": "def:decimal",
+    "type": "def:type",
+    "preprocessor": "def:preprocessor",
+    "openmp-directives": "def:preprocessor",
+    "included-file": "def:string",
+    "escaped-character": "def:special-char"
+   }
+  },
+  "fsharp": {
+   "name": "F#",
+   "styles": {
+    "comment": "def:comment",
+    "base-n-integer": "def:base-n-integer",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "meta-keyword": "def:keyword",
+    "fun-keyword": "def:keyword",
+    "type": "def:type",
+    "label": "def:type",
+    "poly-variant": "def:type",
+    "variant": "def:type",
+    "type-var": "def:type",
+    "module": "def:type",
+    "escape": "def:special-char",
+    "boolean": "def:boolean",
+    "preprocessor": "def:preprocessor",
+    "null-value": "def:special-constant"
+   }
+  },
+  "ftl": {
+   "name": "Fluent",
+   "styles": {
+    "quoted-text": "def:string",
+    "term": "def:keyword",
+    "variable": "def:identifier",
+    "attribute": "def:operator",
+    "variant-key": "def:identifier",
+    "function": "def:function"
+   }
+  },
+  "gap": {
+   "name": "GAP",
+   "styles": {
+    "comment": "def:comment",
+    "character": "def:string",
+    "keyword": "def:keyword",
+    "function": "def:function",
+    "decimal": "def:decimal"
+   }
+  },
+  "gdb-log": {
+   "name": "GDB Log",
+   "styles": {
+    "thread-action": "def:comment",
+    "thread-header": "def:statement",
+    "frame-number": "def:keyword",
+    "address": "def:number",
+    "function": "def:function",
+    "string": "def:string",
+    "filename": "def:statement",
+    "optimized-out": "def:special-constant",
+    "incomplete-sequence": "def:special-constant",
+    "prompt": "def:comment"
+   }
+  },
+  "gdscript": {
+   "name": "GDScript",
+   "styles": {
+    "module-handler": "def:preprocessor",
+    "keyword": "def:keyword",
+    "multiline-string": "def:string",
+    "string": "def:string",
+    "escaped-char": "def:special-char",
+    "format": "def:character",
+    "string-conversion": null,
+    "special-variable": "def:identifier",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "base-n-integer": "def:base-n-integer",
+    "complex": "def:complex",
+    "builtin-constant": "def:special-constant",
+    "builtin-object": "def:type",
+    "builtin-function": "def:builtin"
+   }
+  },
+  "genie": {
+   "name": "Genie",
+   "styles": {
+    "comment": "def:comment",
+    "multiline-string": "def:string",
+    "string": "def:string",
+    "regex": "def:string",
+    "namespace": "def:preprocessor",
+    "type": "def:type",
+    "definition": "def:keyword",
+    "keyword": "def:keyword",
+    "special-variable": "def:identifier",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "number": "def:number",
+    "builtin": "def:builtin",
+    "printf": "def:special-char"
+   }
+  },
+  "glsl": {
+   "name": "OpenGL Shading Language",
+   "styles": {
+    "preprocessor": "def:preprocessor",
+    "type": "def:type",
+    "keyword": "def:keyword",
+    "builtin-function": "def:builtin",
+    "builtin-constant": "def:constant",
+    "builtin-variable": "def:identifier",
+    "future-use": null
+   }
+  },
+  "go": {
+   "name": "Go",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "string": "def:string",
+    "char": "def:character",
+    "keyword": "def:keyword",
+    "external": "def:preprocessor",
+    "type": "def:type",
+    "printf": "def:special-char",
+    "escaped-character": "def:special-char",
+    "floating-point": "def:floating-point",
+    "imaginary": "def:number",
+    "binary": "def:base-n-integer",
+    "decimal": "def:decimal",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer",
+    "boolean": "def:boolean",
+    "builtin-constant": "def:special-constant",
+    "builtin-function": "def:builtin"
+   }
+  },
+  "gradle": {
+   "name": "Gradle",
+   "styles": {
+    "declaration": "def:type"
+   }
+  },
+  "groff": {
+   "name": "Groff",
+   "styles": {
+    "comment": "def:comment",
+    "escaped-character": "def:special-char",
+    "macro": "def:function",
+    "request": "def:builtin",
+    "preprocessor": "def:preprocessor"
+   }
+  },
+  "groovy": {
+   "name": "Groovy",
+   "styles": {
+    "comment": "def:comment",
+    "escaped-character": "def:special-char",
+    "interpolation": "def:special-char",
+    "interpolated": "def:identifier",
+    "string": "def:string",
+    "external": "def:preprocessor",
+    "declaration": "def:type",
+    "storage-class": "def:type",
+    "scope-declaration": "def:type",
+    "operator": "def:operator",
+    "keyword": "def:keyword",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "number": "def:number",
+    "type": "def:type"
+   }
+  },
+  "gtk-doc": {
+   "name": "gtk-doc",
+   "styles": {
+    "inline-docs-section": "def:doc-comment",
+    "function-name": "def:doc-comment-element",
+    "signal-name": "def:doc-comment-element",
+    "property-name": "def:doc-comment-element",
+    "parameter": "def:doc-comment-element",
+    "constant": "def:doc-comment-element",
+    "type": "def:doc-comment-element",
+    "function": "def:doc-comment-element",
+    "return": "def:doc-comment-element",
+    "since": "def:doc-comment-element",
+    "deprecated": "def:doc-comment-element",
+    "code-span": "def:inline-code"
+   }
+  },
+  "gtkrc": {
+   "name": "GtkRC",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "decimal": "def:decimal",
+    "variable": "def:type",
+    "state": "def:special-constant",
+    "include-directive": "def:preprocessor",
+    "boolean-value": "def:boolean"
+   }
+  },
+  "haddock": {
+   "name": "Haddock",
+   "styles": {
+    "markup": "def:doc-comment",
+    "directive": "def:doc-comment-element",
+    "identifier": "def:doc-comment-element",
+    "module": "def:doc-comment-element",
+    "escape": "def:special-char",
+    "emphasis": "def:doc-comment-element",
+    "monospace": null,
+    "codeblock": null,
+    "property": "def:doc-comment-element",
+    "itemized": "def:doc-comment-element",
+    "enumerated": "def:doc-comment-element",
+    "definition": "def:doc-comment-element",
+    "url": "def:net-address",
+    "anchor": "def:doc-comment-element"
+   }
+  },
+  "haskell-literate": {
+   "name": "Literate Haskell",
+   "styles": {}
+  },
+  "haskell": {
+   "name": "Haskell",
+   "styles": {
+    "preprocessor": "def:preprocessor",
+    "comment": "def:comment",
+    "variable": null,
+    "symbol": null,
+    "keyword": "def:keyword",
+    "type": "def:type",
+    "string": "def:string",
+    "character": "def:character",
+    "char-escape": "def:special-char",
+    "float": "def:floating-point",
+    "decimal": "def:decimal",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer"
+   }
+  },
+  "haxe": {
+   "name": "Haxe",
+   "styles": {
+    "comment": "def:comment",
+    "external": "def:preprocessor",
+    "preprocessor": "def:preprocessor",
+    "declaration": "def:type",
+    "storage-class": "def:type",
+    "scope": "def:type",
+    "keyword": "def:keyword",
+    "string": "def:string",
+    "number": "def:decimal",
+    "boolean": "def:boolean",
+    "null-value": "def:special-constant",
+    "type": "def:identifier",
+    "metadata": "def:constant",
+    "macro": "def:preprocessor",
+    "error": "def:error",
+    "escaped-char": "def:special-char",
+    "identifier-prefix": "def:warning"
+   }
+  },
+  "html": {
+   "name": "HTML",
+   "styles": {
+    "comment": "xml:comment",
+    "tag": "xml:element-name",
+    "attrib-name": "xml:attribute-name",
+    "attrib-value": "xml:attribute-value",
+    "dtd": "xml:doctype",
+    "error": "xml:error",
+    "title": "def:heading0",
+    "h1": "def:heading1",
+    "h2": "def:heading2",
+    "h3": "def:heading3",
+    "h4": "def:heading4",
+    "h5": "def:heading5",
+    "h6": "def:heading6"
+   }
+  },
+  "idl-exelis": {
+   "name": "IDL/PV-WAVE/GDL",
+   "styles": {
+    "comment": "def:comment",
+    "type": "def:type",
+    "preprocessor": "def:preprocessor",
+    "keyword": "def:keyword",
+    "string": "def:string",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "function": "def:function"
+   }
+  },
+  "idl": {
+   "name": "IDL",
+   "styles": {
+    "comment": "def:comment",
+    "type": "def:type",
+    "preprocessor": "def:preprocessor",
+    "keyword": "def:keyword",
+    "string": "def:string"
+   }
+  },
+  "imagej": {
+   "name": "ImageJ",
+   "styles": {
+    "builtin": "def:builtin",
+    "boolean": "def:boolean",
+    "command": "def:function",
+    "storage-type": "def:type",
+    "escape": "def:special-char",
+    "keyword": "def:keyword",
+    "operator": "def:operator",
+    "string": "def:string"
+   }
+  },
+  "ini": {
+   "name": ".ini",
+   "styles": {
+    "comment": "def:comment",
+    "floating-point": "def:floating-point",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "decimal": "def:decimal",
+    "variable": "def:type",
+    "non-standard-key": "def:type",
+    "boolean-value": "def:boolean"
+   }
+  },
+  "j": {
+   "name": "J",
+   "styles": {
+    "adverb": "def:identifier",
+    "comment": "def:comment",
+    "conjunction": "def:identifier",
+    "control": "def:keyword",
+    "error": "def:error",
+    "exparg": "def:special-char",
+    "global": "def:type",
+    "labtext": "def:preprocessor",
+    "local": "def:type",
+    "noun": "def:special-constant",
+    "noundef": "def:string",
+    "number": "def:decimal",
+    "parens": "def:statement",
+    "primitive": "def:identifier",
+    "string": "def:string",
+    "verb": "def:identifier"
+   }
+  },
+  "jade": {
+   "name": "Jade",
+   "styles": {
+    "comment": "def:comment",
+    "doctype": "def:preprocessor",
+    "processing-instruction": "def:preprocessor",
+    "element-name": "def:identifier",
+    "attribute-name": "def:type",
+    "attribute-value": "def:string",
+    "tags": "def:keyword",
+    "entity": "def:preprocessor",
+    "error": "def:error"
+   }
+  },
+  "java": {
+   "name": "Java",
+   "styles": {
+    "comment": "def:comment",
+    "doc-comment": "def:doc-comment",
+    "doc-comment-element": "def:doc-comment-element",
+    "escaped-character": "def:special-char",
+    "multiline-string": "def:string",
+    "string": "def:string",
+    "char": "def:character",
+    "external": "def:preprocessor",
+    "annotation": "def:preprocessor",
+    "declaration": "def:type",
+    "storage-class": "def:type",
+    "scope-declaration": "def:type",
+    "keyword": "def:keyword",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "base-n-integer": "def:base-n-integer",
+    "reserved": "def:reserved",
+    "type": "def:type"
+   }
+  },
+  "js-expr": {
+   "name": "JavaScript Expressions",
+   "styles": {}
+  },
+  "js-fn": {
+   "name": "JavaScript Functions and Classes",
+   "styles": {}
+  },
+  "js-lit": {
+   "name": "JavaScript Literals",
+   "styles": {}
+  },
+  "js-mod": {
+   "name": "JavaScript Modules",
+   "styles": {}
+  },
+  "js-st": {
+   "name": "JavaScript Statements",
+   "styles": {}
+  },
+  "js-val": {
+   "name": "JavaScript Built-in Values",
+   "styles": {}
+  },
+  "js": {
+   "name": "JavaScript",
+   "styles": {
+    "comment": "def:comment",
+    "doc-comment": "def:doc-comment",
+    "error": "def:error",
+    "keyword": "def:keyword",
+    "reserved-word": "def:reserved",
+    "directive": "def:preprocessor",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "decimal": "def:decimal",
+    "base-n-integer": "def:base-n-integer",
+    "binary-integer": "js:base-n-integer",
+    "octal-integer": "js:base-n-integer",
+    "hex-integer": "js:base-n-integer",
+    "escape": "def:special-char",
+    "string": "def:string",
+    "included-file": "js:string",
+    "regex": "def:string",
+    "regex-class": "def:special-char",
+    "regex-group": "def:identifier",
+    "regex-flag": "def:special-constant",
+    "template-literal": "js:string",
+    "template-placeholder": "def:preprocessor",
+    "built-in-value": "def:special-constant",
+    "built-in-function": "def:builtin",
+    "built-in-constructor": "def:type",
+    "built-in-object": "def:builtin",
+    "built-in-property": "def:statement",
+    "built-in-method": "js:built-in-function",
+    "identifier": null,
+    "rest-syntax": null,
+    "spread-syntax": null,
+    "array-binding-pattern": null,
+    "object-binding-pattern": null,
+    "array-literal": null,
+    "object-literal": null,
+    "function-expression": null,
+    "class-expression": null,
+    "grouping": null,
+    "grouping-operator": null,
+    "increment-decrement-operator": null,
+    "unary-operator": null,
+    "binary-operator": null,
+    "comma-operator": null,
+    "ternary-operator": null,
+    "expression": null,
+    "block-statement": null,
+    "break-statement": null,
+    "continue-statement": null,
+    "debugger-statement": null,
+    "expression-statement": null,
+    "for-statement": null,
+    "if-statement": null,
+    "else-statement": null,
+    "label-statement": null,
+    "return-statement": null,
+    "switch-statement": null,
+    "throw-statement": null,
+    "try-catch-statement": null,
+    "variable-declaration": null,
+    "while-statement": null,
+    "with-statement": null,
+    "export-import-declaration": null
+   }
+  },
+  "jsdoc": {
+   "name": "JSDoc",
+   "styles": {
+    "inline-tag": "def:doc-comment-element",
+    "type": "def:doc-comment-element",
+    "block-tag": "def:doc-comment-element",
+    "note": "def:note",
+    "argument": "def:doc-comment-element",
+    "event": "jsdoc:argument",
+    "keyword": "jsdoc:argument",
+    "namepath": "jsdoc:argument",
+    "escape": null
+   }
+  },
+  "json": {
+   "name": "JSON",
+   "styles": {
+    "keyname": "def:constant",
+    "special-char": "js:escape",
+    "string": "js:string",
+    "null-value": "js:null-value",
+    "boolean": "js:boolean",
+    "error": "def:error",
+    "float": "def:floating-point",
+    "decimal": "def:decimal"
+   }
+  },
+  "jsx": {
+   "name": "JSX",
+   "styles": {
+    "element": null,
+    "spread-attribute": null,
+    "attribute-expression": null,
+    "child-expression": null
+   }
+  },
+  "julia": {
+   "name": "Julia",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "character": "def:character",
+    "number": "def:number",
+    "boolean": "def:boolean",
+    "math-constant": "def:constant",
+    "special-constant": "def:special-constant",
+    "operator": "def:operator",
+    "keyword": "def:keyword",
+    "macro": "def:preprocessor",
+    "external-command": "def:constant",
+    "builtin-function": "def:builtin",
+    "module": "def:builtin",
+    "type": "def:type"
+   }
+  },
+  "kotlin": {
+   "name": "Kotlin",
+   "styles": {
+    "builtin": "def:builtin",
+    "comment": "def:comment",
+    "declaration": "def:type",
+    "default": null,
+    "error": "def:error",
+    "escaped-character": "def:special-char",
+    "external": "def:preprocessor",
+    "identifier": "def:identifier",
+    "interpolated": "def:identifier",
+    "keyword": "def:keyword",
+    "modifier": "def:type",
+    "number": "def:decimal",
+    "operator": "def:operator",
+    "special": "def:special-constant",
+    "string": "def:string",
+    "type": "def:identifier"
+   }
+  },
+  "latex": {
+   "name": "LaTeX",
+   "styles": {
+    "comment": "def:comment",
+    "display-math": "def:string",
+    "inline-math": "latex:display-math",
+    "math": "latex:display-math",
+    "math-boundary": "latex:display-math",
+    "include": "def:preprocessor",
+    "included-file": "def:string",
+    "common-commands": "def:keyword",
+    "command": "def:keyword",
+    "verbatim": "def:comment",
+    "special-char": "def:special-char",
+    "part": "def:heading0",
+    "chapter": "def:heading1",
+    "section": "def:heading2",
+    "subsection": "def:heading3",
+    "subsubsection": "def:heading4",
+    "paragraph": "def:heading5",
+    "subparagraph": "def:heading6"
+   }
+  },
+  "lean": {
+   "name": "Lean",
+   "styles": {
+    "comment": "def:comment",
+    "attribute": "def:preprocessor",
+    "command": "def:preprocessor",
+    "keyword": "def:keyword",
+    "string": "def:string",
+    "character": "def:character",
+    "escaped-character": "def:special-char",
+    "numeric": "def:number",
+    "boolean": "def:boolean",
+    "identifier": null
+   }
+  },
+  "less": {
+   "name": "Less",
+   "styles": {
+    "variable": "def:identifier",
+    "built-in-variable": "def:builtin",
+    "operator-symbol": "css:symbol",
+    "boolean": "def:boolean",
+    "group-delimiter": "css:delimiter",
+    "mixin-parameters-delimiter": "css:delimiter",
+    "guard-operator": "css:at-rule-operator",
+    "selector-fragment": null
+   }
+  },
+  "lex": {
+   "name": "Lex",
+   "styles": {
+    "token": "def:keyword",
+    "keyword": "def:keyword",
+    "regexp": "def:identifier",
+    "expression": "def:type"
+   }
+  },
+  "libtool": {
+   "name": "libtool",
+   "styles": {
+    "constant": "def:constant",
+    "boolean": "libtool:constant"
+   }
+  },
+  "llvm": {
+   "name": "LLVM IR",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "function": "def:function",
+    "constant": "def:constant",
+    "variable": "def:identifier",
+    "identifier": "def:identifier",
+    "type": "def:type",
+    "boolean": "def:boolean",
+    "number": "def:decimal"
+   }
+  },
+  "logcat": {
+   "name": "logcat",
+   "styles": {
+    "comment": "def:comment",
+    "verbose": "def:identifier",
+    "debug": "def:shebang",
+    "info": "def:string",
+    "warning": "def:statement",
+    "error": "def:number",
+    "fatal": "def:error",
+    "others": "def:comment"
+   }
+  },
+  "logtalk": {
+   "name": "Logtalk",
+   "styles": {
+    "comment": "def:comment",
+    "operator": "def:operator",
+    "error": "def:error",
+    "string": "def:string",
+    "entity": "def:type",
+    "directive": "def:preprocessor",
+    "number": "def:decimal",
+    "built-in": "def:keyword",
+    "variable": "def:identifier",
+    "escaped-character": "def:special-char"
+   }
+  },
+  "lua": {
+   "name": "Lua",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "escape": "def:special-char",
+    "reserved": "def:keyword",
+    "label": "def:keyword",
+    "function": "def:function",
+    "nil-value": "def:special-constant",
+    "boolean": "def:boolean"
+   }
+  },
+  "m4": {
+   "name": "m4",
+   "styles": {
+    "m4-comment": "sh:comment",
+    "m4-macro": "def:keyword",
+    "ac-macro": "def:keyword",
+    "ac-macro-obsolete": "def:error"
+   }
+  },
+  "makefile": {
+   "name": "Makefile",
+   "styles": {
+    "variable": "def:type",
+    "assignment-rhs": null,
+    "assignment-lhs": null,
+    "targets": "def:function",
+    "prereq": null,
+    "command": null,
+    "trailing-tab": null,
+    "function": "def:function",
+    "keyword": "def:keyword"
+   }
+  },
+  "mallard": {
+   "name": "Mallard",
+   "styles": {
+    "page": "def:identifier",
+    "section": "def:identifier",
+    "block": "def:identifier",
+    "inline": "def:identifier"
+   }
+  },
+  "markdown": {
+   "name": "Markdown",
+   "styles": {
+    "header": "def:heading",
+    "horizontal-rule": "def:thematic-break",
+    "list-marker": "def:list-marker",
+    "code-span": "def:inline-code",
+    "code-block": "def:preformatted-section",
+    "blockquote-marker": "def:shebang",
+    "url": "def:link-destination",
+    "link-text": "def:link-text",
+    "label": "def:preprocessor",
+    "attribute-value": "def:constant",
+    "image-marker": "def:link-symbol",
+    "emphasis": "def:emphasis",
+    "strong-emphasis": "def:strong-emphasis",
+    "backslash-escape": "def:special-char",
+    "line-break": "def:note"
+   }
+  },
+  "matlab": {
+   "name": "Matlab",
+   "styles": {
+    "comment": "def:comment",
+    "keyword": "def:keyword",
+    "builtin": "def:builtin"
+   }
+  },
+  "maxima": {
+   "name": "Maxima",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "builtin": "def:builtin",
+    "keyword": "def:keyword",
+    "variable": "def:identifier"
+   }
+  },
+  "mediawiki": {
+   "name": "MediaWiki",
+   "styles": {
+    "strong-emphasis": "def:strong-emphasis",
+    "light-emphasis": "def:emphasis",
+    "signature": "def:statement",
+    "url": "def:link-destination",
+    "link": "def:link-text",
+    "link-symbol": "def:link-symbol",
+    "line": "def:thematic-break",
+    "list": "def:list-marker",
+    "magic-word": "def:statement",
+    "table-symbol": "def:statement",
+    "preformatted": "def:preformatted-section",
+    "redirect": "def:statement",
+    "title": "def:heading",
+    "template": "def:statement"
+   }
+  },
+  "meson": {
+   "name": "Meson",
+   "styles": {
+    "builtin-command": "def:function",
+    "operator": "def:operator",
+    "escape": "def:special-char",
+    "string": "def:string",
+    "boolean": "def:boolean",
+    "keyword": "def:keyword"
+   }
+  },
+  "modelica": {
+   "name": "Modelica",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "operator": "def:operator",
+    "class-type": "def:type",
+    "data-type": "def:type",
+    "default-attribute": "def:identifier",
+    "boolean": "def:boolean",
+    "decimal": "def:decimal",
+    "floating-point": "def:floating-point",
+    "base-n-integer": "def:base-n-integer",
+    "keyword": "def:keyword",
+    "builtin": "def:builtin"
+   }
+  },
+  "mxml": {
+   "name": "MXML",
+   "styles": {
+    "element-name": "xml:element-name",
+    "cdata-delim": "xml:cdata-delim"
+   }
+  },
+  "nemerle": {
+   "name": "Nemerle",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "preprocessor": "def:preprocessor",
+    "character": "def:character",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "type": "def:type",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "binary": "def:base-n-integer",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer"
+   }
+  },
+  "netrexx": {
+   "name": "NetRexx",
+   "styles": {
+    "escaped-character": "def:special-char",
+    "string": "def:string",
+    "char": "def:character",
+    "line-comment": "def:comment",
+    "externals": "def:preprocessor",
+    "options": "def:function",
+    "primitive-types": "def:type",
+    "special": "def:special-constant",
+    "visibility": "def:identifier",
+    "modifiers": "def:type",
+    "keywords": "def:keyword",
+    "sub-keywords": "def:shebang",
+    "builtin-function": "def:builtin",
+    "numeric": "def:number"
+   }
+  },
+  "nix": {
+   "name": "Nix",
+   "styles": {
+    "escape": "def:special-char",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "keyword": "def:keyword",
+    "string": "def:string",
+    "function": "def:builtin",
+    "indented-string": "def:string",
+    "path": "def:underlined",
+    "uri": "def:underlined"
+   }
+  },
+  "nsis": {
+   "name": "NSIS",
+   "styles": {
+    "operator": "def:operator",
+    "comment": "def:comment",
+    "string": "def:string",
+    "variable": "makefile:variable"
+   }
+  },
+  "objc": {
+   "name": "Objective-C",
+   "styles": {
+    "keyword": "c:keyword",
+    "type": "c:type",
+    "common-defines": "c:common-defines",
+    "string": "c:string"
+   }
+  },
+  "objj": {
+   "name": "Objective-J",
+   "styles": {
+    "type": "def:type"
+   }
+  },
+  "ocaml": {
+   "name": "OCaml",
+   "styles": {
+    "comment": "def:comment",
+    "ocamldoc": "def:doc-comment",
+    "ocamldoc-element": "def:doc-comment-element",
+    "base-n-integer": "def:base-n-integer",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "meta-keyword": "def:keyword",
+    "fun-keyword": "def:keyword",
+    "type": "def:type",
+    "label": "def:identifier",
+    "poly-variant": "def:type",
+    "variant": "def:type",
+    "type-var": "def:type",
+    "module": "def:type",
+    "escape": "def:special-char",
+    "boolean": "def:boolean",
+    "error": "def:error",
+    "std-modules": "def:type"
+   }
+  },
+  "ocl": {
+   "name": "OCL",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "operators": "def:keyword",
+    "type": "def:type",
+    "operation": "def:keyword"
+   }
+  },
+  "octave": {
+   "name": "Octave",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "operator": "def:operator",
+    "data-type": "def:type",
+    "storage-type": "def:type",
+    "boolean": "def:boolean",
+    "package-manager": "def:preprocessor",
+    "keyword": "def:keyword",
+    "reserved-constant": "def:special-constant",
+    "builtin": "def:builtin"
+   }
+  },
+  "ooc": {
+   "name": "OOC",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "escaped-character": "def:special-char",
+    "string": "def:string",
+    "external": "def:preprocessor",
+    "declaration": "def:type",
+    "storage-class": "def:type",
+    "scope-declaration": "def:type",
+    "keyword": "def:keyword",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer",
+    "reserved": "def:error",
+    "type": "def:type"
+   }
+  },
+  "opal": {
+   "name": "Opal",
+   "styles": {
+    "module-handler": "def:preprocessor",
+    "comment": "def:comment",
+    "common-defines": "def:special-constant",
+    "error": "def:error",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "boolean": "def:boolean",
+    "decimal": "def:decimal",
+    "type": "def:type",
+    "keysymbol": "def:keyword"
+   }
+  },
+  "opencl": {
+   "name": "OpenCL",
+   "styles": {
+    "keyword": "def:keyword",
+    "data-type": "def:type",
+    "global-function": "def:function",
+    "device-function": "def:function",
+    "device-cast": "def:function",
+    "opencl-const": "def:special-constant",
+    "global-var": "def:identifier"
+   }
+  },
+  "pascal": {
+   "name": "Pascal",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "decimal": "def:decimal",
+    "type": "def:type",
+    "preprocessor": "def:preprocessor"
+   }
+  },
+  "perl": {
+   "name": "Perl",
+   "styles": {
+    "comment": "def:comment",
+    "line-directive": "def:preprocessor",
+    "include-statement": "def:preprocessor",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "builtin": "def:builtin",
+    "here-doc": "def:string",
+    "here-doc-bound": "def:string",
+    "system-command": "def:string",
+    "operator": "def:keyword",
+    "variable": "def:type",
+    "file-descriptor": "def:special-constant",
+    "control": "def:preprocessor",
+    "regex": "def:string",
+    "error": "def:error",
+    "pod": "def:comment",
+    "pod-escape": "def:special-char",
+    "pod-keyword": "def:keyword",
+    "pod-heading": "def:doc-comment-element"
+   }
+  },
+  "php": {
+   "name": "PHP",
+   "styles": {
+    "preprocessor": "def:preprocessor",
+    "comment": "def:comment",
+    "error": "def:error",
+    "variable": "def:identifier",
+    "identifier": null,
+    "escape": "def:special-char",
+    "string": "def:string",
+    "here-doc": "def:string",
+    "here-doc-bound": "def:keyword",
+    "keyword": "def:keyword",
+    "common-function": "def:keyword",
+    "operator": "def:operator",
+    "type": "def:type",
+    "null-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer"
+   }
+  },
+  "pig": {
+   "name": "Pig",
+   "styles": {
+    "datatype": "def:type",
+    "reserved-words": "def:keyword",
+    "builtin-functions": "def:function",
+    "boolean": "def:boolean",
+    "null": "def:special-constant",
+    "comment": "def:comment"
+   }
+  },
+  "pkgconfig": {
+   "name": "pkg-config",
+   "styles": {
+    "variable": "def:keyword",
+    "info": "def:keyword"
+   }
+  },
+  "gettext-translation": {
+   "name": "gettext translation",
+   "styles": {
+    "comment": "def:comment",
+    "location": "def:comment",
+    "string": "def:string",
+    "fuzzy": "def:note",
+    "keyword": "def:keyword",
+    "format": "def:special-char"
+   }
+  },
+  "powershell": {
+   "name": "PowerShell",
+   "styles": {
+    "comment": "def:comment",
+    "multiline-comment": "def:doc-comment-element",
+    "string": "def:string",
+    "char": "def:special-char",
+    "keyword": "def:keyword",
+    "function-param": "def:statement",
+    "operator": "def:keyword",
+    "symbol": "def:identifier",
+    "variable": "def:shebang",
+    "builtin-function": "def:builtin",
+    "user-function": "def:constant",
+    "builtin-parameters": "def:preprocessor",
+    "datatype": "def:type",
+    "number": "def:special-char"
+   }
+  },
+  "prolog": {
+   "name": "Prolog",
+   "styles": {
+    "comment": "def:comment",
+    "variable": "def:type",
+    "keyword": "def:keyword",
+    "string": "def:string",
+    "number": "def:decimal",
+    "operator": "def:operator",
+    "error": "def:error",
+    "escaped-character": "def:special-char"
+   }
+  },
+  "proto": {
+   "name": "Protobuf",
+   "styles": {
+    "comment": "def:comment",
+    "statement": "def:preprocessor",
+    "variable": "def:type",
+    "type": "def:type",
+    "keyword": "def:keyword",
+    "boolean": "def:boolean",
+    "string": "def:string"
+   }
+  },
+  "puppet": {
+   "name": "Puppet",
+   "styles": {
+    "resources": "def:keyword",
+    "parameters": "def:statement",
+    "metaparameters": "def:statement",
+    "functions": "def:type",
+    "values": "def:type",
+    "variables": "def:identifier",
+    "class-names": "def:preprocessor"
+   }
+  },
+  "python": {
+   "name": "Python 2",
+   "styles": {
+    "module-handler": "def:preprocessor",
+    "keyword": "def:keyword",
+    "multiline-string": "def:string",
+    "string": "def:string",
+    "escaped-char": "def:special-char",
+    "format": "def:character",
+    "string-conversion": null,
+    "special-variable": "def:identifier",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "base-n-integer": "def:base-n-integer",
+    "complex": "def:complex",
+    "builtin-constant": "def:special-constant",
+    "builtin-object": "def:type",
+    "builtin-function": "def:builtin",
+    "function-name": "def:function",
+    "class-name": "def:function",
+    "decorator": "def:preprocessor",
+    "operator": "def:operator"
+   }
+  },
+  "python3": {
+   "name": "Python",
+   "styles": {
+    "module-handler": "python:module-handler",
+    "keyword": "python:keyword",
+    "multiline-string": "python:multiline-string",
+    "string": "python:string",
+    "escaped-char": "python:escaped-char",
+    "format": "python:format",
+    "string-conversion": "python:string-conversion",
+    "special-variable": "python:special-variable",
+    "boolean": "python:boolean",
+    "floating-point": "python:floating-point",
+    "decimal": "python:decimal",
+    "base-n-integer": "python:base-n-integer",
+    "complex": "python:complex",
+    "builtin-constant": "python:builtin-constant",
+    "builtin-object": "python:builtin-object",
+    "builtin-function": "python:builtin-function",
+    "function-name": "python:function-name",
+    "class-name": "python:class-name",
+    "decorator": "python:decorator",
+    "operator": "python:operator",
+    "f-string-curly-braces": "def:special-char"
+   }
+  },
+  "reasonml": {
+   "name": "Reason",
+   "styles": {
+    "comment": "def:comment",
+    "ocamldoc": "def:note",
+    "base-n-integer": "def:base-n-integer",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "meta-keyword": "def:keyword",
+    "fun-keyword": "def:keyword",
+    "type": "def:type",
+    "label": "def:type",
+    "poly-variant": "def:type",
+    "variant": "def:type",
+    "type-var": "def:type",
+    "module": "def:type",
+    "escape": "def:special-char",
+    "boolean": "def:boolean",
+    "error": "def:error",
+    "std-modules": "def:type"
+   }
+  },
+  "rpmspec": {
+   "name": "RPM spec",
+   "styles": {
+    "define": "def:preprocessor",
+    "header": "def:keyword",
+    "section": "def:type",
+    "spec-macro": "def:preprocessor",
+    "directory-macro": "def:identifier",
+    "command-macro": "def:identifier",
+    "conditional-macro": "def:preprocessor",
+    "other-macro": "def:identifier",
+    "flow-conditional": "def:preprocessor",
+    "rpm-var": "def:identifier",
+    "switch": "def:operator",
+    "changelog-date": "changelog:date",
+    "changelog-email": "changelog:email"
+   }
+  },
+  "rst": {
+   "name": "reStructuredText",
+   "styles": {
+    "header": "def:heading",
+    "emphasis": "def:emphasis",
+    "strong-emphasis": "def:strong-emphasis",
+    "bullet": "def:list-marker",
+    "lineblock": "def:string",
+    "directive": "def:constant",
+    "comment": "def:comment",
+    "interpreted": "def:identifier",
+    "link": "def:link-text",
+    "substitution": "def:type",
+    "code": "def:inline-code",
+    "url": "def:net-address"
+   }
+  },
+  "ruby": {
+   "name": "Ruby",
+   "styles": {
+    "escape": "def:special-char",
+    "comment": "def:comment",
+    "attribute-definition": "def:statement",
+    "module-handler": "def:preprocessor",
+    "keyword": "def:keyword",
+    "nil-value": "def:special-constant",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "base-n-integer": "def:base-n-integer",
+    "numeric-literal": "def:base-n-integer",
+    "character-literal": "def:string",
+    "string": "def:string",
+    "literal": "def:special-char",
+    "builtin": "def:type",
+    "constant": "def:type",
+    "symbol": "def:string",
+    "special-variable": "def:identifier",
+    "predefined-variable": "def:identifier",
+    "variable": "def:identifier",
+    "here-doc": "def:string",
+    "here-doc-bound": "def:string",
+    "regex": "def:identifier"
+   }
+  },
+  "rust": {
+   "name": "Rust",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "char": "def:character",
+    "keyword": "def:keyword",
+    "type": "def:type",
+    "boolean": "def:boolean",
+    "identifier": "def:identifier",
+    "number": "def:number",
+    "scope": "def:preprocessor",
+    "attribute": "def:preprocessor",
+    "macro": "def:preprocessor",
+    "error": "def:error",
+    "lifetime": "rust:keyword",
+    "self": "rust:identifier"
+   }
+  },
+  "scala": {
+   "name": "Scala",
+   "styles": {
+    "error": "def:error",
+    "external": "def:preprocessor",
+    "comment": "def:comment",
+    "string": "def:string",
+    "escaped-character": "def:special-char",
+    "declaration": "def:type",
+    "modifier": "def:type",
+    "keyword": "def:keyword",
+    "special": "def:special-constant",
+    "number": "def:decimal",
+    "operator": "def:operator",
+    "type": "def:identifier",
+    "builtin": "def:type",
+    "other": "def:special-char",
+    "xmltag": "def:identifier"
+   }
+  },
+  "scheme": {
+   "name": "Scheme",
+   "styles": {
+    "comment": "def:comment",
+    "boolean": "def:boolean",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "function": "def:function"
+   }
+  },
+  "scilab": {
+   "name": "Scilab",
+   "styles": {
+    "comment": "def:comment",
+    "floating-point": "def:floating-point",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "function": "def:function",
+    "boolean": "def:boolean",
+    "reserved-constant": "def:special-constant"
+   }
+  },
+  "scss": {
+   "name": "SCSS",
+   "styles": {
+    "interpolation": "def:preprocessor",
+    "variable": "def:identifier",
+    "operator-symbol": "css:symbol",
+    "logical-operator": "def:preprocessor",
+    "boolean": "def:boolean",
+    "null": "def:special-constant",
+    "list-delimiter": "css:delimiter",
+    "group-delimiter": "css:delimiter",
+    "placeholder-selector": "def:identifier",
+    "selector-fragment": null,
+    "mixin-name": "def:keyword"
+   }
+  },
+  "sh": {
+   "name": "sh",
+   "styles": {
+    "comment": "def:comment",
+    "function": "def:function",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "variable": "def:type",
+    "variable-definition": "sh:variable",
+    "others": "def:keyword",
+    "common-command": "def:keyword",
+    "here-doc-bound": "def:keyword",
+    "subshell": "def:preprocessor",
+    "none": null
+   }
+  },
+  "sml": {
+   "name": "Standard ML",
+   "styles": {
+    "comment": "def:comment",
+    "keyword": "def:keyword",
+    "type": "def:type",
+    "character": "def:character",
+    "string": "def:string",
+    "escaped-character": "def:special-char",
+    "base-n-integer": "def:base-n-integer",
+    "decimal": "def:decimal",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "special-var": "def:type"
+   }
+  },
+  "solidity": {
+   "name": "Solidity",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "preprocessor": "def:preprocessor",
+    "common-defines": "def:special-constant",
+    "char": "def:character",
+    "keyword": "def:keyword",
+    "reserved": "def:error",
+    "type": "def:type",
+    "escaped-character": "def:special-char",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "hexadecimal": "def:base-n-integer",
+    "boolean": "def:boolean",
+    "error": "def:error",
+    "properties": "def:statement",
+    "function": "def:builtin",
+    "module-handler": "def:preprocessor"
+   }
+  },
+  "sparql": {
+   "name": "SPARQL",
+   "styles": {
+    "class": "def:type",
+    "datatype": "def:type",
+    "function": "def:function",
+    "individual": "def:special-constant",
+    "keyword": "def:keyword",
+    "namespace": "def:builtin",
+    "boolean": "def:boolean",
+    "literal": "def:string",
+    "predicate": "def:function",
+    "qname": null,
+    "iri": "def:special-constant",
+    "var": "def:preprocessor",
+    "operator": "def:operator"
+   }
+  },
+  "spice": {
+   "name": "SPICE",
+   "styles": {
+    "preprocessor": "def:preprocessor",
+    "statement": "def:statement",
+    "function": "def:function",
+    "builtin": "def:builtin",
+    "string": "def:string",
+    "attribute": "xml:attribute-name",
+    "note": "def:note",
+    "operator": "def:operator",
+    "identifier": "def:identifier",
+    "comment": "def:comment",
+    "doc-comment": "def:doc-comment",
+    "error": "def:error",
+    "state-machine": "t2t:italic"
+   }
+  },
+  "sql": {
+   "name": "SQL",
+   "styles": {
+    "comment": "def:comment",
+    "floating-point": "def:floating-point",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "function": "def:function",
+    "decimal": "def:decimal",
+    "type": "def:type",
+    "some-thing": "def:preprocessor"
+   }
+  },
+  "star": {
+   "name": "STAR",
+   "styles": {
+    "comment": "def:comment",
+    "data-name": "def:identifier",
+    "keyword": "def:keyword",
+    "framecode": "def:type",
+    "string": "def:string",
+    "data-value": null
+   }
+  },
+  "sweave": {
+   "name": "Sweave",
+   "styles": {
+    "comment": "latex:comment",
+    "command": "latex:command",
+    "verbatim": "latex:verbatim"
+   }
+  },
+  "swift": {
+   "name": "Swift",
+   "styles": {
+    "builtin": "def:builtin",
+    "comment": "def:comment",
+    "compiler-control": "def:preprocessor",
+    "declaration": "def:type",
+    "escaped-character": "def:special-char",
+    "external": "def:preprocessor",
+    "interpolated": "def:identifier",
+    "keyword": "def:keyword",
+    "modifier": "def:type",
+    "number": "def:decimal",
+    "operator": "def:operator",
+    "special": "def:special-constant",
+    "string": "def:string",
+    "type": "def:identifier"
+   }
+  },
+  "systemverilog": {
+   "name": "SystemVerilog",
+   "styles": {
+    "compiler-directive": "def:preprocessor",
+    "system-task": "def:keyword",
+    "keyword": "def:keyword",
+    "type": "def:type"
+   }
+  },
+  "t2t": {
+   "name": "txt2tags",
+   "styles": {
+    "comment": "def:comment",
+    "option": "def:preprocessor",
+    "option-name": "def:preprocessor",
+    "header": "def:heading",
+    "section": "def:heading",
+    "section-1": "t2t:section",
+    "section-2": "t2t:section",
+    "section-3": "t2t:section",
+    "section-4": "t2t:section",
+    "section-5": "t2t:section",
+    "anchor": "t2t:section",
+    "italic": "def:emphasis",
+    "bold": "def:strong-emphasis",
+    "verbatim": "def:inline-code",
+    "verbatim-block": "def:preformatted-section"
+   }
+  },
+  "tcl": {
+   "name": "Tcl",
+   "styles": {
+    "variable": "def:type",
+    "keyword": "def:keyword"
+   }
+  },
+  "tera": {
+   "name": "Tera Template",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "escape": "def:special-char",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "filters": "def:function",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer"
+   }
+  },
+  "terraform": {
+   "name": "Terraform",
+   "styles": {
+    "comment": "def:comment",
+    "escaped-character": "def:special-char",
+    "interpolation": "def:special-char",
+    "interpolated": "def:identifier",
+    "string": "def:string",
+    "number": "def:number",
+    "boolean": "def:boolean",
+    "null": "def:constant",
+    "data-type": "def:type",
+    "keyword": "def:keyword",
+    "identifier": "def:special-char",
+    "reference": "def:special-constant",
+    "block-type": "def:strong-emphasis",
+    "block-title": "def:identifier",
+    "block-label": "def:string",
+    "builtin-function": "def:function",
+    "error": "def:error",
+    "statement": "def:statement"
+   }
+  },
+  "texinfo": {
+   "name": "Texinfo",
+   "styles": {
+    "comment": "def:comment",
+    "escaped-character": "def:special-char",
+    "others": null,
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "macros": "def:keyword",
+    "file-attributes": "def:keyword",
+    "generated-content": "def:keyword",
+    "include": "def:preprocessor"
+   }
+  },
+  "thrift": {
+   "name": "Thrift",
+   "styles": {
+    "comment": "def:comment",
+    "type": "def:type",
+    "keyword": "def:keyword",
+    "string": "def:string"
+   }
+  },
+  "todotxt": {
+   "name": "todo.txt",
+   "styles": {
+    "done": "def:deletion",
+    "priority": "def:list-marker",
+    "date": "def:preprocessor",
+    "link": "def:link-destination",
+    "context": "def:type",
+    "project": "def:special-char",
+    "metadata": "def:emphasis"
+   }
+  },
+  "toml": {
+   "name": "TOML",
+   "styles": {
+    "comment": "def:comment",
+    "floating-point": "def:floating-point",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "decimal": "def:decimal",
+    "variable": "def:type",
+    "non-standard-key": "def:type",
+    "boolean-value": "def:boolean",
+    "datetime-value": "def:constant",
+    "error": "def:error"
+   }
+  },
+  "twig": {
+   "name": "Twig",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "variable": "def:identifier",
+    "escape": "def:special-char",
+    "string": "def:string",
+    "here-doc": "def:string",
+    "here-doc-bound": "def:keyword",
+    "keyword": "def:keyword",
+    "operator": "def:operator",
+    "filters": "def:boolean",
+    "tests": "def:boolean",
+    "boolean": "def:boolean",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer"
+   }
+  },
+  "typescript-js-expr": {
+   "name": "TypeScript JavaScript Expression Additions",
+   "styles": {}
+  },
+  "typescript-js-fn": {
+   "name": "TypeScript JavaScript Function and Class Additions",
+   "styles": {}
+  },
+  "typescript-js-lit": {
+   "name": "TypeScript JavaScript Literal Additions",
+   "styles": {}
+  },
+  "typescript-js-mod": {
+   "name": "TypeScript JavaScript Module Additions",
+   "styles": {}
+  },
+  "typescript-js-st": {
+   "name": "TypeScript JavaScript Statement Additions",
+   "styles": {}
+  },
+  "typescript-jsx": {
+   "name": "TypeScript JSX",
+   "styles": {}
+  },
+  "typescript-type-expr": {
+   "name": "TypeScript Type Expressions",
+   "styles": {}
+  },
+  "typescript-type-gen": {
+   "name": "TypeScript Type Generics",
+   "styles": {}
+  },
+  "typescript-type-lit": {
+   "name": "TypeScript Type Literals",
+   "styles": {}
+  },
+  "typescript": {
+   "name": "TypeScript",
+   "styles": {
+    "type-keyword": "js:keyword",
+    "basic-type": "def:type",
+    "boolean-type": "js:boolean",
+    "decimal-type": "js:decimal",
+    "binary-integer-type": "js:binary-integer",
+    "octal-integer-type": "js:octal-integer",
+    "hex-integer-type": "js:hex-integer",
+    "string-type": "js:string",
+    "built-in-library-type": "js:built-in-constructor",
+    "optional-modifier": null,
+    "definite-assignment-assertion": null,
+    "decorator": null,
+    "decorator-operator": null,
+    "type-annotation": null,
+    "mapped-type-modifier-prefix": null,
+    "tuple-type-literal": null,
+    "object-type-literal": null,
+    "type-parameters-list": null,
+    "type-parameters-list-or-type-assertion": null,
+    "type-arguments-list": null,
+    "parenthesized-type-or-function-type": null,
+    "parenthesized-type-or-function-type-operator": null,
+    "type-query": null,
+    "bracket-type-operator": null,
+    "conditional-type-operator": null,
+    "union-intersection-type-operator": null,
+    "type-expression": null,
+    "non-null-assertion-operator": null,
+    "global-augmentation": null,
+    "ambient-declaration": null,
+    "enum-declaration": null,
+    "interface-declaration": null,
+    "module-declaration": null,
+    "namespace-declaration": null,
+    "type-alias-declaration": null
+   }
+  },
+  "vala": {
+   "name": "Vala",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "type": "def:type",
+    "string": "def:string",
+    "keyword": "def:keyword",
+    "boolean": "def:boolean",
+    "null-value": "def:special-constant",
+    "directive": "def:preprocessor",
+    "attributes": "def:function",
+    "string-template": "def:function",
+    "regex": "def:string",
+    "escape": "def:special-char"
+   }
+  },
+  "vbnet": {
+   "name": "VB.NET",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "preprocessor": "def:preprocessor",
+    "keyword": "def:keyword",
+    "type": "def:type",
+    "special-constant": "def:special-constant",
+    "boolean": "def:boolean"
+   }
+  },
+  "verilog": {
+   "name": "Verilog",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "printf": "def:special-char",
+    "escaped-character": "def:special-char",
+    "error": "def:error",
+    "compiler-directive": "def:preprocessor",
+    "ieee-system-task": "def:keyword",
+    "lrm-additional-system-task": "def:keyword",
+    "keyword": "def:keyword",
+    "gate": "def:keyword",
+    "type": "def:type",
+    "base-n-integer": "def:base-n-integer",
+    "real-number": "def:floating-point",
+    "integer-number": "def:number"
+   }
+  },
+  "vhdl": {
+   "name": "VHDL",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "character": "def:character",
+    "keyword": "def:keyword",
+    "type": "def:type",
+    "boolean": "def:boolean",
+    "base-n-number": "def:base-n-integer",
+    "real": "def:floating-point",
+    "number": "def:number"
+   }
+  },
+  "wren": {
+   "name": "Wren",
+   "styles": {
+    "comment": "def:comment",
+    "string": "def:string",
+    "imported-module": "def:string",
+    "keyword": "def:keyword",
+    "operator": "def:operator",
+    "type": "def:type",
+    "escaped-character": "def:special-char",
+    "floating-point": "def:floating-point",
+    "decimal": "def:decimal",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer",
+    "boolean": "def:boolean",
+    "error": "def:error"
+   }
+  },
+  "xml": {
+   "name": "XML",
+   "styles": {
+    "comment": "def:comment",
+    "doctype": "def:preprocessor",
+    "cdata-delim": "def:preprocessor",
+    "processing-instruction": "def:preprocessor",
+    "element-name": "def:identifier",
+    "attribute-name": "def:type",
+    "attribute-value": "def:string",
+    "entity": "def:preprocessor",
+    "tag": null,
+    "namespace": "xml:element-name",
+    "error": "def:error"
+   }
+  },
+  "xslt": {
+   "name": "XSLT",
+   "styles": {
+    "element": "def:keyword",
+    "namespace": "xslt:element"
+   }
+  },
+  "yacc": {
+   "name": "Yacc",
+   "styles": {
+    "keyword": "def:keyword",
+    "token-type": "def:type",
+    "rule": "def:identifier"
+   }
+  },
+  "yaml": {
+   "name": "YAML",
+   "styles": {
+    "scalar": "def:string",
+    "comment": "def:comment",
+    "string": "def:string",
+    "escape-sequence": "def:special-char",
+    "anchor": "def:identifier",
+    "tag": "def:preprocessor",
+    "alias": "def:type",
+    "map-key": "def:keyword",
+    "directive": "def:shebang",
+    "null": "def:special-constant",
+    "bool": "def:boolean",
+    "int": "def:decimal",
+    "float": "def:floating-point"
+   }
+  },
+  "yara": {
+   "name": "YARA",
+   "styles": {
+    "comment": "def:comment",
+    "include": "def:preprocessor",
+    "keyword": "def:keyword",
+    "rule": "def:function",
+    "string": "def:string",
+    "escaped-character": "def:special-char",
+    "decimal": "def:decimal",
+    "hexadecimal": "def:base-n-integer",
+    "boolean": "def:boolean",
+    "error": "def:error"
+   }
+  },
+  "zig": {
+   "name": "Zig",
+   "styles": {
+    "comment": "def:comment",
+    "error": "def:error",
+    "string": "def:string",
+    "char": "def:character",
+    "keyword": "def:keyword",
+    "external": "def:preprocessor",
+    "type": "def:type",
+    "escaped-character": "def:special-char",
+    "floating-point": "def:floating-point",
+    "number": "def:number",
+    "operator": "def:operator",
+    "binary": "def:base-n-integer",
+    "decimal": "def:decimal",
+    "octal": "def:base-n-integer",
+    "hexadecimal": "def:base-n-integer",
+    "boolean": "def:boolean",
+    "builtin-funcs": "def:preprocessor",
+    "builtin-constant": "def:special-constant"
+   }
+  }
+ }
+}

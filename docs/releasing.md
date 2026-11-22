@@ -12,7 +12,7 @@ Neovim plugin, the DrRacket package and the themes for every other app share one
 | Zed extension | `zed/CHANGELOG.md` | Extension repository, listed in Zed's extension registry by a pull request |
 | Neovim plugin | `nvim/CHANGELOG.md` | Plugin repository, which plugin managers install from |
 | DrRacket package | `drracket/CHANGELOG.md` | Package repository, listed in the Racket package catalog as `heritage-themes` |
-| Notepad++, Xcode, Helix, Kakoune, Micro, Vim, GNU Emacs, Nano, Textadept, Lapce, Qt Creator, Kate, Amp, Eclipse, Nova, Spyder, IDLE and RStudio themes | `notepadpp/`, `xcode/`, `helix/`, `kakoune/`, `micro/`, `vim/`, `emacs/`, `nano/`, `textadept/`, `lapce/`, `qtcreator/`, `kate/`, `amp/`, `eclipse/`, `nova/`, `spyder/`, `idle/` and `rstudio/` `CHANGELOG.md`, one each | GitHub release only: these apps have no registry that Publish uses, and users install the files from the zip |
+| Notepad++, Xcode, Helix, Kakoune, Micro, Vim, GNU Emacs, Nano, Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, Amp, Eclipse, Nova, Spyder, IDLE and RStudio themes | `notepadpp/`, `xcode/`, `helix/`, `kakoune/`, `micro/`, `vim/`, `emacs/`, `nano/`, `textadept/`, `lapce/`, `qtcreator/`, `kate/`, `gnome-text-editor/`, `amp/`, `eclipse/`, `nova/`, `spyder/`, `idle/` and `rstudio/` `CHANGELOG.md`, one each | GitHub release only: these apps have no registry that Publish uses, and users install the files from the zip |
 | JupyterLab extension | `jupyterlab/CHANGELOG.md` | PyPI, as `jupyterlab-heritage-themes` |
 | Pygments styles | `pygments/CHANGELOG.md` | PyPI, as `heritage-themes-pygments` |
 | Thonny themes | `thonny/CHANGELOG.md` | PyPI, as `thonny-heritage-themes` |

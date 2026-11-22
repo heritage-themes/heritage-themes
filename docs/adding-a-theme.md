@@ -200,6 +200,18 @@ podman run --rm --userns=keep-id -v "$PWD:/repo:Z" localhost/heritage-editors \
 
 `python3 build.py` then fails on a rule that names an item the library lacks, and on an item whose own colours no theme replaces.
 
+## Check the GNOME Text Editor style rules
+
+GNOME Text Editor colours code by GtkSourceView's styles. `language_rules()` in `heritage/gnome_text_editor.py` names styles of the library's language definitions, which `heritage/gnome_text_editor.json` lists with the style each maps to. Rewrite the file from the library in the editors image after a GtkSourceView update:
+
+```bash
+podman build -t localhost/heritage-editors scripts/editors
+podman run --rm --userns=keep-id -v "$PWD:/repo:Z" localhost/heritage-editors \
+    python3 /repo/scripts/gnome-text-editor/definitions.py /repo/heritage/gnome_text_editor.json
+```
+
+`python3 build.py` then fails on a rule or scheme style that names a style the library lacks.
+
 ## Add the documentation
 
 Add these to the theme folder:

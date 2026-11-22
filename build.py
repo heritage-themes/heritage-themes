@@ -101,9 +101,9 @@ VISUALSTUDIO_NAME = "Heritage Themes for Visual Studio"
 VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
-           "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate", "Amp",
-           "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE", "RStudio", "Godot", "NetBeans",
-           "DrRacket", "terminals")
+           "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate",
+           "GNOME Text Editor", "Amp", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
+           "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -3191,6 +3191,124 @@ def validate_kate(directory, families):
         check_files("Kate themes", directory, folder, expected)
 
 
+def gnome_text_editor_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for GNOME Text Editor
+
+{DESCRIPTION} {count} dark and light style schemes in {len(families)} families; each family maps the named colours \
+of one tradition to syntax roles.
+
+## Install
+
+The style schemes need GNOME Text Editor 48 or later, from your distribution or from Flathub.
+
+1. Copy the files in `styles` into `~/.local/share/gtksourceview-5/styles`, creating the folder if it does not exist. \
+From the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.local/share/gtksourceview-5/styles
+   cp styles/*.xml ~/.local/share/gtksourceview-5/styles/
+   ```
+
+   Alternatively, open **Preferences** and drop the files onto the style list, which copies them there.
+
+2. Restart GNOME Text Editor, open **Preferences** and choose a scheme, for example **Holi Night**, under \
+**Appearance**.
+
+The list shows the schemes for the current style of the desktop, dark or light. A family's dark and light schemes \
+are a pair: choosing one makes the editor use the other while the desktop's style is the other, so it follows the \
+desktop as it switches. Families with dark schemes only keep theirs in either style.
+
+## What is coloured
+
+Each scheme colours the editor: code, the selection, the current line, line numbers, search matches, matching \
+brackets, spelling mistakes, snippet fields, the right margin and the overview map. With **Recolor Window** on, which \
+it is unless you turned it off in the main menu's style section, it also colours the window: the header bar, tabs, \
+side bar, popovers and the accent of buttons, switches and focus rings.
+
+## Languages
+
+GNOME Text Editor colours code with GtkSourceView's language definitions, which give each construct a style that \
+the schemes colour: a language's keywords, types, strings, numbers, comments and, where the definition finds them, \
+function and class declarations, annotations and built-in names. A definition does not tell fields, parameters and \
+calls apart from other names as a language server does. The schemes give constructs that a definition marks with a \
+style meant for another, such as Java's modifiers, CSS's property names and JSON's keys, the colours that the other \
+Heritage Themes products give them. GtkSourceView has no definition for Vue, whose files show as plain text.
+
+{readme_footer(families, "GNOME Text Editor", "Schemes", "the scheme, GNOME Text Editor version, operating system, "
+               "language")}"""
+
+
+def build_gnome_text_editor(families):
+    """Writes the style schemes to build/gnome-text-editor, with the README, changelog and licence, and returns
+    build/gnome-text-editor."""
+    directory = os.path.join(OUT, "gnome-text-editor")
+    os.makedirs(os.path.join(directory, "styles"))
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            write_text(os.path.join(directory, "styles", f"{heritage.gnome_text_editor.name(t)}.xml"),
+                       heritage.gnome_text_editor.scheme(t, family.THEMES, source))
+    write_text(os.path.join(directory, "README.md"), gnome_text_editor_readme(families))
+    shutil.copy(os.path.join(ROOT, "gnome-text-editor", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_gnome_text_editor(directory, families):
+    """Fails the build when a style scheme does not name its theme, its variant or its family's other variant, leaves
+    out an editor style, a default style of GtkSourceView or a window colour, names a style that the library lacks,
+    leaves out a font flag, or has text that is unreadable on its background."""
+    module = heritage.gnome_text_editor
+    hex_colour = re.compile(r"#[0-9a-f]{6}")
+    schemes, variants = set(), {}
+    for family in families:
+        for t in family.THEMES:
+            name, p = module.name(t), t["palette"]
+            label = f"GNOME Text Editor {name}"
+            schemes.add(f"{name}.xml")
+            root = ET.parse(os.path.join(directory, "styles", f"{name}.xml")).getroot()
+            if root.tag != "style-scheme" or root.get("id") != name or root.get("name") != p["name"] or \
+                    root.get("version") != "1.0":
+                raise SystemExit(f"{label}: the scheme does not name the theme in the format of version 1.0")
+            metadata = {prop.get("name"): prop.text for prop in root.iterfind("metadata/property")}
+            if metadata.get("variant") != ("dark" if p["dark"] else "light"):
+                raise SystemExit(f"{label}: the variant is not {'dark' if p['dark'] else 'light'}")
+            counterpart = module.variant(t, family.THEMES)
+            key = "light-variant" if p["dark"] else "dark-variant"
+            if metadata.get(key) != counterpart or {"light-variant", "dark-variant"} - {key} & set(metadata):
+                raise SystemExit(f"{label}: the variant metadata do not name {counterpart or 'no other scheme'}")
+            variants[name] = (p["dark"], counterpart)
+            for colour in module.WINDOW_COLOURS:
+                if not hex_colour.fullmatch(metadata.get(colour) or ""):
+                    raise SystemExit(f"{label}: the window colour {colour} is not #rrggbb")
+            styles = [style.get("name") for style in root.iterfind("style")]
+            if len(styles) != len(set(styles)):
+                raise SystemExit(f"{label}: a style is set twice")
+            missing = set(module.EDITOR_STYLES + module.DEFAULT_STYLES) - set(styles)
+            if missing:
+                raise SystemExit(f"{label}: leaves out the styles {sorted(missing)}")
+            for style in root.iterfind("style"):
+                style_id = style.get("name")
+                if style_id not in module.EDITOR_STYLES:
+                    language, _, item = style_id.partition(":")
+                    if item not in module.LANGUAGES.get(language, {}).get("styles", {}):
+                        raise SystemExit(f"{label}: sets {style_id}, which GtkSourceView "
+                                         f"{module.DATA['version']} lacks")
+                    if {"foreground", "bold", "italic", "underline", "strikethrough"} - set(style.attrib):
+                        raise SystemExit(f"{label}: {style_id} leaves out a colour or font flag")
+                for attribute in ("foreground", "background", "underline-color"):
+                    if attribute in style.attrib and not hex_colour.fullmatch(style.get(attribute)):
+                        raise SystemExit(f"{label}: {style_id} {attribute} is not #rrggbb")
+            check_styles(label, module.styles(p), "fg", "bg", None, set(), module.low_contrast(p), {})
+    # each pair names each other, so that the editor switches between them in both directions
+    for name, (dark, counterpart) in variants.items():
+        if counterpart and variants[counterpart] != (not dark, name):
+            raise SystemExit(f"GNOME Text Editor {name}: {counterpart} does not name it as its other variant")
+    check_files("GNOME Text Editor schemes", directory, "styles", schemes)
+
+
 def amp_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -3931,6 +4049,7 @@ def validate_thonny(directory, families):
 # Product → its themes' names in READMEs, the README writer, and the folder its theme files go in.
 TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.name, "Lapce": heritage.lapce.name,
                   "Qt Creator": heritage.qtcreator.name, "Kate": lambda t: t["palette"]["name"],
+                  "GNOME Text Editor": lambda t: t["palette"]["name"],
                   "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
@@ -4300,6 +4419,11 @@ def main():
     validate_kate(kate, families)
     print(f"{pack_folder(kate, os.path.join(OUT, f'{VSCODE_NAME}-kate-{VERSION}.zip'), f'{VSCODE_NAME}-kate')}: "
           f"{len(themes)} themes", flush=True)
+    gnome_text_editor = build_gnome_text_editor(families)
+    validate_gnome_text_editor(gnome_text_editor, families)
+    package = os.path.join(OUT, f"{VSCODE_NAME}-gnome-text-editor-{VERSION}.zip")
+    print(f"{pack_folder(gnome_text_editor, package, f'{VSCODE_NAME}-gnome-text-editor')}: {len(themes)} themes",
+          flush=True)
     lapce = build_lapce(families)
     validate_lapce(lapce, families)
     print(f"{pack_folder(lapce, os.path.join(OUT, f'{VSCODE_NAME}-lapce-{VERSION}.zip'), f'{VSCODE_NAME}-lapce')}: "

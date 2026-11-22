@@ -79,6 +79,23 @@ def kate(home, stem, files, sample):
     return ["/usr/bin/kate", "--new", sample], {"QT_QPA_PLATFORM": "xcb"}
 
 
+def gnome_text_editor(home, stem, files, sample):
+    # the style scheme in the user's GtkSourceView styles folder and chosen under Preferences | Appearance, as the README
+    # says, with the desktop's style forced to the scheme's, as a desktop in that style would set it; GNOME Text
+    # Editor keeps its settings in GSettings, here in the key file that the keyfile backend reads; line numbers and the
+    # current line's highlight on, so that the preview shows their colours
+    os.makedirs(f"{home}/.local/share/gtksourceview-5/styles")
+    shutil.copy(f"{files}/styles/{stem}.xml", f"{home}/.local/share/gtksourceview-5/styles/")
+    with open(f"{files}/styles/{stem}.xml", encoding="utf-8") as f:
+        dark = '<property name="variant">dark</property>' in f.read()
+    write(f"{home}/.config/glib-2.0/settings/keyfile",
+          f"[org/gnome/TextEditor]\nstyle-scheme='{stem}'\nstyle-variant='{'dark' if dark else 'light'}'\n"
+          f"restore-session=false\nuse-system-font=false\ncustom-font='{FONT} 11'\nshow-line-numbers=true\n"
+          "highlight-current-line=true\n")
+    return (["/usr/bin/gnome-text-editor", "--standalone", sample],
+            {"GSETTINGS_BACKEND": "keyfile", "GDK_BACKEND": "x11", "GTK_A11Y": "none"})
+
+
 def eclipse(home, stem, files, sample):
     # the plugin in a dropins folder, the appearance theme and the TextMate theme of the same name chosen in the
     # workspace's preferences and the welcome page off, as a user chooses the themes once in the preferences
@@ -101,16 +118,18 @@ def eclipse(home, stem, files, sample):
              f"-Dosgi.configuration.area={home}/configuration"], {"GDK_BACKEND": "x11"})
 
 
-EDITORS = dict(textadept=textadept, lapce=lapce, qtcreator=qtcreator, kate=kate, eclipse=eclipse)
+EDITORS = {"textadept": textadept, "lapce": lapce, "qtcreator": qtcreator, "kate": kate,
+           "gnome-text-editor": gnome_text_editor, "eclipse": eclipse}
 # The file beside the eclipse folder that names each theme's identifier, stem=identifier per line.
 THEME_IDS = "eclipse-theme-ids.txt"
-WAIT = {"textadept": 5, "lapce": 12, "qtcreator": 15, "kate": 8, "eclipse": 10}
+WAIT = {"textadept": 5, "lapce": 12, "qtcreator": 15, "kate": 8, "gnome-text-editor": 6, "eclipse": 10}
 # Editors whose window title names the open file, with the most seconds to wait for it before WAIT.
 TITLED = {"eclipse": 180}
 # Samples that an editor opens as a project, by the name they are opened under instead.
 RENAME = {("qtcreator", "Cargo.toml"): "settings.toml"}
 # Window classes of the editors that shoot.py resizes to WIDTH x HEIGHT.
-RESIZE = {"lapce": "lapce", "qtcreator": "qtcreator", "kate": "kate", "eclipse": "Eclipse"}
+RESIZE = {"lapce": "lapce", "qtcreator": "qtcreator", "kate": "kate", "gnome-text-editor": "gnome-text-editor",
+          "eclipse": "Eclipse"}
 
 
 def main():

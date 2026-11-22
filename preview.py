@@ -2,7 +2,8 @@
 
 Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
                           | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --textadept
-                          | --lapce | --qtcreator | --kate | --eclipse | --jupyterlab | --pygments] [--png] [THEME ...]
+                          | --lapce | --qtcreator | --kate | --gnome-text-editor | --eclipse | --jupyterlab
+                          | --pygments] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --visualstudio  write the Visual Studio preview instead of the IntelliJ one; needs Windows and Visual Studio 2026
@@ -23,6 +24,8 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --lapce      write the Lapce preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --qtcreator  write the Qt Creator preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --kate       write the Kate preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
+  --gnome-text-editor  write the GNOME Text Editor preview instead of the IntelliJ one; needs Linux, Podman and
+               ImageMagick
   --eclipse    write the Eclipse preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --jupyterlab write the JupyterLab preview instead of the IntelliJ one; needs python3 build.py --jupyterlab run
                first, Python 3.10 or later, Google Chrome or Chromium, and ImageMagick
@@ -58,11 +61,12 @@ colours (scripts/terminals/check.py) or a screen shows a colour the theme does n
 minimum (scripts/terminals/cells.py). iTerm2 and Windows Terminal do not run on Linux, so the build's checks of their
 files are all they get. Termux runs in the Android emulator that scripts/termux/setup.sh starts, and
 scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. The Nano, Amp, Textadept,
-Lapce, Qt Creator, Kate and Eclipse pages go to themes/<theme>/build/preview-<editor>.html. Each editor runs in the
-container image of scripts/editors/Containerfile, with the theme installed and chosen as its README says: Nano and Amp
-in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour that the theme does
-not set or text below its contrast minimum, and the others on Xvfb through scripts/editors/shoot.py, whose screenshots
-go to themes/<theme>/build/<editor> and fail when they show a colour that is no colour of the theme nor a blend of one
+Lapce, Qt Creator, Kate, GNOME Text Editor and Eclipse pages go to themes/<theme>/build/preview-<editor>.html. Each
+editor runs in the container image of scripts/editors/Containerfile, with the theme installed and chosen as its README
+says: Nano and Amp in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
+that the theme does not set or text below its contrast minimum, and the others on Xvfb through
+scripts/editors/shoot.py, whose screenshots go to themes/<theme>/build/<editor> and fail when they show a colour that
+is no colour of the theme nor a blend of one
 (scripts/editors/pixels.py), or when a main role shows in no sample. All pages use JetBrains
 Mono, downloaded once from the pinned release below into ~/.cache/heritage-themes. The JupyterLab page goes to themes/<theme>/build/preview-jupyterlab.html, with
 the screenshots it shows in themes/<theme>/build/jupyterlab. scripts/jupyterlab/shoot.py takes them in JupyterLab
@@ -122,7 +126,7 @@ SYMBOLS_FONT = "SymbolsNerdFontMono-Regular.ttf"
 CACHE = os.path.join(os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "heritage-themes")
 CHROMES = ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser")
 # Screenshot geometry in CSS pixels. HEIGHT only has to exceed the page; the PNG is trimmed to the windows.
-WIDTH, HEIGHT, SCALE, MARGIN = 1328, 12000, 2, 24
+WIDTH, HEIGHT, SCALE, MARGIN = 1328, 16000, 2, 24
 
 
 def font_archive(url=FONT_URL, sha256=FONT_SHA256, name="JetBrains Mono"):
@@ -604,6 +608,9 @@ GUI_EDITORS = {
     "kate": ("Kate", heritage.kate,
              lambda themes: [(f"themes/{heritage.kate.name(t)}.theme", heritage.kate.theme(t, "")) for t in themes]
              + [(f"color-schemes/{heritage.kate.name(t)}.colors", heritage.kate.colour_scheme(t, "")) for t in themes]),
+    "gnome-text-editor": ("GNOME Text Editor", heritage.gnome_text_editor,
+                          lambda themes: [(f"styles/{heritage.gnome_text_editor.name(t)}.xml",
+                                           heritage.gnome_text_editor.scheme(t, themes, "")) for t in themes]),
     "eclipse": ("Eclipse", heritage.eclipse,
                 lambda themes: [("eclipse-theme-ids.txt", heritage.eclipse.theme_ids(themes))]),
 }
@@ -789,7 +796,7 @@ def main():
         target = next((name for name in ("vscode", "visualstudio", "sublime", "zed", "nvim", "notepadpp", "xcode",
                                           *TERMINAL_THEMES, "terminals", *SCREEN_EDITORS, *GUI_EDITORS, "jupyterlab",
                                           "pygments")
-                       if getattr(args, name)), None)
+                       if getattr(args, name.replace("-", "_"))), None)
         page_path = os.path.join(out, f"preview-{target}.html" if target else "preview.html")
         tokens = {"vscode": vscode_tokens, "sublime": sublime_tokens, "zed": zed_tokens, "nvim": nvim_tokens,
                   "notepadpp": notepadpp_tokens, "pygments": pygments_tokens,
