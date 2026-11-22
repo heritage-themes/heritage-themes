@@ -3048,7 +3048,7 @@ def validate_qtcreator(directory, families):
 def kate_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
-    return f"""# Heritage Themes for Kate
+    return f"""# Heritage Themes for Kate and KWrite
 
 {DESCRIPTION} {count} dark and light colour themes in {len(families)} families, each with a window colour scheme of \
 the same name; each family maps the named colours of one tradition to syntax roles.
@@ -3060,8 +3060,8 @@ KDevelop.
 
 1. Copy the files in `themes` into `org.kde.syntax-highlighting/themes` and the files in `color-schemes` into \
 `color-schemes` in your data folder, creating the folders if they do not exist: `~/.local/share` on Linux, \
-`~/.var/app/org.kde.kate/data` for Kate from Flathub, `~/Library/Application Support` on macOS and `%LOCALAPPDATA%` \
-on Windows. On Linux, from the unzipped folder:
+`~/.var/app/org.kde.kate/data` for Kate and `~/.var/app/org.kde.kwrite/data` for KWrite from Flathub, \
+`~/Library/Application Support` on macOS and `%LOCALAPPDATA%` on Windows. On Linux, from the unzipped folder:
 
    ```bash
    mkdir -p ~/.local/share/org.kde.syntax-highlighting/themes ~/.local/share/color-schemes
@@ -3069,11 +3069,11 @@ on Windows. On Linux, from the unzipped folder:
    cp color-schemes/* ~/.local/share/color-schemes/
    ```
 
-2. Restart Kate and choose a scheme, for example **Holi Night**, under **Settings | Window Color Scheme**.
+2. Restart the app and choose a scheme, for example **Holi Night**, under **Settings | Window Color Scheme**.
 
 3. The editor takes the theme of the same name while **Follow System Color Scheme** is chosen under **Settings | \
-Configure Kate | Color Themes | Default Theme**, which it is unless you chose another theme there. Otherwise choose \
-the theme in that list.
+Configure Kate | Color Themes | Default Theme** (**Configure KWrite** in KWrite), which it is unless you chose \
+another theme there. Otherwise choose the theme in that list.
 
 To add one theme without copying files, choose **Import…** on that page and select its file in `themes`.
 
@@ -3081,7 +3081,7 @@ To add one theme without copying files, choose **Import…** on that page and se
 
 The colour theme colours the editor: code, the selection, the current line, found and replaced text, matching \
 brackets, line numbers, the code folding and indentation guides, spelling mistakes, modified and saved lines, \
-bookmarks, breakpoints and code templates. The window colour scheme colours Kate's window: the menu bar, tool bars, \
+bookmarks, breakpoints and code templates. The window colour scheme colours the window: the menu bar, tool bars, \
 tabs, side panels, lists, buttons, tooltips and the status bar. Kate's terminal panel takes the colours of Konsole's \
 profile; the Heritage Themes for terminals include Konsole's.
 
