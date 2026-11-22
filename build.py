@@ -3194,14 +3194,15 @@ def validate_kate(directory, families):
 def gnome_text_editor_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
-    return f"""# Heritage Themes for GNOME Text Editor
+    return f"""# Heritage Themes for GNOME Text Editor and GNOME Builder
 
 {DESCRIPTION} {count} dark and light style schemes in {len(families)} families; each family maps the named colours \
 of one tradition to syntax roles.
 
 ## Install
 
-The style schemes need GNOME Text Editor 48 or later, from your distribution or from Flathub.
+The style schemes need GNOME Text Editor 48 or later or GNOME Builder 47 or later, from your distribution or from \
+Flathub. Both apps read the same folder, so one copy serves both.
 
 1. Copy the files in `styles` into `~/.local/share/gtksourceview-5/styles`, creating the folder if it does not exist. \
 From the unzipped folder:
@@ -3211,32 +3212,40 @@ From the unzipped folder:
    cp styles/*.xml ~/.local/share/gtksourceview-5/styles/
    ```
 
-   Alternatively, open **Preferences** and drop the files onto the style list, which copies them there.
+   Alternatively, open **Preferences** in either app and drop the files onto the style list, which copies them \
+there.
 
-2. Restart GNOME Text Editor, open **Preferences** and choose a scheme, for example **Holi Night**, under \
-**Appearance**.
+2. Restart the app, open **Preferences** and choose a scheme, for example **Holi Night**: under **Appearance** in \
+GNOME Text Editor, under **Appearance | Color** in GNOME Builder.
 
-The list shows the schemes for the current style of the desktop, dark or light. A family's dark and light schemes \
-are a pair: choosing one makes the editor use the other while the desktop's style is the other, so it follows the \
-desktop as it switches. Families with dark schemes only keep theirs in either style.
+The list shows the schemes for the current style, dark or light: the desktop's in GNOME Text Editor, and the one \
+chosen under **Appearance | Interface** in GNOME Builder. A family's dark and light schemes are a pair: choosing one \
+makes the app use the other while the style is the other, so it follows the style as it switches. Families with dark \
+schemes only keep theirs in either style.
 
 ## What is coloured
 
 Each scheme colours the editor: code, the selection, the current line, line numbers, search matches, matching \
-brackets, spelling mistakes, snippet fields, the right margin and the overview map. With **Recolor Window** on, which \
-it is unless you turned it off in the main menu's style section, it also colours the window: the header bar, tabs, \
-side bar, popovers and the accent of buttons, switches and focus rings.
+brackets, spelling mistakes, snippet fields, the right margin and the overview map. In GNOME Text Editor with \
+**Recolor Window** on, which it is unless you turned it off in the main menu's style section, it also colours the \
+window: the header bar, tabs, side bar, popovers and the accent of buttons, switches and focus rings.
+
+GNOME Builder always colours its window from the scheme. The scheme also colours Builder's diagnostics, breakpoints, \
+changed lines in the gutter, other occurrences of the selected text, the matching XML tag, the link to a definition \
+under the pointer and the labels in the outline of XML and GtkBuilder files. Builder's terminal keeps its own palette, \
+which a style scheme cannot set.
 
 ## Languages
 
-GNOME Text Editor colours code with GtkSourceView's language definitions, which give each construct a style that \
+Both apps colour code with GtkSourceView's language definitions, which give each construct a style that \
 the schemes colour: a language's keywords, types, strings, numbers, comments and, where the definition finds them, \
 function and class declarations, annotations and built-in names. A definition does not tell fields, parameters and \
 calls apart from other names as a language server does. The schemes give constructs that a definition marks with a \
 style meant for another, such as Java's modifiers, CSS's property names and JSON's keys, the colours that the other \
-Heritage Themes products give them. GtkSourceView has no definition for Vue, whose files show as plain text.
+Heritage Themes products give them. GtkSourceView has no definition for Vue, whose files show as plain text. GNOME \
+Builder also colours the names that its language servers and code index find as functions, types and constants.
 
-{readme_footer(families, "GNOME Text Editor", "Schemes", "the scheme, GNOME Text Editor version, operating system, "
+{readme_footer(families, "GNOME Text Editor", "Schemes", "the scheme, the app and its version, operating system, "
                "language")}"""
 
 
@@ -3258,8 +3267,8 @@ def build_gnome_text_editor(families):
 
 def validate_gnome_text_editor(directory, families):
     """Fails the build when a style scheme does not name its theme, its variant or its family's other variant, leaves
-    out an editor style, a default style of GtkSourceView or a window colour, names a style that the library lacks,
-    leaves out a font flag, or has text that is unreadable on its background."""
+    out an editor style, a style of GNOME Builder, a default style of GtkSourceView or a window colour, names a style
+    that the library lacks, leaves out a font flag, or has text that is unreadable on its background."""
     module = heritage.gnome_text_editor
     hex_colour = re.compile(r"#[0-9a-f]{6}")
     schemes, variants = set(), {}
@@ -3286,19 +3295,19 @@ def validate_gnome_text_editor(directory, families):
             styles = [style.get("name") for style in root.iterfind("style")]
             if len(styles) != len(set(styles)):
                 raise SystemExit(f"{label}: a style is set twice")
-            missing = set(module.EDITOR_STYLES + module.DEFAULT_STYLES) - set(styles)
+            missing = set(module.EDITOR_STYLES + module.BUILDER_STYLES + module.DEFAULT_STYLES) - set(styles)
             if missing:
                 raise SystemExit(f"{label}: leaves out the styles {sorted(missing)}")
             for style in root.iterfind("style"):
                 style_id = style.get("name")
-                if style_id not in module.EDITOR_STYLES:
+                if style_id not in module.EDITOR_STYLES + module.BUILDER_STYLES:
                     language, _, item = style_id.partition(":")
                     if item not in module.LANGUAGES.get(language, {}).get("styles", {}):
                         raise SystemExit(f"{label}: sets {style_id}, which GtkSourceView "
                                          f"{module.DATA['version']} lacks")
                     if {"foreground", "bold", "italic", "underline", "strikethrough"} - set(style.attrib):
                         raise SystemExit(f"{label}: {style_id} leaves out a colour or font flag")
-                for attribute in ("foreground", "background", "underline-color"):
+                for attribute in module.COLOUR_ATTRIBUTES:
                     if attribute in style.attrib and not hex_colour.fullmatch(style.get(attribute)):
                         raise SystemExit(f"{label}: {style_id} {attribute} is not #rrggbb")
             check_styles(label, module.styles(p), "fg", "bg", None, set(), module.low_contrast(p), {})

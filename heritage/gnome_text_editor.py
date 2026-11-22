@@ -1,4 +1,4 @@
-"""GNOME Text Editor style schemes generated from a palette.
+"""GtkSourceView 5 style schemes for GNOME Text Editor and GNOME Builder, generated from a palette.
 
 GNOME Text Editor colours code with GtkSourceView 5, whose language definitions give each of their styles a style it
 maps to (map-to), as a chain that ends in a default style of def.lang (gnome_text_editor.json, written by
@@ -11,7 +11,8 @@ else the first style along the chain that the scheme sets. The scheme sets:
   give it, as heritage.vscode does for TextMate scopes: Java's modifiers map to def:type, CSS's property names to
   def:keyword and JSON's keys to def:constant;
 - the editor's own styles (EDITOR_STYLES): the text, the selection, the current line, line numbers, search matches,
-  matching brackets, the right margin and whitespace.
+  matching brackets, the right margin and whitespace;
+- GNOME Builder's styles (BUILDER_STYLES): diagnostics, the gutter's marks and the IDE's highlights.
 
 Every style sets each font flag, so that no flag of an enclosing style shows through.
 
@@ -20,8 +21,12 @@ frame, the window and the side bar on bgTool and popovers on surface, as the Isl
 the accent, which fills switches and suggested buttons and draws focus rings and links, on ansiBlue with the editor's
 background as its text. The editor derives the list views' and dialogs' backgrounds from the text background itself.
 
-A family's dark and light themes name each other as their dark and light variants, so that the editor shows one of
-them in its style list and switches between them when the desktop's style changes.
+GNOME Builder colours its window from the same metadata (ide-recoloring.c, unchanged from Builder 47 to 50), except
+the side bar, which it mixes from the text colours (builder_sidebar()).
+
+A family's dark and light themes name each other as their dark and light variants, so that both editors show one of
+them in their style lists and switch between them when the style changes: the desktop's in GNOME Text Editor, the one
+chosen in its preferences in GNOME Builder.
 """
 import json, os, re
 from xml.sax.saxutils import quoteattr
@@ -40,10 +45,24 @@ DEFAULT_STYLES = tuple(f"def:{style}" for style in LANGUAGES["def"]["styles"])
 EDITOR_STYLES = ("text", "selection", "selection-unfocused", "cursor", "current-line", "line-numbers",
                  "current-line-number", "bracket-match", "bracket-mismatch", "right-margin", "draw-spaces",
                  "background-pattern", "search-match", "map-overlay", "snippet-focus", "def:misspelled-word")
+# The styles that GNOME Builder looks up beyond GtkSourceView's, which GNOME Text Editor ignores: diagnostics, snippet
+# tab stops and the definition under the pointer (ide-buffer.c, which falls back to def:error, def:warning and
+# def:note for a missing -Builder:error, -Builder:warning and -Builder:note), the debugger's and the version control's
+# marks in the gutter (gbp-omni-gutter-renderer.c), other occurrences of the selected word
+# (gbp-quick-highlight-editor-page-addin.c), the tag matching the one at the cursor (ide-xml-highlighter.c) and the
+# labels of the outline of XML and GtkBuilder files (ide-xml-parser.c).
+XML_LABELS = ("label", "id", "style-class", "type", "parent", "class", "attribute")
+BUILDER_STYLES = ("-Builder:error", "-Builder:warning", "-Builder:note", "-Builder:deprecated", "-Builder:unused",
+                  "-Builder:tab-stop", "-Builder:hover-definition", "-Builder:current-breakpoint",
+                  "-Builder:breakpoint", "-Builder:countpoint", "-Builder:added-line", "-Builder:changed-line",
+                  "-Builder:removed-line", "quick-highlight-match", "xml:tag-match",
+                  *(f"-Builder:{label}" for label in XML_LABELS))
 # The window colours that the scheme's metadata set, by GNOME Text Editor's names (editor-recoloring.c).
 WINDOW_COLOURS = ("window_bg_color", "window_fg_color", "headerbar_bg_color", "headerbar_fg_color",
                   "sidebar_bg_color", "sidebar_fg_color", "popover_bg_color", "popover_fg_color", "accent_bg_color",
                   "accent_fg_color", "accent_color")
+# The attributes of a style that hold a colour.
+COLOUR_ATTRIBUTES = ("foreground", "background", "line-background", "underline-color")
 FONTS = {"": {}, "bold": {"bold": True}, "italic": {"italic": True}, "bold italic": {"bold": True, "italic": True},
          "underline": {"underline": True}, "strike": {"strike": True}}
 # The background of comment alerts, such as TODO: an attention wash, as heritage.kate gives them.
@@ -53,6 +72,10 @@ LOW_CONTRAST_ROLES = ("comment", "todo")
 # How far GNOME Text Editor mixes the text background with white for dialogs in dark schemes, and with black and
 # white for list views in dark and light schemes (editor-recoloring.c).
 DIALOG_DARK, VIEW_DARK, VIEW_LIGHT = 0.07, 0.1, 0.3
+# How far GNOME Builder, which ignores the side bar's metadata, mixes the text background with the text colour for the
+# side bar, and the text colour with white in dark schemes and black in light ones for the side bar's text
+# (ide-recoloring.c).
+BUILDER_SIDEBAR, BUILDER_SIDEBAR_TEXT = 0.085, 0.25
 
 
 def default_styles(p):
@@ -249,6 +272,41 @@ def editor_styles(p):
     return out
 
 
+def builder_styles(p):
+    """Builder style → dict of the style's attributes, as palette keys for colours, in the roles of heritage.scheme's
+    editor colours. Builder copies a style's colours, bold, italic and underline to its text, and nothing else, so
+    deprecated code takes a muted wavy underline in place of a strikethrough."""
+    def wave(colour):
+        return dict(underline="error", **{"underline-color": colour})
+    # the outline's labels: the text colour on the washes of diffs, search matches and highlights
+    washes = ("diffMod", "diffIns", "diffConf", "writeCaret", "diffDel", "searchBg", "underCaret")
+    out = {
+        # diagnostics: a wavy underline in the colour of their severity that leaves the code's colours
+        "-Builder:error": wave("error"), "-Builder:warning": wave("warning"), "-Builder:note": wave("weak"),
+        "-Builder:deprecated": wave("muted"),
+        # unused declarations in the muted text colour, as heritage.scheme dims them
+        "-Builder:unused": dict(foreground="muted"),
+        "-Builder:tab-stop": dict(underline="single", **{"underline-color": "azure"}),
+        # a name that Ctrl and a click jump to the definition of: a link
+        "-Builder:hover-definition": dict(foreground="azure", underline="single", **{"underline-color": "azure"}),
+        # the gutter: the line the debugger stopped at on the execution point's wash, breakpoints' line numbers on
+        # the breakpoint colour and count points' on the inserted wash; changed lines in the version control colours
+        "-Builder:current-breakpoint": {"line-background": "diffMod"},
+        "-Builder:breakpoint": {"foreground": "redText", "line-background": "red", "bold": "true"},
+        "-Builder:countpoint": dict(foreground="fg", background="diffIns", bold="false"),
+        "-Builder:added-line": dict(foreground="added"), "-Builder:changed-line": dict(foreground="modified"),
+        "-Builder:removed-line": dict(foreground="deleted"),
+        # other occurrences of the selected word, and the tag that matches the one at the cursor, in the text colour
+        # on the identifier-under-caret wash, as search matches take the text colour
+        "quick-highlight-match": dict(foreground="fg", background="underCaret"),
+        "xml:tag-match": dict(foreground="fg", background="underCaret"),
+        **{f"-Builder:{label}": dict(foreground="fg", background=wash) for label, wash in zip(XML_LABELS, washes)},
+    }
+    if set(out) != set(BUILDER_STYLES):
+        raise ValueError(f"Builder styles that differ from BUILDER_STYLES: {sorted(set(out) ^ set(BUILDER_STYLES))}")
+    return out
+
+
 def window_colours(p):
     """Window colour → palette key or ANSI colour name: the Islands layout of the other targets."""
     return {"window_bg_color": "bgTool", "window_fg_color": "fg", "headerbar_bg_color": "frame",
@@ -304,8 +362,8 @@ def scheme(t, themes, source):
         metadata.append(("light-variant" if p["dark"] else "dark-variant", counterpart))
     metadata += [(key, c[role]) for key, role in window_colours(p).items()]
     lines = ['<?xml version="1.0" encoding="UTF-8"?>',
-             f"<!-- {p['name']}: a Heritage Themes style scheme for GNOME Text Editor. Generated from {source}; changes "
-             "here are overwritten. SPDX-License-Identifier: MIT -->",
+             f"<!-- {p['name']}: a Heritage Themes style scheme for GNOME Text Editor and GNOME Builder. Generated "
+             f"from {source}; changes here are overwritten. SPDX-License-Identifier: MIT -->",
              f'<style-scheme id={quoteattr(name(t))} name={quoteattr(p["name"])} version="1.0">',
              "  <author>Heritage Themes</author>",
              f"  <description>{p['name']}: colours drawn from a culture's colour tradition.</description>",
@@ -316,9 +374,8 @@ def scheme(t, themes, source):
     def style(style_id, attributes):
         attrs = " ".join(f"{key}={quoteattr(value)}" for key, value in attributes.items())
         lines.append(f"  <style name={quoteattr(style_id)} {attrs}/>")
-    for style_id, attributes in editor_styles(p).items():
-        style(style_id, {k: c[v] if k in ("foreground", "background", "underline-color") else v
-                         for k, v in attributes.items()})
+    for style_id, attributes in (editor_styles(p) | builder_styles(p)).items():
+        style(style_id, {k: c[v] if k in COLOUR_ATTRIBUTES else v for k, v in attributes.items()})
     for style_id, (role, font, background) in syntax_styles(p).items():
         style(style_id, syntax_attributes(p, role, font, background))
     lines.append("</style-scheme>")
@@ -330,6 +387,12 @@ def derived(p):
     if p["dark"]:
         return {"view": mix(p["bg"], "000000", VIEW_DARK), "dialog": mix(p["bg"], "FFFFFF", DIALOG_DARK)}
     return {"view": mix(p["bg"], "FFFFFF", VIEW_LIGHT), "dialog": p["bg"]}
+
+
+def builder_sidebar(p):
+    """dict(fg, bg) as six-digit hex: the side bar that GNOME Builder derives from the text colours."""
+    return dict(fg=mix(p["fg"], "FFFFFF" if p["dark"] else "000000", BUILDER_SIDEBAR_TEXT),
+                bg=mix(p["bg"], p["fg"], BUILDER_SIDEBAR))
 
 
 def styles(p):
@@ -354,6 +417,21 @@ def styles(p):
         out[f"{fg} on {bg}"] = dict(fg=c[window[fg]], bg=c[window[bg]])
     for surface, colour in derived(p).items():
         out[f"text on the {surface} background"] = dict(fg=c["fg"], bg="#" + colour.lower())
+    # GNOME Builder: what its styles draw text in or behind, and its side bar
+    builder = builder_styles(p)
+    for element, style_id in (("unused declaration", "-Builder:unused"),
+                              ("definition link", "-Builder:hover-definition")):
+        out[element] = dict(fg=c[builder[style_id]["foreground"]], bg=c["bg"])
+        out[f"{element} on the current line"] = dict(fg=c[builder[style_id]["foreground"]], bg=c["caretRow"])
+    for element, style_id, background in (
+            ("occurrence of the selected word", "quick-highlight-match", "background"),
+            ("matching XML tag", "xml:tag-match", "background"),
+            ("breakpoint line number", "-Builder:breakpoint", "line-background"),
+            ("count point line number", "-Builder:countpoint", "background"),
+            *((f"outline label {label}", f"-Builder:{label}", "background") for label in XML_LABELS)):
+        out[element] = dict(fg=c[builder[style_id]["foreground"]], bg=c[builder[style_id][background]])
+    sidebar = builder_sidebar(p)
+    out["text on GNOME Builder's side bar"] = dict(fg="#" + sidebar["fg"].lower(), bg="#" + sidebar["bg"].lower())
     return out
 
 

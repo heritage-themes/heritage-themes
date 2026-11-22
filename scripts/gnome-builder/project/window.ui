@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="DemoWindow" parent="AdwApplicationWindow">
+    <property name="title">Demo</property>
+    <child>
+      <object class="GtkBox" id="content">
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel" id="greeting">
+            <property name="label">Hello</property>
+            <style>
+              <class name="title-1"/>
+            </style>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="close_button">
+            <property name="label">Close</property>
+            <signal name="clicked" handler="on_close_clicked"/>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>
