@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.17.0] - 2026-11-22
+
 ### Changed
 
 - The README gives KWrite's menu and Flathub data folder beside Kate's.
