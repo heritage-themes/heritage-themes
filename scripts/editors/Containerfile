@@ -1,14 +1,14 @@
-# The editors that the previews of Nano, Qt Creator, Eclipse, Lapce, Textadept and Amp run their themes in: Nano and
-# Qt Creator as Fedora 45 packages them, and pinned upstream releases of the others, each checked against its
-# published checksum. GUI editors draw on Xvfb with Mesa's software OpenGL and Vulkan; Nano and Amp run in a
-# pseudo-terminal.
+# The editors that the previews of Nano, Qt Creator, Kate, Eclipse, Lapce, Textadept and Amp run their themes in: Nano,
+# Qt Creator and Kate (with its plugins and the Breeze style it uses where installed) as Fedora 45 packages them, and
+# pinned upstream releases of the others, each checked against its published checksum. GUI editors draw on Xvfb with
+# Mesa's software OpenGL and Vulkan; Nano and Amp run in a pseudo-terminal.
 FROM registry.fedoraproject.org/fedora:45
 
 RUN dnf -y install --setopt=install_weak_deps=False \
         xorg-x11-server-Xvfb xdotool xwininfo ImageMagick dbus-x11 dbus-daemon \
         mesa-dri-drivers mesa-vulkan-drivers vulkan-loader mesa-libEGL mesa-libGL libglvnd-glx \
         python3 python3-pyte git findutils procps-ng which jetbrains-mono-fonts-all google-noto-sans-fonts \
-        nano qt-creator qt6-qtbase-gui qt6-qtsvg qt5-qtbase qt5-qtbase-gui \
+        nano qt-creator kate kate-plugins plasma-breeze-qt6 qt6-qtbase-gui qt6-qtsvg qt5-qtbase qt5-qtbase-gui \
         java-25-openjdk gtk3 webkit2gtk4.1 libsecret \
         libxkbcommon-x11 xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm \
         fontconfig ncurses zstd python3-pyqt6-base \

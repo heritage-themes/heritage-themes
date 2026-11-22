@@ -63,6 +63,22 @@ def qtcreator(home, stem, files, sample):
             {"QT_QPA_PLATFORM": "xcb"})
 
 
+def kate(home, stem, files, sample):
+    # the theme and window colour scheme in the user's data folder and the scheme chosen under Settings | Window
+    # Color Scheme, as the README says; the editor's theme is left at Kate's default, Follow System Color Scheme,
+    # which chooses the theme of the same name, so a preview that shows another theme shows that the pairing fails
+    data = f"{home}/.local/share"
+    os.makedirs(f"{data}/org.kde.syntax-highlighting/themes")
+    os.makedirs(f"{data}/color-schemes")
+    shutil.copy(f"{files}/themes/{stem}.theme", f"{data}/org.kde.syntax-highlighting/themes/")
+    shutil.copy(f"{files}/color-schemes/{stem}.colors", f"{data}/color-schemes/")
+    write(f"{home}/.config/katerc",
+          f"[UiSettings]\nColorScheme={stem}\n\n"
+          f"[KTextEditor Renderer]\nText Font={FONT},11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1\n\n"
+          "[General]\nShow welcome view for new window=false\n")
+    return ["/usr/bin/kate", "--new", sample], {"QT_QPA_PLATFORM": "xcb"}
+
+
 def eclipse(home, stem, files, sample):
     # the plugin in a dropins folder, the appearance theme and the TextMate theme of the same name chosen in the
     # workspace's preferences and the welcome page off, as a user chooses the themes once in the preferences
@@ -85,16 +101,16 @@ def eclipse(home, stem, files, sample):
              f"-Dosgi.configuration.area={home}/configuration"], {"GDK_BACKEND": "x11"})
 
 
-EDITORS = dict(textadept=textadept, lapce=lapce, qtcreator=qtcreator, eclipse=eclipse)
+EDITORS = dict(textadept=textadept, lapce=lapce, qtcreator=qtcreator, kate=kate, eclipse=eclipse)
 # The file beside the eclipse folder that names each theme's identifier, stem=identifier per line.
 THEME_IDS = "eclipse-theme-ids.txt"
-WAIT = {"textadept": 5, "lapce": 12, "qtcreator": 15, "eclipse": 10}
+WAIT = {"textadept": 5, "lapce": 12, "qtcreator": 15, "kate": 8, "eclipse": 10}
 # Editors whose window title names the open file, with the most seconds to wait for it before WAIT.
 TITLED = {"eclipse": 180}
 # Samples that an editor opens as a project, by the name they are opened under instead.
 RENAME = {("qtcreator", "Cargo.toml"): "settings.toml"}
 # Window classes of the editors that shoot.py resizes to WIDTH x HEIGHT.
-RESIZE = {"lapce": "lapce", "qtcreator": "qtcreator", "eclipse": "Eclipse"}
+RESIZE = {"lapce": "lapce", "qtcreator": "qtcreator", "kate": "kate", "eclipse": "Eclipse"}
 
 
 def main():

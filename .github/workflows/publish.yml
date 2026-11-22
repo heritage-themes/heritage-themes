@@ -40,6 +40,7 @@ jobs:
       textadept: ${{ steps.check.outputs.textadept }}
       lapce: ${{ steps.check.outputs.lapce }}
       qtcreator: ${{ steps.check.outputs.qtcreator }}
+      kate: ${{ steps.check.outputs.kate }}
       amp: ${{ steps.check.outputs.amp }}
       eclipse: ${{ steps.check.outputs.eclipse }}
       nova: ${{ steps.check.outputs.nova }}
@@ -71,7 +72,7 @@ jobs:
           fi
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
             kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
-            qtcreator=false amp=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
+            qtcreator=false kate=false amp=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
             godot=false netbeans=false drracket=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
@@ -91,6 +92,7 @@ jobs:
           grep -q "^## \[$version\]" textadept/CHANGELOG.md && textadept=true
           grep -q "^## \[$version\]" lapce/CHANGELOG.md && lapce=true
           grep -q "^## \[$version\]" qtcreator/CHANGELOG.md && qtcreator=true
+          grep -q "^## \[$version\]" kate/CHANGELOG.md && kate=true
           grep -q "^## \[$version\]" amp/CHANGELOG.md && amp=true
           grep -q "^## \[$version\]" eclipse/CHANGELOG.md && eclipse=true
           grep -q "^## \[$version\]" nova/CHANGELOG.md && nova=true
@@ -107,7 +109,7 @@ jobs:
               && [ "$zed" = false ] && [ "$nvim" = false ] && [ "$notepadpp" = false ] && [ "$xcode" = false ] \
               && [ "$helix" = false ] && [ "$kakoune" = false ] && [ "$micro" = false ] && [ "$vim" = false ] \
               && [ "$emacs" = false ] && [ "$terminals" = false ] && [ "$nano" = false ] && [ "$textadept" = false ] \
-              && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$amp" = false ] \
+              && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$kate" = false ] && [ "$amp" = false ] \
               && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
               && [ "$pygments" = false ] && [ "$spyder" = false ] && [ "$thonny" = false ] \
               && [ "$idle" = false ] && [ "$rstudio" = false ] && [ "$godot" = false ] && [ "$netbeans" = false ] \
@@ -135,6 +137,7 @@ jobs:
             echo "textadept=$textadept"
             echo "lapce=$lapce"
             echo "qtcreator=$qtcreator"
+            echo "kate=$kate"
             echo "amp=$amp"
             echo "eclipse=$eclipse"
             echo "nova=$nova"
@@ -921,6 +924,28 @@ jobs:
           path: build/heritage-themes-qtcreator-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # Kate has no registry that Publish can upload to: users install the themes and window colour schemes from the zip
+  # that the GitHub release attaches.
+  kate:
+    needs: check
+    if: needs.check.outputs.kate == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: kate
+          path: build/heritage-themes-kate-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   # Amp has no theme registry: users install the themes from the zip that the GitHub release attaches.
   amp:
     needs: check
@@ -1245,7 +1270,7 @@ jobs:
 
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
-            emacs, terminals, nano, textadept, lapce, qtcreator,
+            emacs, terminals, nano, textadept, lapce, qtcreator, kate,
             amp, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot, netbeans, drracket]
     # Runs once each product has either published or been left out of the release.
     if: >-
@@ -1268,6 +1293,7 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.textadept.result)
       && contains(fromJSON('["success", "skipped"]'), needs.lapce.result)
       && contains(fromJSON('["success", "skipped"]'), needs.qtcreator.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.kate.result)
       && contains(fromJSON('["success", "skipped"]'), needs.amp.result)
       && contains(fromJSON('["success", "skipped"]'), needs.eclipse.result)
       && contains(fromJSON('["success", "skipped"]'), needs.nova.result)
@@ -1303,6 +1329,7 @@ jobs:
       TEXTADEPT: ${{ needs.check.outputs.textadept }}
       LAPCE: ${{ needs.check.outputs.lapce }}
       QTCREATOR: ${{ needs.check.outputs.qtcreator }}
+      KATE: ${{ needs.check.outputs.kate }}
       AMP: ${{ needs.check.outputs.amp }}
       ECLIPSE: ${{ needs.check.outputs.eclipse }}
       NOVA: ${{ needs.check.outputs.nova }}
@@ -1385,6 +1412,7 @@ jobs:
           notes "Textadept themes" "$TEXTADEPT" textadept/CHANGELOG.md "heritage-themes-textadept-<version>.zip"
           notes "Lapce themes" "$LAPCE" lapce/CHANGELOG.md "heritage-themes-lapce-<version>.zip"
           notes "Qt Creator themes" "$QTCREATOR" qtcreator/CHANGELOG.md "heritage-themes-qtcreator-<version>.zip"
+          notes "Kate themes" "$KATE" kate/CHANGELOG.md "heritage-themes-kate-<version>.zip"
           notes "Amp themes" "$AMP" amp/CHANGELOG.md "heritage-themes-amp-<version>.zip"
           notes "Eclipse plugin" "$ECLIPSE" eclipse/CHANGELOG.md "heritage-themes-eclipse-<version>.zip"
           notes "Nova themes" "$NOVA" nova/CHANGELOG.md "heritage-themes-nova-<version>.zip"

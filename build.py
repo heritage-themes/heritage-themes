@@ -101,9 +101,9 @@ VISUALSTUDIO_NAME = "Heritage Themes for Visual Studio"
 VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
-           "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Amp", "Eclipse", "Nova",
-           "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE", "RStudio", "Godot", "NetBeans", "DrRacket",
-           "terminals")
+           "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate", "Amp",
+           "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE", "RStudio", "Godot", "NetBeans",
+           "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -3045,6 +3045,152 @@ def validate_qtcreator(directory, families):
         check_files("Qt Creator themes", directory, folder, expected)
 
 
+def kate_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Kate
+
+{DESCRIPTION} {count} dark and light colour themes in {len(families)} families, each with a window colour scheme of \
+the same name; each family maps the named colours of one tradition to syntax roles.
+
+## Install
+
+The themes need Kate 24.02 or later, or another app built on KDE Frameworks 6 and KTextEditor, such as KWrite or \
+KDevelop.
+
+1. Copy the files in `themes` into `org.kde.syntax-highlighting/themes` and the files in `color-schemes` into \
+`color-schemes` in your data folder, creating the folders if they do not exist: `~/.local/share` on Linux, \
+`~/.var/app/org.kde.kate/data` for Kate from Flathub, `~/Library/Application Support` on macOS and `%LOCALAPPDATA%` \
+on Windows. On Linux, from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.local/share/org.kde.syntax-highlighting/themes ~/.local/share/color-schemes
+   cp themes/* ~/.local/share/org.kde.syntax-highlighting/themes/
+   cp color-schemes/* ~/.local/share/color-schemes/
+   ```
+
+2. Restart Kate and choose a scheme, for example **Holi Night**, under **Settings | Window Color Scheme**.
+
+3. The editor takes the theme of the same name while **Follow System Color Scheme** is chosen under **Settings | \
+Configure Kate | Color Themes | Default Theme**, which it is unless you chose another theme there. Otherwise choose \
+the theme in that list.
+
+To add one theme without copying files, choose **Import…** on that page and select its file in `themes`.
+
+## What is coloured
+
+The colour theme colours the editor: code, the selection, the current line, found and replaced text, matching \
+brackets, line numbers, the code folding and indentation guides, spelling mistakes, modified and saved lines, \
+bookmarks, breakpoints and code templates. The window colour scheme colours Kate's window: the menu bar, tool bars, \
+tabs, side panels, lists, buttons, tooltips and the status bar. Kate's terminal panel takes the colours of Konsole's \
+profile; the Heritage Themes for terminals include Konsole's.
+
+## Languages
+
+Kate colours code with KSyntaxHighlighting's definitions, which give each construct one of a few dozen styles that \
+every language shares: a language's keywords, types, strings, numbers, comments and, where the definition finds \
+them, function names, members and annotations. A definition does not tell declarations, fields and parameters apart \
+from other names as a language server does. The themes give constructs that a definition marks with a style meant \
+for another, such as JSON's keys, Python's `self` and C's `#include` file names, the colours that the other Heritage \
+Themes products give them, and replace the colours that some definitions set themselves, such as CMake's and \
+Doxygen's.
+
+{readme_footer(families, "Kate", "Themes", "the theme, Kate version, operating system, language")}"""
+
+
+def build_kate(families):
+    """Writes the colour themes and window colour schemes to build/kate, with the README, changelog and licence, and
+    returns build/kate."""
+    directory = os.path.join(OUT, "kate")
+    for folder in ("themes", "color-schemes"):
+        os.makedirs(os.path.join(directory, folder))
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            name = heritage.kate.name(t)
+            write_text(os.path.join(directory, "themes", f"{name}.theme"), heritage.kate.theme(t, source, VERSION))
+            write_text(os.path.join(directory, "color-schemes", f"{name}.colors"),
+                       heritage.kate.colour_scheme(t, source))
+    write_text(os.path.join(directory, "README.md"), kate_readme(families))
+    shutil.copy(os.path.join(ROOT, "kate", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_kate(directory, families):
+    """Fails the build when a theme does not set exactly the text styles and editor colours of KSyntaxHighlighting,
+    names a definition or item that the library lacks, leaves a colour that a definition sets itself in place, or has
+    text that is unreadable on its background; or when a window colour scheme leaves out a colour role, does not name
+    its theme, or would make Kate's Follow System Color Scheme choose another theme than its own."""
+    themes, schemes, backgrounds = set(), set(), {}
+    hex_colour = re.compile(r"#[0-9a-f]{6}")
+    bundled = {value[0]: name for name, value in heritage.kate.DATA["bundled"].items()}
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.kate.name(t), t["palette"]
+            label = f"Kate {name}"
+            themes.add(f"{name}.theme")
+            schemes.add(f"{name}.colors")
+            with open(os.path.join(directory, "themes", f"{name}.theme"), encoding="utf-8") as f:
+                data = json.load(f)
+            if data["metadata"]["name"] != p["name"] or data["metadata"]["revision"] != heritage.kate.revision(VERSION):
+                raise SystemExit(f"{label}: the metadata do not name the theme and the revision of {VERSION}")
+            styles = [*data["text-styles"].values(),
+                      *(style for items in data["custom-styles"].values() for style in items.values())]
+            if list(data["text-styles"]) != list(heritage.kate.TEXT_STYLES):
+                raise SystemExit(f"{label}: does not set exactly the text styles of KSyntaxHighlighting")
+            if list(data["editor-colors"]) != list(heritage.kate.EDITOR_COLOURS):
+                raise SystemExit(f"{label}: does not set exactly the editor colours of KSyntaxHighlighting")
+            for colour in [*data["editor-colors"].values(), *(v for style in styles for k, v in style.items()
+                                                              if k.endswith("color"))]:
+                if not hex_colour.fullmatch(colour):
+                    raise SystemExit(f"{label}: colour {colour!r} is not #rrggbb")
+            for style in styles:
+                if {"text-color", "selected-text-color", "bold", "italic", "underline", "strike-through"} - set(style):
+                    raise SystemExit(f"{label}: a style leaves out a colour or font flag: {style}")
+            for definition, items in data["custom-styles"].items():
+                for item in items:
+                    if item not in heritage.kate.DEFINITIONS.get(definition, {}):
+                        raise SystemExit(f"{label}: custom-styles names {definition} {item}, which KSyntaxHighlighting "
+                                         f"{heritage.kate.DATA['version']} lacks")
+            for definition, items in heritage.kate.HARD_CODED.items():
+                for item, colours in items.items():
+                    style = data["custom-styles"].get(definition, {}).get(item, {})
+                    needed = {"text-color", "selected-text-color"} | \
+                        ({"background-color"} if "backgroundColor" in colours else set()) | \
+                        ({"selected-background-color"} if "selBackgroundColor" in colours else set())
+                    if needed - set(style):
+                        raise SystemExit(f"{label}: {definition} {item} keeps colours of its own: {colours}")
+            check_styles(label, heritage.kate.styles(p), "fg", "bg", None, set(), heritage.kate.low_contrast(p), {})
+            parser = configparser.ConfigParser(interpolation=None)
+            parser.optionxform = str
+            parser.read(os.path.join(directory, "color-schemes", f"{name}.colors"), encoding="utf-8")
+            for group in heritage.kate.COLOUR_SETS:
+                section = f"Colors:{group}"
+                if not parser.has_section(section) or set(parser[section]) != set(heritage.kate.COLOUR_ROLES):
+                    raise SystemExit(f"{label}: [{section}] does not set exactly the colour roles of KDE")
+                for role, value in parser[section].items():
+                    if not re.fullmatch(r"\d{1,3},\d{1,3},\d{1,3}", value) or \
+                            any(int(v) > 255 for v in value.split(",")):
+                        raise SystemExit(f"{label}: [{section}] {role} is {value!r}, not r,g,b")
+            if parser["General"]["Name"] != p["name"] or parser["General"]["ColorScheme"] != name:
+                raise SystemExit(f"{label}: the window colour scheme does not name the theme")
+
+            def colour(group, role):
+                return "#" + "".join(f"{int(v):02x}" for v in parser[f"Colors:{group}"][role].split(","))
+            # Kate chooses the theme whose background is the window's View background, the first one when the
+            # selection matches none
+            background = colour("View", "BackgroundNormal")
+            if background != data["editor-colors"]["BackgroundColor"]:
+                raise SystemExit(f"{label}: the window colour scheme's View background is not the theme's background")
+            if background in backgrounds or background in bundled:
+                raise SystemExit(f"{label}: {backgrounds.get(background) or bundled[background]} has the same "
+                                 f"background, so Kate could choose it for this window colour scheme")
+            backgrounds[background] = name
+    for folder, expected in (("themes", themes), ("color-schemes", schemes)):
+        check_files("Kate themes", directory, folder, expected)
+
+
 def amp_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -3784,7 +3930,8 @@ def validate_thonny(directory, families):
 
 # Product → its themes' names in READMEs, the README writer, and the folder its theme files go in.
 TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.name, "Lapce": heritage.lapce.name,
-                  "Qt Creator": heritage.qtcreator.name, "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
+                  "Qt Creator": heritage.qtcreator.name, "Kate": lambda t: t["palette"]["name"],
+                  "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
                   "RStudio": heritage.rstudio.name, "Godot": heritage.godot.name,
@@ -4148,6 +4295,10 @@ def main():
     qtcreator = build_qtcreator(families)
     validate_qtcreator(qtcreator, families)
     print(f"{pack_folder(qtcreator, os.path.join(OUT, f'{VSCODE_NAME}-qtcreator-{VERSION}.zip'), f'{VSCODE_NAME}-qtcreator')}: "
+          f"{len(themes)} themes", flush=True)
+    kate = build_kate(families)
+    validate_kate(kate, families)
+    print(f"{pack_folder(kate, os.path.join(OUT, f'{VSCODE_NAME}-kate-{VERSION}.zip'), f'{VSCODE_NAME}-kate')}: "
           f"{len(themes)} themes", flush=True)
     lapce = build_lapce(families)
     validate_lapce(lapce, families)

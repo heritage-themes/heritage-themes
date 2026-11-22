@@ -2,7 +2,7 @@
 
 Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
                           | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --textadept
-                          | --lapce | --qtcreator | --eclipse | --jupyterlab | --pygments] [--png] [THEME ...]
+                          | --lapce | --qtcreator | --kate | --eclipse | --jupyterlab | --pygments] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --visualstudio  write the Visual Studio preview instead of the IntelliJ one; needs Windows and Visual Studio 2026
@@ -22,6 +22,7 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --textadept  write the Textadept preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --lapce      write the Lapce preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --qtcreator  write the Qt Creator preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
+  --kate       write the Kate preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --eclipse    write the Eclipse preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --jupyterlab write the JupyterLab preview instead of the IntelliJ one; needs python3 build.py --jupyterlab run
                first, Python 3.10 or later, Google Chrome or Chromium, and ImageMagick
@@ -56,7 +57,13 @@ Podman, through scripts/terminals/shoot.py and shells.py, and fails when a scree
 colours (scripts/terminals/check.py) or a screen shows a colour the theme does not set or text below its contrast
 minimum (scripts/terminals/cells.py). iTerm2 and Windows Terminal do not run on Linux, so the build's checks of their
 files are all they get. Termux runs in the Android emulator that scripts/termux/setup.sh starts, and
-scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. All pages use JetBrains
+scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. The Nano, Amp, Textadept,
+Lapce, Qt Creator, Kate and Eclipse pages go to themes/<theme>/build/preview-<editor>.html. Each editor runs in the
+container image of scripts/editors/Containerfile, with the theme installed and chosen as its README says: Nano and Amp
+in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour that the theme does
+not set or text below its contrast minimum, and the others on Xvfb through scripts/editors/shoot.py, whose screenshots
+go to themes/<theme>/build/<editor> and fail when they show a colour that is no colour of the theme nor a blend of one
+(scripts/editors/pixels.py), or when a main role shows in no sample. All pages use JetBrains
 Mono, downloaded once from the pinned release below into ~/.cache/heritage-themes. The JupyterLab page goes to themes/<theme>/build/preview-jupyterlab.html, with
 the screenshots it shows in themes/<theme>/build/jupyterlab. scripts/jupyterlab/shoot.py takes them in JupyterLab
 itself and in Notebook 7, in the virtual environment that preview.py creates in scripts/jupyterlab/.venv from the pinned
@@ -594,6 +601,9 @@ GUI_EDITORS = {
                   lambda themes: [(f"themes/{heritage.qtcreator.name(t)}.creatortheme", heritage.qtcreator.theme(t, ""))
                                   for t in themes]
                   + [(f"styles/{heritage.qtcreator.name(t)}.xml", heritage.qtcreator.scheme(t, "")) for t in themes]),
+    "kate": ("Kate", heritage.kate,
+             lambda themes: [(f"themes/{heritage.kate.name(t)}.theme", heritage.kate.theme(t, "")) for t in themes]
+             + [(f"color-schemes/{heritage.kate.name(t)}.colors", heritage.kate.colour_scheme(t, "")) for t in themes]),
     "eclipse": ("Eclipse", heritage.eclipse,
                 lambda themes: [("eclipse-theme-ids.txt", heritage.eclipse.theme_ids(themes))]),
 }

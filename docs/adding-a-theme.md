@@ -188,6 +188,18 @@ With the Flatpak, `raco` is `flatpak run --command=raco org.racket_lang.Racket`,
 that it has been given. Add `--filesystem=<heritage-themes folder>:ro` to the command. Set `PLTUSERHOME=<empty folder>`
 on `raco` and on DrRacket to test without touching the installed preferences and packages.
 
+## Check the Kate definition rules
+
+Kate colours code by KSyntaxHighlighting's default styles. `language_rules()` in `heritage/kate.py` names items of the library's syntax definitions, which `heritage/kate.json` lists with the colours that some items set themselves. Rewrite the file from the library in the editors image after a KDE Frameworks update:
+
+```bash
+podman build -t localhost/heritage-editors scripts/editors
+podman run --rm --userns=keep-id -v "$PWD:/repo:Z" localhost/heritage-editors \
+    python3 /repo/scripts/kate/definitions.py /repo/heritage/kate.json
+```
+
+`python3 build.py` then fails on a rule that names an item the library lacks, and on an item whose own colours no theme replaces.
+
 ## Add the documentation
 
 Add these to the theme folder:
