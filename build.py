@@ -118,7 +118,8 @@ CONTRAST = (
     (("lineNoCaret",), ("bg", "caretRow"), 4.5),  # the current line's number, on the gutter and on the current line
     (ANSI, ("bgTool",), 4.5),  # console and terminal
     (("fg",), ("hover", "selection", "selInactive", "searchBg"), 4.5),
-    (("ansiBlue",), ("selection",), 4.5),  # VS Code match highlights in a selected list row
+    (("fg",), ("diffDel", "diffConf", "diffMod"), 4.5),  # VS Code input validation messages, Theia warning bars
+    (("ansiBlue",), ("selection",), 4.5),  # VS Code match highlights and Arduino IDE's check mark in a selected row
     (("ansiBlue", "azure"), ("surface",), 4.5),  # Sublime Text quick panel matches and links in popups
     (("redText",), ("red",), 4.5),
     (("gold",), ("bgTool", "bgUi", "surface"), 3),  # IntelliJ focus ring

@@ -18,6 +18,7 @@ body:
         - JetBrains IDE
         - VS Code
         - Other VS Code-compatible editor
+        - Arduino IDE
         - Visual Studio
         - Sublime Text
         - Zed
@@ -55,7 +56,7 @@ body:
     id: editor-version
     attributes:
       label: Editor name and version
-      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Visual Studio 2026 18.11, Sublime Text 4200, Zed 1.25, Neovim 0.12, Notepad++ 8.9.8, Xcode 27.1, Helix 25.07, Kakoune 2026.04.12, Micro 2.0.15, Vim 9.2, Emacs 30.2, Qt Creator 20.0, Kate 26.08, GNOME Text Editor 51, GNOME Builder 50, Eclipse 2026-09, JupyterLab 4.6, Pygments 2.21, Thonny 5.0, IDLE 3.14, RStudio 2026.11, Godot 4.7, NetBeans 32, DrRacket 9.3, kitty 0.48 with fish 4.6 or tmux 3.8.
+      description: For example IntelliJ IDEA 2025.3.1, PyCharm 2025.3, VS Code 1.105, Arduino IDE 2.3.11, Visual Studio 2026 18.11, Sublime Text 4200, Zed 1.25, Neovim 0.12, Notepad++ 8.9.8, Xcode 27.1, Helix 25.07, Kakoune 2026.04.12, Micro 2.0.15, Vim 9.2, Emacs 30.2, Qt Creator 20.0, Kate 26.08, GNOME Text Editor 51, GNOME Builder 50, Eclipse 2026-09, JupyterLab 4.6, Pygments 2.21, Thonny 5.0, IDLE 3.14, RStudio 2026.11, Godot 4.7, NetBeans 32, DrRacket 9.3, kitty 0.48 with fish 4.6 or tmux 3.8.
     validations:
       required: true
   - type: input

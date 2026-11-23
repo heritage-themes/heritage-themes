@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Arduino IDE 2 support: the extension loads from Arduino IDE's `plugins` folder. The themes also colour the check mark on the selected board in the toolbar and the Serial Monitor's warning bar, whose text otherwise falls below 4.5:1 in 29 of the 65 themes.
+
 ## [1.11.1] - 2026-11-14
 
 ### Fixed

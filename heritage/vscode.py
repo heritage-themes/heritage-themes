@@ -403,6 +403,11 @@ def workbench(p):
         "charts.foreground": c["fg"], "charts.lines": c["border"], "charts.red": c["ansiRed"],
         "charts.blue": c["ansiBlue"], "charts.yellow": c["ansiYellow"], "charts.orange": c["warning"],
         "charts.green": c["ansiGreen"], "charts.purple": c["ansiMagenta"],
+        # Theia-based apps such as Arduino IDE load the extension too. Theia draws warning bars from warningBackground
+        # and warningForeground, which default to the input-validation tint as text on the warning colour.
+        "warningBackground": c["diffConf"], "warningForeground": c["fg"],
+        # Arduino IDE's check mark on the selected board in the toolbar's board list, drawn on the selection
+        "arduino.toolbar.dropdown.iconSelected": c["ansiBlue"],
     }
 
 
