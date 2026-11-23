@@ -224,6 +224,20 @@ podman run --rm --userns=keep-id -v "$PWD:/repo:Z" localhost/heritage-editors \
 
 `python3 build.py` then fails on a rule or scheme style that names a style the library lacks.
 
+## Check the Geany named styles
+
+A Geany scheme sets every named style of Geany's `filetypes.common`, which `NAMED_STYLES` in `heritage/geany.py` lists. After a Geany update, compare the two in the editors image; the command prints nothing when they match:
+
+```bash
+podman build -t localhost/heritage-editors scripts/editors
+podman run --rm --userns=keep-id -v "$PWD:/repo:Z" -w /repo localhost/heritage-editors python3 -c '
+import configparser, heritage.geany as g
+c = configparser.ConfigParser(delimiters=("=",), comment_prefixes=("#",), interpolation=None, strict=False)
+c.optionxform = str
+c.read("/usr/share/geany/filedefs/filetypes.common")
+print(sorted(set(c["named_styles"]) ^ set(g.NAMED_STYLES)) or "", end="")'
+```
+
 ## Add the documentation
 
 Add these to the theme folder:

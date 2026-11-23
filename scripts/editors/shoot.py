@@ -113,6 +113,19 @@ def gedit(home, stem, files, sample):
             {"GSETTINGS_BACKEND": "keyfile", "GDK_BACKEND": "x11", "GTK_A11Y": "none"})
 
 
+def geany(home, stem, files, sample):
+    # the colour scheme in the user's colorschemes folder and chosen under View | Change Color Scheme, as the README
+    # says, which Geany keeps in geany.conf; the side bar, message window and toolbar hidden and no session restored,
+    # so that the window shows the editor and its tab
+    os.makedirs(f"{home}/.config/geany/colorschemes")
+    shutil.copy(f"{files}/colorschemes/{stem}.conf", f"{home}/.config/geany/colorschemes/")
+    write(f"{home}/.config/geany/geany.conf",
+          f"[geany]\ncolor_scheme={stem}.conf\neditor_font={FONT} 11\npref_main_load_session=false\n"
+          f"sidebar_visible=false\nmsgwindow_visible=false\npref_toolbar_show=false\n"
+          f"geometry=0;0;{WIDTH};{HEIGHT};0\n")
+    return ["/usr/bin/geany", "--new-instance", sample], {"GDK_BACKEND": "x11", "GTK_A11Y": "none"}
+
+
 def eclipse(home, stem, files, sample):
     # the plugin in a dropins folder, the appearance theme and the TextMate theme of the same name chosen in the
     # workspace's preferences and the welcome page off, as a user chooses the themes once in the preferences
@@ -136,17 +149,17 @@ def eclipse(home, stem, files, sample):
 
 
 EDITORS = {"textadept": textadept, "lapce": lapce, "qtcreator": qtcreator, "kate": kate,
-           "gnome-text-editor": gnome_text_editor, "gedit": gedit, "eclipse": eclipse}
+           "gnome-text-editor": gnome_text_editor, "gedit": gedit, "geany": geany, "eclipse": eclipse}
 # The file beside the eclipse folder that names each theme's identifier, stem=identifier per line.
 THEME_IDS = "eclipse-theme-ids.txt"
-WAIT = {"textadept": 5, "lapce": 12, "qtcreator": 15, "kate": 8, "gnome-text-editor": 6, "gedit": 6, "eclipse": 10}
+WAIT = {"textadept": 5, "lapce": 12, "qtcreator": 15, "kate": 8, "gnome-text-editor": 6, "gedit": 6, "geany": 5, "eclipse": 10}
 # Editors whose window title names the open file, with the most seconds to wait for it before WAIT.
 TITLED = {"eclipse": 180}
 # Samples that an editor opens as a project, by the name they are opened under instead.
 RENAME = {("qtcreator", "Cargo.toml"): "settings.toml"}
 # Window classes of the editors that shoot.py resizes to WIDTH x HEIGHT.
 RESIZE = {"lapce": "lapce", "qtcreator": "qtcreator", "kate": "kate", "gnome-text-editor": "gnome-text-editor",
-          "gedit": "gedit", "eclipse": "Eclipse"}
+          "gedit": "gedit", "geany": "geany", "eclipse": "Eclipse"}
 
 
 def main():

@@ -102,7 +102,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate",
-           "GNOME Text Editor", "gedit", "Amp", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
+           "GNOME Text Editor", "gedit", "Geany", "Amp", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
            "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
@@ -3432,6 +3432,96 @@ def validate_gedit(directory, families):
     check_files("gedit schemes", directory, "styles", schemes)
 
 
+def geany_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for Geany
+
+{DESCRIPTION} {count} dark and light colour schemes in {len(families)} families; each family maps the named colours \
+of one tradition to syntax roles.
+
+## Install
+
+The colour schemes need Geany 1.38 or later.
+
+1. Copy the files in `colorschemes` into Geany's `colorschemes` folder, creating it if it does not exist. From the \
+unzipped folder:
+
+   ```bash
+   mkdir -p ~/.config/geany/colorschemes
+   cp colorschemes/*.conf ~/.config/geany/colorschemes/
+   ```
+
+   On Windows, the folder is `%APPDATA%\\geany\\colorschemes`. Geany run with `--config` reads the `colorschemes` \
+folder in that configuration folder.
+
+2. Restart Geany, open **View | Change Color Scheme** and choose a scheme, for example **Holi Night**.
+
+## What is coloured
+
+Each scheme colours the editor: code, the selection, the current line, line numbers, the fold margin, the caret, \
+indent guides, visible whitespace, matching and unmatched brackets, call tips, the boxes of **Mark All**, and the \
+markers of **Toggle Marker** and **Go to Line**. Geany draws its window, tabs, side bar and message window in the \
+desktop's GTK theme, which a colour scheme cannot set. The long line marker takes the colour of **Edit | \
+Preferences | Editor | Display**, light green by default; choose a colour that suits the scheme there, or turn the \
+marker off.
+
+## Languages
+
+Geany gives each language's constructs a named style, such as `keyword_1`, `string_1` or `type`, in its filetype \
+definitions, and a scheme colours the named styles for all languages at once. The definitions mark keywords, types, \
+strings, numbers, comments, preprocessor directives, tags and attributes, and in some languages function and class \
+declarations, decorators and macros, but not fields, parameters, calls or annotations as a language server does. \
+Several languages give one named style to unlike constructs: Markdown's headings and links take the keyword colour, \
+its code spans the attribute colour, and CSS's property names the type colour.
+
+{readme_footer(families, "Geany", "Schemes", "the scheme, Geany's version, operating system, language")}"""
+
+
+def build_geany(families):
+    """Writes the colour schemes to build/geany, with the README, changelog and licence, and returns build/geany."""
+    return build_themes(families, "Geany", "colorschemes",
+                        lambda t, source: (f"{heritage.geany.name(t)}.conf", heritage.geany.scheme(t, source)))
+
+
+# A named style as foreground;background;bold;italic, the background left empty to keep the default style's.
+GEANY_STYLE = re.compile(r"(#[0-9a-f]{6});(#[0-9a-f]{6})?;(true|false);(true|false)")
+
+
+def validate_geany(directory, families):
+    """Fails the build when a colour scheme does not name its theme, leaves out or adds a named style, gives a style a
+    value that is not foreground;background;bold;italic in #rrggbb, gives an editor style no background, or has text
+    that is unreadable on its background."""
+    module = heritage.geany
+    schemes = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = module.name(t), t["palette"]
+            label = f"Geany {name}"
+            schemes.add(f"{name}.conf")
+            # Geany reads the file with GKeyFile, whose comments start with # at the start of a line
+            parser = configparser.ConfigParser(delimiters=("=",), comment_prefixes=("#",), interpolation=None,
+                                               strict=True)
+            parser.optionxform = str
+            parser.read(os.path.join(directory, "colorschemes", f"{name}.conf"), encoding="utf-8")
+            if parser.sections() != ["theme_info", "named_styles"]:
+                raise SystemExit(f"{label}: has the sections {parser.sections()}, not theme_info and named_styles")
+            if parser["theme_info"].get("name") != p["name"]:
+                raise SystemExit(f"{label}: theme_info does not name the theme")
+            styles = parser["named_styles"]
+            if list(styles) != list(module.NAMED_STYLES):
+                raise SystemExit(f"{label}: the named styles differ from Geany's: "
+                                 f"{sorted(set(styles) ^ set(module.NAMED_STYLES))}")
+            for style, text in styles.items():
+                match = GEANY_STYLE.fullmatch(text)
+                if not match:
+                    raise SystemExit(f"{label}: {style} is {text!r}, not foreground;background;bold;italic")
+                if style in module.EDITOR_STYLES and not match[2]:
+                    raise SystemExit(f"{label}: the editor style {style} has no background")
+            check_styles(label, module.styles(p), "fg", "bg", None, set(), module.low_contrast(p), {})
+    check_files("Geany schemes", directory, "colorschemes", schemes)
+
+
 def amp_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -4173,6 +4263,7 @@ def validate_thonny(directory, families):
 TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.name, "Lapce": heritage.lapce.name,
                   "Qt Creator": heritage.qtcreator.name, "Kate": lambda t: t["palette"]["name"],
                   "GNOME Text Editor": lambda t: t["palette"]["name"], "gedit": lambda t: t["palette"]["name"],
+                  "Geany": lambda t: t["palette"]["name"],
                   "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
@@ -4180,7 +4271,7 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Geany": geany_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
 
 
 def terminals_readme(families):
@@ -4550,6 +4641,10 @@ def main():
     gedit = build_gedit(families)
     validate_gedit(gedit, families)
     print(f"{pack_folder(gedit, os.path.join(OUT, f'{VSCODE_NAME}-gedit-{VERSION}.zip'), f'{VSCODE_NAME}-gedit')}: "
+          f"{len(themes)} themes", flush=True)
+    geany = build_geany(families)
+    validate_geany(geany, families)
+    print(f"{pack_folder(geany, os.path.join(OUT, f'{VSCODE_NAME}-geany-{VERSION}.zip'), f'{VSCODE_NAME}-geany')}: "
           f"{len(themes)} themes", flush=True)
     lapce = build_lapce(families)
     validate_lapce(lapce, families)
