@@ -1,5 +1,5 @@
-# The editors that the previews of Nano, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse, Lapce, Textadept
-# and Amp run their themes in: Nano, Qt Creator, Kate (with its plugins and the Breeze style it uses where installed),
+# The editors that the previews of Nano, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse, Lapce, Textadept,
+# Pulsar and Amp run their themes in: Nano, Qt Creator, Kate (with its plugins and the Breeze style it uses where installed),
 # GNOME Text Editor, gedit and Geany as Fedora 45 packages them, and pinned upstream releases of the others, each checked against
 # its published checksum. GUI editors draw on Xvfb with Mesa's software OpenGL and Vulkan; Nano and Amp run in a
 # pseudo-terminal. PyGObject with GtkSourceView's introspection data lets scripts/gnome-text-editor/definitions.py read
@@ -48,6 +48,10 @@ RUN fetch https://github.com/orbitalquark/textadept/releases/download/textadept_
 RUN fetch https://github.com/jmacdonald/amp/releases/download/0.7.1/amp-x86_64-unknown-linux-musl \
         b9d3a1fcbdc683ce680a7c7f4f36570ba6772329fe02232a517659fecab56db3 /usr/local/bin/amp \
     && chmod +x /usr/local/bin/amp
+# Pulsar's RPM, which dnf installs with the libraries that Electron needs, in /opt/Pulsar
+RUN fetch https://github.com/pulsar-edit/pulsar/releases/download/v1.133.1/Linux.pulsar-1.133.1.x86_64.rpm \
+        eadcacfce2ab9ba08f35344c7e5b1456ca2bc48d15abf37a20be42abf7a7d5d0 pulsar.rpm \
+    && dnf -y install --setopt=install_weak_deps=False ./pulsar.rpm && dnf clean all && rm pulsar.rpm
 
 RUN useradd -m -s /bin/bash heritage
 USER heritage

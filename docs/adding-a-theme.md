@@ -238,6 +238,17 @@ c.read("/usr/share/geany/filedefs/filetypes.common")
 print(sorted(set(c["named_styles"]) ^ set(g.NAMED_STYLES)) or "", end="")'
 ```
 
+## Check the Pulsar UI stylesheets
+
+A Pulsar UI theme takes the stylesheets in `heritage/pulsar-ui`, which are Pulsar's One UI stylesheets (`packages/one-dark-ui/styles` in Pulsar's repository) with every computed colour replaced by a variable that `ui_variables()` in `heritage/pulsar.py` sets from the palette. After a Pulsar update, compare them with the release's and carry its changes over, keeping the variables:
+
+```bash
+git clone --depth 1 --branch v<version> https://github.com/pulsar-edit/pulsar /tmp/pulsar
+diff -r /tmp/pulsar/packages/one-dark-ui/styles heritage/pulsar-ui
+```
+
+`python3 build.py` fails on a variable that no stylesheet defines and on a colour that is not `#RRGGBB`. `python3 preview.py --pulsar` fails on a colour that is not the palette's.
+
 ## Add the documentation
 
 Add these to the theme folder:

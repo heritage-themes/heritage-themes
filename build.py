@@ -102,7 +102,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate",
-           "GNOME Text Editor", "gedit", "Geany", "Amp", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
+           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
            "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
@@ -3522,6 +3522,175 @@ def validate_geany(directory, families):
     check_files("Geany schemes", directory, "colorschemes", schemes)
 
 
+def pulsar_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    example = next(t for f in families for t in f.THEMES if t["slug"] == "HoliNight")
+    return f"""# Heritage Themes for Pulsar
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles and to the workspace.
+
+Each theme is two Pulsar packages, because Pulsar takes a UI theme and a syntax theme: `<theme>-ui` colours the \
+workspace and `<theme>-syntax` the editor. Install both and choose them together.
+
+## Install
+
+The themes need Pulsar 1.113 or later.
+
+1. Copy the theme's two folders from `packages` into Pulsar's `packages` folder, `~/.pulsar/packages` \
+(`%USERPROFILE%\\.pulsar\\packages` on Windows), or copy all folders to have every theme to choose from. From the \
+unzipped folder:
+
+   ```bash
+   mkdir -p ~/.pulsar/packages
+   cp -r packages/{heritage.pulsar.name(example)}-* ~/.pulsar/packages/
+   ```
+
+   With `ATOM_HOME` set, Pulsar reads the `packages` folder there.
+
+2. Restart Pulsar, open **Settings | Themes** and choose the theme under both **UI Theme** and **Syntax Theme**, \
+for example **Heritage {example["palette"]["name"]}**.
+
+## What is coloured
+
+The syntax theme colours the editor: code, the gutter, the current line, the cursor, selections, indent guides, \
+invisible characters, matching brackets and find results. It also sets the syntax variables that other packages \
+read, such as the gutter marks of Git changes and the colours of terminal packages. The UI theme colours the \
+workspace: the tree view, tabs, docks and panels, the status bar, the command palette and other lists, dialogs, \
+buttons and inputs, tooltips, notifications and the settings. It keeps Pulsar's own layout, as One Dark and One \
+Light draw it. Electron draws the menu bar on Linux and Windows in the operating system's colours.
+
+## Languages
+
+Pulsar's grammars give each token a scope, such as `entity.name.function` or `support.other.property`, and the \
+syntax theme colours the scopes that Pulsar's own Tree-sitter grammars use: declarations apart from calls, fields \
+apart from parameters and plain names, and types, annotations, macros and constants. Languages whose grammar is a \
+community package colour as far as its scopes follow the same names.
+
+{readme_footer(families, "Pulsar", "Themes", "the theme, Pulsar's version, operating system, language")}"""
+
+
+def build_pulsar(families):
+    """Writes each theme's UI and syntax packages to build/pulsar/packages, with the README, changelog and licence,
+    and returns build/pulsar."""
+    directory = os.path.join(OUT, "pulsar")
+    with open(os.path.join(ROOT, "LICENSE"), encoding="utf-8") as f:
+        licence = f.read()
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            for package, files in heritage.pulsar.packages(t, VERSION, VENDOR_URL, source, licence):
+                for path, text in files:
+                    target = os.path.join(directory, "packages", package, path)
+                    os.makedirs(os.path.dirname(target), exist_ok=True)
+                    write_text(target, text)
+    write_text(os.path.join(directory, "README.md"), pulsar_readme(families))
+    shutil.copy(os.path.join(ROOT, "pulsar", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+# Less at-rules, which validate_pulsar() tells apart from variables.
+LESS_AT_RULES = {"import", "media", "keyframes", "-webkit-keyframes", "font-face", "supports", "charset"}
+# The UI variables that Pulsar documents for UI themes (static/variables/ui-variables.less), which packages import.
+PULSAR_UI_VARIABLES = {
+    "text-color", "text-color-subtle", "text-color-highlight", "text-color-selected", "text-color-info",
+    "text-color-success", "text-color-warning", "text-color-error", "background-color-info",
+    "background-color-success", "background-color-warning", "background-color-error", "background-color-highlight",
+    "background-color-selected", "app-background-color", "base-background-color", "base-border-color",
+    "pane-item-background-color", "pane-item-border-color", "input-background-color", "input-border-color",
+    "tool-panel-background-color", "tool-panel-border-color", "inset-panel-background-color",
+    "inset-panel-border-color", "panel-heading-background-color", "panel-heading-border-color",
+    "overlay-background-color", "overlay-border-color", "button-background-color", "button-background-color-hover",
+    "button-background-color-selected", "button-border-color", "tab-bar-background-color", "tab-bar-border-color",
+    "tab-background-color", "tab-background-color-active", "tab-border-color", "tree-view-background-color",
+    "tree-view-border-color", "ui-site-color-1", "ui-site-color-2", "ui-site-color-3", "ui-site-color-4",
+    "ui-site-color-5", "font-size", "input-font-size", "disclosure-arrow-size", "component-padding",
+    "component-icon-padding", "component-icon-size", "component-line-height", "component-border-radius",
+    "tab-height", "font-family"}
+# The syntax variables that Pulsar documents for syntax themes (static/variables/syntax-variables.less).
+PULSAR_SYNTAX_VARIABLES = {
+    "syntax-text-color", "syntax-cursor-color", "syntax-selection-color", "syntax-selection-flash-color",
+    "syntax-background-color", "syntax-wrap-guide-color", "syntax-indent-guide-color",
+    "syntax-invisible-character-color", "syntax-result-marker-color", "syntax-result-marker-color-selected",
+    "syntax-gutter-text-color", "syntax-gutter-text-color-selected", "syntax-gutter-background-color",
+    "syntax-gutter-background-color-selected", "syntax-color-renamed", "syntax-color-added",
+    "syntax-color-modified", "syntax-color-removed"}
+
+
+def less_variables(text):
+    """The variables that Less text defines, as name: value or as mixin parameters, and those it uses."""
+    text = re.sub(r"//[^\n]*", "", text)
+    defined = set(re.findall(r"@([\w-]+)\s*:", text))
+    for parameters in re.findall(r"\.[\w-]+\s*\(([^)]*@[^)]*)\)\s*(?:when[^{]*)?\{", text):
+        defined |= set(re.findall(r"@([\w-]+)", parameters))
+    return defined, set(re.findall(r"@\{?([\w-]+)", text)) - LESS_AT_RULES
+
+
+def validate_pulsar(directory, families):
+    """Fails the build when a theme's UI or syntax package is missing or has other packages beside it, a package.json
+    does not name its package, theme kind, version, licence and Pulsar's engine, a package has no README or licence,
+    a stylesheet uses a variable that no stylesheet of its package defines, a package leaves out a documented
+    variable, a colour is not #rrggbb, or text is unreadable on its background."""
+    module = heritage.pulsar
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            p = t["palette"]
+            for package, kind, variables in ((module.syntax_name(t), "syntax", PULSAR_SYNTAX_VARIABLES),
+                                             (module.ui_name(t), "ui", PULSAR_UI_VARIABLES)):
+                expected.add(package)
+                label = f"Pulsar {package}"
+                folder = os.path.join(directory, "packages", package)
+                for name in ("package.json", "index.less", "README.md", "LICENSE"):
+                    if not os.path.isfile(os.path.join(folder, name)):
+                        raise SystemExit(f"{label}: {name} is missing")
+                with open(os.path.join(folder, "package.json"), encoding="utf-8") as f:
+                    manifest = json.load(f)
+                wanted = {"name": package, "theme": kind, "version": VERSION, "license": "MIT",
+                          "engines": {"atom": module.ENGINES}, "repository": VENDOR_URL}
+                for key, value in wanted.items():
+                    if manifest.get(key) != value:
+                        raise SystemExit(f"{label}: package.json has {key} {manifest.get(key)!r}, not {value!r}")
+                sheets = {}
+                for root, _, names in os.walk(folder):
+                    for name in names:
+                        if name.endswith(".less"):
+                            with open(os.path.join(root, name), encoding="utf-8") as f:
+                                sheets[os.path.relpath(os.path.join(root, name), folder)] = f.read()
+                for sheet in re.findall(r'@import "(styles/[\w-]+\.less)";', sheets["index.less"]):
+                    if sheet not in sheets:
+                        raise SystemExit(f"{label}: index.less imports {sheet}, which is missing")
+                defined, used = less_variables("\n".join(sheets.values()))
+                # octicon-mixins.less is Pulsar's own, which every theme imports
+                missing = {v for v in used - defined if not v.startswith("octicon")}
+                if missing:
+                    raise SystemExit(f"{label}: no stylesheet defines {', '.join(sorted(missing))}")
+                if variables - defined:
+                    raise SystemExit(f"{label}: leaves out {', '.join(sorted(variables - defined))}")
+                for sheet, text in sheets.items():
+                    for colour in re.findall(r"#[0-9A-Fa-f]+\b", re.sub(r"//[^\n]*", "", text)):
+                        if not re.fullmatch(r"#[0-9A-F]{6}([0-9A-F]{2})?", colour):
+                            raise SystemExit(f"{label}: {sheet} has the colour {colour}, not #RRGGBB or #RRGGBBAA")
+            # text on the backgrounds that the UI theme gives it: states in the tree view and panels, text on the
+            # states' tints and on filled buttons, and the accent's icons
+            label = f"Pulsar {module.name(t)}"
+            pairs = [(state, "bgTool", 4.5) for state in ("ansiRed", "ansiGreen", "ansiYellow", "ansiBlue")]
+            pairs += [("fg", tint, 4.5) for tint in ("diffMod", "diffIns", "diffConf", "diffDel")]
+            pairs += [("redText", "red", 4.5), ("bg", "ansiBlue", 3)]
+            for text, background, needed in pairs:
+                ratio = contrast(p[text], p[background])
+                if ratio < needed:
+                    raise SystemExit(f"{label}: {text} is {ratio:.2f}:1 on {background}, needs {needed}:1")
+    found = set(os.listdir(os.path.join(directory, "packages")))
+    if found != expected:
+        raise SystemExit(f"Pulsar packages: {len(found)} packages for {len(expected)} expected")
+    for name in ("README.md", "CHANGELOG.md", "LICENSE"):
+        if not os.path.isfile(os.path.join(directory, name)):
+            raise SystemExit(f"Pulsar packages: {name} is missing")
+
+
 def amp_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -4263,7 +4432,7 @@ def validate_thonny(directory, families):
 TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.name, "Lapce": heritage.lapce.name,
                   "Qt Creator": heritage.qtcreator.name, "Kate": lambda t: t["palette"]["name"],
                   "GNOME Text Editor": lambda t: t["palette"]["name"], "gedit": lambda t: t["palette"]["name"],
-                  "Geany": lambda t: t["palette"]["name"],
+                  "Geany": lambda t: t["palette"]["name"], "Pulsar": heritage.pulsar.name,
                   "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
@@ -4271,7 +4440,7 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Geany": geany_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
 
 
 def terminals_readme(families):
@@ -4645,6 +4814,10 @@ def main():
     geany = build_geany(families)
     validate_geany(geany, families)
     print(f"{pack_folder(geany, os.path.join(OUT, f'{VSCODE_NAME}-geany-{VERSION}.zip'), f'{VSCODE_NAME}-geany')}: "
+          f"{len(themes)} themes", flush=True)
+    pulsar = build_pulsar(families)
+    validate_pulsar(pulsar, families)
+    print(f"{pack_folder(pulsar, os.path.join(OUT, f'{VSCODE_NAME}-pulsar-{VERSION}.zip'), f'{VSCODE_NAME}-pulsar')}: "
           f"{len(themes)} themes", flush=True)
     lapce = build_lapce(families)
     validate_lapce(lapce, families)

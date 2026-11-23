@@ -148,13 +148,38 @@ def eclipse(home, stem, files, sample):
              f"-Dosgi.configuration.area={home}/configuration"], {"GDK_BACKEND": "x11"})
 
 
+def pulsar(home, stem, files, sample):
+    # the theme's UI and syntax packages in the packages folder of Pulsar's home and chosen under Settings | Themes,
+    # which Pulsar keeps in config.cson, as the README says; the sample opened in a project folder of its own, so that
+    # the tree view shows it. The welcome page, change log and the GitHub package's Git panel, which first runs open,
+    # are off, so that the window shows the tree view, the editor and the status bar. Electron's GPU process does not
+    # start on Xvfb, and Pulsar paints nothing until it is off.
+    atom_home = f"{home}/.pulsar"
+    for kind in ("ui", "syntax"):
+        shutil.copytree(f"{files}/packages/{stem}-{kind}", f"{atom_home}/packages/{stem}-{kind}")
+    write(f"{atom_home}/config.cson",
+          f'"*":\n  core:\n    telemetryConsent: "no"\n    disabledPackages: ["github"]\n'
+          f'    themes: ["{stem}-ui", "{stem}-syntax"]\n'
+          f'  editor:\n    fontFamily: "{FONT}"\n    fontSize: 14\n'
+          f'  welcome:\n    showOnStartup: false\n    showChangeLog: false\n')
+    write(f"{atom_home}/init.js", f"atom.packages.onDidActivateInitialPackages(() => {{\n"
+                                  f"  atom.setPosition(0, 0);\n  atom.setSize({WIDTH}, {HEIGHT});\n}});\n")
+    project = f"{home}/project"
+    os.makedirs(project)
+    shutil.move(sample, project)
+    return (["/opt/Pulsar/pulsar", "--no-sandbox", "--disable-gpu", "--foreground", project,
+             f"{project}/{os.path.basename(sample)}"], {"ATOM_HOME": atom_home})
+
+
 EDITORS = {"textadept": textadept, "lapce": lapce, "qtcreator": qtcreator, "kate": kate,
-           "gnome-text-editor": gnome_text_editor, "gedit": gedit, "geany": geany, "eclipse": eclipse}
+           "gnome-text-editor": gnome_text_editor, "gedit": gedit, "geany": geany, "eclipse": eclipse,
+           "pulsar": pulsar}
 # The file beside the eclipse folder that names each theme's identifier, stem=identifier per line.
 THEME_IDS = "eclipse-theme-ids.txt"
-WAIT = {"textadept": 5, "lapce": 12, "qtcreator": 15, "kate": 8, "gnome-text-editor": 6, "gedit": 6, "geany": 5, "eclipse": 10}
+WAIT = {"textadept": 5, "lapce": 12, "qtcreator": 15, "kate": 8, "gnome-text-editor": 6, "gedit": 6, "geany": 5, "eclipse": 10,
+        "pulsar": 8}
 # Editors whose window title names the open file, with the most seconds to wait for it before WAIT.
-TITLED = {"eclipse": 180}
+TITLED = {"eclipse": 180, "pulsar": 120}
 # Samples that an editor opens as a project, by the name they are opened under instead.
 RENAME = {("qtcreator", "Cargo.toml"): "settings.toml"}
 # Window classes of the editors that shoot.py resizes to WIDTH x HEIGHT.

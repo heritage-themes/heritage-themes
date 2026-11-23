@@ -3,7 +3,7 @@
 Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
                           | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --textadept
                           | --lapce | --qtcreator | --kate | --gnome-text-editor | --gedit | --geany | --eclipse
-                          | --jupyterlab | --pygments] [--png] [THEME ...]
+                          | --pulsar | --jupyterlab | --pygments] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --visualstudio  write the Visual Studio preview instead of the IntelliJ one; needs Windows and Visual Studio 2026
@@ -29,6 +29,7 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --gedit      write the gedit preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --geany      write the Geany preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --eclipse    write the Eclipse preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
+  --pulsar     write the Pulsar preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --jupyterlab write the JupyterLab preview instead of the IntelliJ one; needs python3 build.py --jupyterlab run
                first, Python 3.10 or later, Google Chrome or Chromium, and ImageMagick
   --pygments   write the Pygments preview instead of the IntelliJ one; needs python3 build.py run first and Python 3.8
@@ -63,7 +64,7 @@ colours (scripts/terminals/check.py) or a screen shows a colour the theme does n
 minimum (scripts/terminals/cells.py). iTerm2 and Windows Terminal do not run on Linux, so the build's checks of their
 files are all they get. Termux runs in the Android emulator that scripts/termux/setup.sh starts, and
 scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. The Nano, Amp, Textadept,
-Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany and Eclipse pages go to themes/<theme>/build/preview-<editor>.html. Each
+Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
 editor runs in the container image of scripts/editors/Containerfile, with the theme installed and chosen as its README
 says: Nano and Amp in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
 that the theme does not set or text below its contrast minimum, and the others on Xvfb through
@@ -620,6 +621,10 @@ GUI_EDITORS = {
                               for t in themes]),
     "eclipse": ("Eclipse", heritage.eclipse,
                 lambda themes: [("eclipse-theme-ids.txt", heritage.eclipse.theme_ids(themes))]),
+    "pulsar": ("Pulsar", heritage.pulsar,
+               lambda themes: [(f"packages/{package}/{path}", text) for t in themes
+                               for package, files in heritage.pulsar.packages(t, VERSION, "", "")
+                               for path, text in files]),
 }
 # Files that a GUI editor's preview writes as bytes: the Eclipse plugin, a jar.
 GUI_BINARIES = {"eclipse": lambda themes: [(f"eclipse/{heritage.eclipse.BUNDLE}.jar", heritage.eclipse.jar(themes, VERSION,
