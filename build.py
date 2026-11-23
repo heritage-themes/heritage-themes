@@ -3658,7 +3658,7 @@ def validate_pulsar(directory, families):
                     for name in names:
                         if name.endswith(".less"):
                             with open(os.path.join(root, name), encoding="utf-8") as f:
-                                sheets[os.path.relpath(os.path.join(root, name), folder)] = f.read()
+                                sheets[os.path.relpath(os.path.join(root, name), folder).replace(os.sep, "/")] = f.read()
                 for sheet in re.findall(r'@import "(styles/[\w-]+\.less)";', sheets["index.less"]):
                     if sheet not in sheets:
                         raise SystemExit(f"{label}: index.less imports {sheet}, which is missing")
