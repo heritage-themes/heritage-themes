@@ -14,7 +14,7 @@
 # themes, helix/CHANGELOG.md for the Helix themes, kakoune/CHANGELOG.md for the Kakoune colour schemes,
 # micro/CHANGELOG.md for the Micro colour schemes, vim/CHANGELOG.md for the Vim colour schemes,
 # emacs/CHANGELOG.md for the Emacs themes, terminals/CHANGELOG.md for the Terminals themes,
-# nano/, textadept/, lapce/, qtcreator/, kate/, gnome-text-editor/, amp/, eclipse/, nova/, jupyterlab/, pygments/,
+# nano/, textadept/, lapce/, qtcreator/, kate/, gnome-text-editor/, gedit/, amp/, eclipse/, nova/, jupyterlab/, pygments/,
 # spyder/, thonny/, idle/ and rstudio/ CHANGELOG.md for those themes, godot/CHANGELOG.md for the Godot plugin, netbeans/CHANGELOG.md for
 # the NetBeans plugin and drracket/CHANGELOG.md for the DrRacket package.
 # A product without entries keeps its last published build, which the GitHub release attaches.
@@ -89,7 +89,7 @@ for product in "JetBrains plugin:CHANGELOG.md" "VS Code extension:vscode/CHANGEL
   "Terminals themes:terminals/CHANGELOG.md" "Nano themes:nano/CHANGELOG.md" \
   "Textadept themes:textadept/CHANGELOG.md" "Lapce themes:lapce/CHANGELOG.md" \
   "Qt Creator themes:qtcreator/CHANGELOG.md" "Kate themes:kate/CHANGELOG.md" \
-  "GNOME Text Editor style schemes:gnome-text-editor/CHANGELOG.md" "Amp themes:amp/CHANGELOG.md" \
+  "GNOME Text Editor style schemes:gnome-text-editor/CHANGELOG.md" "gedit style schemes:gedit/CHANGELOG.md" "Amp themes:amp/CHANGELOG.md" \
   "Eclipse themes:eclipse/CHANGELOG.md" "Nova themes:nova/CHANGELOG.md" \
   "JupyterLab themes:jupyterlab/CHANGELOG.md" "Pygments styles:pygments/CHANGELOG.md" \
   "Spyder themes:spyder/CHANGELOG.md" "Thonny themes:thonny/CHANGELOG.md" \
