@@ -212,6 +212,18 @@ podman run --rm --userns=keep-id -v "$PWD:/repo:Z" localhost/heritage-editors \
 
 `python3 build.py` then fails on a rule or scheme style that names a style the library lacks.
 
+## Check the gedit style rules
+
+gedit colours code by the styles of libgedit-gtksourceview, whose language definitions `heritage/gedit.json` lists. A gedit scheme gives each style the colours of GNOME Text Editor's style of the same id; `language_rules()` in `heritage/gedit.py` sets the styles that GtkSourceView 5 lacks. Rewrite the file from the library in the editors image after a gedit update:
+
+```bash
+podman build -t localhost/heritage-editors scripts/editors
+podman run --rm --userns=keep-id -v "$PWD:/repo:Z" localhost/heritage-editors \
+    python3 /repo/scripts/gedit/definitions.py /repo/heritage/gedit.json
+```
+
+`python3 build.py` then fails on a rule or scheme style that names a style the library lacks.
+
 ## Add the documentation
 
 Add these to the theme folder:

@@ -102,7 +102,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate",
-           "GNOME Text Editor", "Amp", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
+           "GNOME Text Editor", "gedit", "Amp", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
            "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
@@ -3318,6 +3318,120 @@ def validate_gnome_text_editor(directory, families):
     check_files("GNOME Text Editor schemes", directory, "styles", schemes)
 
 
+def gedit_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    return f"""# Heritage Themes for gedit
+
+{DESCRIPTION} {count} dark and light style schemes in {len(families)} families; each family maps the named colours \
+of one tradition to syntax roles.
+
+## Install
+
+The style schemes need gedit 48 or later, from your distribution or from Flathub. Older versions read another \
+format from another folder.
+
+1. Copy the files in `styles` into gedit's styles folder, creating it if it does not exist. From the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.local/share/libgedit-gtksourceview-300/styles
+   cp styles/*.xml ~/.local/share/libgedit-gtksourceview-300/styles/
+   ```
+
+   For gedit from Flathub, the folder is `~/.var/app/org.gnome.gedit/data/libgedit-gtksourceview-300/styles`.
+
+2. Restart gedit, open **Preferences | Font & Colors** and choose a scheme, for example **Holi Night**.
+
+gedit uses one scheme while the desktop's style is light and another while it is dark, and the list chooses the \
+scheme for the current style. To set both, choose a family's light scheme, such as **Holi Day**, while the style is \
+light, and its dark one while the style is dark. A family with dark schemes only serves either style.
+
+## What is coloured
+
+Each scheme colours the editor: code, the selection, the current line, line numbers, search matches, matching \
+brackets, the right margin, visible whitespace, bookmarked lines and, with the Quick Highlight plugin, other \
+occurrences of the selected text. gedit draws its window, tabs, side panel and spelling mistakes in the desktop's \
+theme, which a style scheme cannot set.
+
+## Languages
+
+gedit colours code with the language definitions of libgedit-gtksourceview, which give each construct a style that \
+the schemes colour: a language's keywords, types, strings, numbers, comments and, where the definition finds them, \
+function and class declarations and built-in names. A definition does not tell fields, parameters and calls apart \
+from other names as a language server does. The schemes give constructs that a definition marks with a style meant \
+for another, such as Java's modifiers, CSS's property names, JSON's keys and Markdown's headings, the colours that \
+the other Heritage Themes products give them. gedit has no definition for TypeScript, TSX, Vue or Dockerfiles, whose \
+files show as plain text.
+
+{readme_footer(families, "gedit", "Schemes", "the scheme, gedit's version, operating system, language")}"""
+
+
+def build_gedit(families):
+    """Writes the style schemes to build/gedit, with the README, changelog and licence, and returns build/gedit."""
+    directory = os.path.join(OUT, "gedit")
+    os.makedirs(os.path.join(directory, "styles"))
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            write_text(os.path.join(directory, "styles", f"{heritage.gedit.name(t)}.xml"),
+                       heritage.gedit.scheme(t, source))
+    write_text(os.path.join(directory, "README.md"), gedit_readme(families))
+    shutil.copy(os.path.join(ROOT, "gedit", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+# The elements and attributes that libgedit-gtksourceview's parser accepts (gtksourcestyleschemeparser.c); it rejects a
+# scheme with any other.
+GEDIT_SCHEME_ATTRIBUTES = {"id", "name", "kind"}
+GEDIT_ELEMENTS = {"description", "style"}
+GEDIT_STYLE_ATTRIBUTES = {"name", "foreground", "background", "italic", "bold", "underline", "underline_color",
+                          "strikethrough"}
+
+
+def validate_gedit(directory, families):
+    """Fails the build when a style scheme does not name its theme or its kind, holds an element or attribute that
+    libgedit-gtksourceview rejects, leaves out an editor style or a default style, names a style that the library
+    lacks, leaves out a font flag, or has text that is unreadable on its background."""
+    module = heritage.gedit
+    hex_colour = re.compile(r"#[0-9a-f]{6}")
+    schemes = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = module.name(t), t["palette"]
+            label = f"gedit {name}"
+            schemes.add(f"{name}.xml")
+            root = ET.parse(os.path.join(directory, "styles", f"{name}.xml")).getroot()
+            if root.tag != "style-scheme" or set(root.attrib) != GEDIT_SCHEME_ATTRIBUTES or root.get("id") != name \
+                    or root.get("name") != p["name"] or root.get("kind") != ("dark" if p["dark"] else "light"):
+                raise SystemExit(f"{label}: the scheme does not name the theme and its kind alone")
+            if {child.tag for child in root} - GEDIT_ELEMENTS or len(root.findall("description")) != 1:
+                raise SystemExit(f"{label}: holds elements other than one description and styles")
+            styles = [style.get("name") for style in root.iterfind("style")]
+            if len(styles) != len(set(styles)):
+                raise SystemExit(f"{label}: a style is set twice")
+            missing = set(module.EDITOR_STYLES + module.DEFAULT_STYLES) - set(styles)
+            if missing:
+                raise SystemExit(f"{label}: leaves out the styles {sorted(missing)}")
+            for style in root.iterfind("style"):
+                style_id = style.get("name")
+                if set(style.attrib) - GEDIT_STYLE_ATTRIBUTES:
+                    raise SystemExit(f"{label}: {style_id} has attributes that gedit rejects: "
+                                     f"{sorted(set(style.attrib) - GEDIT_STYLE_ATTRIBUTES)}")
+                if style_id not in module.EDITOR_STYLES:
+                    language, _, item = style_id.partition(":")
+                    if item not in module.LANGUAGES.get(language, {}).get("styles", {}):
+                        raise SystemExit(f"{label}: sets {style_id}, which libgedit-gtksourceview "
+                                         f"{module.DATA['version']} lacks")
+                    if {"foreground", "bold", "italic", "underline", "strikethrough"} - set(style.attrib):
+                        raise SystemExit(f"{label}: {style_id} leaves out a colour or font flag")
+                for attribute in module.COLOUR_ATTRIBUTES:
+                    if attribute in style.attrib and not hex_colour.fullmatch(style.get(attribute)):
+                        raise SystemExit(f"{label}: {style_id} {attribute} is not #rrggbb")
+            check_styles(label, module.styles(p), "fg", "bg", None, set(), module.low_contrast(p), {})
+    check_files("gedit schemes", directory, "styles", schemes)
+
+
 def amp_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -4058,7 +4172,7 @@ def validate_thonny(directory, families):
 # Product → its themes' names in READMEs, the README writer, and the folder its theme files go in.
 TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.name, "Lapce": heritage.lapce.name,
                   "Qt Creator": heritage.qtcreator.name, "Kate": lambda t: t["palette"]["name"],
-                  "GNOME Text Editor": lambda t: t["palette"]["name"],
+                  "GNOME Text Editor": lambda t: t["palette"]["name"], "gedit": lambda t: t["palette"]["name"],
                   "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
@@ -4433,6 +4547,10 @@ def main():
     package = os.path.join(OUT, f"{VSCODE_NAME}-gnome-text-editor-{VERSION}.zip")
     print(f"{pack_folder(gnome_text_editor, package, f'{VSCODE_NAME}-gnome-text-editor')}: {len(themes)} themes",
           flush=True)
+    gedit = build_gedit(families)
+    validate_gedit(gedit, families)
+    print(f"{pack_folder(gedit, os.path.join(OUT, f'{VSCODE_NAME}-gedit-{VERSION}.zip'), f'{VSCODE_NAME}-gedit')}: "
+          f"{len(themes)} themes", flush=True)
     lapce = build_lapce(families)
     validate_lapce(lapce, families)
     print(f"{pack_folder(lapce, os.path.join(OUT, f'{VSCODE_NAME}-lapce-{VERSION}.zip'), f'{VSCODE_NAME}-lapce')}: "

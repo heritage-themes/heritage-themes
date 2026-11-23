@@ -42,6 +42,7 @@ jobs:
       qtcreator: ${{ steps.check.outputs.qtcreator }}
       kate: ${{ steps.check.outputs.kate }}
       gnome_text_editor: ${{ steps.check.outputs.gnome_text_editor }}
+      gedit: ${{ steps.check.outputs.gedit }}
       amp: ${{ steps.check.outputs.amp }}
       eclipse: ${{ steps.check.outputs.eclipse }}
       nova: ${{ steps.check.outputs.nova }}
@@ -73,7 +74,7 @@ jobs:
           fi
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
             kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
-            qtcreator=false kate=false gnome_text_editor=false amp=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
+            qtcreator=false kate=false gnome_text_editor=false gedit=false amp=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
             godot=false netbeans=false drracket=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
@@ -95,6 +96,7 @@ jobs:
           grep -q "^## \[$version\]" qtcreator/CHANGELOG.md && qtcreator=true
           grep -q "^## \[$version\]" kate/CHANGELOG.md && kate=true
           grep -q "^## \[$version\]" gnome-text-editor/CHANGELOG.md && gnome_text_editor=true
+          grep -q "^## \[$version\]" gedit/CHANGELOG.md && gedit=true
           grep -q "^## \[$version\]" amp/CHANGELOG.md && amp=true
           grep -q "^## \[$version\]" eclipse/CHANGELOG.md && eclipse=true
           grep -q "^## \[$version\]" nova/CHANGELOG.md && nova=true
@@ -112,7 +114,7 @@ jobs:
               && [ "$helix" = false ] && [ "$kakoune" = false ] && [ "$micro" = false ] && [ "$vim" = false ] \
               && [ "$emacs" = false ] && [ "$terminals" = false ] && [ "$nano" = false ] && [ "$textadept" = false ] \
               && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$kate" = false ] && [ "$gnome_text_editor" = false ] \
-              && [ "$amp" = false ] \
+              && [ "$gedit" = false ] && [ "$amp" = false ] \
               && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
               && [ "$pygments" = false ] && [ "$spyder" = false ] && [ "$thonny" = false ] \
               && [ "$idle" = false ] && [ "$rstudio" = false ] && [ "$godot" = false ] && [ "$netbeans" = false ] \
@@ -142,6 +144,7 @@ jobs:
             echo "qtcreator=$qtcreator"
             echo "kate=$kate"
             echo "gnome_text_editor=$gnome_text_editor"
+            echo "gedit=$gedit"
             echo "amp=$amp"
             echo "eclipse=$eclipse"
             echo "nova=$nova"
@@ -972,6 +975,27 @@ jobs:
           path: build/heritage-themes-gnome-text-editor-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # gedit has no registry for style schemes: users install them from the zip that the GitHub release attaches.
+  gedit:
+    needs: check
+    if: needs.check.outputs.gedit == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: gedit
+          path: build/heritage-themes-gedit-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   # Amp has no theme registry: users install the themes from the zip that the GitHub release attaches.
   amp:
     needs: check
@@ -1296,7 +1320,7 @@ jobs:
 
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
-            emacs, terminals, nano, textadept, lapce, qtcreator, kate, gnome_text_editor,
+            emacs, terminals, nano, textadept, lapce, qtcreator, kate, gnome_text_editor, gedit,
             amp, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot, netbeans, drracket]
     # Runs once each product has either published or been left out of the release.
     if: >-
@@ -1321,6 +1345,7 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.qtcreator.result)
       && contains(fromJSON('["success", "skipped"]'), needs.kate.result)
       && contains(fromJSON('["success", "skipped"]'), needs.gnome_text_editor.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.gedit.result)
       && contains(fromJSON('["success", "skipped"]'), needs.amp.result)
       && contains(fromJSON('["success", "skipped"]'), needs.eclipse.result)
       && contains(fromJSON('["success", "skipped"]'), needs.nova.result)
@@ -1358,6 +1383,7 @@ jobs:
       QTCREATOR: ${{ needs.check.outputs.qtcreator }}
       KATE: ${{ needs.check.outputs.kate }}
       GNOME_TEXT_EDITOR: ${{ needs.check.outputs.gnome_text_editor }}
+      GEDIT: ${{ needs.check.outputs.gedit }}
       AMP: ${{ needs.check.outputs.amp }}
       ECLIPSE: ${{ needs.check.outputs.eclipse }}
       NOVA: ${{ needs.check.outputs.nova }}
@@ -1443,6 +1469,7 @@ jobs:
           notes "Kate themes" "$KATE" kate/CHANGELOG.md "heritage-themes-kate-<version>.zip"
           notes "GNOME Text Editor style schemes" "$GNOME_TEXT_EDITOR" gnome-text-editor/CHANGELOG.md \
             "heritage-themes-gnome-text-editor-<version>.zip"
+          notes "gedit style schemes" "$GEDIT" gedit/CHANGELOG.md "heritage-themes-gedit-<version>.zip"
           notes "Amp themes" "$AMP" amp/CHANGELOG.md "heritage-themes-amp-<version>.zip"
           notes "Eclipse plugin" "$ECLIPSE" eclipse/CHANGELOG.md "heritage-themes-eclipse-<version>.zip"
           notes "Nova themes" "$NOVA" nova/CHANGELOG.md "heritage-themes-nova-<version>.zip"

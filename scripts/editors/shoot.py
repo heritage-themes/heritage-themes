@@ -96,6 +96,23 @@ def gnome_text_editor(home, stem, files, sample):
             {"GSETTINGS_BACKEND": "keyfile", "GDK_BACKEND": "x11", "GTK_A11Y": "none"})
 
 
+def gedit(home, stem, files, sample):
+    # the style scheme in the user's libgedit-gtksourceview styles folder and chosen under Preferences | Font & Colors
+    # for the style it suits, as the README says, with gedit's style forced to the scheme's, as a desktop in that style
+    # would set it; gedit keeps its settings in GSettings, here in the key file that the keyfile backend reads; line
+    # numbers and the current line's highlight are on by default
+    os.makedirs(f"{home}/.local/share/libgedit-gtksourceview-300/styles")
+    shutil.copy(f"{files}/styles/{stem}.xml", f"{home}/.local/share/libgedit-gtksourceview-300/styles/")
+    with open(f"{files}/styles/{stem}.xml", encoding="utf-8") as f:
+        variant = re.search(r'kind="(light|dark)"', f.read()).group(1)
+    write(f"{home}/.config/glib-2.0/settings/keyfile",
+          f"[org/gnome/gedit/preferences/editor]\nstyle-scheme-for-{variant}-theme-variant='{stem}'\n"
+          f"use-default-font=false\neditor-font='{FONT} 11'\n\n"
+          f"[org/gnome/gedit/preferences/ui]\ntheme-variant='{variant}'\n")
+    return (["/usr/bin/gedit", "--standalone", sample],
+            {"GSETTINGS_BACKEND": "keyfile", "GDK_BACKEND": "x11", "GTK_A11Y": "none"})
+
+
 def eclipse(home, stem, files, sample):
     # the plugin in a dropins folder, the appearance theme and the TextMate theme of the same name chosen in the
     # workspace's preferences and the welcome page off, as a user chooses the themes once in the preferences
@@ -119,17 +136,17 @@ def eclipse(home, stem, files, sample):
 
 
 EDITORS = {"textadept": textadept, "lapce": lapce, "qtcreator": qtcreator, "kate": kate,
-           "gnome-text-editor": gnome_text_editor, "eclipse": eclipse}
+           "gnome-text-editor": gnome_text_editor, "gedit": gedit, "eclipse": eclipse}
 # The file beside the eclipse folder that names each theme's identifier, stem=identifier per line.
 THEME_IDS = "eclipse-theme-ids.txt"
-WAIT = {"textadept": 5, "lapce": 12, "qtcreator": 15, "kate": 8, "gnome-text-editor": 6, "eclipse": 10}
+WAIT = {"textadept": 5, "lapce": 12, "qtcreator": 15, "kate": 8, "gnome-text-editor": 6, "gedit": 6, "eclipse": 10}
 # Editors whose window title names the open file, with the most seconds to wait for it before WAIT.
 TITLED = {"eclipse": 180}
 # Samples that an editor opens as a project, by the name they are opened under instead.
 RENAME = {("qtcreator", "Cargo.toml"): "settings.toml"}
 # Window classes of the editors that shoot.py resizes to WIDTH x HEIGHT.
 RESIZE = {"lapce": "lapce", "qtcreator": "qtcreator", "kate": "kate", "gnome-text-editor": "gnome-text-editor",
-          "eclipse": "Eclipse"}
+          "gedit": "gedit", "eclipse": "Eclipse"}
 
 
 def main():
