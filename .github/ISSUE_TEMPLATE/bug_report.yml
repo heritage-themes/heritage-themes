@@ -39,6 +39,7 @@ body:
         - GNOME Builder
         - Amp
         - bat
+        - delta
         - Eclipse
         - Nova
         - JupyterLab

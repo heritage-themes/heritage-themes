@@ -2,7 +2,7 @@
 
 Usage: python3 screen.py EDITOR THEME FILES SAMPLE BACKGROUND FOREGROUND OUT.json
 
-EDITOR is nano, amp or bat, THEME the theme's file name stem, FILES the folder of the editor's generated files, SAMPLE
+EDITOR is nano, amp, bat or delta, THEME the theme's file name stem, FILES the folder of the editor's generated files, SAMPLE
 the file to open, and BACKGROUND and FOREGROUND the terminal's default colours as #RRGGBB, those of the matching
 Terminals theme. The editor starts in a pseudo-terminal of 256 colours that reports 24-bit colour and answers queries
 for its default colours, in a fresh HOME with the theme installed as its README says, and the screen is read through
@@ -15,6 +15,8 @@ import fcntl, json, os, pty, re, select, shutil, signal, struct, subprocess, sys
 import pyte
 
 COLUMNS, ROWS = 88, 20
+# delta prints a diff and exits: its screen is taller than the longest diff, and the rows below its output are dropped
+DELTA_ROWS = 32
 QUIET, TIMEOUT = 1.5, 30
 # a query for the terminal's foreground (OSC 10) or background (OSC 11) colour, ended by BEL or ST
 COLOUR_QUERY = re.compile(rb"\x1b\](1[01]);\?(?:\x07|\x1b\\)")
@@ -85,7 +87,43 @@ def bat(home, stem, files, sample, background, foreground):
     return ["/usr/local/bin/bat", os.path.basename(sample)]
 
 
-EDITORS = dict(nano=nano, amp=amp, bat=bat)
+def delta(home, stem, files, sample, background, foreground):
+    # the bat themes installed as for bat, and the features file included from Git's configuration with delta as Git's
+    # pager and the theme's feature named, as the README says, with line numbers on so their styles are on screen.
+    # git diff shows the sample against an earlier version committed in a repository in the home folder: the earlier
+    # version lacks the first line after the first that is not blank, which shows as added, and changes the last other
+    # line with digits, each digit one higher, or else the last other word of two letters or more, reversed, which shows
+    # as a changed line whose changed words are marked.
+    env = dict(os.environ, HOME=home, XDG_CONFIG_HOME=f"{home}/.config", XDG_CACHE_HOME=f"{home}/.cache")
+    os.makedirs(f"{home}/.config/bat/themes")
+    shutil.copy(f"{files}/{stem}.tmTheme", f"{home}/.config/bat/themes")
+    subprocess.run(["/usr/local/bin/bat", "cache", "--build"], env=env, check=True, capture_output=True)
+    os.makedirs(f"{home}/.config/delta")
+    shutil.copy(f"{files}/heritage-themes.gitconfig", f"{home}/.config/delta")
+    write(f"{home}/.gitconfig", "[include]\n    path = ~/.config/delta/heritage-themes.gitconfig\n"
+                                "[core]\n    pager = /usr/local/bin/delta\n"
+                                f"[delta]\n    features = {stem}\n    line-numbers = true\n    paging = never\n"
+                                "[user]\n    name = Heritage\n    email = heritage@localhost\n")
+    with open(sample, encoding="utf-8") as f:
+        text = f.read()
+    lines = text.splitlines(keepends=True)
+    added = next(i for i, line in enumerate(lines) if i and line.strip())
+    def change(line):
+        if re.search(r"[0-9]", line):
+            return re.sub(r"[0-9]", lambda m: str((int(m[0]) + 1) % 10), line)
+        word = list(re.finditer(r"[A-Za-z]{2,}", line))[-1]
+        return line[:word.start()] + word[0][::-1] + line[word.end():]
+    candidates = [i for i, line in enumerate(lines) if i != added and re.search(r"[A-Za-z]{2,}", line)]
+    changed = max([i for i in candidates if re.search(r"[0-9]", lines[i])] or candidates)
+    write(sample, "".join(change(line) if i == changed else line for i, line in enumerate(lines) if i != added))
+    name = os.path.basename(sample)
+    for command in (["init", "-q"], ["add", name], ["commit", "-q", "-m", "Earlier version"]):
+        subprocess.run(["/usr/bin/git", *command], cwd=home, env=env, check=True, capture_output=True)
+    write(sample, text)
+    return ["/usr/bin/git", "diff"]
+
+
+EDITORS = dict(nano=nano, amp=amp, bat=bat, delta=delta)
 
 
 def colour_reply(code, colour):
@@ -93,14 +131,14 @@ def colour_reply(code, colour):
     return f"\x1b]{code};rgb:" + "/".join(colour[i:i + 2].lower() * 2 for i in (1, 3, 5)) + "\x1b\\"
 
 
-def run(argv, env, background, foreground):
-    screen = Screen(COLUMNS, ROWS)
+def run(argv, env, background, foreground, rows):
+    screen = Screen(COLUMNS, rows)
     stream = pyte.ByteStream(screen)
     pid, fd = pty.fork()
     if pid == 0:
         os.chdir(env["HOME"])
         os.execve(argv[0], argv, env)
-    fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", ROWS, COLUMNS, 0, 0))
+    fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", rows, COLUMNS, 0, 0))
     screen.write_process_input = lambda data: os.write(fd, data.encode())
     start = last = time.monotonic()
     pending = b""
@@ -127,7 +165,7 @@ def run(argv, env, background, foreground):
     def colour(value):
         return "#" + value.upper() if re.fullmatch(r"[0-9a-fA-F]{6}", value) else value
     return [[[cell.data, colour(cell.fg), colour(cell.bg), cell.bold, cell.italics, cell.underscore]
-             for cell in (screen.buffer[y][x] for x in range(COLUMNS))] for y in range(ROWS)]
+             for cell in (screen.buffer[y][x] for x in range(COLUMNS))] for y in range(rows)]
 
 
 def main():
@@ -139,8 +177,15 @@ def main():
     shutil.copy(sample, home)
     argv = EDITORS[editor](home, stem, files, os.path.join(home, os.path.basename(sample)), background,
                            foreground)
+    rows = run(argv, env, background, foreground, DELTA_ROWS if editor == "delta" else ROWS)
+    if editor == "delta":
+        while rows and all(char == " " and bg == "default" for char, fg, bg, *_ in rows[-1]):
+            rows.pop()
+        # the output and the row the cursor ends on must fit, or the screen has scrolled the first rows away
+        if len(rows) >= DELTA_ROWS - 1:
+            raise SystemExit(f"delta: the diff of {os.path.basename(sample)} needs more than {DELTA_ROWS} rows")
     with open(out, "w", encoding="utf-8") as f:
-        json.dump(run(argv, env, background, foreground), f)
+        json.dump(rows, f)
 
 
 if __name__ == "__main__":

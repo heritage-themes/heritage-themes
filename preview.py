@@ -1,9 +1,9 @@
 """Writes the preview page of each theme family and, with --png, renders it to PNG.
 
 Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
-                          | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --bat | --textadept
-                          | --lapce | --qtcreator | --kate | --gnome-text-editor | --gedit | --geany | --eclipse
-                          | --pulsar | --jupyterlab | --pygments] [--png] [THEME ...]
+                          | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --bat | --delta
+                          | --textadept | --lapce | --qtcreator | --kate | --gnome-text-editor | --gedit | --geany
+                          | --eclipse | --pulsar | --jupyterlab | --pygments] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --visualstudio  write the Visual Studio preview instead of the IntelliJ one; needs Windows and Visual Studio 2026
@@ -21,6 +21,7 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --nano       write the Nano preview instead of the IntelliJ one; needs Linux and Podman
   --amp        write the Amp preview instead of the IntelliJ one; needs Linux and Podman
   --bat        write the bat preview instead of the IntelliJ one; needs Linux and Podman
+  --delta      write the delta preview instead of the IntelliJ one; needs Linux and Podman
   --textadept  write the Textadept preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --lapce      write the Lapce preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --qtcreator  write the Qt Creator preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
@@ -64,10 +65,10 @@ Podman, through scripts/terminals/shoot.py and shells.py, and fails when a scree
 colours (scripts/terminals/check.py) or a screen shows a colour the theme does not set or text below its contrast
 minimum (scripts/terminals/cells.py). iTerm2 and Windows Terminal do not run on Linux, so the build's checks of their
 files are all they get. Termux runs in the Android emulator that scripts/termux/setup.sh starts, and
-scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. The Nano, Amp, bat, Textadept,
-Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
+scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. The Nano, Amp, bat, delta,
+Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
 editor runs in the container image of scripts/editors/Containerfile, with the theme installed and chosen as its README
-says: Nano, Amp and bat in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
+says: Nano, Amp, bat and delta in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
 that the theme does not set or text below its contrast minimum, and the others on Xvfb through
 scripts/editors/shoot.py, whose screenshots go to themes/<theme>/build/<editor> and fail when they show a colour that
 is no colour of the theme nor a blend of one
@@ -535,6 +536,13 @@ SCREEN_EDITORS = {
     # bat: every row, the header, grid, line numbers and code, with the third line highlighted
     "bat": ("bat", lambda themes: [(f"{heritage.bat.name(t)}.tmTheme", heritage.bat.theme(t["palette"], ""))
                                    for t in themes], lambda p: set(), "0:"),
+    # delta: every row of git diff, the file and hunk headers, line numbers, and code on added and removed lines with
+    # the changed words marked
+    "delta": ("delta", lambda themes: [(f"{heritage.bat.name(t)}.tmTheme", heritage.bat.theme(t["palette"], ""))
+                                       for t in themes]
+              + [(heritage.delta.FILENAME, heritage.delta.config([(t, "") for t in themes]))],
+              lambda p: {"#" + heritage.delta.emphasis(p, line, gutter)
+                         for line, gutter in (("diffDel", "deleted"), ("diffIns", "added"))}, "0:"),
 }
 
 

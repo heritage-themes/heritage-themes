@@ -102,7 +102,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate",
-           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
+           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "delta", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
            "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
@@ -3798,8 +3798,7 @@ Each theme colours code, line numbers, the grid and the line that `--highlight-l
 terminal's own background, the header's labels in the terminal's text colour and the Git change markers in its green, \
 yellow and red, which the matching terminal theme takes from the same palette.
 
-[delta](https://github.com/dandavison/delta) reads the themes from bat's cache and colours code with them, for example \
-with `delta --syntax-theme {night}`; it draws added and removed lines in colours of its own.
+[Heritage Themes for delta]({VENDOR_URL}/releases/latest) colour delta's diffs with the same themes.
 
 ## Languages
 
@@ -3809,15 +3808,15 @@ the themes take the rules of the Sublime Text colour schemes.
 {readme_footer(families, "bat", "Themes", "the theme, bat version, terminal, language")}"""
 
 
-def validate_bat(directory, families):
+def validate_bat(directory, families, product="bat"):
     """Fails the build when a file is missing, a theme does not parse or differs from heritage.bat, or a rule's colour
-    or the line numbers are unreadable on the background."""
+    or the line numbers are unreadable on the background. product names the product whose zip holds the themes."""
     expected = set()
     for family in families:
         for t in family.THEMES:
             name, p = heritage.bat.name(t), t["palette"]
             expected.add(f"{name}.tmTheme")
-            label = f"bat {name}"
+            label = f"{product} {name}"
             with open(os.path.join(directory, "themes", f"{name}.tmTheme"), "rb") as f:
                 data = plistlib.load(f)
             if data["settings"][0]["settings"] != heritage.bat.settings(p) or data["name"] != p["name"]:
@@ -3827,7 +3826,87 @@ def validate_bat(directory, families):
                 raise SystemExit(f"{label}: the rules differ from heritage.bat.rules")
             check_styles(label, heritage.bat.styles(p), "fg", "bg", None, set(),
                          {k for k in heritage.bat.styles(p) if "comment" in k.split(" (")[0]}, {})
-    check_files("bat themes", directory, "themes", expected)
+    check_files(f"{product} themes", directory, "themes", expected)
+
+
+def delta_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    night, day = (heritage.delta.name(next(t for f in families for t in f.THEMES if t["slug"] == slug))
+                  for slug in ("HoliNight", "HoliDay"))
+    return f"""# Heritage Themes for delta
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+The themes need [delta](https://github.com/dandavison/delta) and [bat](https://github.com/sharkdp/bat) in a terminal \
+with 24-bit colour, which runs the matching theme of the [Heritage Themes for terminals]({VENDOR_URL}/releases/latest). \
+They are tested with delta 0.20.1 and 0.22.0 and bat 0.26.1.
+
+1. Install the syntax themes as bat themes. delta reads them from the cache that bat builds. In a terminal, from the \
+unzipped folder:
+
+   ```bash
+   mkdir -p "$(bat --config-dir)/themes"
+   cp themes/* "$(bat --config-dir)/themes/"
+   bat cache --build
+   ```
+
+   The files in `themes` are those of the [Heritage Themes for bat]({VENDOR_URL}/releases/latest); if those are \
+installed, skip this step.
+
+2. Copy `{heritage.delta.FILENAME}` to a lasting place, for example `~/.config/delta`, include it from your Git \
+configuration, and name a theme in delta's `features`:
+
+   ```gitconfig
+   [include]
+       path = ~/.config/delta/{heritage.delta.FILENAME}
+   [delta]
+       features = {night}
+   ```
+
+   Each theme is a delta feature that sets `dark` or `light`, so `delta --show-themes --dark` and \
+`delta --show-themes --light` show them on a sample diff. A feature holds one theme, so switching between Night and Day themes means naming the other feature, for example `{day}`, or \
+setting `DELTA_FEATURES={day}` in the shell. Options of your own, such as `side-by-side` or `line-numbers`, go \
+beside `features` and apply with any theme.
+
+If delta prints `Unknown theme '{night}', using default`, bat's cache lacks the themes: repeat step 1.
+
+## What is coloured
+
+Each theme colours code and the lines that a diff adds and removes, the words that change within them, file and hunk \
+headers, line numbers, whitespace errors, and the lines of `git blame`. delta prints text on the terminal's own \
+background and the commit lines of `git log` in Git's own colours, which the matching terminal theme takes from the \
+same palette.
+
+## Languages
+
+delta highlights code with the Sublime Text syntaxes it bundles, which tell constructs apart as Sublime Text does, so \
+the themes take the rules of the Sublime Text colour schemes.
+
+{readme_footer(families, "delta", "Themes", "the theme, delta and bat versions, terminal, language")}"""
+
+
+def validate_delta(directory, families):
+    """Fails the build when a bat theme or the features file is missing or differs from heritage.bat or heritage.delta,
+    as Git reads the file, or when a style is unreadable on the background it is drawn on."""
+    validate_bat(directory, families, "delta")
+    path = os.path.join(directory, heritage.delta.FILENAME)
+    result = subprocess.run(["git", "config", "--file", path, "--list"], capture_output=True, text=True)
+    if result.returncode:
+        raise SystemExit(f"delta: Git cannot read {heritage.delta.FILENAME}: {result.stderr.strip()}")
+    found = [line.split("=", 1) for line in result.stdout.splitlines()]
+    expected = [[f"delta.{heritage.delta.name(t)}.{key}", value] for f in families for t in f.THEMES
+                for key, value in heritage.delta.settings(t).items()]
+    if found != expected:
+        raise SystemExit(f"delta: {heritage.delta.FILENAME} differs from heritage.delta.settings")
+    for family in families:
+        for t in family.THEMES:
+            styles = heritage.delta.styles(t)
+            check_styles(f"delta {heritage.delta.name(t)}", styles, "fg", "bg", None, set(),
+                         {k for k in styles if "comment" in k.split(" (")[0]}, {})
 
 
 def eclipse_readme(families):
@@ -4510,14 +4589,14 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "Qt Creator": heritage.qtcreator.name, "Kate": lambda t: t["palette"]["name"],
                   "GNOME Text Editor": lambda t: t["palette"]["name"], "gedit": lambda t: t["palette"]["name"],
                   "Geany": lambda t: t["palette"]["name"], "Pulsar": heritage.pulsar.name,
-                  "Amp": heritage.amp.name, "bat": heritage.bat.name, "Eclipse": heritage.eclipse.name,
+                  "Amp": heritage.amp.name, "bat": heritage.bat.name, "delta": heritage.delta.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
                   "RStudio": heritage.rstudio.name, "Godot": heritage.godot.name,
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "bat": bat_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "bat": bat_readme, "delta": delta_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
 
 
 def terminals_readme(families):
@@ -4839,6 +4918,9 @@ def main():
             ("bat", "themes", lambda t, source: (f"{heritage.bat.name(t)}.tmTheme",
                                                   heritage.bat.theme(t["palette"], source)),
              validate_bat),
+            ("delta", "themes", lambda t, source: (f"{heritage.bat.name(t)}.tmTheme",
+                                                    heritage.bat.theme(t["palette"], source)),
+             validate_delta),
             ("Spyder", "themes", lambda t, source: (f"{heritage.spyder.name(t)}.ini",
                                                      heritage.spyder.theme(t["palette"], heritage.spyder.name(t),
                                                                            source)),
@@ -4851,6 +4933,9 @@ def main():
                                                                              source)),
              validate_rstudio)):
         directory = build_themes(families, editor, folder, files)
+        if editor == "delta":
+            write_text(os.path.join(directory, heritage.delta.FILENAME), heritage.delta.config(
+                [(t, f"{VENDOR_URL}/tree/master/themes/{heritage.folder(f)}") for f in families for t in f.THEMES]))
         validate_themes(directory, families)
         name = f"{VSCODE_NAME}-{editor.lower()}"
         print(f"{pack_folder(directory, os.path.join(OUT, f'{name}-{VERSION}.zip'), name)}: {len(themes)} themes",
