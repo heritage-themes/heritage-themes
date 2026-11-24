@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.24.0] - 2026-11-24
+
 ### Fixed
 
 - Code and text keep WCAG AA contrast on the theme's green and red highlight backgrounds, as on added and removed lines in diffs, breakpoint lines, smart casts, file colours, and success and error banners and tooltips. In 44 themes those backgrounds are a shade lighter in light themes or darker in dark ones, with their hue and depth of colour kept.
