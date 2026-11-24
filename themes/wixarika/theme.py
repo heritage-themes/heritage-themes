@@ -22,7 +22,7 @@ HARAMARA = dict(
     searchBg="4A3E12", searchBorder="F7D23E", underCaret="1E2F47", writeCaret="4A1A28",
     braceBg="2A3F5C", todo="F7D23E",
     added="6FAE68", modified="5E8EE0", deleted="C8605A",
-    diffIns="1B2C1E", diffMod="1A2636", diffDel="361C24", diffConf="36311A", fileYellow="1A191B",
+    diffIns="18291B", diffMod="1A2636", diffDel="361C24", diffConf="36311A", fileYellow="1A191B",
     ansiRed="F07E70", ansiGreen="8CD47E", ansiYellow="F2CF5A", ansiBlue="7CB4F2", ansiMagenta="E08ADA", ansiCyan="6DCFD8",
 )
 WIRIKUTA = dict(
@@ -39,7 +39,7 @@ WIRIKUTA = dict(
     searchBg="F4E08C", searchBorder="925F00", underCaret="D4E2F2", writeCaret="F4D3DC",
     braceBg="C8DCF0", todo="B0164F",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6D8", diffConf="EEE0B4", fileYellow="EFEBDE",
+    diffIns="E2EFCF", diffMod="D8E2EE", diffDel="FFE3E5", diffConf="EEE0B4", fileYellow="EFEBDE",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

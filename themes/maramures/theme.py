@@ -23,7 +23,7 @@ ZADIE = dict(
     searchBg="4A3A12", searchBorder="EBAA4C", underCaret="27303E", writeCaret="4A2622",
     braceBg="343C4E", todo="EBAA4C",
     added="7FB070", modified="6A9AD8", deleted="D0605A",
-    diffIns="17291E", diffMod="182A40", diffDel="34191C", diffConf="342E16", fileYellow="191716",
+    diffIns="0D1E14", diffMod="182A40", diffDel="2D1316", diffConf="342E16", fileYellow="191716",
     ansiRed="F07E6E", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 CANEPA = dict(
@@ -40,7 +40,7 @@ CANEPA = dict(
     searchBg="F2DA98", searchBorder="9A5400", underCaret="D8E0EC", writeCaret="F2D6CE",
     braceBg="CCD6E6", todo="B0261E",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6D2", diffConf="EEE0B4", fileYellow="EEEAE0",
+    diffIns="DDEACB", diffMod="D8E2EE", diffDel="FADDD9", diffConf="EEE0B4", fileYellow="EEEAE0",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

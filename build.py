@@ -115,6 +115,10 @@ CONTRAST = (
     (("keyword", "string", "number", "type", "method", "call", "field", "constant", "annotation", "directive", "doc",
       "docTag", "op", "param", "typeParam", "label", "gold", "azure") + ANSI, ("bg", "caretRow"), 4.5),
     (("comment",), ("bg", "caretRow"), 3),
+    # code keeps its colours on the backgrounds of inserted and deleted lines, in diff views and in delta
+    (("fg", "keyword", "string", "number", "type", "method", "call", "field", "constant", "annotation", "directive",
+      "doc", "docTag", "op", "param", "typeParam", "label", "gold", "azure") + ANSI, ("diffIns", "diffDel"), 4.5),
+    (("comment",), ("diffIns", "diffDel"), 3),
     (("lineNoCaret",), ("bg", "caretRow"), 4.5),  # the current line's number, on the gutter and on the current line
     (ANSI, ("bgTool",), 4.5),  # console and terminal
     (("fg",), ("hover", "selection", "selInactive", "searchBg"), 4.5),

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Code and text keep WCAG AA contrast on the theme's green and red highlight backgrounds, as on code coverage, breakpoint lines and the remove surround code preview. In 44 themes those backgrounds are a shade lighter in light themes or darker in dark ones, with their hue and depth of colour kept.
+
 ## [1.14.0] - 2026-11-21
 
 ### Added

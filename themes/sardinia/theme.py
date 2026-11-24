@@ -39,7 +39,7 @@ CAMISA = dict(
     searchBg="F2DC8A", searchBorder="9A6A00", underCaret="D4E0F2", writeCaret="F2D4CC",
     braceBg="D0DCF0", todo="8A5600",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6D4", diffConf="EEE0B4", fileYellow="EFEADC",
+    diffIns="E3F0D1", diffMod="D8E2EE", diffDel="FFE6E4", diffConf="EEE0B4", fileYellow="EFEADC",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

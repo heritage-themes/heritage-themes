@@ -21,7 +21,7 @@ CORTE = dict(
     searchBg="4A3E12", searchBorder="F0CF5C", underCaret="22305A", writeCaret="4A1E2A",
     braceBg="2E3E6A", todo="F0CF5C",
     added="6FAE68", modified="5E8EE0", deleted="C8605A",
-    diffIns="1A2C26", diffMod="1C2440", diffDel="3A1C26", diffConf="36311A", fileYellow="181B2E",
+    diffIns="152721", diffMod="1C2440", diffDel="381B25", diffConf="36311A", fileYellow="181B2E",
     ansiRed="F07E70", ansiGreen="8CD47E", ansiYellow="F2CF5A", ansiBlue="7CB4F2", ansiMagenta="E08ADA", ansiCyan="6DCFD8",
 )
 HUIPIL = dict(
@@ -38,7 +38,7 @@ HUIPIL = dict(
     searchBg="F4E08C", searchBorder="935F00", underCaret="D6DEF4", writeCaret="F4D6D2",
     braceBg="C8D4F0", todo="A8201E",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6D2", diffConf="EEE0B4", fileYellow="EFEDE5",
+    diffIns="E2EFCF", diffMod="D8E2EE", diffDel="FFE5E1", diffConf="EEE0B4", fileYellow="EFEDE5",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

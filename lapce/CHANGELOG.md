@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Code and text keep WCAG AA contrast on the theme's green and red highlight backgrounds, as on the lines that Error Lens marks with an error. In 44 themes those backgrounds are a shade lighter in light themes or darker in dark ones, with their hue and depth of colour kept.
+
 ## [1.7.3] - 2026-11-05
 
 ### Changed

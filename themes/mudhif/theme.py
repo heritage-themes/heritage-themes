@@ -22,7 +22,7 @@ QIR = dict(
     searchBg="4A3E14", searchBorder="E2B44A", underCaret="2E3226", writeCaret="4A2A1C",
     braceBg="3E3622", todo="EC8250",
     added="7FB070", modified="6A9AD8", deleted="D0605A",
-    diffIns="1A2616", diffMod="1A2232", diffDel="33191A", diffConf="352C14", fileYellow="1B1811",
+    diffIns="121D0C", diffMod="1A2232", diffDel="2D1314", diffConf="352C14", fileYellow="1B1811",
     ansiRed="F07E6E", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 QASAB = dict(
@@ -39,7 +39,7 @@ QASAB = dict(
     searchBg="EED690", searchBorder="7A5600", underCaret="E0DCC4", writeCaret="F2D8C8",
     braceBg="DCD0A8", todo="AF451A",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DFE8C6", diffMod="DCE0E2", diffDel="F2D8CC", diffConf="EEDDA8", fileYellow="F0E9D3",
+    diffIns="E0E9C7", diffMod="DCE0E2", diffDel="FAE0D4", diffConf="EEDDA8", fileYellow="F0E9D3",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

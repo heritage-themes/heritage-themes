@@ -38,7 +38,7 @@ HEMP = dict(
     searchBg="F4E08C", searchBorder="9A7400", underCaret="D6E0F4", writeCaret="F6D4E4",
     braceBg="CFDAF2", todo="AD1068",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6DC", diffConf="EEE0B4", fileYellow="ECE9DF",
+    diffIns="E0EDCE", diffMod="D8E2EE", diffDel="FDE1E7", diffConf="EEE0B4", fileYellow="ECE9DF",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

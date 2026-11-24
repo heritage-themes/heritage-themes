@@ -22,7 +22,7 @@ GALAWU = dict(
     searchBg="4C3402", searchBorder="EAD072", underCaret="3C2E25", writeCaret="4E2620",
     braceBg="4E3A2A", todo="EAD072",
     added="7FAE60", modified="6A90C8", deleted="C8605A",
-    diffIns="1F2A18", diffMod="1E2432", diffDel="3A1A18", diffConf="3A3018", fileYellow="241B15",
+    diffIns="192412", diffMod="1E2432", diffDel="371715", diffConf="3A3018", fileYellow="241B15",
     ansiRed="F07E6E", ansiGreen="8CC878", ansiYellow="F0CC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 GAPAN = dict(
@@ -39,7 +39,7 @@ GAPAN = dict(
     searchBg="F2DE94", searchBorder="7A5E00", underCaret="EAD9C4", writeCaret="F2D4CC",
     braceBg="E2C8AA", todo="A8281C",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6D2", diffConf="EEE0B4", fileYellow="ECE8E0",
+    diffIns="DDEACB", diffMod="D8E2EE", diffDel="FADEDA", diffConf="EEE0B4", fileYellow="ECE8E0",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

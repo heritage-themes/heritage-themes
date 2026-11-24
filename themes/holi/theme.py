@@ -20,7 +20,7 @@ NIGHT = dict(
     searchBg="4A3A12", searchBorder="F5C842", underCaret="2B3552", writeCaret="4C2334",
     braceBg="2E4A3B", todo="F5C842",
     added="5FAE6A", modified="5C8FD6", deleted="C0506A",
-    diffIns="1F3024", diffMod="1E2639", diffDel="3B1E29", diffConf="3A311C", fileYellow="2D2714",
+    diffIns="1E2F23", diffMod="1E2639", diffDel="3B1E29", diffConf="3A311C", fileYellow="2D2714",
     ansiRed="FF5468", ansiGreen="93D38C", ansiYellow="F5C842", ansiBlue="72AAF6", ansiMagenta="F2669C", ansiCyan="4FD0C2",
 )
 DAY = dict(
@@ -37,7 +37,7 @@ DAY = dict(
     searchBg="FBE29A", searchBorder="D4A017", underCaret="D9E4F5", writeCaret="F7D6E1",
     braceBg="CDEBCF", todo="855800",
     added="5FA866", modified="6A8FD0", deleted="D0617A",
-    diffIns="E1F2DD", diffMod="DFE8F7", diffDel="F9DCE4", diffConf="F7EAC6", fileYellow="FBF2D6",
+    diffIns="E4F5E0", diffMod="DFE8F7", diffDel="FFEBF0", diffConf="F7EAC6", fileYellow="FBF2D6",
     ansiRed="D0213A", ansiGreen="2E7A32", ansiYellow="855800", ansiBlue="1A5FB4", ansiMagenta="C2185B", ansiCyan="00756A",
 )
 

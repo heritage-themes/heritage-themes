@@ -39,7 +39,7 @@ PLASTER = dict(
     searchBg="F2DE94", searchBorder="856000", underCaret="D6E0EC", writeCaret="F2D6CE",
     braceBg="CCD8E6", todo="B02A22",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6D2", diffConf="EEE0B4", fileYellow="F0EEE8",
+    diffIns="E3F0D1", diffMod="D8E2EE", diffDel="FFE5E2", diffConf="EEE0B4", fileYellow="F0EEE8",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

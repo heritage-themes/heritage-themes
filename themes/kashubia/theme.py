@@ -39,7 +39,7 @@ NIEBO = dict(
     searchBg="F0DC8A", searchBorder="9A7400", underCaret="D4E2F0", writeCaret="F2D4CC",
     braceBg="D2E6CC", todo="8A5A00",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6CC", diffConf="EEE0B4", fileYellow="EFE8D4",
+    diffIns="E1EECF", diffMod="D8E2EE", diffDel="FFE4DA", diffConf="EEE0B4", fileYellow="EFE8D4",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

@@ -39,7 +39,7 @@ WASLI = dict(
     searchBg="F0D68A", searchBorder="B8860B", underCaret="D6DCF2", writeCaret="F2D2CC",
     braceBg="CDE4D6", todo="7A5800",
     added="5E9A5A", modified="5868C0", deleted="C0574B",
-    diffIns="DDEBD6", diffMod="DADFF4", diffDel="F2D8D2", diffConf="EFE2BF", fileYellow="F5E8C4",
+    diffIns="DEECD7", diffMod="DADFF4", diffDel="FDE2DC", diffConf="EFE2BF", fileYellow="F5E8C4",
     ansiRed="B0301E", ansiGreen="1E6E55", ansiYellow="7A5800", ansiBlue="2B3BA6", ansiMagenta="992D82", ansiCyan="136A8F",
 )
 

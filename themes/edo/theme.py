@@ -21,7 +21,7 @@ CHA = dict(
     searchBg="4A371B", searchBorder="D0A260", underCaret="20303B", writeCaret="492826",
     braceBg="2C404E", todo="E8605B",
     added="5D9669", modified="5C8BB3", deleted="B75B55",
-    diffIns="17261A", diffMod="15232F", diffDel="32191A", diffConf="2D220F", fileYellow="1F1A13",
+    diffIns="142217", diffMod="15232F", diffDel="311819", diffConf="2D220F", fileYellow="1F1A13",
     ansiRed="E66E68", ansiGreen="7ABA7C", ansiYellow="DCBA5C", ansiBlue="73ABDA", ansiMagenta="C88EC3", ansiCyan="6CBEC2",
 )
 NEZUMI = dict(
@@ -38,7 +38,7 @@ NEZUMI = dict(
     searchBg="EAD5AB", searchBorder="9A6418", underCaret="D0E1ED", writeCaret="F5D6D2",
     braceBg="C0D4E3", todo="BA2B2E",
     added="579766", modified="507FA7", deleted="BB5752",
-    diffIns="D7EBDA", diffMod="D7E7F5", diffDel="F8DDDC", diffConf="F1E3C7", fileYellow="EEE9DF",
+    diffIns="D9EDDC", diffMod="D7E7F5", diffDel="FDE2E1", diffConf="F1E3C7", fileYellow="EEE9DF",
     ansiRed="AC3031", ansiGreen="2F6D34", ansiYellow="7D5E07", ansiBlue="23588A", ansiMagenta="793974", ansiCyan="086A73",
 )
 

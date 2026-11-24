@@ -39,7 +39,7 @@ WAPNO = dict(
     searchBg="F0DC8A", searchBorder="866700", underCaret="D4E2F0", writeCaret="F2D4D8",
     braceBg="D2E6CC", todo="8A5A00",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6D4", diffConf="EEE0B4", fileYellow="ECEDE2",
+    diffIns="E4F1D1", diffMod="D8E2EE", diffDel="FFE7E5", diffConf="EEE0B4", fileYellow="ECEDE2",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

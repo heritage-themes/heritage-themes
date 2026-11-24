@@ -38,7 +38,7 @@ PLOTNO = dict(
     searchBg="F0DC8A", searchBorder="A07A10", underCaret="DCE3EA", writeCaret="F0D6D8",
     braceBg="D6E6D8", todo="7A5A08",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6D4", diffConf="EEE0B4", fileYellow="F0E9D2",
+    diffIns="E2EFCF", diffMod="D8E2EE", diffDel="FFE4E2", diffConf="EEE0B4", fileYellow="F0E9D2",
     ansiRed="A82A2A", ansiGreen="2F6B2F", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A80", ansiCyan="0A6A70",
 )
 

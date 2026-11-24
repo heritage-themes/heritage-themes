@@ -39,7 +39,7 @@ OLAI = dict(
     searchBg="F0D684", searchBorder="B08A10", underCaret="D0E6E8", writeCaret="F2D2CF",
     braceBg="CFE6C8", todo="7A5800",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6CC", diffConf="EEE0B4", fileYellow="F2E4B7",
+    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F9DDD3", diffConf="EEE0B4", fileYellow="F2E4B7",
     ansiRed="9C1F4A", ansiGreen="366A14", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0B6672",
 )
 

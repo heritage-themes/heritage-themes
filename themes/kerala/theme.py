@@ -39,7 +39,7 @@ KASAVU = dict(
     searchBg="F5DE8E", searchBorder="B8900E", underCaret="D4E4F2", writeCaret="F5D3D6",
     braceBg="CDE8CF", todo="7A5A00",
     added="5FA060", modified="5A8CC8", deleted="C85A5A",
-    diffIns="E0F0DA", diffMod="DCE8F4", diffDel="F8DCDC", diffConf="F5E8C4", fileYellow="F7EBC4",
+    diffIns="E1F1DB", diffMod="DCE8F4", diffDel="FFE7E7", diffConf="F5E8C4", fileYellow="F7EBC4",
     ansiRed="B0203A", ansiGreen="3A791E", ansiYellow="7A5A00", ansiBlue="1060A8", ansiMagenta="9C3A8A", ansiCyan="007876",
 )
 

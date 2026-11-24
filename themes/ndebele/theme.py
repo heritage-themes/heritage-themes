@@ -21,7 +21,7 @@ NZIMA = dict(
     searchBg="4A3E12", searchBorder="F2CF5A", underCaret="1E3247", writeCaret="4A1F20",
     braceBg="2A4258", todo="F2CF5A",
     added="6FAE68", modified="5E8EE0", deleted="C8605A",
-    diffIns="1B2C1E", diffMod="1A2636", diffDel="361C1E", diffConf="36311A", fileYellow="1C1C19",
+    diffIns="19291C", diffMod="1A2636", diffDel="361C1E", diffConf="36311A", fileYellow="1C1C19",
     ansiRed="F07E70", ansiGreen="8CD47E", ansiYellow="F2CF5A", ansiBlue="7CB4F2", ansiMagenta="E08ADA", ansiCyan="6DCFD8",
 )
 MHLOPHE = dict(
@@ -38,7 +38,7 @@ MHLOPHE = dict(
     searchBg="F4E08C", searchBorder="8F6C00", underCaret="D4E2F2", writeCaret="F4D6D2",
     braceBg="C8DCF0", todo="B42A1E",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6D2", diffConf="EEE0B4", fileYellow="EEECE4",
+    diffIns="E2EFCF", diffMod="D8E2EE", diffDel="FFE5E1", diffConf="EEE0B4", fileYellow="EEECE4",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

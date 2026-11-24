@@ -39,7 +39,7 @@ LAAL_PAAR = dict(
     searchBg="F5DC8C", searchBorder="C09010", underCaret="D8E0F5", writeCaret="F7D3D3",
     braceBg="CFE8CC", todo="7E5A00",
     added="5FA05A", modified="5A80D0", deleted="C85A5A",
-    diffIns="E2F1DC", diffMod="DFE6F7", diffDel="FADCDC", diffConf="F6E8C4", fileYellow="F9F0D2",
+    diffIns="E8F7E2", diffMod="DFE6F7", diffDel="FFEEED", diffConf="F6E8C4", fileYellow="F9F0D2",
     ansiRed="C0202A", ansiGreen="3C7A22", ansiYellow="7E5A00", ansiBlue="2847B0", ansiMagenta="A0287E", ansiCyan="00786A",
 )
 

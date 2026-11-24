@@ -24,7 +24,7 @@ QERNERTOQ = dict(
     searchBg="483E10", searchBorder="E6C462", underCaret="263446", writeCaret="4A2228",
     braceBg="2E3E56", todo="E6C462",
     added="7FB070", modified="6A9AD8", deleted="D0605A",
-    diffIns="17291E", diffMod="182A40", diffDel="34191C", diffConf="342E16", fileYellow="171C21",
+    diffIns="112218", diffMod="182A40", diffDel="32171A", diffConf="342E16", fileYellow="171C21",
     ansiRed="F07E7E", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 QAQORTOQ = dict(
@@ -41,7 +41,7 @@ QAQORTOQ = dict(
     searchBg="F2DE94", searchBorder="7E5E00", underCaret="D6E0EC", writeCaret="F2D6D6",
     braceBg="CCD8E6", todo="B0222C",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
-    diffIns="DDEACB", diffMod="D8E2EE", diffDel="F2D6D2", diffConf="EEE0B4", fileYellow="EEEEE8",
+    diffIns="E2EFCF", diffMod="D8E2EE", diffDel="FFE4E0", diffConf="EEE0B4", fileYellow="EEEEE8",
     ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
 )
 

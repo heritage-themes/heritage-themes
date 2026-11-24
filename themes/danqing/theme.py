@@ -20,7 +20,7 @@ INK = dict(
     searchBg="4A3D18", searchBorder="E9B949", underCaret="263A3E", writeCaret="4A2622",
     braceBg="2F4A3E", todo="E9B949",
     added="6E9C5A", modified="4F93A8", deleted="A54A3E",
-    diffIns="1F2E22", diffMod="1C2C31", diffDel="352021", diffConf="352E1C", fileYellow="29271C",
+    diffIns="1E2C21", diffMod="1C2C31", diffDel="352021", diffConf="352E1C", fileYellow="29271C",
     ansiRed="F0643F", ansiGreen="A3B47E", ansiYellow="E9B949", ansiBlue="4FB3C9", ansiMagenta="CFA3C0", ansiCyan="7FC4B6",
 )
 PAPER = dict(

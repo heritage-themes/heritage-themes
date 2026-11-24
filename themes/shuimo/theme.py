@@ -18,7 +18,7 @@ SHN = dict(
     searchBg="3B3524", searchBorder="C9A24E", underCaret="25313B", writeCaret="3E2422",
     braceBg="2D3A44", todo="D75E51",
     added="5F8A5A", modified="5C7F9C", deleted="9A4A40",
-    diffIns="1D291C", diffMod="1B242C", diffDel="31201E", diffConf="302A1B", fileYellow="24221B",
+    diffIns="142013", diffMod="1B242C", diffDel="291917", diffConf="302A1B", fileYellow="24221B",
     ansiRed="D75E51", ansiGreen="8AA886", ansiYellow="C9A24E", ansiBlue="8FAAC2", ansiMagenta="B491B0", ansiCyan="71ABAA",
 )
 SHD = dict(
@@ -35,7 +35,7 @@ SHD = dict(
     searchBg="E8DDB8", searchBorder="9A7420", underCaret="DCE3EA", writeCaret="F0D8D3",
     braceBg="D5DDE4", todo="B03A2E",
     added="6E9A6A", modified="6F8FAA", deleted="B8655A",
-    diffIns="E1EBDD", diffMod="DDE5EC", diffDel="F2DEDA", diffConf="EEE4C8", fileYellow="EFEADA",
+    diffIns="E2ECDE", diffMod="DDE5EC", diffDel="F9E5E1", diffConf="EEE4C8", fileYellow="EFEADA",
     ansiRed="B03A2E", ansiGreen="476444", ansiYellow="7B5F1B", ansiBlue="3D5F7A", ansiMagenta="6E4E6B", ansiCyan="2C6565",
 )
 

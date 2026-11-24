@@ -38,7 +38,7 @@ COTTON = dict(
     searchBg="EDD28A", searchBorder="B07D12", underCaret="D2DBEE", writeCaret="F0D0C6",
     braceBg="CFE0C8", todo="745200",
     added="5E9450", modified="4F6FB0", deleted="B8503E",
-    diffIns="DCE8CF", diffMod="D8DFEF", diffDel="F2D6CC", diffConf="EEE0BA", fileYellow="EEDEB1",
+    diffIns="DCE8CF", diffMod="D8DFEF", diffDel="F3D7CD", diffConf="EEE0BA", fileYellow="EEDEB1",
     ansiRed="A3301F", ansiGreen="46672A", ansiYellow="745200", ansiBlue="27408A", ansiMagenta="892C5A", ansiCyan="1D6B63",
 )
 
