@@ -38,6 +38,7 @@ body:
         - GNOME Text Editor
         - GNOME Builder
         - Amp
+        - bat
         - Eclipse
         - Nova
         - JupyterLab

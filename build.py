@@ -102,7 +102,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate",
-           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
+           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
            "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
@@ -3754,6 +3754,78 @@ def validate_amp(directory, families):
     check_files("Amp themes", directory, "themes", expected)
 
 
+def bat_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    night, day = (heritage.bat.name(next(t for f in families for t in f.THEMES if t["slug"] == slug))
+                  for slug in ("HoliNight", "HoliDay"))
+    return f"""# Heritage Themes for bat
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+The themes need bat 0.25 or later in a terminal with 24-bit colour, which runs the matching theme of the \
+[Heritage Themes for terminals]({VENDOR_URL}/releases/latest).
+
+1. Copy the files in `themes` into the `themes` folder of bat's configuration folder, which \
+`bat --config-dir` prints, and rebuild bat's cache. In a terminal, from the unzipped folder:
+
+   ```bash
+   mkdir -p "$(bat --config-dir)/themes"
+   cp themes/* "$(bat --config-dir)/themes/"
+   bat cache --build
+   ```
+
+2. Name a theme in bat's configuration file, which `bat --config-file` prints, as a dark and a light theme. bat asks \
+the terminal for its background and takes the matching one:
+
+   ```text
+   --theme-dark="{night}"
+   --theme-light="{day}"
+   ```
+
+   `bat --theme={night} FILE` uses a theme once, and `bat --list-themes` lists them.
+
+## What is coloured
+
+Each theme colours code, line numbers, the grid and the line that `--highlight-line` names. bat prints text on the \
+terminal's own background, the header's labels in the terminal's text colour and the Git change markers in its green, \
+yellow and red, which the matching terminal theme takes from the same palette.
+
+[delta](https://github.com/dandavison/delta) reads the themes from bat's cache and colours code with them, for example \
+with `delta --syntax-theme {night}`; it draws added and removed lines in colours of its own.
+
+## Languages
+
+bat highlights code with the Sublime Text syntaxes it bundles, which tell constructs apart as Sublime Text does, so \
+the themes take the rules of the Sublime Text colour schemes.
+
+{readme_footer(families, "bat", "Themes", "the theme, bat version, terminal, language")}"""
+
+
+def validate_bat(directory, families):
+    """Fails the build when a file is missing, a theme does not parse or differs from heritage.bat, or a rule's colour
+    or the line numbers are unreadable on the background."""
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.bat.name(t), t["palette"]
+            expected.add(f"{name}.tmTheme")
+            label = f"bat {name}"
+            with open(os.path.join(directory, "themes", f"{name}.tmTheme"), "rb") as f:
+                data = plistlib.load(f)
+            if data["settings"][0]["settings"] != heritage.bat.settings(p) or data["name"] != p["name"]:
+                raise SystemExit(f"{label}: the global settings differ from heritage.bat.settings")
+            found = [(r["scope"], r["settings"]["foreground"], r["settings"]["fontStyle"]) for r in data["settings"][1:]]
+            if found != [(scope, colour, font) for _, scope, colour, font in heritage.bat.rules(p)]:
+                raise SystemExit(f"{label}: the rules differ from heritage.bat.rules")
+            check_styles(label, heritage.bat.styles(p), "fg", "bg", None, set(),
+                         {k for k in heritage.bat.styles(p) if "comment" in k.split(" (")[0]}, {})
+    check_files("bat themes", directory, "themes", expected)
+
+
 def eclipse_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -4434,14 +4506,14 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "Qt Creator": heritage.qtcreator.name, "Kate": lambda t: t["palette"]["name"],
                   "GNOME Text Editor": lambda t: t["palette"]["name"], "gedit": lambda t: t["palette"]["name"],
                   "Geany": lambda t: t["palette"]["name"], "Pulsar": heritage.pulsar.name,
-                  "Amp": heritage.amp.name, "Eclipse": heritage.eclipse.name,
+                  "Amp": heritage.amp.name, "bat": heritage.bat.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
                   "RStudio": heritage.rstudio.name, "Godot": heritage.godot.name,
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "bat": bat_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
 
 
 def terminals_readme(families):
@@ -4760,6 +4832,9 @@ def main():
             ("Amp", "themes", lambda t, source: (f"{heritage.amp.name(t)}.tmTheme",
                                                   heritage.amp.theme(t["palette"], source)),
              validate_amp),
+            ("bat", "themes", lambda t, source: (f"{heritage.bat.name(t)}.tmTheme",
+                                                  heritage.bat.theme(t["palette"], source)),
+             validate_bat),
             ("Spyder", "themes", lambda t, source: (f"{heritage.spyder.name(t)}.ini",
                                                      heritage.spyder.theme(t["palette"], heritage.spyder.name(t),
                                                                            source)),

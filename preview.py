@@ -1,7 +1,7 @@
 """Writes the preview page of each theme family and, with --png, renders it to PNG.
 
 Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
-                          | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --textadept
+                          | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --bat | --textadept
                           | --lapce | --qtcreator | --kate | --gnome-text-editor | --gedit | --geany | --eclipse
                           | --pulsar | --jupyterlab | --pygments] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
@@ -20,6 +20,7 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --terminals  write the terminals preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --nano       write the Nano preview instead of the IntelliJ one; needs Linux and Podman
   --amp        write the Amp preview instead of the IntelliJ one; needs Linux and Podman
+  --bat        write the bat preview instead of the IntelliJ one; needs Linux and Podman
   --textadept  write the Textadept preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --lapce      write the Lapce preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --qtcreator  write the Qt Creator preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
@@ -63,10 +64,10 @@ Podman, through scripts/terminals/shoot.py and shells.py, and fails when a scree
 colours (scripts/terminals/check.py) or a screen shows a colour the theme does not set or text below its contrast
 minimum (scripts/terminals/cells.py). iTerm2 and Windows Terminal do not run on Linux, so the build's checks of their
 files are all they get. Termux runs in the Android emulator that scripts/termux/setup.sh starts, and
-scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. The Nano, Amp, Textadept,
+scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. The Nano, Amp, bat, Textadept,
 Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
 editor runs in the container image of scripts/editors/Containerfile, with the theme installed and chosen as its README
-says: Nano and Amp in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
+says: Nano, Amp and bat in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
 that the theme does not set or text below its contrast minimum, and the others on Xvfb through
 scripts/editors/shoot.py, whose screenshots go to themes/<theme>/build/<editor> and fail when they show a colour that
 is no colour of the theme nor a blend of one
@@ -531,6 +532,9 @@ SCREEN_EDITORS = {
     # Amp: every row but the status bar, where Amp draws its modes in colours of its own
     "amp": ("Amp", lambda themes: [(f"{heritage.amp.name(t)}.tmTheme", heritage.amp.theme(t["palette"], ""))
                                    for t in themes], lambda p: set(), "0:-1"),
+    # bat: every row, the header, grid, line numbers and code, with the third line highlighted
+    "bat": ("bat", lambda themes: [(f"{heritage.bat.name(t)}.tmTheme", heritage.bat.theme(t["palette"], ""))
+                                   for t in themes], lambda p: set(), "0:"),
 }
 
 
@@ -557,7 +561,8 @@ def screen_results(family, out, editor):
             run = subprocess.run([podman, "run", "--rm", "--userns=keep-id", "--security-opt", "label=disable",
                                   "-v", f"{EDITORS}:/work:ro", "-v", f"{files}:/gen:ro", "-v", f"{samples}:/samples:ro",
                                   "-v", f"{screens}:/out", EDITORS_IMAGE, "python3", "/work/screen.py", editor, stem,
-                                  "/gen", f"/samples/{name}", f"/out/{target}"], capture_output=True, text=True)
+                                  "/gen", f"/samples/{name}", "#" + p["bg"], "#" + p["fg"],
+                                  f"/out/{target}"], capture_output=True, text=True)
             if run.returncode:
                 return name, None, None, [f"{editor} {stem} {name} failed: {run.stderr.strip()[-400:]}"]
             ansi = heritage.terminals.colours(p)["ansi"]

@@ -1,20 +1,26 @@
 """Reads the screen of a terminal editor showing a sample with a Heritage theme, inside the heritage-editors container.
 
-Usage: python3 screen.py EDITOR THEME FILES SAMPLE OUT.json
+Usage: python3 screen.py EDITOR THEME FILES SAMPLE BACKGROUND FOREGROUND OUT.json
 
-EDITOR is nano or amp, THEME the theme's file name stem, FILES the folder of the editor's generated files and SAMPLE the
-file to open. The editor starts in a pseudo-terminal of 256 colours that reports 24-bit colour, in a fresh HOME with the
-theme installed as its README says, and the screen is read through the pyte terminal emulator once the editor has been
-quiet for QUIET seconds. The output is the screen as rows of cells [character, foreground, background, bold, italic,
-underline]; a colour is #RRGGBB, "default" for the terminal's own, or the name pyte gives one of the 16 ANSI colours.
+EDITOR is nano, amp or bat, THEME the theme's file name stem, FILES the folder of the editor's generated files, SAMPLE
+the file to open, and BACKGROUND and FOREGROUND the terminal's default colours as #RRGGBB, those of the matching
+Terminals theme. The editor starts in a pseudo-terminal of 256 colours that reports 24-bit colour and answers queries
+for its default colours, in a fresh HOME with the theme installed as its README says, and the screen is read through
+the pyte terminal emulator once the editor has been quiet for QUIET seconds. The output is the screen as rows of cells
+[character, foreground, background, bold, italic, underline]; a colour is #RRGGBB, "default" for the terminal's own,
+or the name pyte gives one of the 16 ANSI colours.
 """
-import fcntl, json, os, pty, re, select, shutil, signal, struct, sys, tempfile, termios, time
+import fcntl, json, os, pty, re, select, shutil, signal, struct, subprocess, sys, tempfile, termios, time
 
 import pyte
 
 COLUMNS, ROWS = 88, 20
 QUIET, TIMEOUT = 1.5, 30
+# a query for the terminal's foreground (OSC 10) or background (OSC 11) colour, ended by BEL or ST
+COLOUR_QUERY = re.compile(rb"\x1b\](1[01]);\?(?:\x07|\x1b\\)")
 CONTROL_STRING = re.compile(rb"\x1b(?:\](?![012];)|[P_^X])[^\x07\x1b]*(?:\x07|\x1b\\)")
+# the end of the output read so far when it stops inside an escape or a control string, which the next read completes
+INCOMPLETE = re.compile(rb"\x1b(?:[\]P_^X][^\x07\x1b]*\x1b?)?$")
 
 
 class Screen(pyte.Screen):
@@ -35,7 +41,7 @@ def write(path, text):
         f.write(text)
 
 
-def nano(home, stem, files, sample):
+def nano(home, stem, files, sample, background, foreground):
     # the scheme's lines after the syntax files in the nanorc, as the README says, with line numbers, the guide stripe
     # and the scroll indicator shown so their colours are on screen
     with open(f"{files}/{stem}.nanorc", encoding="utf-8") as f:
@@ -45,7 +51,7 @@ def nano(home, stem, files, sample):
     return ["/usr/bin/nano", "--", sample]
 
 
-def amp(home, stem, files, sample):
+def amp(home, stem, files, sample, background, foreground):
     # the theme in Amp's themes folder and named in its config.yml, as the README says
     os.makedirs(f"{home}/.config/amp/themes")
     shutil.copy(f"{files}/{stem}.tmTheme", f"{home}/.config/amp/themes/")
@@ -53,10 +59,41 @@ def amp(home, stem, files, sample):
     return ["/usr/local/bin/amp", sample]
 
 
-EDITORS = dict(nano=nano, amp=amp)
+def luminance(colour):
+    def channel(c):
+        c /= 255
+        return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+    r, g, b = (channel(int(colour[i:i + 2], 16)) for i in (1, 3, 5))
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
 
-def run(argv, env):
+def bat(home, stem, files, sample, background, foreground):
+    # the theme in bat's themes folder with the cache rebuilt, and named in the configuration file as the dark or the
+    # light theme, as the README says: dark when the terminal's background is darker than its text, as bat judges it.
+    # The other slot names bat's ansi theme, whose named colours the check rejects, so the screen shows the theme only
+    # when bat matches it to the terminal. The third line is highlighted to show lineHighlight. Every sample fits one
+    # screen, so the output is what bat's pager, less -F, prints.
+    themes = f"{home}/.config/bat/themes"
+    os.makedirs(themes)
+    shutil.copy(f"{files}/{stem}.tmTheme", themes)
+    dark = luminance(background) < luminance(foreground)
+    write(f"{home}/.config/bat/config", f'--theme-dark="{stem if dark else "ansi"}"\n'
+                                        f'--theme-light="{"ansi" if dark else stem}"\n--highlight-line=3\n--paging=never\n')
+    subprocess.run(["/usr/local/bin/bat", "cache", "--build"], env=dict(os.environ, HOME=home,
+                   XDG_CONFIG_HOME=f"{home}/.config", XDG_CACHE_HOME=f"{home}/.cache"), check=True,
+                   capture_output=True)
+    return ["/usr/local/bin/bat", os.path.basename(sample)]
+
+
+EDITORS = dict(nano=nano, amp=amp, bat=bat)
+
+
+def colour_reply(code, colour):
+    """The answer to a colour query, as xterm gives it: each channel as four hex digits."""
+    return f"\x1b]{code};rgb:" + "/".join(colour[i:i + 2].lower() * 2 for i in (1, 3, 5)) + "\x1b\\"
+
+
+def run(argv, env, background, foreground):
     screen = Screen(COLUMNS, ROWS)
     stream = pyte.ByteStream(screen)
     pid, fd = pty.fork()
@@ -66,13 +103,21 @@ def run(argv, env):
     fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", ROWS, COLUMNS, 0, 0))
     screen.write_process_input = lambda data: os.write(fd, data.encode())
     start = last = time.monotonic()
+    pending = b""
     try:
         while time.monotonic() - last < QUIET and time.monotonic() - start < TIMEOUT:
             if select.select([fd], [], [], 0.05)[0]:
                 try:
-                    data = os.read(fd, 1 << 16)
+                    pending += os.read(fd, 1 << 16)
                 except OSError:
                     break
+                # a query or control string can arrive over two reads: keep its start until the rest arrives
+                cut = INCOMPLETE.search(pending)
+                data, pending = (pending[:cut.start()], pending[cut.start():]) if cut else (pending, b"")
+                # answer colour queries before feeding the rest, whose device attributes query pyte answers, so the
+                # replies arrive in the order a terminal sends them
+                for code in COLOUR_QUERY.findall(data):
+                    os.write(fd, colour_reply(code.decode(), foreground if code == b"10" else background).encode())
                 stream.feed(CONTROL_STRING.sub(b"", data))
                 last = time.monotonic()
     finally:
@@ -86,15 +131,16 @@ def run(argv, env):
 
 
 def main():
-    editor, stem, files, sample, out = sys.argv[1:6]
+    editor, stem, files, sample, background, foreground, out = sys.argv[1:8]
     home = tempfile.mkdtemp(prefix="home-")
     env = dict(os.environ, HOME=home, XDG_CONFIG_HOME=f"{home}/.config", XDG_DATA_HOME=f"{home}/.local/share",
                XDG_CACHE_HOME=f"{home}/.cache", TERM="xterm-256color", COLORTERM="truecolor", LANG="C.UTF-8")
     # a copy in the home folder, which the editor can write to, so it opens without a read-only warning
     shutil.copy(sample, home)
-    argv = EDITORS[editor](home, stem, files, os.path.join(home, os.path.basename(sample)))
+    argv = EDITORS[editor](home, stem, files, os.path.join(home, os.path.basename(sample)), background,
+                           foreground)
     with open(out, "w", encoding="utf-8") as f:
-        json.dump(run(argv, env), f)
+        json.dump(run(argv, env, background, foreground), f)
 
 
 if __name__ == "__main__":
