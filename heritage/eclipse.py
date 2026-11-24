@@ -7,7 +7,7 @@ contribute colours to Eclipse's own dark theme (JDT, debug, Ant, EGit, compare, 
 bracket pairs, EclEmma and Mylyn) as IEclipsePreferences, which Eclipse applies when the theme is chosen. Those plugins contribute
 their colours to Eclipse's dark theme by its identifier only, so the stylesheet sets each of them for the Heritage
 theme. The other languages open in the generic editor, which TM4E highlights with TextMate grammars: the plugin also
-contributes a TextMate theme of the same name and colours (heritage.amp's, which take the Sublime Text scheme's rules),
+contributes a TextMate theme of the same name and colours (heritage.textmate's, which take the Sublime Text scheme's rules),
 which the user chooses in TM4E's preferences, as TM4E reads its theme before an appearance theme's preferences
 apply.
 
@@ -17,7 +17,7 @@ contains "dark", so a dark Heritage theme's identifier does.
 """
 import io, re, zipfile
 
-from . import amp
+from . import textmate as tm
 from .nvim import name  # noqa: F401 - the files take the names of Neovim's schemes
 from .terminals import colours as terminal_colours, contrast
 from .vscode import mix
@@ -427,8 +427,8 @@ def stylesheet(t, source):
 
 
 def textmate(t, source):
-    """The TextMate theme for TM4E, as heritage.amp writes it."""
-    return amp.theme(t["palette"], source)
+    """The TextMate theme for TM4E."""
+    return tm.theme(t["palette"], source, "Eclipse", tm.settings(t["palette"]))
 
 
 def plugin_xml(themes):
