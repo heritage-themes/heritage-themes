@@ -1566,12 +1566,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Prints the changelog section for a version.
+          # Prints the changelog section for a version, without the blank lines that end it, which the last
+          # section of a changelog lacks and the others have.
           section() {
             awk -v v="$2" '
               $0 ~ "^## \\[" v "\\]" {on = 1; next}
               /^## \[/ {on = 0}
-              on' "$1"
+              on' "$1" | awk 'NF {for (; blank; blank--) print ""; print; next} {blank++}'
           }
           # Downloads the files matching the patterns from the newest release that carries the
           # first one, so a product left out of this release ships the build of its last release.
@@ -1595,7 +1596,7 @@ jobs:
             local title=$1 included=$2 changelog=$3 file=$4
             shift 4
             if [ "$included" = true ]; then
-              { echo "## $title"; section "$changelog" "$VERSION"; } >> "$changed"
+              { echo "## $title"; section "$changelog" "$VERSION"; echo; } >> "$changed"
               echo "$title" >> "$titles"
             else
               local previous
