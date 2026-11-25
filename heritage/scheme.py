@@ -160,7 +160,7 @@ def attributes(p):
     s("LOG_EXPIRED_ENTRY", attr(p["disabled"]))
     for k in "RED GREEN YELLOW BLUE MAGENTA CYAN".split():
         s(f"CONSOLE_{k}_OUTPUT CONSOLE_{k}_BRIGHT_OUTPUT", attr(p["ansi" + k.title()]))
-    s("CONSOLE_BLACK_OUTPUT", attr(p["disabled"])); s("CONSOLE_DARKGRAY_OUTPUT", attr(p["muted"]))
+    s("CONSOLE_BLACK_OUTPUT", attr(p["bgTool"])); s("CONSOLE_DARKGRAY_OUTPUT", attr(p["muted"]))
     s("CONSOLE_GRAY_OUTPUT", attr(p["op"])); s("CONSOLE_WHITE_OUTPUT", attr(p["fg"]))
     # diff
     s("DIFF_INSERTED", attr(bg=p["diffIns"], stripe=p["added"]))

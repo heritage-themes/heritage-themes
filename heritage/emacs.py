@@ -323,7 +323,7 @@ def ui(p):
     # the terminal's 16 colours, as the Neovim scheme gives them; Emacs draws ANSI output, in shell and compilation
     # buffers among others, with these faces
     colours = ("black", "red", "green", "yellow", "blue", "magenta", "cyan", "white")
-    terminal = ["#" + v for v in [p["disabled"], *(p["ansi" + n] for n in ("Red", "Green", "Yellow", "Blue",
+    terminal = ["#" + v for v in [p["bgTool"], *(p["ansi" + n] for n in ("Red", "Green", "Yellow", "Blue",
                                                                           "Magenta", "Cyan")), p["op"]]]
     bright = ["#" + p["muted"], *terminal[1:7], "#" + p["fg"]]
     for colour, normal, light in zip(colours, terminal, bright):

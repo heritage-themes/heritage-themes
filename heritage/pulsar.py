@@ -221,7 +221,7 @@ def syntax_variables(p):
         "terminal-selection-background-color": c["selection"], "terminal-selection-text-color": c["fg"],
         "terminal-cursor-color": "#" + p.get("caret", p["gold"]),
         "terminal-result-marker-color": c["searchBg"], "terminal-result-marker-color-selected": c["searchBorder"],
-        "terminal-color-black": c["disabled"], "terminal-color-white": c["op"],
+        "terminal-color-black": c["bgTool"], "terminal-color-white": c["op"],
         **{f"terminal-color-{n}": colour for n, colour in ansi.items()},
         "terminal-color-bright-black": c["muted"], "terminal-color-bright-white": c["fg"],
         **{f"terminal-color-bright-{n}": colour for n, colour in ansi.items()},

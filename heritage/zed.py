@@ -159,8 +159,8 @@ def colours(p):
         # terminal
         "terminal.background": c["bgTool"], "terminal.ansi.background": c["bgTool"],
         "terminal.foreground": c["fg"], "terminal.bright_foreground": c["fg"], "terminal.dim_foreground": c["muted"],
-        "terminal.ansi.black": c["disabled"], "terminal.ansi.bright_black": c["muted"],
-        "terminal.ansi.dim_black": dim("disabled"),
+        "terminal.ansi.black": c["bgTool"], "terminal.ansi.bright_black": c["muted"],
+        "terminal.ansi.dim_black": dim("bgTool"),
         "terminal.ansi.white": c["op"], "terminal.ansi.bright_white": c["fg"], "terminal.ansi.dim_white": c["muted"],
         **{f"terminal.ansi.{name}": colour for name, colour in ansi.items()},
         **{f"terminal.ansi.bright_{name}": colour for name, colour in ansi.items()},

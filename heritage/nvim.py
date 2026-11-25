@@ -271,8 +271,10 @@ def highlights(p):
 
 
 def terminal(p):
-    """The 16 colours of Neovim's terminal, as the Zed theme gives them."""
-    normal = [p["disabled"], *(p["ansi" + n] for n in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan")), p["op"]]
+    """The 16 colours of Neovim's terminal, as the Zed theme gives them. Black is bgTool, the terminal's background in
+    the other apps, so that black text on any of the other colours, as lazygit draws search matches, keeps the 4.5:1
+    that the build holds them to on bgTool; bright black is muted, for faint text."""
+    normal = [p["bgTool"], *(p["ansi" + n] for n in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan")), p["op"]]
     bright = [p["muted"], *normal[1:7], p["fg"]]
     return ["#" + v for v in normal + bright]
 

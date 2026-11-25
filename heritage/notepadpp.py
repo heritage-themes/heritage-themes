@@ -37,7 +37,7 @@ USER = {1: ("type", ""), 2: ("call", ""), 3: ("field", ""), 4: ("constant", "bol
         6: ("typeParam", "italic"), 7: ("label", "bold"), 8: ("param", "italic")}
 # Terminal colours, as heritage.nvim gives them, for the lexers that show ANSI escape sequences in colour: the eight
 # normal colours, and the bright ones, which differ only for black and white.
-TERMINAL = {"BLACK": "disabled", "RED": "ansiRed", "GREEN": "ansiGreen", "YELLOW": "ansiYellow", "BLUE": "ansiBlue",
+TERMINAL = {"BLACK": "bgTool", "RED": "ansiRed", "GREEN": "ansiGreen", "YELLOW": "ansiYellow", "BLUE": "ansiBlue",
             "MAGENTA": "ansiMagenta", "CYAN": "ansiCyan", "WHITE": "op"}
 BRIGHT = dict(TERMINAL, BLACK="muted", WHITE="fg")
 # The 16 colours of the ErrorList lexer by their names there.

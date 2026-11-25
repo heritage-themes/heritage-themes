@@ -75,10 +75,13 @@ def colours(p):
 
 def standard_pairs(p):
     """(element, text colour, background, minimum contrast) that every terminal emulator draws: text, the ANSI colours
-    but black, which colours backgrounds and faint text, the cursor, the selection and search matches."""
+    but black, which is a background, black text on the red to cyan ones, as programs draw highlights, the cursor, the
+    selection and search matches."""
     c = colours(p)
     return [("text", c["fg"], c["bg"], 4.5), ("bright text", c["bright_fg"], c["bg"], 4.5),
             *((f"colour {i}", colour, c["bg"], 4.5) for i, colour in enumerate(c["ansi"]) if i != 0),
+            *((f"black on colour {i}", c["ansi"][0], colour, 4.5) for i, colour in enumerate(c["ansi"])
+              if i % 8 in range(1, 7)),
             ("cursor", c["cursor"], c["bg"], 3), ("text under the cursor", c["cursor_text"], c["cursor"], 3),
             ("selection", c["selection_fg"], c["selection_bg"], 4.5), ("search match", c["match_fg"], c["match_bg"], 4.5),
             ("focused search match", c["focused_match_fg"], c["focused_match_bg"], 4.5), ("link", c["link"], c["bg"], 4.5)]

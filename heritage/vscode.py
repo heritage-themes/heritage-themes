@@ -264,7 +264,7 @@ def workbench(p):
         "panelInput.border": c["border"], "outputView.background": c["bgTool"],
         "terminal.background": c["bgTool"], "terminal.foreground": c["fg"],
         "terminal.selectionBackground": c["selection"], "terminalCursor.foreground": "#" + p.get("caret", p["gold"]),
-        "terminal.ansiBlack": c["disabled"], "terminal.ansiBrightBlack": c["muted"],
+        "terminal.ansiBlack": c["bgTool"], "terminal.ansiBrightBlack": c["muted"],
         "terminal.ansiWhite": c["op"], "terminal.ansiBrightWhite": c["fg"],
         **{f"terminal.ansi{bright}{k}": c["ansi" + k] for k in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan")
            for bright in ("", "Bright")},
