@@ -21,7 +21,7 @@ INK = dict(
     braceBg="2F4A3E", todo="E9B949",
     added="6E9C5A", modified="4F93A8", deleted="A54A3E",
     diffIns="1E2C21", diffMod="1C2C31", diffDel="352021", diffConf="352E1C", fileYellow="29271C",
-    ansiRed="F0643F", ansiGreen="A3B47E", ansiYellow="E9B949", ansiBlue="4FB3C9", ansiMagenta="CFA3C0", ansiCyan="7FC4B6",
+    ansiRed="FF825F", ansiGreen="A3B47E", ansiYellow="E9B949", ansiBlue="4FB3C9", ansiMagenta="CFA3C0", ansiCyan="7FC4B6",
 )
 PAPER = dict(
     name="Danqing Paper (Light)", dark=False, parent="Default",
@@ -38,7 +38,7 @@ PAPER = dict(
     braceBg="C8E0CF", todo="7E5500",
     added="5E9A5A", modified="4F8FA8", deleted="C0574B",
     diffIns="DDEBD6", diffMod="D7E6EA", diffDel="F2D8D2", diffConf="EFE2BF", fileYellow="E6DBBA",
-    ansiRed="B32D1E", ansiGreen="4A6526", ansiYellow="7E5500", ansiBlue="0F6680", ansiMagenta="7A3F6A", ansiCyan="0E6A62",
+    ansiRed="B22C1E", ansiGreen="4A6526", ansiYellow="7E5500", ansiBlue="0F6680", ansiMagenta="7A3F6A", ansiCyan="0E6A62",
 )
 
 FAMILY = "Danqing"

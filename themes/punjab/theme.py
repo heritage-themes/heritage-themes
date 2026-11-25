@@ -41,7 +41,7 @@ BASANT = dict(
     braceBg="CDE6C2", todo="7A5200",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
     diffIns="E1EECD", diffMod="DCE6F2", diffDel="FDE4DA", diffConf="F2E4B4", fileYellow="F4E4A9",
-    ansiRed="B0202E", ansiGreen="3A7018", ansiYellow="7A5200", ansiBlue="1F55A8", ansiMagenta="A3207A", ansiCyan="00756E",
+    ansiRed="B0202E", ansiGreen="3A7018", ansiYellow="7A5200", ansiBlue="1F55A8", ansiMagenta="A3207A", ansiCyan="00706A",
 )
 
 FAMILY = "Punjab"

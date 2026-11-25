@@ -21,7 +21,7 @@ NIGHT = dict(
     braceBg="2E4A3B", todo="F5C842",
     added="5FAE6A", modified="5C8FD6", deleted="C0506A",
     diffIns="1E2F23", diffMod="1E2639", diffDel="3B1E29", diffConf="3A311C", fileYellow="2D2714",
-    ansiRed="FF5468", ansiGreen="93D38C", ansiYellow="F5C842", ansiBlue="72AAF6", ansiMagenta="F2669C", ansiCyan="4FD0C2",
+    ansiRed="FF6774", ansiGreen="93D38C", ansiYellow="F5C842", ansiBlue="72AAF6", ansiMagenta="F6699F", ansiCyan="4FD0C2",
 )
 DAY = dict(
     name="Holi Day", dark=False, parent="Default",
@@ -38,7 +38,7 @@ DAY = dict(
     braceBg="CDEBCF", todo="855800",
     added="5FA866", modified="6A8FD0", deleted="D0617A",
     diffIns="E4F5E0", diffMod="DFE8F7", diffDel="FFEBF0", diffConf="F7EAC6", fileYellow="FBF2D6",
-    ansiRed="D0213A", ansiGreen="2E7A32", ansiYellow="855800", ansiBlue="1A5FB4", ansiMagenta="C2185B", ansiCyan="00756A",
+    ansiRed="C20831", ansiGreen="226F28", ansiYellow="845800", ansiBlue="1A5FB4", ansiMagenta="BD0F57", ansiCyan="006D63",
 )
 
 FAMILY = "Holi"

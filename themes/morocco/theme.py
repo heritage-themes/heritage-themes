@@ -22,7 +22,7 @@ MAJORELLE = dict(
     braceBg="224760", todo="F6C945",
     added="5FBF86", modified="6A8FFF", deleted="E0607A",
     diffIns="0D404B", diffMod="27399B", diffDel="5A2150", diffConf="4A4428", fileYellow="2A2C4F",
-    ansiRed="FF7A8A", ansiGreen="86E0A0", ansiYellow="F6C945", ansiBlue="8FB0FF", ansiMagenta="FF8FBF", ansiCyan="4FE0D4",
+    ansiRed="FF909A", ansiGreen="86E0A0", ansiYellow="F6C945", ansiBlue="8FB0FF", ansiMagenta="FF8FBF", ansiCyan="4FE0D4",
 )
 MARRAKECH = dict(
     name="Morocco Marrakech (Dark)", dark=True, parent="Darcula",

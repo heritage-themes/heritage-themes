@@ -23,7 +23,7 @@ SADZA = dict(
     braceBg="25402C", todo="EAD06C",
     added="6FAE68", modified="5E98D6", deleted="C8605A",
     diffIns="1C3020", diffMod="1A2A3C", diffDel="3E211C", diffConf="3A3218", fileYellow="26241E",
-    ansiRed="F07E70", ansiGreen="95D27E", ansiYellow="EAD06C", ansiBlue="7FB0F5", ansiMagenta="D795D8", ansiCyan="6DCFD8",
+    ansiRed="F48173", ansiGreen="95D27E", ansiYellow="EAD06C", ansiBlue="7FB0F5", ansiMagenta="D795D8", ansiCyan="6DCFD8",
 )
 WAPNO = dict(
     name="Zalipie Wapno (Light)", dark=False, parent="Default",

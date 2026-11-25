@@ -20,7 +20,7 @@ NIGHT = dict(
     braceBg="3A4A3A", todo="E2B84C",
     added="4C8A57", modified="5878B0", deleted="9A4A44",
     diffIns="1A2C19", diffMod="1D2840", diffDel="3A1E22", diffConf="3A3020", fileYellow="1F2028",
-    ansiRed="E8705F", ansiGreen="8CC88E", ansiYellow="E8BE52", ansiBlue="7EA8F2", ansiMagenta="C59BE3", ansiCyan="45BFC8",
+    ansiRed="F77D6B", ansiGreen="8CC88E", ansiYellow="E8BE52", ansiBlue="7EA8F2", ansiMagenta="C59BE3", ansiCyan="45BFC8",
 )
 DAY = dict(
     name="Wuxing Day", dark=False, parent="Default",
@@ -37,7 +37,7 @@ DAY = dict(
     braceBg="CFE6CF", todo="8A5E00",
     added="6AA672", modified="6C8CC4", deleted="C46A60",
     diffIns="E2F0DC", diffMod="DDE6F4", diffDel="FBE2DE", diffConf="F3E6C4", fileYellow="F0E9D6",
-    ansiRed="B0362B", ansiGreen="2A7244", ansiYellow="7A5200", ansiBlue="2456B4", ansiMagenta="7B3FA6", ansiCyan="0A727E",
+    ansiRed="AE352A", ansiGreen="256D40", ansiYellow="7A5200", ansiBlue="2456B4", ansiMagenta="7B3FA6", ansiCyan="006A76",
 )
 
 FAMILY = "Wuxing"

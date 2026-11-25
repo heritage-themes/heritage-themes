@@ -22,7 +22,7 @@ NZIMA = dict(
     braceBg="2A4258", todo="F2CF5A",
     added="6FAE68", modified="5E8EE0", deleted="C8605A",
     diffIns="19291C", diffMod="1A2636", diffDel="361C1E", diffConf="36311A", fileYellow="1C1C19",
-    ansiRed="F07E70", ansiGreen="8CD47E", ansiYellow="F2CF5A", ansiBlue="7CB4F2", ansiMagenta="E08ADA", ansiCyan="6DCFD8",
+    ansiRed="F38173", ansiGreen="8CD47E", ansiYellow="F2CF5A", ansiBlue="7CB4F2", ansiMagenta="E08ADA", ansiCyan="6DCFD8",
 )
 MHLOPHE = dict(
     name="Ndebele Mhlophe (Light)", dark=False, parent="Default", kwBold=True,

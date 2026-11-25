@@ -23,7 +23,7 @@ NIGHT = dict(
     braceBg="2D4636", todo="E8C25E",
     added="6BA36A", modified="6878D0", deleted="B5574A",
     diffIns="1E2E22", diffMod="1F2340", diffDel="37201C", diffConf="383019", fileYellow="2D2617",
-    ansiRed="F2785C", ansiGreen="7CCBA6", ansiYellow="E8C25E", ansiBlue="8E9CFA", ansiMagenta="E592B4", ansiCyan="7CC6E6",
+    ansiRed="F3795D", ansiGreen="7CCBA6", ansiYellow="E8C25E", ansiBlue="8E9CFA", ansiMagenta="E592B4", ansiCyan="7CC6E6",
 )
 WASLI = dict(
     name="Mughal Wasli (Light)", dark=False, parent="Default",
@@ -40,7 +40,7 @@ WASLI = dict(
     braceBg="CDE4D6", todo="7A5800",
     added="5E9A5A", modified="5868C0", deleted="C0574B",
     diffIns="DEECD7", diffMod="DADFF4", diffDel="FDE2DC", diffConf="EFE2BF", fileYellow="F5E8C4",
-    ansiRed="B0301E", ansiGreen="1E6E55", ansiYellow="7A5800", ansiBlue="2B3BA6", ansiMagenta="992D82", ansiCyan="136A8F",
+    ansiRed="B0301E", ansiGreen="1C6C54", ansiYellow="7A5800", ansiBlue="2B3BA6", ansiMagenta="992D82", ansiCyan="0A678B",
 )
 
 FAMILY = "Mughal"

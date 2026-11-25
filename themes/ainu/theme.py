@@ -25,7 +25,7 @@ KAPARAMIP = dict(
     braceBg="34406A", todo="EE705E",
     added="7FB070", modified="6A90D8", deleted="D0605A",
     diffIns="162521", diffMod="1C2640", diffDel="371924", diffConf="38341C", fileYellow="181E30",
-    ansiRed="F07E6E", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
+    ansiRed="F78474", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 ATTUS = dict(
     name="Ainu Attus (Light)", dark=False, parent="Default", kwBold=True,
@@ -42,7 +42,7 @@ ATTUS = dict(
     braceBg="CCD2E6", todo="B0281C",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
     diffIns="DCE8C8", diffMod="D6DEEC", diffDel="F5D7D1", diffConf="ECDDB0", fileYellow="EAE2CF",
-    ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
+    ansiRed="A3201E", ansiGreen="2B6925", ansiYellow="795700", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="006674",
 )
 
 FAMILY = "Ainu"

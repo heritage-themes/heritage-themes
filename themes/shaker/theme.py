@@ -23,7 +23,7 @@ PRUSSIAN = dict(
     braceBg="2E4A60", todo="E8D06A",
     added="7FB070", modified="6A9AD8", deleted="D0605A",
     diffIns="17291E", diffMod="182A40", diffDel="34191C", diffConf="342E16", fileYellow="13202C",
-    ansiRed="F07E6E", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
+    ansiRed="FD8A79", ansiGreen="8CC878", ansiYellow="EECC5A", ansiBlue="82AEF0", ansiMagenta="E38ED4", ansiCyan="6CCCD0",
 )
 PLASTER = dict(
     name="Shaker Plaster (Light)", dark=False, parent="Default", kwBold=True,

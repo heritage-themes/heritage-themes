@@ -23,7 +23,7 @@ BLUE = dict(
     braceBg="2A4A40", todo="F2C75C",
     added="68A860", modified="4F9BD8", deleted="C0564A",
     diffIns="18302A", diffMod="15304A", diffDel="3A2028", diffConf="383218", fileYellow="283236",
-    ansiRed="F2707A", ansiGreen="8FD47A", ansiYellow="F2C75C", ansiBlue="6CC0FF", ansiMagenta="E486D9", ansiCyan="4FD6C8",
+    ansiRed="FF8B91", ansiGreen="8FD47A", ansiYellow="F2C75C", ansiBlue="6CC0FF", ansiMagenta="EA8CDF", ansiCyan="4FD6C8",
 )
 PINK = dict(
     name="Rajasthan Pink City (Light)", dark=False, parent="Default",
@@ -40,7 +40,7 @@ PINK = dict(
     braceBg="CFE8C8", todo="7F5800",
     added="5FA05A", modified="5A8AD0", deleted="C85A5A",
     diffIns="E0F0D8", diffMod="DCE7F5", diffDel="F8DADA", diffConf="F5E6C2", fileYellow="F5DEBD",
-    ansiRed="B3203F", ansiGreen="337012", ansiYellow="7F5800", ansiBlue="1D62B0", ansiMagenta="A3207F", ansiCyan="056F64",
+    ansiRed="B3203F", ansiGreen="306D0F", ansiYellow="7F5800", ansiBlue="1860AE", ansiMagenta="A3207F", ansiCyan="006C62",
 )
 
 FAMILY = "Rajasthan"

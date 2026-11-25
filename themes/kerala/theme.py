@@ -23,7 +23,7 @@ BACKWATERS = dict(
     braceBg="3A5530", todo="E3B84A",
     added="6BB070", modified="5B98D0", deleted="C25A4E",
     diffIns="1A3524", diffMod="162F3A", diffDel="3A2220", diffConf="38341A", fileYellow="222C19",
-    ansiRed="F27560", ansiGreen="A8D67A", ansiYellow="EDCB5E", ansiBlue="6CB8F5", ansiMagenta="EC8EBA", ansiCyan="4FD1CC",
+    ansiRed="FF8670", ansiGreen="A8D67A", ansiYellow="EDCB5E", ansiBlue="6CB8F5", ansiMagenta="EC8EBA", ansiCyan="4FD1CC",
 )
 KASAVU = dict(
     name="Kerala Kasavu (Light)", dark=False, parent="Default",
@@ -40,7 +40,7 @@ KASAVU = dict(
     braceBg="CDE8CF", todo="7A5A00",
     added="5FA060", modified="5A8CC8", deleted="C85A5A",
     diffIns="E1F1DB", diffMod="DCE8F4", diffDel="FFE7E7", diffConf="F5E8C4", fileYellow="F7EBC4",
-    ansiRed="B0203A", ansiGreen="3A791E", ansiYellow="7A5A00", ansiBlue="1060A8", ansiMagenta="9C3A8A", ansiCyan="007876",
+    ansiRed="B0203A", ansiGreen="347318", ansiYellow="7A5A00", ansiBlue="1060A8", ansiMagenta="9C3A8A", ansiCyan="007170",
 )
 
 FAMILY = "Kerala"

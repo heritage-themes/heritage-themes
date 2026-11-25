@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- The terminal colours keep WCAG AA contrast on the selection, in focused and unfocused views. In 40 themes the red, green, yellow, blue, magenta or cyan that fell short is a shade lighter in dark themes or darker in light ones, with its hue kept.
+
 ## [1.11.0] - 2026-11-12
 
 ### Added

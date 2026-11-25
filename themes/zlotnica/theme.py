@@ -22,7 +22,7 @@ AKSAMIT = dict(
     braceBg="2A4A3A", todo="E8C35E",
     added="72B07A", modified="6E9CD2", deleted="CF6A6A",
     diffIns="183424", diffMod="172C38", diffDel="38202A", diffConf="35311A", fileYellow="1C2A1E",
-    ansiRed="F08080", ansiGreen="8FD496", ansiYellow="E8C35E", ansiBlue="8DB4F0", ansiMagenta="DA9AD8", ansiCyan="74D0D0",
+    ansiRed="F48383", ansiGreen="8FD496", ansiYellow="E8C35E", ansiBlue="8DB4F0", ansiMagenta="DA9AD8", ansiCyan="74D0D0",
 )
 PLOTNO = dict(
     name="Złotnica Płótno (Light)", dark=False, parent="Default", kwBold=True,

@@ -39,7 +39,7 @@ RANN = dict(
     braceBg="CDE8CF", todo="7A5800",
     added="5FA05A", modified="5A80D0", deleted="C85A5A",
     diffIns="E4F4DE", diffMod="DCE6F5", diffDel="FFEBEC", diffConf="F5E8C4", fileYellow="F5EED2",
-    ansiRed="B0202A", ansiGreen="2E7A1E", ansiYellow="7A5800", ansiBlue="1A5FA8", ansiMagenta="B0206A", ansiCyan="00756E",
+    ansiRed="B0202A", ansiGreen="277418", ansiYellow="7A5800", ansiBlue="1A5FA8", ansiMagenta="B0206A", ansiCyan="00726B",
 )
 
 FAMILY = "Gujarat"

@@ -22,7 +22,7 @@ KULLI = dict(
     braceBg="005559", todo="F4D660",
     added="79C77C", modified="73B0EE", deleted="EF7E80",
     diffIns="074029", diffMod="1E3761", diffDel="5D192E", diffConf="4E3A06", fileYellow="4B1F34",
-    ansiRed="FF7E76", ansiGreen="93E195", ansiYellow="F4D660", ansiBlue="80BDFB", ansiMagenta="F19FD6", ansiCyan="73DFDF",
+    ansiRed="FF9990", ansiGreen="93E195", ansiYellow="F4D660", ansiBlue="80BDFB", ansiMagenta="F19FD6", ansiCyan="73DFDF",
 )
 PUKA = dict(
     name="Peru Puka (Dark)", dark=True, parent="Darcula",
@@ -39,7 +39,7 @@ PUKA = dict(
     braceBg="1D676A", todo="97ED9A",
     added="79C77C", modified="73B0EE", deleted="FDA1A0",
     diffIns="1C5038", diffMod="2D4772", diffDel="54002E", diffConf="5F4A1A", fileYellow="6C1B30",
-    ansiRed="FF9E96", ansiGreen="97ED9A", ansiYellow="F4E382", ansiBlue="92C9FF", ansiMagenta="E8B6F3", ansiCyan="7AE6E5",
+    ansiRed="FFAFA7", ansiGreen="97ED9A", ansiYellow="F4E382", ansiBlue="92C9FF", ansiMagenta="E8B6F3", ansiCyan="7AE6E5",
 )
 
 FAMILY = "Peru"

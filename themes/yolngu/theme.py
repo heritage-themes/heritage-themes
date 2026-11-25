@@ -23,7 +23,7 @@ GALAWU = dict(
     braceBg="4E3A2A", todo="EAD072",
     added="7FAE60", modified="6A90C8", deleted="C8605A",
     diffIns="192412", diffMod="1E2432", diffDel="371715", diffConf="3A3018", fileYellow="241B15",
-    ansiRed="F07E6E", ansiGreen="8CC878", ansiYellow="F0CC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
+    ansiRed="F27F6F", ansiGreen="8CC878", ansiYellow="F0CC5A", ansiBlue="82AEF0", ansiMagenta="DE8AD0", ansiCyan="6CCCD0",
 )
 GAPAN = dict(
     name="Yolŋu Gapaṉ (Light)", dark=False, parent="Default",
@@ -40,7 +40,7 @@ GAPAN = dict(
     braceBg="E2C8AA", todo="A8281C",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
     diffIns="DDEACB", diffMod="D8E2EE", diffDel="FADEDA", diffConf="EEE0B4", fileYellow="ECE8E0",
-    ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
+    ansiRed="A3201E", ansiGreen="2C6A26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="036775",
 )
 
 FAMILY = "Yolŋu"

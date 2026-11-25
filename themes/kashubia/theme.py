@@ -23,7 +23,7 @@ ZEMIA = dict(
     braceBg="25402C", todo="E6C35C",
     added="6FAE68", modified="5E98D6", deleted="C8605A",
     diffIns="1C3020", diffMod="1A2A3C", diffDel="3E211C", diffConf="3A3218", fileYellow="29241A",
-    ansiRed="F07E70", ansiGreen="95D27E", ansiYellow="E6C35C", ansiBlue="7FB0F5", ansiMagenta="D795D8", ansiCyan="6DCFD8",
+    ansiRed="F38173", ansiGreen="95D27E", ansiYellow="E6C35C", ansiBlue="7FB0F5", ansiMagenta="D795D8", ansiCyan="6DCFD8",
 )
 NIEBO = dict(
     name="Kashubia Niebò (Light)", dark=False, parent="Default",

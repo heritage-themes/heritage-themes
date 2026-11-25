@@ -22,7 +22,7 @@ INDIGO = dict(
     braceBg="2C4A44", todo="EAB84A",
     added="6A9E64", modified="5E82C8", deleted="B0544A",
     diffIns="1A2E2A", diffMod="1B2645", diffDel="36202A", diffConf="35301E", fileYellow="262A30",
-    ansiRed="EE7A63", ansiGreen="A9C47F", ansiYellow="EAC46A", ansiBlue="93AAEB", ansiMagenta="DE8FB0", ansiCyan="6EC6B6",
+    ansiRed="F9846C", ansiGreen="A9C47F", ansiYellow="EAC46A", ansiBlue="93AAEB", ansiMagenta="DE8FB0", ansiCyan="6EC6B6",
 )
 COTTON = dict(
     name="Kalamkari Cotton (Light)", dark=False, parent="Default",
@@ -39,7 +39,7 @@ COTTON = dict(
     braceBg="CFE0C8", todo="745200",
     added="5E9450", modified="4F6FB0", deleted="B8503E",
     diffIns="DCE8CF", diffMod="D8DFEF", diffDel="F3D7CD", diffConf="EEE0BA", fileYellow="EEDEB1",
-    ansiRed="A3301F", ansiGreen="46672A", ansiYellow="745200", ansiBlue="27408A", ansiMagenta="892C5A", ansiCyan="1D6B63",
+    ansiRed="A3301F", ansiGreen="446528", ansiYellow="745200", ansiBlue="27408A", ansiMagenta="892C5A", ansiCyan="18675F",
 )
 
 FAMILY = "Kalamkari"

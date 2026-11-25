@@ -23,7 +23,7 @@ BALUCHARI = dict(
     braceBg="2E4A3A", todo="F2C94C",
     added="68AC66", modified="6A8FDC", deleted="C85060",
     diffIns="1E3122", diffMod="1F2440", diffDel="3E1A22", diffConf="3B321A", fileYellow="372221",
-    ansiRed="FF6B5E", ansiGreen="A6D17E", ansiYellow="F2C94C", ansiBlue="7EA6FF", ansiMagenta="E58AD0", ansiCyan="5CCFBE",
+    ansiRed="FF6E61", ansiGreen="A6D17E", ansiYellow="F2C94C", ansiBlue="7EA6FF", ansiMagenta="E58AD0", ansiCyan="5CCFBE",
 )
 LAAL_PAAR = dict(
     name="Bengal Laal Paar (Light)", dark=False, parent="Default",
@@ -40,7 +40,7 @@ LAAL_PAAR = dict(
     braceBg="CFE8CC", todo="7E5A00",
     added="5FA05A", modified="5A80D0", deleted="C85A5A",
     diffIns="E8F7E2", diffMod="DFE6F7", diffDel="FFEEED", diffConf="F6E8C4", fileYellow="F9F0D2",
-    ansiRed="C0202A", ansiGreen="3C7A22", ansiYellow="7E5A00", ansiBlue="2847B0", ansiMagenta="A0287E", ansiCyan="00786A",
+    ansiRed="BE1E29", ansiGreen="306F17", ansiYellow="7E5A00", ansiBlue="2847B0", ansiMagenta="A0287E", ansiCyan="006E61",
 )
 
 FAMILY = "Bengal"

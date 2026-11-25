@@ -23,7 +23,7 @@ KOLAM = dict(
     braceBg="2D4A3A", todo="EBC35A",
     added="68AC66", modified="5B98D0", deleted="C25A5A",
     diffIns="1A3324", diffMod="182C3A", diffDel="3C2024", diffConf="38331A", fileYellow="2A281B",
-    ansiRed="EE6E80", ansiGreen="9CD86A", ansiYellow="EBC35A", ansiBlue="7AA8F5", ansiMagenta="D98AE0", ansiCyan="45C6D6",
+    ansiRed="FD7C8D", ansiGreen="9CD86A", ansiYellow="EBC35A", ansiBlue="7AA8F5", ansiMagenta="D98AE0", ansiCyan="45C6D6",
 )
 OLAI = dict(
     name="Tamil Olai (Light)", dark=False, parent="Default",

@@ -40,7 +40,7 @@ QASAB = dict(
     braceBg="DCD0A8", todo="AF451A",
     added="5E9A50", modified="4F7FC0", deleted="C05050",
     diffIns="E0E9C7", diffMod="DCE0E2", diffDel="FAE0D4", diffConf="EEDDA8", fileYellow="F0E9D3",
-    ansiRed="A3201E", ansiGreen="2D6B26", ansiYellow="7A5800", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="0A6A78",
+    ansiRed="A3201E", ansiGreen="2B6925", ansiYellow="785600", ansiBlue="1F55A8", ansiMagenta="8E2A90", ansiCyan="006674",
 )
 
 FAMILY = "Mudhif"

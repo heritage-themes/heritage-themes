@@ -22,7 +22,7 @@ KACHI = dict(
     braceBg="233F5B", todo="C1DCEB",
     added="5D9669", modified="5B8ABB", deleted="B75B55",
     diffIns="011E14", diffMod="0F2336", diffDel="2F1010", diffConf="2E220B", fileYellow="1D190F",
-    ansiRed="E66E68", ansiGreen="73BB83", ansiYellow="DCBA5C", ansiBlue="73A9E1", ansiMagenta="CC8BC5", ansiCyan="60BFC4",
+    ansiRed="EF766F", ansiGreen="73BB83", ansiYellow="DCBA5C", ansiBlue="73A9E1", ansiMagenta="CC8BC5", ansiCyan="60BFC4",
 )
 KAMENOZOKI = dict(
     name="Aizome Kamenozoki (Light)", dark=False, parent="Default", kwBold=False,
@@ -39,7 +39,7 @@ KAMENOZOKI = dict(
     braceBg="B9D1E7", todo="111F37",
     added="579766", modified="4F7EAE", deleted="BB5752",
     diffIns="D5EFE0", diffMod="D3E6F6", diffDel="FFE2E1", diffConf="F2E3C3", fileYellow="EFEBDD",
-    ansiRed="AC3031", ansiGreen="246E3A", ansiYellow="7D5E07", ansiBlue="255691", ansiMagenta="793974", ansiCyan="086A73",
+    ansiRed="AA2E30", ansiGreen="1F6936", ansiYellow="755800", ansiBlue="255691", ansiMagenta="793974", ansiCyan="00666F",
 )
 
 FAMILY = "Aizome"
