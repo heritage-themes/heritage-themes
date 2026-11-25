@@ -266,12 +266,23 @@ def sublime_tokens(family):
         return out
 
 
+def venv_version(venv):
+    """The (major, minor) Python version that made the venv, as its pyvenv.cfg records it, or None."""
+    try:
+        with open(os.path.join(venv, "pyvenv.cfg"), encoding="utf-8") as f:
+            match = re.search(r"^version(?:_info)?\s*=\s*(\d+)\.(\d+)", f.read(), re.MULTILINE)
+    except OSError:
+        return None
+    return (int(match[1]), int(match[2])) if match else None
+
+
 def venv_python(folder, module):
-    """The Python of folder/.venv, created with folder/requirements.txt installed when module does not import."""
+    """The Python of folder/.venv, created with folder/requirements.txt installed when module does not import. A venv
+    made by another Python version is made again, as its packages, some of them compiled, belong to that version."""
     venv = os.path.join(folder, ".venv")
     python = os.path.join(venv, "Scripts" if os.name == "nt" else "bin", "python")
-    if not os.path.isfile(python):
-        subprocess.run([sys.executable, "-m", "venv", venv], check=True)
+    if not os.path.isfile(python) or venv_version(venv) != sys.version_info[:2]:
+        subprocess.run([sys.executable, "-m", "venv", "--clear", venv], check=True)
     # -I keeps the working directory off the path: the product folders of this repository, such as pygments/, would
     # import as namespace packages
     if subprocess.run([python, "-I", "-c", f"import {module}"], capture_output=True).returncode:
