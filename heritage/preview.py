@@ -432,13 +432,21 @@ pre div{{padding:0 12px 0 0;white-space:pre}}
 
 def screen_html(rows, p):
     """A terminal screen that scripts/terminals/shells.py read, as HTML: the terminal's default colours stand for the
-    theme's text and background, as in a terminal that runs the theme. Trailing empty rows are left out."""
+    theme's text and background, as in a terminal that runs the theme. Trailing empty rows are left out. Each character
+    beyond ASCII sits in a cell one character wide, or two for a wide character, which pyte follows with an empty cell,
+    as a terminal draws it, so a glyph that a fallback font draws wider or narrower, such as the braille of btop's
+    graphs, does not shift the rest of its row."""
     while rows and not "".join(cell[0] for cell in rows[-1]).strip():
         rows = rows[:-1]
     out = []
     for row in rows:
         spans, last = [], None
-        for char, fg, bg, bold, italic, underline in row:
+        for x, (char, fg, bg, bold, italic, underline) in enumerate(row):
+            if ord(char[:1] or "\0") > 0x7F:
+                wide = " wide" if x + 1 < len(row) and row[x + 1][0] == "" else ""
+                char = f'<i class="cell{wide}">{html.escape(char)}</i>'
+            else:
+                char = html.escape(char)
             fg = "#" + p["fg"] if fg == "default" else fg
             bg = "#" + p["bg"] if bg == "default" else bg
             css = (f"color:{fg};background:{bg}" + (";font-weight:700" if bold else "")
@@ -448,7 +456,7 @@ def screen_html(rows, p):
             else:
                 spans.append([css, char])
                 last = css
-        out.append("".join(f'<span style="{css}">{html.escape(text)}</span>' for css, text in spans))
+        out.append("".join(f'<span style="{css}">{text}</span>' for css, text in spans))
     return "\n".join(out)
 
 
@@ -493,6 +501,7 @@ figcaption{{font-size:12px;color:var(--muted);margin:0 0 4px}}
 img{{display:block;max-width:100%;height:auto;border-radius:6px}}
 pre{{margin:0;padding:8px;border-radius:6px;overflow:hidden;width:max-content;max-width:100%;box-sizing:border-box;
   font:12px/1.4 "JetBrains Mono","Symbols Nerd Font Mono",ui-monospace,monospace}}
+pre .cell{{display:inline-block;width:1ch;font-style:inherit;text-align:center}} pre .wide{{width:2ch}}
 figure.screen{{grid-column:1/-1}}
 section.fit{{width:max-content;max-width:100%;box-sizing:border-box}} .fit .grid{{grid-template-columns:auto}}
 </style></head><body>
