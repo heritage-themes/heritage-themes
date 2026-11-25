@@ -455,7 +455,8 @@ def screen_html(rows, p):
 def terminals_page(family, results, title="Terminals", wide=True):
     """The terminals preview page, or with title another app's page drawn the same way: per theme, (app, image path
     relative to the page, or screen rows) per app or sample. Screens span the page when wide, and share a row of two
-    otherwise, as an editor's narrower screens do."""
+    otherwise, as an editor's narrower screens do. A theme whose cards are all wide screens is as wide as its screens,
+    so that the frame leaves no empty band beside them."""
     faces = "".join(
         f'@font-face{{font-family:"JetBrains Mono";font-weight:{w};font-style:{s};'
         f'src:url("{FONT_DIR}/JetBrainsMono-{n}.woff2") format("woff2"),local("JetBrains Mono")}}' for n, w, s in FONTS)
@@ -471,7 +472,8 @@ def terminals_page(family, results, title="Terminals", wide=True):
                     if image else f'<pre style="background:#{p["bg"]};color:#{p["fg"]}">{screen_html(rows, p)}</pre>')
             kind = "" if image or not wide else ' class="screen"'
             cards.append(f'<figure{kind}><figcaption>{html.escape(app)}</figcaption>{body}</figure>')
-        sections.append(f"""<section style="--frame:#{p['frame']};--fg:#{p['fg']};--muted:#{p['muted']};\
+        fit = ' class="fit"' if wide and all(not image for _, image, _ in apps) else ""
+        sections.append(f"""<section{fit} style="--frame:#{p['frame']};--fg:#{p['fg']};--muted:#{p['muted']};\
 --border:#{p['border']}"><div class="bar"><b>{html.escape(p['name'])}</b><span class="swatches">{swatches}</span>\
 </div><div class="grid">{''.join(cards)}</div></section>""")
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">\
@@ -492,6 +494,7 @@ img{{display:block;max-width:100%;height:auto;border-radius:6px}}
 pre{{margin:0;padding:8px;border-radius:6px;overflow:hidden;width:max-content;max-width:100%;box-sizing:border-box;
   font:12px/1.4 "JetBrains Mono","Symbols Nerd Font Mono",ui-monospace,monospace}}
 figure.screen{{grid-column:1/-1}}
+section.fit{{width:max-content;max-width:100%;box-sizing:border-box}} .fit .grid{{grid-template-columns:auto}}
 </style></head><body>
 {''.join(sections)}
 </body></html>

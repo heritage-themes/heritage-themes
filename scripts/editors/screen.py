@@ -2,13 +2,14 @@
 
 Usage: python3 screen.py EDITOR THEME FILES SAMPLE BACKGROUND FOREGROUND OUT.json
 
-EDITOR is nano, amp, bat or delta, THEME the theme's file name stem, FILES the folder of the editor's generated files, SAMPLE
-the file to open, and BACKGROUND and FOREGROUND the terminal's default colours as #RRGGBB, those of the matching
-Terminals theme. The editor starts in a pseudo-terminal of 256 colours that reports 24-bit colour and answers queries
-for its default colours, in a fresh HOME with the theme installed as its README says, and the screen is read through
-the pyte terminal emulator once the editor has been quiet for QUIET seconds. The output is the screen as rows of cells
-[character, foreground, background, bold, italic, underline]; a colour is #RRGGBB, "default" for the terminal's own,
-or the name pyte gives one of the 16 ANSI colours.
+EDITOR is nano, amp, bat, delta or lazygit, THEME the theme's file name stem, FILES the folder of the editor's generated
+files, SAMPLE the file to open, or for lazygit a file whose name is the view to show (files, commits or search), and
+BACKGROUND and FOREGROUND the terminal's default colours as #RRGGBB, those of the matching Terminals theme. The editor
+starts in a pseudo-terminal of 256 colours that reports 24-bit colour and answers queries for its default colours, in a
+fresh HOME with the theme installed as its README says, and the screen is read through the pyte terminal emulator once
+the editor has been quiet for QUIET seconds after each key that the view needs. The output is the screen as rows of
+cells [character, foreground, background, bold, italic, underline]; a colour is #RRGGBB, "default" for the terminal's
+own, or the name pyte gives one of the 16 ANSI colours.
 """
 import fcntl, json, os, pty, re, select, shutil, signal, struct, subprocess, sys, tempfile, termios, time
 
@@ -17,6 +18,8 @@ import pyte
 COLUMNS, ROWS = 88, 20
 # delta prints a diff and exits: its screen is taller than the longest diff, and the rows below its output are dropped
 DELTA_ROWS = 32
+# lazygit lays out five panels beside the main view and needs a larger screen for them to show their rows
+LAZYGIT_COLUMNS, LAZYGIT_ROWS = 120, 30
 QUIET, TIMEOUT = 1.5, 30
 # a query for the terminal's foreground (OSC 10) or background (OSC 11) colour, ended by BEL or ST
 COLOUR_QUERY = re.compile(rb"\x1b\](1[01]);\?(?:\x07|\x1b\\)")
@@ -25,12 +28,32 @@ CONTROL_STRING = re.compile(rb"\x1b(?:\](?![012];)|[P_^X])[^\x07\x1b]*(?:\x07|\x
 INCOMPLETE = re.compile(rb"\x1b(?:[\]P_^X][^\x07\x1b]*\x1b?)?$")
 
 
+def indexed(attrs):
+    """Graphic rendition parameters with each of the 16 ANSI colours given by its 256-colour index (38;5;N or 48;5;N,
+    as tcell sends the bright ones) given by its own code instead, so pyte names it as the terminal's colour rather than
+    taking xterm's default RGB for it."""
+    result = []
+    while attrs:
+        if attrs[0] in (38, 48) and len(attrs) >= 3 and attrs[1] == 5 and attrs[2] < 16:
+            base = (30 if attrs[0] == 38 else 40) if attrs[2] < 8 else (90 if attrs[0] == 38 else 100)
+            result.append(base + attrs[2] % 8)
+            attrs = attrs[3:]
+        elif attrs[0] in (38, 48) and len(attrs) >= 2 and attrs[1] in (2, 5):
+            size = 5 if attrs[1] == 2 else 3
+            result += attrs[:size]
+            attrs = attrs[size:]
+        else:
+            result.append(attrs.pop(0))
+    return result
+
+
 class Screen(pyte.Screen):
     """A pyte screen that ignores the private graphic renditions and device status reports with which editors set
-    keyboard modes or query the terminal, rather than failing on them."""
+    keyboard modes or query the terminal, rather than failing on them, and names the 16 ANSI colours however they are
+    sent."""
     def select_graphic_rendition(self, *attrs, private=False):
         if not private:
-            super().select_graphic_rendition(*attrs)
+            super().select_graphic_rendition(*indexed(list(attrs)))
 
     def report_device_status(self, mode, private=False):
         if not private:
@@ -123,7 +146,62 @@ def delta(home, stem, files, sample, background, foreground):
     return ["/usr/bin/git", "diff"]
 
 
-EDITORS = dict(nano=nano, amp=amp, bat=bat, delta=delta)
+def git(home, env, *args):
+    subprocess.run(["/usr/bin/git", *args], cwd=home, env=env, check=True, capture_output=True)
+
+
+# lazygit's view → the keys that show it: the files panel as lazygit opens; the commits panel with the newest commit
+# copied for a cherry-pick and the third marked as the base of a rebase, which lazygit marks with a row of its own, the
+# selection then on the second; and a search of the commits panel, which lazygit draws with the searching border
+LAZYGIT_KEYS = {"files": [], "commits": ["4", "C", "j", "j", "B", "k"], "search": ["4", "/", *"tile", "\r"]}
+
+
+def lazygit(home, stem, files, sample, background, foreground):
+    # the theme in a themes folder of lazygit's configuration folder and listed after config.yml in LG_CONFIG_FILE, as
+    # the README says; config.yml holds settings of the user's own that keep the screen the same on every run. The
+    # repository has commits by two authors, three pushed to a remote and two not, a branch and a tag, and a staged, an
+    # unstaged and an untracked file, so the panels show each kind of row that lazygit colours.
+    env = dict(os.environ, HOME=home, XDG_CONFIG_HOME=f"{home}/.config", GIT_CONFIG_NOSYSTEM="1")
+    config = f"{home}/.config/lazygit"
+    os.makedirs(f"{config}/themes")
+    shutil.copy(f"{files}/{stem}.yml", f"{config}/themes")
+    write(f"{config}/config.yml", "disableStartupPopups: true\nupdate:\n  method: never\ngit:\n  autoFetch: false\n"
+                                  "gui:\n  showRandomTip: false\n  showCommandLog: false\n  timeFormat: 02 Jan 06\n")
+    write(f"{home}/.gitconfig", "[user]\n    name = Ada Weaver\n    email = ada@localhost\n"
+                                "[init]\n    defaultBranch = master\n[advice]\n    detachedHead = false\n")
+    os.remove(sample)
+    repo = f"{home}/repo"
+    os.makedirs(repo)
+    git(repo, env, "init", "-q")
+    git(home, env, "init", "-q", "--bare", "origin.git")
+    def commit(message, path, text, author="Ada Weaver <ada@localhost>", day=1):
+        write(f"{repo}/{path}", text)
+        git(repo, env, "add", path)
+        stamp = f"2026-11-{day:02d}T10:00:00"
+        git(repo, dict(env, GIT_AUTHOR_DATE=stamp, GIT_COMMITTER_DATE=stamp), "commit", "-q", "--author", author,
+            "-m", message)
+    commit("Add the loom pattern", "pattern.py", "WARP = 12\nWEFT = 24\n", day=1)
+    commit("Describe the tiles", "README.md", "# Tiles\n\nGlazed tiles in five colours.\n",
+           "Bilal Potter <bilal@localhost>", day=2)
+    commit("Count the tile colours", "tiles.py", "COLOURS = 5\n", day=3)
+    git(repo, env, "tag", "v1.0")
+    git(repo, env, "remote", "add", "origin", f"{home}/origin.git")
+    git(repo, env, "push", "-q", "-u", "origin", "master")
+    git(repo, env, "switch", "-q", "-c", "feature/glaze")
+    commit("Add a glaze", "glaze.py", "GLAZE = 'cobalt'\n", "Bilal Potter <bilal@localhost>", day=4)
+    git(repo, env, "switch", "-q", "master")
+    commit("Widen the warp", "pattern.py", "WARP = 16\nWEFT = 24\n", day=5)
+    commit("Add a sixth tile colour", "tiles.py", "COLOURS = 6\n", "Bilal Potter <bilal@localhost>", day=6)
+    write(f"{repo}/pattern.py", "WARP = 16\nWEFT = 32\nTWILL = True\n")
+    write(f"{repo}/README.md", "# Tiles\n\nGlazed tiles in six colours.\n")
+    git(repo, env, "add", "README.md")
+    write(f"{repo}/notes.txt", "Fire at 1200 degrees.\n")
+    themes = ",".join(f"{config}/{name}" for name in ("config.yml", f"themes/{stem}.yml"))
+    keys = LAZYGIT_KEYS[os.path.basename(sample)]
+    return ["/usr/bin/env", f"LG_CONFIG_FILE={themes}", "/usr/bin/lazygit", "--path", repo], keys
+
+
+EDITORS = dict(nano=nano, amp=amp, bat=bat, delta=delta, lazygit=lazygit)
 
 
 def colour_reply(code, colour):
@@ -131,19 +209,26 @@ def colour_reply(code, colour):
     return f"\x1b]{code};rgb:" + "/".join(colour[i:i + 2].lower() * 2 for i in (1, 3, 5)) + "\x1b\\"
 
 
-def run(argv, env, background, foreground, rows):
-    screen = Screen(COLUMNS, rows)
+def run(argv, env, background, foreground, rows, columns=COLUMNS, keys=()):
+    """The screen once the program has been quiet for QUIET seconds after each of keys, sent in turn."""
+    keys = list(keys)
+    screen = Screen(columns, rows)
     stream = pyte.ByteStream(screen)
     pid, fd = pty.fork()
     if pid == 0:
         os.chdir(env["HOME"])
         os.execve(argv[0], argv, env)
-    fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", rows, COLUMNS, 0, 0))
+    fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", rows, columns, 0, 0))
     screen.write_process_input = lambda data: os.write(fd, data.encode())
     start = last = time.monotonic()
     pending = b""
     try:
-        while time.monotonic() - last < QUIET and time.monotonic() - start < TIMEOUT:
+        while time.monotonic() - start < TIMEOUT:
+            if time.monotonic() - last >= QUIET:
+                if not keys:
+                    break
+                os.write(fd, keys.pop(0).encode())
+                last = time.monotonic()
             if select.select([fd], [], [], 0.05)[0]:
                 try:
                     pending += os.read(fd, 1 << 16)
@@ -165,7 +250,7 @@ def run(argv, env, background, foreground, rows):
     def colour(value):
         return "#" + value.upper() if re.fullmatch(r"[0-9a-fA-F]{6}", value) else value
     return [[[cell.data, colour(cell.fg), colour(cell.bg), cell.bold, cell.italics, cell.underscore]
-             for cell in (screen.buffer[y][x] for x in range(COLUMNS))] for y in range(rows)]
+             for cell in (screen.buffer[y][x] for x in range(columns))] for y in range(rows)]
 
 
 def main():
@@ -177,7 +262,11 @@ def main():
     shutil.copy(sample, home)
     argv = EDITORS[editor](home, stem, files, os.path.join(home, os.path.basename(sample)), background,
                            foreground)
-    rows = run(argv, env, background, foreground, DELTA_ROWS if editor == "delta" else ROWS)
+    if editor == "lazygit":
+        argv, keys = argv
+        rows = run(argv, env, background, foreground, LAZYGIT_ROWS, LAZYGIT_COLUMNS, keys)
+    else:
+        rows = run(argv, env, background, foreground, DELTA_ROWS if editor == "delta" else ROWS)
     if editor == "delta":
         while rows and all(char == " " and bg == "default" for char, fg, bg, *_ in rows[-1]):
             rows.pop()

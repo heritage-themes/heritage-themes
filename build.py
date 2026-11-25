@@ -102,7 +102,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate",
-           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "delta", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
+           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "delta", "lazygit", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
            "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
@@ -3910,6 +3910,130 @@ def validate_delta(directory, families):
                          {k for k in styles if "comment" in k.split(" (")[0]}, {})
 
 
+def lazygit_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    holi = [next(t for f in families for t in f.THEMES if t["slug"] == slug) for slug in ("HoliNight", "HoliDay")]
+    night, day = (heritage.lazygit.name(t) for t in holi)
+    delta_night, delta_day = (heritage.delta.name(t) for t in holi)
+    return f"""# Heritage Themes for lazygit
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+The themes need [lazygit](https://github.com/jesseduffield/lazygit) 0.66 or later, tested with 0.66.3, in a terminal \
+with 24-bit colour, which runs the matching theme of the [Heritage Themes for terminals]({VENDOR_URL}/releases/latest). \
+lazygit takes its background and most text colours from the terminal, so switch the terminal's theme with the lazygit \
+theme, or the change barely shows.
+
+1. Copy the files in `themes` into a `themes` folder in lazygit's configuration folder, which \
+`lazygit --print-config-dir` prints, and create lazygit's `config.yml` there if it does not exist. In a terminal, from \
+the unzipped folder:
+
+   ```bash
+   dir="$(lazygit --print-config-dir)"
+   mkdir -p "$dir/themes"
+   cp themes/* "$dir/themes/"
+   touch "$dir/config.yml"
+   ```
+
+2. List your `config.yml`, a dark theme and a light theme, separated by commas, in the `LG_CONFIG_FILE` environment \
+variable, for example in `~/.bashrc` or `~/.zshrc` on Linux, where the folder is `~/.config/lazygit`:
+
+   ```bash
+   export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml,$HOME/.config/lazygit/themes/{night}.yml,\
+$HOME/.config/lazygit/themes/{day}.yml"
+   ```
+
+   lazygit reads the files in that order and fails to start if one is missing. A dark theme sets `gui.darkTheme` and \
+a light one `gui.lightTheme`, so lazygit asks the terminal for its background and applies the matching theme, and \
+switches when the terminal does. If the terminal does not tell, lazygit assumes a dark background; set \
+`gui.colorScheme: light` in `config.yml` for a light one. To use one theme without the environment variable, copy its \
+`gui` section into `config.yml` instead.
+
+If the borders stay in the terminal's text colour, lazygit has not read the themes: run `echo $LG_CONFIG_FILE` in the \
+shell that starts lazygit, which must list the theme files, and open a new terminal after editing `~/.bashrc` or \
+`~/.zshrc`.
+
+## What is coloured
+
+Each theme colours panel borders and titles, the key hints in the bottom line, the selected row, copied commits, \
+unstaged changes, authors and the commit graph. lazygit draws text on the terminal's own \
+background, and file status, commit hashes, branch names, tags and diffs in the terminal's colours, which the matching \
+terminal theme takes from the same palette.
+
+[Heritage Themes for delta]({VENDOR_URL}/releases/latest) colour lazygit's diffs with the same themes when delta is \
+lazygit's diff renderer. With the delta themes installed, name the feature that matches the terminal's background in \
+`config.yml`:
+
+```yaml
+git:
+  diffRenderers:
+    - command: delta --paging=never --features={{{{if eq .colorScheme "light"}}}}{delta_day}{{{{else}}}}{delta_night}{{{{end}}}}
+```
+
+{readme_footer(families, "lazygit", "Themes", "the theme, lazygit version, terminal")}"""
+
+
+def read_lazygit(text):
+    """The gui section → field → list or map of a lazygit theme file, read as YAML for the layout that heritage.lazygit
+    writes: comments, then two-space indented mappings whose leaves are lists or a map of double-quoted strings. Fails
+    on any other line, so the comparison with heritage.lazygit.settings stands for what a YAML parser reads."""
+    result, section, field = {}, None, None
+    lines = [line for line in text.splitlines() if not line.startswith("#")]
+    if lines[:1] != ["gui:"]:
+        raise ValueError("the file does not start with gui:")
+    for line in lines[1:]:
+        if match := re.fullmatch(r"  (\w+):", line):
+            section = result.setdefault(match[1], {})
+        elif (match := re.fullmatch(r"    (\w+):", line)) and section is not None:
+            field = match[1]
+            if field in section:
+                raise ValueError(f"{field} repeats")
+            section[field] = None
+        elif (match := re.fullmatch(r'      - (?:"(#[0-9A-F]{6})"|([a-z]+))', line)) and field:
+            if section[field] is None:
+                section[field] = []
+            section[field].append(match[1] or match[2])
+        elif (match := re.fullmatch(r'      "([^"]+)": "(#[0-9A-F]{6})"', line)) and field:
+            if section[field] is None:
+                section[field] = {}
+            section[field][match[1]] = match[2]
+        else:
+            raise ValueError(f"unexpected line {line!r}")
+    return result
+
+
+def validate_lazygit(directory, families):
+    """Fails the build when a theme file is missing, does not read as the gui section that heritage.lazygit.settings
+    gives, sets a field that lazygit does not have or a list with other than one colour, or when text it colours is
+    unreadable on its background."""
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.lazygit.name(t), t["palette"]
+            expected.add(f"{name}.yml")
+            label = f"lazygit {name}"
+            with open(os.path.join(directory, "themes", f"{name}.yml"), encoding="utf-8") as f:
+                try:
+                    found = read_lazygit(f.read())
+                except ValueError as error:
+                    raise SystemExit(f"{label}: {error}")
+            if found != {heritage.lazygit.section(p): heritage.lazygit.settings(p)}:
+                raise SystemExit(f"{label}: the theme differs from heritage.lazygit.settings")
+            for field, value in found[heritage.lazygit.section(p)].items():
+                if field not in heritage.lazygit.THEME_FIELDS:
+                    raise SystemExit(f"{label}: lazygit has no theme field {field}")
+                if isinstance(value, list) and ([v.startswith("#") for v in value].count(True) != 1
+                                                or not all(v.startswith("#") or v in heritage.lazygit.ATTRIBUTES
+                                                           for v in value)):
+                    raise SystemExit(f"{label}: {field} needs one colour and lazygit's attributes")
+            check_styles(label, heritage.lazygit.styles(p), "fg", "bg", None, set(), set(), {})
+    check_files("lazygit themes", directory, "themes", expected)
+
+
 def eclipse_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -4590,14 +4714,15 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "Qt Creator": heritage.qtcreator.name, "Kate": lambda t: t["palette"]["name"],
                   "GNOME Text Editor": lambda t: t["palette"]["name"], "gedit": lambda t: t["palette"]["name"],
                   "Geany": lambda t: t["palette"]["name"], "Pulsar": heritage.pulsar.name,
-                  "Amp": heritage.amp.name, "bat": heritage.bat.name, "delta": heritage.delta.name, "Eclipse": heritage.eclipse.name,
+                  "Amp": heritage.amp.name, "bat": heritage.bat.name, "delta": heritage.delta.name,
+                  "lazygit": heritage.lazygit.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
                   "RStudio": heritage.rstudio.name, "Godot": heritage.godot.name,
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "bat": bat_readme, "delta": delta_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "bat": bat_readme, "delta": delta_readme, "lazygit": lazygit_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
 
 
 def terminals_readme(families):
@@ -4922,6 +5047,9 @@ def main():
             ("delta", "themes", lambda t, source: (f"{heritage.bat.name(t)}.tmTheme",
                                                     heritage.bat.theme(t["palette"], source)),
              validate_delta),
+            ("lazygit", "themes", lambda t, source: (f"{heritage.lazygit.name(t)}.yml",
+                                                      heritage.lazygit.theme(t["palette"], source)),
+             validate_lazygit),
             ("Spyder", "themes", lambda t, source: (f"{heritage.spyder.name(t)}.ini",
                                                      heritage.spyder.theme(t["palette"], heritage.spyder.name(t),
                                                                            source)),

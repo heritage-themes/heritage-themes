@@ -40,6 +40,7 @@ body:
         - Amp
         - bat
         - delta
+        - lazygit
         - Eclipse
         - Nova
         - JupyterLab

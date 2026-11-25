@@ -2,8 +2,8 @@
 
 Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
                           | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --bat | --delta
-                          | --textadept | --lapce | --qtcreator | --kate | --gnome-text-editor | --gedit | --geany
-                          | --eclipse | --pulsar | --jupyterlab | --pygments] [--png] [THEME ...]
+                          | --lazygit | --textadept | --lapce | --qtcreator | --kate | --gnome-text-editor | --gedit
+                          | --geany | --eclipse | --pulsar | --jupyterlab | --pygments] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --visualstudio  write the Visual Studio preview instead of the IntelliJ one; needs Windows and Visual Studio 2026
@@ -22,6 +22,7 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --amp        write the Amp preview instead of the IntelliJ one; needs Linux and Podman
   --bat        write the bat preview instead of the IntelliJ one; needs Linux and Podman
   --delta      write the delta preview instead of the IntelliJ one; needs Linux and Podman
+  --lazygit    write the lazygit preview instead of the IntelliJ one; needs Linux and Podman
   --textadept  write the Textadept preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --lapce      write the Lapce preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --qtcreator  write the Qt Creator preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
@@ -66,9 +67,9 @@ colours (scripts/terminals/check.py) or a screen shows a colour the theme does n
 minimum (scripts/terminals/cells.py). iTerm2 and Windows Terminal do not run on Linux, so the build's checks of their
 files are all they get. Termux runs in the Android emulator that scripts/termux/setup.sh starts, and
 scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. The Nano, Amp, bat, delta,
-Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
+lazygit, Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
 editor runs in the container image of scripts/editors/Containerfile, with the theme installed and chosen as its README
-says: Nano, Amp, bat and delta in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
+says: Nano, Amp, bat, delta and lazygit in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
 that the theme does not set or text below its contrast minimum, and the others on Xvfb through
 scripts/editors/shoot.py, whose screenshots go to themes/<theme>/build/<editor> and fail when they show a colour that
 is no colour of the theme nor a blend of one
@@ -534,7 +535,8 @@ def terminals_results(family, out):
 
 
 # Terminal editors that scripts/editors/screen.py runs: (title, the (path, text) of the files of a family's themes,
-# the colours that a theme's own settings show besides the palette's, the rows that the check covers).
+# the colours that a theme's own settings show besides the palette's, the rows that the check covers). Each screen shows
+# one of SAMPLES, unless SCREEN_VIEWS names the views of the editor that the screens show instead.
 SCREEN_EDITORS = {
     # Nano: the title bar, status bar and help lines that the scheme colours; code takes the colours that nano's syntax
     # files name, among them nano's own extended colours
@@ -554,7 +556,12 @@ SCREEN_EDITORS = {
               + [(heritage.delta.FILENAME, heritage.delta.config([(t, "") for t in themes]))],
               lambda p: {"#" + heritage.delta.emphasis(p, line, gutter)
                          for line, gutter in (("diffDel", "deleted"), ("diffIns", "added"))}, "0:"),
+    # lazygit: every row of its panels, the main view with the diff of the selected file, and the bottom line
+    "lazygit": ("lazygit", lambda themes: [(f"{heritage.lazygit.name(t)}.yml", heritage.lazygit.theme(t["palette"], ""))
+                                           for t in themes], lambda p: set(), "0:"),
 }
+# Editor → the views that its screens show, as scripts/editors/screen.py names them, in place of SAMPLES.
+SCREEN_VIEWS = {"lazygit": ("files", "commits", "search")}
 
 
 def screen_results(family, out, editor):
@@ -573,7 +580,9 @@ def screen_results(family, out, editor):
         for folder in (files, samples, screens):
             os.makedirs(folder)
         write_files(files, theme_files(family.THEMES))
-        write_files(samples, [(name, plain(code) + "\n") for name, *_, code in SAMPLES])
+        names = SCREEN_VIEWS.get(editor) or [name for name, *_ in SAMPLES]
+        write_files(samples, [(name, "") for name in SCREEN_VIEWS.get(editor, ())]
+                    or [(name, plain(code) + "\n") for name, *_, code in SAMPLES])
         def screen(t, name):
             stem, p = heritage.nvim.name(t), t["palette"]
             target = f"{stem}-{name}.json"
@@ -599,7 +608,7 @@ def screen_results(family, out, editor):
             return name, None, rows, [f"{editor} {stem} {name}: {line.split(': ', 1)[1]}"
                                       for line in check.stdout.splitlines()]
         with concurrent.futures.ThreadPoolExecutor(4) as pool:
-            jobs = [[pool.submit(screen, t, name) for name, *_ in SAMPLES] for t in family.THEMES]
+            jobs = [[pool.submit(screen, t, name) for name in names] for t in family.THEMES]
             for theme_jobs in jobs:
                 theme_results = [job.result() for job in theme_jobs]
                 problems += [problem for *_, found in theme_results for problem in found]
@@ -842,7 +851,7 @@ def main():
         with open(page_path, "w", encoding="utf-8") as f:
             f.write(terminals_page(family, terminals_results(family, out)) if target == "terminals"
                     else terminals_page(family, screen_results(family, out, target), SCREEN_EDITORS[target][0],
-                                        wide=False) if target in SCREEN_EDITORS
+                                        wide=target in SCREEN_VIEWS) if target in SCREEN_EDITORS
                     else terminals_page(family, gui_results(family, out, target), GUI_EDITORS[target][0])
                     if target in GUI_EDITORS
                     else terminals_page(family, jupyterlab_results(family, out), "JupyterLab") if target == "jupyterlab"

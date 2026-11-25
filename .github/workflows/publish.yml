@@ -48,6 +48,7 @@ jobs:
       amp: ${{ steps.check.outputs.amp }}
       bat: ${{ steps.check.outputs.bat }}
       delta: ${{ steps.check.outputs.delta }}
+      lazygit: ${{ steps.check.outputs.lazygit }}
       eclipse: ${{ steps.check.outputs.eclipse }}
       nova: ${{ steps.check.outputs.nova }}
       jupyterlab: ${{ steps.check.outputs.jupyterlab }}
@@ -78,7 +79,7 @@ jobs:
           fi
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
             kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
-            qtcreator=false kate=false gnome_text_editor=false gedit=false geany=false pulsar=false amp=false bat=false delta=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
+            qtcreator=false kate=false gnome_text_editor=false gedit=false geany=false pulsar=false amp=false bat=false delta=false lazygit=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
             godot=false netbeans=false drracket=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
@@ -106,6 +107,7 @@ jobs:
           grep -q "^## \[$version\]" amp/CHANGELOG.md && amp=true
           grep -q "^## \[$version\]" bat/CHANGELOG.md && bat=true
           grep -q "^## \[$version\]" delta/CHANGELOG.md && delta=true
+          grep -q "^## \[$version\]" lazygit/CHANGELOG.md && lazygit=true
           grep -q "^## \[$version\]" eclipse/CHANGELOG.md && eclipse=true
           grep -q "^## \[$version\]" nova/CHANGELOG.md && nova=true
           grep -q "^## \[$version\]" jupyterlab/CHANGELOG.md && jupyterlab=true
@@ -123,7 +125,7 @@ jobs:
               && [ "$emacs" = false ] && [ "$terminals" = false ] && [ "$nano" = false ] && [ "$textadept" = false ] \
               && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$kate" = false ] && [ "$gnome_text_editor" = false ] \
               && [ "$gedit" = false ] && [ "$geany" = false ] && [ "$pulsar" = false ] && [ "$amp" = false ] && [ "$bat" = false ] \
-              && [ "$delta" = false ] && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
+              && [ "$delta" = false ] && [ "$lazygit" = false ] && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
               && [ "$pygments" = false ] && [ "$spyder" = false ] && [ "$thonny" = false ] \
               && [ "$idle" = false ] && [ "$rstudio" = false ] && [ "$godot" = false ] && [ "$netbeans" = false ] \
               && [ "$drracket" = false ]; then
@@ -158,6 +160,7 @@ jobs:
             echo "amp=$amp"
             echo "bat=$bat"
             echo "delta=$delta"
+            echo "lazygit=$lazygit"
             echo "eclipse=$eclipse"
             echo "nova=$nova"
             echo "jupyterlab=$jupyterlab"
@@ -1114,6 +1117,27 @@ jobs:
           path: build/heritage-themes-delta-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # lazygit has no theme registry: users install the themes from the zip that the GitHub release attaches.
+  lazygit:
+    needs: check
+    if: needs.check.outputs.lazygit == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: lazygit
+          path: build/heritage-themes-lazygit-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   # Users drop the Eclipse plugin from the zip that the GitHub release attaches into Eclipse; the Eclipse
   # Marketplace needs an update site that this release does not publish.
   eclipse:
@@ -1418,7 +1442,7 @@ jobs:
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
             emacs, terminals, nano, textadept, lapce, qtcreator, kate, gnome_text_editor, gedit, geany, pulsar,
-            amp, bat, delta, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot, netbeans, drracket]
+            amp, bat, delta, lazygit, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot, netbeans, drracket]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -1448,6 +1472,7 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.amp.result)
       && contains(fromJSON('["success", "skipped"]'), needs.bat.result)
       && contains(fromJSON('["success", "skipped"]'), needs.delta.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.lazygit.result)
       && contains(fromJSON('["success", "skipped"]'), needs.eclipse.result)
       && contains(fromJSON('["success", "skipped"]'), needs.nova.result)
       && contains(fromJSON('["success", "skipped"]'), needs.jupyterlab.result)
@@ -1490,6 +1515,7 @@ jobs:
       AMP: ${{ needs.check.outputs.amp }}
       BAT: ${{ needs.check.outputs.bat }}
       DELTA: ${{ needs.check.outputs.delta }}
+      LAZYGIT: ${{ needs.check.outputs.lazygit }}
       ECLIPSE: ${{ needs.check.outputs.eclipse }}
       NOVA: ${{ needs.check.outputs.nova }}
       JUPYTERLAB: ${{ needs.check.outputs.jupyterlab }}
@@ -1580,6 +1606,7 @@ jobs:
           notes "Amp themes" "$AMP" amp/CHANGELOG.md "heritage-themes-amp-<version>.zip"
           notes "bat themes" "$BAT" bat/CHANGELOG.md "heritage-themes-bat-<version>.zip"
           notes "delta themes" "$DELTA" delta/CHANGELOG.md "heritage-themes-delta-<version>.zip"
+          notes "lazygit themes" "$LAZYGIT" lazygit/CHANGELOG.md "heritage-themes-lazygit-<version>.zip"
           notes "Eclipse plugin" "$ECLIPSE" eclipse/CHANGELOG.md "heritage-themes-eclipse-<version>.zip"
           notes "Nova themes" "$NOVA" nova/CHANGELOG.md "heritage-themes-nova-<version>.zip"
           notes "JupyterLab themes" "$JUPYTERLAB" jupyterlab/CHANGELOG.md "heritage-themes-jupyterlab-<version>.zip"
