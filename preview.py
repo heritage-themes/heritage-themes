@@ -2,8 +2,8 @@
 
 Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
                           | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --bat | --delta
-                          | --lazygit | --textadept | --lapce | --qtcreator | --kate | --gnome-text-editor | --gedit
-                          | --geany | --eclipse | --pulsar | --jupyterlab | --pygments] [--png] [THEME ...]
+                          | --lazygit | --btop | --textadept | --lapce | --qtcreator | --kate | --gnome-text-editor
+                          | --gedit | --geany | --eclipse | --pulsar | --jupyterlab | --pygments] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
   --visualstudio  write the Visual Studio preview instead of the IntelliJ one; needs Windows and Visual Studio 2026
@@ -23,6 +23,7 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --bat        write the bat preview instead of the IntelliJ one; needs Linux and Podman
   --delta      write the delta preview instead of the IntelliJ one; needs Linux and Podman
   --lazygit    write the lazygit preview instead of the IntelliJ one; needs Linux and Podman
+  --btop       write the btop preview instead of the IntelliJ one; needs Linux and Podman
   --textadept  write the Textadept preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --lapce      write the Lapce preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --qtcreator  write the Qt Creator preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
@@ -67,9 +68,9 @@ colours (scripts/terminals/check.py) or a screen shows a colour the theme does n
 minimum (scripts/terminals/cells.py). iTerm2 and Windows Terminal do not run on Linux, so the build's checks of their
 files are all they get. Termux runs in the Android emulator that scripts/termux/setup.sh starts, and
 scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. The Nano, Amp, bat, delta,
-lazygit, Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
+lazygit, btop, Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
 editor runs in the container image of scripts/editors/Containerfile, with the theme installed and chosen as its README
-says: Nano, Amp, bat, delta and lazygit in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
+says: Nano, Amp, bat, delta, lazygit and btop in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
 that the theme does not set or text below its contrast minimum, and the others on Xvfb through
 scripts/editors/shoot.py, whose screenshots go to themes/<theme>/build/<editor> and fail when they show a colour that
 is no colour of the theme nor a blend of one
@@ -534,9 +535,9 @@ def terminals_results(family, out):
     return [[(app, image, rows) for app, image, rows, _ in theme_results] for theme_results in results]
 
 
-# Terminal editors that scripts/editors/screen.py runs: (title, the (path, text) of the files of a family's themes,
-# the colours that a theme's own settings show besides the palette's, the rows that the check covers). Each screen shows
-# one of SAMPLES, unless SCREEN_VIEWS names the views of the editor that the screens show instead.
+# Terminal editors and apps that scripts/editors/screen.py runs: (title, the (path, text) of the files of a family's
+# themes, the colours that a theme's own settings show besides the palette's, the rows that the check covers). Each
+# screen shows one of SAMPLES, unless SCREEN_VIEWS names the views of the editor that the screens show instead.
 SCREEN_EDITORS = {
     # Nano: the title bar, status bar and help lines that the scheme colours; code takes the colours that nano's syntax
     # files name, among them nano's own extended colours
@@ -559,9 +560,15 @@ SCREEN_EDITORS = {
     # lazygit: every row of its panels, the main view with the diff of the selected file, and the bottom line
     "lazygit": ("lazygit", lambda themes: [(f"{heritage.lazygit.name(t)}.yml", heritage.lazygit.theme(t["palette"], ""))
                                            for t in themes], lambda p: set(), "0:"),
+    # btop: every row of its four boxes, with the colours btop draws between the stops of the theme's gradients
+    "btop": ("btop", lambda themes: [(f"{heritage.btop.name(t)}.theme", heritage.btop.theme(t["palette"], ""))
+                                     for t in themes],
+             lambda p: {c for steps in heritage.btop.gradients(p).values() for c in steps}, "0:"),
 }
 # Editor → the views that its screens show, as scripts/editors/screen.py names them, in place of SAMPLES.
-SCREEN_VIEWS = {"lazygit": ("files", "commits", "search")}
+SCREEN_VIEWS = {"lazygit": ("files", "commits", "search"), "btop": ("selected", "followed", "paused")}
+# Editor → the colours, besides comments, that the check holds to 3:1 as dimmed text: btop's fading process list.
+SCREEN_DIMMED = {"btop": lambda p: {c for name in ("proc", "proc_color") for c in heritage.btop.gradients(p)[name]}}
 
 
 def screen_results(family, out, editor):
@@ -603,7 +610,10 @@ def screen_results(family, out, editor):
             colours = {"#" + v for v in p.values() if isinstance(v, str) and re.fullmatch(r"[0-9A-F]{6}", v)}
             colours |= set(ansi) | own_colours(p)
             check = subprocess.run([sys.executable, "-I", os.path.join(TERMINALS, "cells.py"), checked, "#" + p["bg"],
-                                    "#" + p["fg"], ",".join(sorted(colours)), "#" + p["comment"], checked_rows],
+                                    "#" + p["fg"], ",".join(sorted(colours)),
+                                    ",".join(sorted({"#" + p["comment"]}
+                                                    | SCREEN_DIMMED.get(editor, lambda p: set())(p))),
+                                    checked_rows],
                                    capture_output=True, text=True)
             return name, None, rows, [f"{editor} {stem} {name}: {line.split(': ', 1)[1]}"
                                       for line in check.stdout.splitlines()]

@@ -2,14 +2,16 @@
 
 Usage: python3 screen.py EDITOR THEME FILES SAMPLE BACKGROUND FOREGROUND OUT.json
 
-EDITOR is nano, amp, bat, delta or lazygit, THEME the theme's file name stem, FILES the folder of the editor's generated
-files, SAMPLE the file to open, or for lazygit a file whose name is the view to show (files, commits or search), and
+EDITOR is nano, amp, bat, delta, lazygit or btop, THEME the theme's file name stem, FILES the folder of the editor's
+generated files, SAMPLE the file to open, or for lazygit and btop a file whose name is the view to show (for lazygit
+files, commits or search, for btop selected, followed or paused), and
 BACKGROUND and FOREGROUND the terminal's default colours as #RRGGBB, those of the matching Terminals theme. The editor
 starts in a pseudo-terminal of 256 colours that reports 24-bit colour and answers queries for its default colours, in a
 fresh HOME with the theme installed as its README says, and the screen is read through the pyte terminal emulator once
 the editor has been quiet for QUIET seconds after each key that the view needs. The output is the screen as rows of
 cells [character, foreground, background, bold, italic, underline]; a colour is #RRGGBB, "default" for the terminal's
-own, or the name pyte gives one of the 16 ANSI colours.
+own, or the name pyte gives one of the 16 ANSI colours. btop redraws its graphs continuously, so its keys are sent at
+a fixed pace instead, and the screen is read once a frame has been fully written.
 """
 import fcntl, json, os, pty, re, select, shutil, signal, struct, subprocess, sys, tempfile, termios, time
 
@@ -20,7 +22,12 @@ COLUMNS, ROWS = 88, 20
 DELTA_ROWS = 32
 # lazygit lays out five panels beside the main view and needs a larger screen for them to show their rows
 LAZYGIT_COLUMNS, LAZYGIT_ROWS = 120, 30
+# btop needs 80 by 24 cells for its four boxes; a larger screen gives the process list rows to fade over
+BTOP_COLUMNS, BTOP_ROWS = 120, 36
 QUIET, TIMEOUT = 1.5, 30
+# btop updates every BTOP_UPDATE milliseconds and gets BTOP_PACE seconds before each key and before the screen is read,
+# so its graphs hold several samples
+BTOP_UPDATE, BTOP_PACE = 400, 4
 # a query for the terminal's foreground (OSC 10) or background (OSC 11) colour, ended by BEL or ST
 COLOUR_QUERY = re.compile(rb"\x1b\](1[01]);\?(?:\x07|\x1b\\)")
 CONTROL_STRING = re.compile(rb"\x1b(?:\](?![012];)|[P_^X])[^\x07\x1b]*(?:\x07|\x1b\\)")
@@ -201,7 +208,28 @@ def lazygit(home, stem, files, sample, background, foreground):
     return ["/usr/bin/env", f"LG_CONFIG_FILE={themes}", "/usr/bin/lazygit", "--path", repo], keys
 
 
-EDITORS = dict(nano=nano, amp=amp, bat=bat, delta=delta, lazygit=lazygit)
+# btop's view → the keys that show it: the second process selected, with the list fading away from it; the first
+# process's details open, which btop 1.4.7 follows and marks with a banner of its own; and the process list paused,
+# which has a banner too
+BTOP_KEYS = {"selected": ["\x1b[B", "\x1b[B"], "followed": ["\x1b[B", "\r"], "paused": ["u"]}
+# processes that btop lists besides the harness's own, so the process list has rows to fade over
+BTOP_PROCESSES = 16
+
+
+def btop(home, stem, files, sample, background, foreground):
+    # the theme in btop's user themes folder and named in btop.conf, as the README says; btop.conf holds settings of
+    # the user's own that keep the screen the same on every run: a fast update, and a clock without seconds
+    os.makedirs(f"{home}/.config/btop/themes")
+    shutil.copy(f"{files}/{stem}.theme", f"{home}/.config/btop/themes")
+    write(f"{home}/.config/btop/btop.conf", f'color_theme = "{stem}"\nupdate_ms = {BTOP_UPDATE}\n'
+                                            'clock_format = "%H:%M"\nshow_battery = false\n')
+    os.remove(sample)
+    for _ in range(BTOP_PROCESSES):
+        subprocess.Popen(["/usr/bin/sleep", "600"], start_new_session=True)
+    return ["/usr/bin/btop"], BTOP_KEYS[os.path.basename(sample)]
+
+
+EDITORS = dict(nano=nano, amp=amp, bat=bat, delta=delta, lazygit=lazygit, btop=btop)
 
 
 def colour_reply(code, colour):
@@ -209,8 +237,11 @@ def colour_reply(code, colour):
     return f"\x1b]{code};rgb:" + "/".join(colour[i:i + 2].lower() * 2 for i in (1, 3, 5)) + "\x1b\\"
 
 
-def run(argv, env, background, foreground, rows, columns=COLUMNS, keys=()):
-    """The screen once the program has been quiet for QUIET seconds after each of keys, sent in turn."""
+def run(argv, env, background, foreground, rows, columns=COLUMNS, keys=(), pace=None):
+    """The screen once the program has been quiet for QUIET seconds after each of keys, sent in turn, or with pace,
+    for a program that never goes quiet, the screen pace seconds after the last key, each key sent pace seconds after
+    the one before, and the first pace seconds after the start; the screen is read once no output has arrived for a
+    tenth of a second, so it holds whole frames."""
     keys = list(keys)
     screen = Screen(columns, rows)
     stream = pyte.ByteStream(screen)
@@ -220,11 +251,18 @@ def run(argv, env, background, foreground, rows, columns=COLUMNS, keys=()):
         os.execve(argv[0], argv, env)
     fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", rows, columns, 0, 0))
     screen.write_process_input = lambda data: os.write(fd, data.encode())
-    start = last = time.monotonic()
+    start = last = step = time.monotonic()
     pending = b""
     try:
         while time.monotonic() - start < TIMEOUT:
-            if time.monotonic() - last >= QUIET:
+            if pace and time.monotonic() - step >= pace:
+                if not keys:
+                    if time.monotonic() - last >= 0.1:
+                        break
+                else:
+                    os.write(fd, keys.pop(0).encode())
+                    step = time.monotonic()
+            elif not pace and time.monotonic() - last >= QUIET:
                 if not keys:
                     break
                 os.write(fd, keys.pop(0).encode())
@@ -265,6 +303,9 @@ def main():
     if editor == "lazygit":
         argv, keys = argv
         rows = run(argv, env, background, foreground, LAZYGIT_ROWS, LAZYGIT_COLUMNS, keys)
+    elif editor == "btop":
+        argv, keys = argv
+        rows = run(argv, env, background, foreground, BTOP_ROWS, BTOP_COLUMNS, keys, BTOP_PACE)
     else:
         rows = run(argv, env, background, foreground, DELTA_ROWS if editor == "delta" else ROWS)
     if editor == "delta":

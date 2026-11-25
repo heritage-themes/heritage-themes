@@ -1,20 +1,23 @@
 """Checks a screen that shells.py read: every colour is one the theme sets, and text reaches its contrast minimum on the
 background it is drawn on.
 
-Usage: python3 cells.py SCREEN.json BG FG ALLOWED COMMENT [ROWS]
+Usage: python3 cells.py SCREEN.json BG FG ALLOWED DIMMED [ROWS]
 
 BG and FG are the theme's background and text colours, which the terminal's default colours stand for when the
 terminal runs the matching Terminals theme. ALLOWED is a comma-separated list of the colours the app's theme sets.
-COMMENT is the comment colour, which is held to 3:1 as in every target. ROWS limits the check to those rows, counted
-from the end when negative, for example 0,-1 for a multiplexer's bars, or to a slice of them, as 0:-1 for every row but
-the last. Other text is held to 4.5:1, except characters drawn as decoration rather than text, such
-as powerline separators and box drawing. Whitespace shows only its background, so only that is checked. Prints each
-problem and exits 1 when there is one.
+DIMMED is a comma-separated list of the colours held to 3:1: the comment colour, as in every target, and the colours an
+app dims text to, such as btop's fading process list. ROWS limits the check to those rows, counted from the end when
+negative, for example 0,-1 for a multiplexer's bars, or to a slice of them, as 0:-1 for every row but the last. Other
+text is held to 4.5:1, except characters drawn as decoration rather than text, such as powerline separators and box
+drawing, which are not checked, and characters that draw graphs and meters, which are held to the 3:1 of graphics.
+Whitespace shows only its background, so only that is checked. Prints each problem and exits 1 when there is one.
 """
 import json, sys
 
 DECORATION = set("─│╭╮╰╯├┤┬┴┼━┃═║") | {chr(c) for c in range(0xE0A0, 0xE0D8)} | {chr(c) for c in range(0x2500, 0x2580)}
-MINIMUM = 4.5
+# braille patterns, block elements and the black square, of which graphs and meters are drawn
+GRAPHICS = {chr(c) for c in range(0x2800, 0x2900)} | {chr(c) for c in range(0x2580, 0x25A1)}
+MINIMUM, LOW = 4.5, 3
 
 
 def luminance(colour):
@@ -31,7 +34,7 @@ def contrast(a, b):
 
 
 def main():
-    path, bg, fg, allowed, comment = sys.argv[1:6]
+    path, bg, fg, allowed, dimmed = sys.argv[1:6]
     rows = json.load(open(path, encoding="utf-8"))
     if len(sys.argv) <= 6:
         selected = range(len(rows))
@@ -41,6 +44,7 @@ def main():
     else:
         selected = [int(y) % len(rows) for y in sys.argv[6].split(",")]
     allowed = {c.upper() for c in allowed.split(",")} | {bg.upper(), fg.upper()}
+    dimmed = {c.upper() for c in dimmed.split(",")}
     problems = []
     for y in selected:
         for x, (char, cfg, cbg, bold, italic, underline) in enumerate(rows[y]):
@@ -52,7 +56,7 @@ def main():
             if not char.strip() or char in DECORATION or cfg not in allowed or cbg not in allowed:
                 continue
             ratio = contrast(cfg, cbg)
-            if ratio < (3 if cfg == comment.upper() else MINIMUM):
+            if ratio < (LOW if cfg in dimmed or char in GRAPHICS else MINIMUM):
                 problems.append(f"row {y} column {x} {char!r}: {cfg} on {cbg} is {ratio:.2f}:1")
     for problem in dict.fromkeys(problems):
         print(f"{path}: {problem}")

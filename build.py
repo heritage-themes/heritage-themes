@@ -13,8 +13,8 @@ Usage: python3 build.py [--vsix] [--jupyterlab]
 
 Output goes to build/.
 """
-import argparse, ast, base64, configparser, contextlib, datetime, hashlib, html, importlib.util, io, json, os, plistlib, \
-    re, shutil, subprocess, sys, tempfile, time, tomllib, types, unittest.mock, zipfile
+import argparse, ast, base64, configparser, contextlib, datetime, hashlib, html, importlib.util, io, itertools, json, \
+    os, plistlib, re, shutil, subprocess, sys, tempfile, time, tomllib, types, unittest.mock, zipfile
 import xml.etree.ElementTree as ET
 
 import heritage
@@ -102,7 +102,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate",
-           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "delta", "lazygit", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
+           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "delta", "lazygit", "btop", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
            "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
@@ -4034,6 +4034,104 @@ def validate_lazygit(directory, families):
     check_files("lazygit themes", directory, "themes", expected)
 
 
+def btop_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    night, day = (heritage.btop.name(next(t for f in families for t in f.THEMES if t["slug"] == slug))
+                  for slug in ("HoliNight", "HoliDay"))
+    return f"""# Heritage Themes for btop
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+The themes need [btop](https://github.com/aristocratos/btop) in a terminal with 24-bit colour, and are tested with \
+btop 1.4.7. The colours of a followed process and of the banner over a paused or followed process list apply from \
+btop 1.4.7; earlier releases ignore them.
+
+1. Copy the files in `themes` into btop's user themes folder, `~/.config/btop/themes`, or \
+`$XDG_CONFIG_HOME/btop/themes` when `XDG_CONFIG_HOME` is set. In a terminal, from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.config/btop/themes
+   cp themes/* ~/.config/btop/themes/
+   ```
+
+2. In btop, press `Esc`, choose **Options**, and pick the theme under **Color theme** with the arrow keys. Or quit \
+btop and set the theme in `~/.config/btop/btop.conf`, which btop rewrites when it quits:
+
+   ```ini
+   color_theme = "{night}"
+   ```
+
+btop paints the theme's background behind its boxes. When **Theme background** is off in btop's options \
+(`theme_background = false`), btop draws on the terminal's background instead: run the matching theme of the \
+[Heritage Themes for terminals]({VENDOR_URL}/releases/latest) then, and switch the btop theme with it, for example to \
+`{day}` with a light terminal theme.
+
+## What is coloured
+
+Each theme colours the background and text, box outlines, titles and their shortcut letters, the selected and the \
+followed process, the banners of a paused or followed process list, dimmed text, graphs and meters. Load and \
+temperatures take the terminal colours of the matching terminal theme, from green through yellow to red and from blue \
+through magenta to red. Memory, disks and network take the family's syntax colours, one for each series. The process \
+list fades from the text colour towards the colour of dimmed text, which stays readable.
+
+{readme_footer(families, "btop", "Themes", "the theme, btop version, terminal")}"""
+
+
+def read_btop(text):
+    """Key → value of a btop theme file, read as btop 1.4's Theme::loadFile reads it: comment lines start with #, and
+    each other line sets theme[key]="value". Fails on any other line or a repeated key, so the comparison with
+    heritage.btop.colours stands for what btop reads."""
+    result = {}
+    for line in text.splitlines():
+        if line.startswith("#"):
+            continue
+        match = re.fullmatch(r'theme\[([a-z_]+)\]="((?:#[0-9A-F]{6})?)"', line)
+        if not match:
+            raise ValueError(f"unexpected line {line!r}")
+        if match[1] in result:
+            raise ValueError(f"{match[1]} repeats")
+        result[match[1]] = match[2]
+    return result
+
+
+def validate_btop(directory, families):
+    """Fails the build when a theme file is missing, does not read as heritage.btop.colours, leaves out a key that btop
+    reads or sets one it does not, leaves a colour empty that btop needs, draws two series of a box too alike, or when
+    text, graphics or a step of a gradient is unreadable on its background."""
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.btop.name(t), t["palette"]
+            expected.add(f"{name}.theme")
+            label = f"btop {name}"
+            with open(os.path.join(directory, "themes", f"{name}.theme"), encoding="utf-8") as f:
+                try:
+                    found = read_btop(f.read())
+                except ValueError as error:
+                    raise SystemExit(f"{label}: {error}")
+            if list(found) != list(heritage.btop.KEYS):
+                raise SystemExit(f"{label}: the keys differ from those btop reads")
+            if found != heritage.btop.colours(p):
+                raise SystemExit(f"{label}: the theme differs from heritage.btop.colours")
+            if any(not value and not key.endswith(("_mid", "_end")) for key, value in found.items()):
+                raise SystemExit(f"{label}: only a gradient's _mid and _end can be empty")
+            for series in heritage.btop.SERIES:
+                for a, b in itertools.combinations(series, 2):
+                    apart = distance(found[f"{a}_start"][1:], found[f"{b}_start"][1:])
+                    if apart < heritage.btop.SERIES_APART:
+                        raise SystemExit(f"{label}: {a} and {b} are {apart:.1f} apart, need "
+                                         f"{heritage.btop.SERIES_APART}")
+            for element, fg, bg, minimum in heritage.btop.styles(p):
+                ratio = contrast(fg[1:], bg[1:])
+                if ratio < minimum:
+                    raise SystemExit(f"{label}: {element} is {ratio:.2f}:1 on {bg}, needs {minimum}:1")
+    check_files("btop themes", directory, "themes", expected)
+
+
 def eclipse_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -4715,14 +4813,14 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "GNOME Text Editor": lambda t: t["palette"]["name"], "gedit": lambda t: t["palette"]["name"],
                   "Geany": lambda t: t["palette"]["name"], "Pulsar": heritage.pulsar.name,
                   "Amp": heritage.amp.name, "bat": heritage.bat.name, "delta": heritage.delta.name,
-                  "lazygit": heritage.lazygit.name, "Eclipse": heritage.eclipse.name,
+                  "lazygit": heritage.lazygit.name, "btop": heritage.btop.name, "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
                   "RStudio": heritage.rstudio.name, "Godot": heritage.godot.name,
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "bat": bat_readme, "delta": delta_readme, "lazygit": lazygit_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "bat": bat_readme, "delta": delta_readme, "lazygit": lazygit_readme, "btop": btop_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
 
 
 def terminals_readme(families):
@@ -5050,6 +5148,9 @@ def main():
             ("lazygit", "themes", lambda t, source: (f"{heritage.lazygit.name(t)}.yml",
                                                       heritage.lazygit.theme(t["palette"], source)),
              validate_lazygit),
+            ("btop", "themes", lambda t, source: (f"{heritage.btop.name(t)}.theme",
+                                                   heritage.btop.theme(t["palette"], source)),
+             validate_btop),
             ("Spyder", "themes", lambda t, source: (f"{heritage.spyder.name(t)}.ini",
                                                      heritage.spyder.theme(t["palette"], heritage.spyder.name(t),
                                                                            source)),

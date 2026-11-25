@@ -41,6 +41,7 @@ body:
         - bat
         - delta
         - lazygit
+        - btop
         - Eclipse
         - Nova
         - JupyterLab
