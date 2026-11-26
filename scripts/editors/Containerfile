@@ -1,8 +1,9 @@
 # The editors that the previews of Nano, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse, Lapce, Textadept,
-# Pulsar, Amp, bat, delta, lazygit and btop run their themes in: Nano, lazygit, btop, Qt Creator, Kate (with its plugins and the Breeze style it
-# uses where installed), GNOME Text Editor, gedit and Geany as Fedora 45 packages them, and pinned upstream releases of the others,
-# each checked against its published checksum. GUI editors draw on Xvfb with Mesa's software OpenGL and Vulkan; Nano, Amp, bat,
-# delta, lazygit and btop run in a pseudo-terminal. PyGObject with GtkSourceView's introspection data lets
+# Pulsar, Amp, bat, delta, lazygit, btop and yazi run their themes in: Nano, lazygit, btop, Qt Creator, Kate (with its
+# plugins and the Breeze style it uses where installed), GNOME Text Editor, gedit and Geany as Fedora 45 packages them,
+# with file, which yazi detects file types with, and pinned upstream releases of the others, each checked against its
+# published checksum. GUI editors draw on Xvfb with Mesa's software OpenGL and Vulkan; Nano, Amp, bat, delta, lazygit,
+# btop and yazi run in a pseudo-terminal. PyGObject with GtkSourceView's introspection data lets
 # scripts/gnome-text-editor/definitions.py read the library; scripts/gedit/definitions.py reads gedit's from
 # libgedit-gtksourceview's data folder.
 FROM registry.fedoraproject.org/fedora:45
@@ -11,12 +12,15 @@ RUN dnf -y install --setopt=install_weak_deps=False \
         xorg-x11-server-Xvfb xdotool xwininfo ImageMagick dbus-x11 dbus-daemon \
         mesa-dri-drivers mesa-vulkan-drivers vulkan-loader mesa-libEGL mesa-libGL libglvnd-glx \
         python3 python3-pyte git findutils procps-ng which jetbrains-mono-fonts-all google-noto-sans-fonts \
-        nano lazygit btop qt-creator kate kate-plugins plasma-breeze-qt6 qt6-qtbase-gui qt6-qtsvg qt5-qtbase qt5-qtbase-gui \
+        nano lazygit btop file unzip qt-creator kate kate-plugins plasma-breeze-qt6 qt6-qtbase-gui qt6-qtsvg qt5-qtbase qt5-qtbase-gui \
         gnome-text-editor gedit geany python3-gobject gobject-introspection gtksourceview5 adwaita-icon-theme \
         java-25-openjdk gtk3 webkit2gtk4.1 libsecret \
         libxkbcommon-x11 xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm \
         fontconfig ncurses zstd python3-pyqt6-base \
     && dnf clean all
+# Every JVM in the image, Fedora's and the one Eclipse bundles, turns off the HotSpot Base64 intrinsic behind
+# CVE-2026-114938 (Java4Shell).
+ENV JAVA_TOOL_OPTIONS=-XX:-UseBASE64Intrinsics
 
 WORKDIR /opt
 # fetch URL SHA256 FILE: downloads URL to FILE and stops the build when it does not match SHA256.
@@ -59,6 +63,9 @@ RUN fetch https://github.com/dandavison/delta/releases/download/0.22.0/delta-0.2
     && tar --no-same-owner -xzf delta.tar.gz --strip-components=1 -C /usr/local/bin \
         delta-0.22.0-x86_64-unknown-linux-musl/delta \
     && rm delta.tar.gz
+RUN fetch https://github.com/sxyazi/yazi/releases/download/v26.9.1/yazi-x86_64-unknown-linux-musl.zip \
+        9b9c39decccf8cb0ff53a7d637d38f8a79d93bbd0099f4ea9c619ef6bb392f5d yazi.zip \
+    && unzip -q -j yazi.zip yazi-x86_64-unknown-linux-musl/yazi -d /usr/local/bin && rm yazi.zip
 # Pulsar's RPM, which dnf installs with the libraries that Electron needs, in /opt/Pulsar
 RUN fetch https://github.com/pulsar-edit/pulsar/releases/download/v1.133.1/Linux.pulsar-1.133.1.x86_64.rpm \
         eadcacfce2ab9ba08f35344c7e5b1456ca2bc48d15abf37a20be42abf7a7d5d0 pulsar.rpm \
