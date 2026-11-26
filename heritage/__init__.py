@@ -12,7 +12,7 @@ import importlib.util, os
 
 from . import (amp, bat, btop, delta, drracket, eclipse, emacs, gedit, geany, gnome_text_editor, godot, helix, idle, jupyterlab, kakoune, kate, lapce,
                lazygit, micro, nano, netbeans, notepadpp, nova, nvim, pulsar, pygments, qtcreator, rstudio, spyder, sublime, terminals,
-               textadept, thonny, vim, visualstudio, vscode, xcode, zed)
+               textadept, thonny, vim, visualstudio, vscode, xcode, yazi, zed)
 from .scheme import scheme
 from .ui import theme
 

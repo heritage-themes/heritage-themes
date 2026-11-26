@@ -102,8 +102,8 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate",
-           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "delta", "lazygit", "btop", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny", "IDLE",
-           "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
+           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "delta", "lazygit", "btop", "yazi", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny",
+           "IDLE", "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
 ANSI = tuple(f"ansi{c}" for c in ("Red", "Green", "Yellow", "Blue", "Magenta", "Cyan"))
@@ -4132,6 +4132,152 @@ def validate_btop(directory, families):
     check_files("btop themes", directory, "themes", expected)
 
 
+def yazi_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    night, day = (heritage.yazi.name(next(t for f in families for t in f.THEMES if t["slug"] == slug))
+                  for slug in ("HoliNight", "HoliDay"))
+    return f"""# Heritage Themes for yazi
+
+{DESCRIPTION} {count} dark and light flavors in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+The flavors need [yazi](https://github.com/sxyazi/yazi), tested with yazi {heritage.yazi.VERSION}, in a terminal with \
+24-bit colour, which runs the matching theme of the [Heritage Themes for terminals]({VENDOR_URL}/releases/latest). \
+yazi draws on the terminal's own background, so switch the terminal's theme with the flavor.
+
+1. Copy the folders in `flavors` into yazi's `flavors` folder: `~/.config/yazi/flavors` on Linux and macOS, \
+`%AppData%\\yazi\\config\\flavors` on Windows, or `flavors` in the folder that `YAZI_CONFIG_HOME` names when it is set. \
+In a terminal, from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.config/yazi/flavors
+   cp -r flavors/* ~/.config/yazi/flavors/
+   ```
+
+2. Name a dark and a light flavor in `theme.toml` in yazi's configuration folder, `~/.config/yazi/theme.toml` on \
+Linux and macOS:
+
+   ```toml
+   [flavor]
+   dark = "{night}"
+   light = "{day}"
+   ```
+
+   yazi asks the terminal for its background when it starts and applies the flavor that matches it. Styles that \
+`theme.toml` sets itself take precedence over the flavor's.
+
+## What is coloured
+
+Each flavor colours file names and icons by kind, the hovered file, the current folder, the markers and counts of \
+yanked, cut and selected files, find matches, the mode and permissions in the status bar, tabs, pop-ups, the help \
+menu, task progress and the code that the preview shows. Folders, executables, images, media, archives and documents \
+take the terminal colours of the matching terminal theme, and the icons of other file types the terminal colour \
+nearest their usual one. The icons need a [Nerd Font](https://www.nerdfonts.com), as yazi's own do.
+
+{readme_footer(families, "yazi", "Flavors", "the flavor, yazi version, terminal")}"""
+
+
+def yazi_flavor_readme(family, t):
+    """The README in a flavor's folder."""
+    p, name = t["palette"], heritage.yazi.name(t)
+    return f"""# {p['name']} for yazi
+
+{p['name']} is a {'dark' if p['dark'] else 'light'} flavor of [Heritage Themes]({VENDOR_URL}) for \
+[yazi](https://github.com/sxyazi/yazi), from the {family.FAMILY} family: {family.BLURB} Its colours are those of \
+the {p['name']} theme of the [Heritage Themes for terminals]({VENDOR_URL}/releases/latest), which the terminal should \
+run with it.
+
+With this folder in yazi's `flavors` folder, name the flavor in yazi's `theme.toml`:
+
+```toml
+[flavor]
+{'dark' if p['dark'] else 'light'} = "{name}"
+```
+
+The [family's page]({VENDOR_URL}/tree/master/themes/{heritage.folder(family)}) describes its colour tradition.
+"""
+
+
+# The files of a yazi flavor's folder, which yazi's package manager copies.
+YAZI_FLAVOR_FILES = ("LICENSE", "LICENSE-tmtheme", "README.md", "flavor.toml", "tmtheme.xml")
+
+
+def build_yazi(families):
+    """Writes each theme's flavor to build/yazi/flavors/<name>.yazi, with the README, changelog and licence, and returns
+    build/yazi."""
+    directory = os.path.join(OUT, "yazi")
+    for family in families:
+        source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
+        for t in family.THEMES:
+            folder = os.path.join(directory, "flavors", f"{heritage.yazi.name(t)}.yazi")
+            os.makedirs(folder)
+            write_text(os.path.join(folder, "flavor.toml"), heritage.yazi.flavor(t["palette"], source))
+            write_text(os.path.join(folder, "tmtheme.xml"), heritage.yazi.tmtheme(t["palette"], source))
+            write_text(os.path.join(folder, "README.md"), yazi_flavor_readme(family, t))
+            for name in ("LICENSE", "LICENSE-tmtheme"):
+                shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(folder, name))
+    write_text(os.path.join(directory, "README.md"), yazi_readme(families))
+    shutil.copy(os.path.join(ROOT, "yazi", "CHANGELOG.md"), os.path.join(directory, "CHANGELOG.md"))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(directory, "LICENSE"))
+    return directory
+
+
+def validate_yazi(directory, families):
+    """Fails the build when a flavor's folder lacks a file or holds another, its flavor.toml does not parse or differs
+    from heritage.yazi, sets a style key that yazi's default theme does not have or leaves one out, its file type rules
+    differ from yazi's in their selectors, or its tmtheme.xml differs from heritage.textmate; or when text, an icon or a
+    marker is unreadable on its background."""
+    preset = heritage.yazi.PRESET
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.yazi.name(t), t["palette"]
+            expected.add(f"{name}.yazi")
+            label = f"yazi {name}"
+            folder = os.path.join(directory, "flavors", f"{name}.yazi")
+            if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", name):
+                raise SystemExit(f"{label}: yazi's package manager needs a kebab-case name")
+            if sorted(os.listdir(folder)) != sorted(YAZI_FLAVOR_FILES):
+                raise SystemExit(f"{label}: the folder does not hold {', '.join(YAZI_FLAVOR_FILES)}")
+            with open(os.path.join(folder, "flavor.toml"), "rb") as f:
+                try:
+                    found = tomllib.load(f)
+                except tomllib.TOMLDecodeError as error:
+                    raise SystemExit(f"{label}: {error}")
+            settings = heritage.yazi.settings(p)
+            if {s: list(keys) for s, keys in settings.items()} != preset["styles"]:
+                raise SystemExit(f"{label}: the style keys differ from those of yazi's default theme")
+            for section, keys in settings.items():
+                for key, style in keys.items():
+                    if set(style) - {"fg", "bg", *heritage.yazi.MODIFIERS}:
+                        raise SystemExit(f"{label}: {section}.{key} sets an attribute that yazi does not read")
+            wanted = {section: {key: heritage.yazi.resolve(p, style) for key, style in keys.items()}
+                      for section, keys in settings.items()}
+            wanted.update(filetype={"rules": heritage.yazi.filetypes(p)}, icon=heritage.yazi.icons(p))
+            if found != wanted:
+                raise SystemExit(f"{label}: flavor.toml differs from heritage.yazi")
+            selectors = [{k: v for k, v in rule.items() if k in ("mime", "url", "is")} for rule in found["filetype"]["rules"]]
+            if selectors[:-1] != preset["filetype"] or selectors[-1] != heritage.yazi.OTHER_FILES[0]:
+                raise SystemExit(f"{label}: the file type rules differ from yazi's")
+            if any(len(found["icon"][f"prepend_{kind}"]) != len(icons) for kind, icons in preset["icon"].items() if icons):
+                raise SystemExit(f"{label}: the icons differ from yazi's")
+            with open(os.path.join(folder, "tmtheme.xml"), "rb") as f:
+                data = plistlib.load(f)
+            if data["settings"][0]["settings"] != heritage.textmate.settings(p) or data["name"] != p["name"]:
+                raise SystemExit(f"{label}: the global settings differ from heritage.textmate.settings")
+            rules = [(r["scope"], r["settings"]["foreground"], r["settings"]["fontStyle"]) for r in data["settings"][1:]]
+            if rules != [(scope, colour, font) for _, scope, colour, font in heritage.yazi.rules(p)]:
+                raise SystemExit(f"{label}: the rules differ from heritage.textmate.rules")
+            for element, fg, bg, minimum in heritage.yazi.styles(p):
+                ratio = contrast(fg[1:], bg[1:])
+                if ratio < minimum:
+                    raise SystemExit(f"{label}: {element} is {ratio:.2f}:1 on {bg}, needs {minimum}:1")
+    check_files("yazi flavors", directory, "flavors", expected)
+
+
 def eclipse_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -4813,7 +4959,8 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "GNOME Text Editor": lambda t: t["palette"]["name"], "gedit": lambda t: t["palette"]["name"],
                   "Geany": lambda t: t["palette"]["name"], "Pulsar": heritage.pulsar.name,
                   "Amp": heritage.amp.name, "bat": heritage.bat.name, "delta": heritage.delta.name,
-                  "lazygit": heritage.lazygit.name, "btop": heritage.btop.name, "Eclipse": heritage.eclipse.name,
+                  "lazygit": heritage.lazygit.name, "btop": heritage.btop.name, "yazi": heritage.yazi.name,
+                  "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
                   "RStudio": heritage.rstudio.name, "Godot": heritage.godot.name,
@@ -5170,6 +5317,10 @@ def main():
         name = f"{VSCODE_NAME}-{editor.lower()}"
         print(f"{pack_folder(directory, os.path.join(OUT, f'{name}-{VERSION}.zip'), name)}: {len(themes)} themes",
               flush=True)
+    yazi = build_yazi(families)
+    validate_yazi(yazi, families)
+    name = f"{VSCODE_NAME}-yazi"
+    print(f"{pack_folder(yazi, os.path.join(OUT, f'{name}-{VERSION}.zip'), name)}: {len(themes)} themes", flush=True)
     godot = build_godot(families)
     validate_godot(godot, families)
     name = f"{VSCODE_NAME}-godot"

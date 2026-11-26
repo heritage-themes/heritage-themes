@@ -50,6 +50,7 @@ jobs:
       delta: ${{ steps.check.outputs.delta }}
       lazygit: ${{ steps.check.outputs.lazygit }}
       btop: ${{ steps.check.outputs.btop }}
+      yazi: ${{ steps.check.outputs.yazi }}
       eclipse: ${{ steps.check.outputs.eclipse }}
       nova: ${{ steps.check.outputs.nova }}
       jupyterlab: ${{ steps.check.outputs.jupyterlab }}
@@ -80,7 +81,7 @@ jobs:
           fi
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
             kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
-            qtcreator=false kate=false gnome_text_editor=false gedit=false geany=false pulsar=false amp=false bat=false delta=false lazygit=false btop=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
+            qtcreator=false kate=false gnome_text_editor=false gedit=false geany=false pulsar=false amp=false bat=false delta=false lazygit=false btop=false yazi=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
             godot=false netbeans=false drracket=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
@@ -110,6 +111,7 @@ jobs:
           grep -q "^## \[$version\]" delta/CHANGELOG.md && delta=true
           grep -q "^## \[$version\]" lazygit/CHANGELOG.md && lazygit=true
           grep -q "^## \[$version\]" btop/CHANGELOG.md && btop=true
+          grep -q "^## \[$version\]" yazi/CHANGELOG.md && yazi=true
           grep -q "^## \[$version\]" eclipse/CHANGELOG.md && eclipse=true
           grep -q "^## \[$version\]" nova/CHANGELOG.md && nova=true
           grep -q "^## \[$version\]" jupyterlab/CHANGELOG.md && jupyterlab=true
@@ -127,7 +129,7 @@ jobs:
               && [ "$emacs" = false ] && [ "$terminals" = false ] && [ "$nano" = false ] && [ "$textadept" = false ] \
               && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$kate" = false ] && [ "$gnome_text_editor" = false ] \
               && [ "$gedit" = false ] && [ "$geany" = false ] && [ "$pulsar" = false ] && [ "$amp" = false ] && [ "$bat" = false ] \
-              && [ "$delta" = false ] && [ "$lazygit" = false ] && [ "$btop" = false ] && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
+              && [ "$delta" = false ] && [ "$lazygit" = false ] && [ "$btop" = false ] && [ "$yazi" = false ] && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
               && [ "$pygments" = false ] && [ "$spyder" = false ] && [ "$thonny" = false ] \
               && [ "$idle" = false ] && [ "$rstudio" = false ] && [ "$godot" = false ] && [ "$netbeans" = false ] \
               && [ "$drracket" = false ]; then
@@ -164,6 +166,7 @@ jobs:
             echo "delta=$delta"
             echo "lazygit=$lazygit"
             echo "btop=$btop"
+            echo "yazi=$yazi"
             echo "eclipse=$eclipse"
             echo "nova=$nova"
             echo "jupyterlab=$jupyterlab"
@@ -1162,6 +1165,28 @@ jobs:
           path: build/heritage-themes-btop-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # yazi's package manager installs flavors from GitHub repositories only: users install the flavors from the zip that
+  # the GitHub release attaches.
+  yazi:
+    needs: check
+    if: needs.check.outputs.yazi == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: yazi
+          path: build/heritage-themes-yazi-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   # Users drop the Eclipse plugin from the zip that the GitHub release attaches into Eclipse; the Eclipse
   # Marketplace needs an update site that this release does not publish.
   eclipse:
@@ -1466,7 +1491,7 @@ jobs:
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
             emacs, terminals, nano, textadept, lapce, qtcreator, kate, gnome_text_editor, gedit, geany, pulsar,
-            amp, bat, delta, lazygit, btop, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot, netbeans, drracket]
+            amp, bat, delta, lazygit, btop, yazi, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot, netbeans, drracket]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -1498,6 +1523,7 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.delta.result)
       && contains(fromJSON('["success", "skipped"]'), needs.lazygit.result)
       && contains(fromJSON('["success", "skipped"]'), needs.btop.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.yazi.result)
       && contains(fromJSON('["success", "skipped"]'), needs.eclipse.result)
       && contains(fromJSON('["success", "skipped"]'), needs.nova.result)
       && contains(fromJSON('["success", "skipped"]'), needs.jupyterlab.result)
@@ -1542,6 +1568,7 @@ jobs:
       DELTA: ${{ needs.check.outputs.delta }}
       LAZYGIT: ${{ needs.check.outputs.lazygit }}
       BTOP: ${{ needs.check.outputs.btop }}
+      YAZI: ${{ needs.check.outputs.yazi }}
       ECLIPSE: ${{ needs.check.outputs.eclipse }}
       NOVA: ${{ needs.check.outputs.nova }}
       JUPYTERLAB: ${{ needs.check.outputs.jupyterlab }}
@@ -1635,6 +1662,7 @@ jobs:
           notes "delta themes" "$DELTA" delta/CHANGELOG.md "heritage-themes-delta-<version>.zip"
           notes "lazygit themes" "$LAZYGIT" lazygit/CHANGELOG.md "heritage-themes-lazygit-<version>.zip"
           notes "btop themes" "$BTOP" btop/CHANGELOG.md "heritage-themes-btop-<version>.zip"
+          notes "yazi flavors" "$YAZI" yazi/CHANGELOG.md "heritage-themes-yazi-<version>.zip"
           notes "Eclipse plugin" "$ECLIPSE" eclipse/CHANGELOG.md "heritage-themes-eclipse-<version>.zip"
           notes "Nova themes" "$NOVA" nova/CHANGELOG.md "heritage-themes-nova-<version>.zip"
           notes "JupyterLab themes" "$JUPYTERLAB" jupyterlab/CHANGELOG.md "heritage-themes-jupyterlab-<version>.zip"

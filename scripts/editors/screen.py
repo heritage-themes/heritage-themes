@@ -2,9 +2,10 @@
 
 Usage: python3 screen.py EDITOR THEME FILES SAMPLE BACKGROUND FOREGROUND OUT.json
 
-EDITOR is nano, amp, bat, delta, lazygit or btop, THEME the theme's file name stem, FILES the folder of the editor's
-generated files, SAMPLE the file to open, or for lazygit and btop a file whose name is the view to show (for lazygit
-files, commits or search, for btop selected, followed or paused), and
+EDITOR is nano, amp, bat, delta, lazygit, btop or yazi, THEME the theme's file name stem, FILES the folder of the
+editor's generated files, SAMPLE the file to open, or for lazygit, btop and yazi a file whose name is the view to show
+(for lazygit files, commits or search, for btop selected, followed or paused, for yazi preview, select, cut, help or
+rename), which for yazi holds the code sample that its folder shows, and
 BACKGROUND and FOREGROUND the terminal's default colours as #RRGGBB, those of the matching Terminals theme. The editor
 starts in a pseudo-terminal of 256 colours that reports 24-bit colour and answers queries for its default colours, in a
 fresh HOME with the theme installed as its README says, and the screen is read through the pyte terminal emulator once
@@ -24,6 +25,8 @@ DELTA_ROWS = 32
 LAZYGIT_COLUMNS, LAZYGIT_ROWS = 120, 30
 # btop needs 80 by 24 cells for its four boxes; a larger screen gives the process list rows to fade over
 BTOP_COLUMNS, BTOP_ROWS = 120, 36
+# yazi's three columns need room for the preview of the code sample
+YAZI_COLUMNS, YAZI_ROWS = 120, 30
 QUIET, TIMEOUT = 1.5, 30
 # btop updates every BTOP_UPDATE milliseconds and gets BTOP_PACE seconds before each key and before the screen is read,
 # so its graphs hold several samples
@@ -229,7 +232,45 @@ def btop(home, stem, files, sample, background, foreground):
     return ["/usr/bin/btop"], BTOP_KEYS[os.path.basename(sample)]
 
 
-EDITORS = dict(nano=nano, amp=amp, bat=bat, delta=delta, lazygit=lazygit, btop=btop)
+# yazi's view → the keys that show it, in a folder of files of each kind that yazi colours: the code sample found and
+# hovered, its preview highlighted; two folders selected and yanked, and two files marked in visual mode, the shell
+# script hovered; a folder cut, with the key help of g open; the help menu with its third entry hovered; and a folder
+# being renamed, its name selected in the input
+YAZI_KEYS = {"preview": ["/", *"orders", "\r"], "select": [" ", " ", "y", "j", "j", "v", "j"],
+             "cut": ["j", "x", "g"], "help": ["~", "\x1b[B", "\x1b[B"], "rename": ["r"]}
+
+
+def yazi(home, stem, files, sample, background, foreground):
+    # the flavor in yazi's flavors folder and named in theme.toml as the dark or the light flavor, as the README says:
+    # the one that matches the terminal's background, as yazi judges it. The other slot names a flavor whose one colour
+    # the check rejects, so the screen shows the flavor only when yazi matches it to the terminal. The folder holds
+    # the code sample as orders.py, folders, an image, an archive, a document, audio, an executable, a link and a
+    # broken link, each with the bytes that file(1) detects its type by.
+    flavors = f"{home}/.config/yazi/flavors"
+    shutil.copytree(f"{files}/{stem}.yazi", f"{flavors}/{stem}.yazi")
+    write(f"{flavors}/decoy.yazi/flavor.toml", '[mgr]\ncwd = { fg = "#010203" }\n')
+    dark = luminance(background) < luminance(foreground)
+    write(f"{home}/.config/yazi/theme.toml",
+          f'[flavor]\ndark = "{stem if dark else "decoy"}"\nlight = "{"decoy" if dark else stem}"\n')
+    folder = f"{home}/weaving"
+    for name in ("dyes", "patterns"):
+        os.makedirs(f"{folder}/{name}")
+    shutil.move(sample, f"{folder}/orders.py")
+    write(f"{folder}/notes.txt", "Fire at 1200 degrees.\n")
+    write(f"{folder}/loom.sh", "#!/bin/sh\n# weave the next row\necho \"warp $1\"\n")
+    os.chmod(f"{folder}/loom.sh", 0o755)
+    blobs = {"motif.png": b"\x89PNG\r\n\x1a\n\0\0\0\rIHDR\0\0\0\1\0\0\0\1\x08\x02\0\0\0\x90wS\xde",
+             "archive.zip": b"PK\x05\x06" + b"\0" * 18, "catalogue.pdf": b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n",
+             "song.mp3": b"ID3\x03\0\0\0\0\0\0" + b"\xff\xfb\x90\x64" + b"\0" * 400}
+    for name, data in blobs.items():
+        with open(f"{folder}/{name}", "wb") as f:
+            f.write(data)
+    os.symlink("orders.py", f"{folder}/latest.py")
+    os.symlink("missing.txt", f"{folder}/lost.txt")
+    return ["/usr/local/bin/yazi", folder], YAZI_KEYS[os.path.basename(sample)]
+
+
+EDITORS = dict(nano=nano, amp=amp, bat=bat, delta=delta, lazygit=lazygit, btop=btop, yazi=yazi)
 
 
 def colour_reply(code, colour):
@@ -306,6 +347,9 @@ def main():
     elif editor == "btop":
         argv, keys = argv
         rows = run(argv, env, background, foreground, BTOP_ROWS, BTOP_COLUMNS, keys, BTOP_PACE)
+    elif editor == "yazi":
+        argv, keys = argv
+        rows = run(argv, env, background, foreground, YAZI_ROWS, YAZI_COLUMNS, keys)
     else:
         rows = run(argv, env, background, foreground, DELTA_ROWS if editor == "delta" else ROWS)
     if editor == "delta":

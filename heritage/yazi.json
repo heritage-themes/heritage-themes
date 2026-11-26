@@ -1,0 +1,4501 @@
+{
+ "version": "26.9.1",
+ "styles": {
+  "app": [
+   "overall"
+  ],
+  "mgr": [
+   "cwd",
+   "find_keyword",
+   "find_position",
+   "symlink_target",
+   "marker_copied",
+   "marker_cut",
+   "marker_marked",
+   "marker_selected",
+   "count_copied",
+   "count_cut",
+   "count_selected",
+   "border_style"
+  ],
+  "tabs": [
+   "active",
+   "inactive"
+  ],
+  "mode": [
+   "normal_main",
+   "normal_alt",
+   "select_main",
+   "select_alt",
+   "unset_main",
+   "unset_alt"
+  ],
+  "indicator": [
+   "parent",
+   "current",
+   "preview"
+  ],
+  "status": [
+   "overall",
+   "perm_sep",
+   "perm_type",
+   "perm_read",
+   "perm_write",
+   "perm_exec",
+   "progress_label",
+   "progress_normal",
+   "progress_error"
+  ],
+  "which": [
+   "border",
+   "mask",
+   "cand",
+   "rest",
+   "desc",
+   "separator_style"
+  ],
+  "confirm": [
+   "border",
+   "title",
+   "body",
+   "list",
+   "btn_yes",
+   "btn_no"
+  ],
+  "spot": [
+   "border",
+   "title",
+   "tbl_col",
+   "tbl_cell"
+  ],
+  "notify": [
+   "title_info",
+   "title_warn",
+   "title_error"
+  ],
+  "pick": [
+   "border",
+   "active",
+   "inactive"
+  ],
+  "input": [
+   "border",
+   "title",
+   "value",
+   "selected"
+  ],
+  "cmp": [
+   "border",
+   "active",
+   "inactive"
+  ],
+  "tasks": [
+   "border",
+   "title",
+   "hovered"
+  ],
+  "help": [
+   "border",
+   "chord",
+   "action",
+   "hovered"
+  ]
+ },
+ "filetype": [
+  {
+   "mime": "**/image/*"
+  },
+  {
+   "mime": "**/{audio,video}/*"
+  },
+  {
+   "mime": "**/application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}"
+  },
+  {
+   "mime": "**/application/{pdf,doc,rtf}"
+  },
+  {
+   "mime": "vfs/{absent,stale}"
+  },
+  {
+   "url": "*",
+   "is": "orphan"
+  },
+  {
+   "url": "*",
+   "is": "exec"
+  },
+  {
+   "url": "*",
+   "is": "dummy"
+  },
+  {
+   "url": "*/",
+   "is": "dummy"
+  },
+  {
+   "url": "*/"
+  }
+ ],
+ "icon": {
+  "globs": [],
+  "dirs": [
+   {
+    "name": ".config",
+    "text": "",
+    "dark": "#FF9800",
+    "light": "#FF9800"
+   },
+   {
+    "name": ".git",
+    "text": "",
+    "dark": "#00BCD4",
+    "light": "#009688"
+   },
+   {
+    "name": ".github",
+    "text": "",
+    "dark": "#03A9F4",
+    "light": "#03A9F4"
+   },
+   {
+    "name": ".npm",
+    "text": "",
+    "dark": "#03A9F4",
+    "light": "#03A9F4"
+   },
+   {
+    "name": "Desktop",
+    "text": "",
+    "dark": "#00BCD4",
+    "light": "#009688"
+   },
+   {
+    "name": "Development",
+    "text": "",
+    "dark": "#00BCD4",
+    "light": "#009688"
+   },
+   {
+    "name": "Documents",
+    "text": "",
+    "dark": "#00BCD4",
+    "light": "#009688"
+   },
+   {
+    "name": "Downloads",
+    "text": "",
+    "dark": "#00BCD4",
+    "light": "#009688"
+   },
+   {
+    "name": "Library",
+    "text": "",
+    "dark": "#00BCD4",
+    "light": "#009688"
+   },
+   {
+    "name": "Movies",
+    "text": "",
+    "dark": "#00BCD4",
+    "light": "#009688"
+   },
+   {
+    "name": "Music",
+    "text": "",
+    "dark": "#00BCD4",
+    "light": "#009688"
+   },
+   {
+    "name": "Pictures",
+    "text": "",
+    "dark": "#00BCD4",
+    "light": "#009688"
+   },
+   {
+    "name": "Public",
+    "text": "",
+    "dark": "#00BCD4",
+    "light": "#009688"
+   },
+   {
+    "name": "Videos",
+    "text": "",
+    "dark": "#00BCD4",
+    "light": "#009688"
+   }
+  ],
+  "files": [
+   {
+    "name": ".babelrc",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": ".bash_profile",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": ".bashrc",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": ".clang-format",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": ".clang-tidy",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": ".codespellrc",
+    "text": "󰓆",
+    "dark": "#35DA60",
+    "light": "#239140"
+   },
+   {
+    "name": ".condarc",
+    "text": "",
+    "dark": "#43B02A",
+    "light": "#2D751C"
+   },
+   {
+    "name": ".dockerignore",
+    "text": "󰡨",
+    "dark": "#458EE6",
+    "light": "#2E5F99"
+   },
+   {
+    "name": ".ds_store",
+    "text": "",
+    "dark": "#41535B",
+    "light": "#41535B"
+   },
+   {
+    "name": ".editorconfig",
+    "text": "",
+    "dark": "#FFF2F2",
+    "light": "#333030"
+   },
+   {
+    "name": ".env",
+    "text": "",
+    "dark": "#FAF743",
+    "light": "#32310D"
+   },
+   {
+    "name": ".eslintignore",
+    "text": "",
+    "dark": "#4B32C3",
+    "light": "#4B32C3"
+   },
+   {
+    "name": ".eslintrc",
+    "text": "",
+    "dark": "#4B32C3",
+    "light": "#4B32C3"
+   },
+   {
+    "name": ".git-blame-ignore-revs",
+    "text": "",
+    "dark": "#F54D27",
+    "light": "#B83A1D"
+   },
+   {
+    "name": ".gitattributes",
+    "text": "",
+    "dark": "#F54D27",
+    "light": "#B83A1D"
+   },
+   {
+    "name": ".gitconfig",
+    "text": "",
+    "dark": "#F54D27",
+    "light": "#B83A1D"
+   },
+   {
+    "name": ".gitignore",
+    "text": "",
+    "dark": "#F54D27",
+    "light": "#B83A1D"
+   },
+   {
+    "name": ".gitlab-ci.yml",
+    "text": "",
+    "dark": "#E24329",
+    "light": "#AA321F"
+   },
+   {
+    "name": ".gitmodules",
+    "text": "",
+    "dark": "#F54D27",
+    "light": "#B83A1D"
+   },
+   {
+    "name": ".gtkrc-2.0",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": ".gvimrc",
+    "text": "",
+    "dark": "#019833",
+    "light": "#017226"
+   },
+   {
+    "name": ".justfile",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": ".luacheckrc",
+    "text": "",
+    "dark": "#00A2FF",
+    "light": "#007ABF"
+   },
+   {
+    "name": ".luaurc",
+    "text": "",
+    "dark": "#00A2FF",
+    "light": "#007ABF"
+   },
+   {
+    "name": ".mailmap",
+    "text": "󰊢",
+    "dark": "#F54D27",
+    "light": "#B83A1D"
+   },
+   {
+    "name": ".nanorc",
+    "text": "",
+    "dark": "#440077",
+    "light": "#440077"
+   },
+   {
+    "name": ".npmignore",
+    "text": "",
+    "dark": "#E8274B",
+    "light": "#AE1D38"
+   },
+   {
+    "name": ".npmrc",
+    "text": "",
+    "dark": "#E8274B",
+    "light": "#AE1D38"
+   },
+   {
+    "name": ".nuxtrc",
+    "text": "󱄆",
+    "dark": "#00C58E",
+    "light": "#00835F"
+   },
+   {
+    "name": ".nvmrc",
+    "text": "",
+    "dark": "#5FA04E",
+    "light": "#3F6B34"
+   },
+   {
+    "name": ".pnpmfile.cjs",
+    "text": "",
+    "dark": "#F9AD02",
+    "light": "#7C5601"
+   },
+   {
+    "name": ".pre-commit-config.yaml",
+    "text": "󰛢",
+    "dark": "#F8B424",
+    "light": "#7C5A12"
+   },
+   {
+    "name": ".prettierignore",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": ".prettierrc",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": ".prettierrc.cjs",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": ".prettierrc.js",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": ".prettierrc.json",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": ".prettierrc.json5",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": ".prettierrc.mjs",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": ".prettierrc.toml",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": ".prettierrc.yaml",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": ".prettierrc.yml",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": ".pylintrc",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": ".settings.json",
+    "text": "",
+    "dark": "#854CC7",
+    "light": "#643995"
+   },
+   {
+    "name": ".SRCINFO",
+    "text": "󰣇",
+    "dark": "#0F94D2",
+    "light": "#0B6F9E"
+   },
+   {
+    "name": ".vimrc",
+    "text": "",
+    "dark": "#019833",
+    "light": "#017226"
+   },
+   {
+    "name": ".Xauthority",
+    "text": "",
+    "dark": "#E54D18",
+    "light": "#AC3A12"
+   },
+   {
+    "name": ".xinitrc",
+    "text": "",
+    "dark": "#E54D18",
+    "light": "#AC3A12"
+   },
+   {
+    "name": ".Xresources",
+    "text": "",
+    "dark": "#E54D18",
+    "light": "#AC3A12"
+   },
+   {
+    "name": ".xsession",
+    "text": "",
+    "dark": "#E54D18",
+    "light": "#AC3A12"
+   },
+   {
+    "name": ".zprofile",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": ".zshenv",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": ".zshrc",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": "_gvimrc",
+    "text": "",
+    "dark": "#019833",
+    "light": "#017226"
+   },
+   {
+    "name": "_vimrc",
+    "text": "",
+    "dark": "#019833",
+    "light": "#017226"
+   },
+   {
+    "name": "AUTHORS",
+    "text": "",
+    "dark": "#A172FF",
+    "light": "#6B4CAA"
+   },
+   {
+    "name": "AUTHORS.txt",
+    "text": "",
+    "dark": "#A172FF",
+    "light": "#6B4CAA"
+   },
+   {
+    "name": "brewfile",
+    "text": "",
+    "dark": "#701516",
+    "light": "#701516"
+   },
+   {
+    "name": "bspwmrc",
+    "text": "",
+    "dark": "#2F2F2F",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "build",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": "build.gradle",
+    "text": "",
+    "dark": "#005F87",
+    "light": "#005F87"
+   },
+   {
+    "name": "build.zig.zon",
+    "text": "",
+    "dark": "#F69A1B",
+    "light": "#7B4D0E"
+   },
+   {
+    "name": "bun.lock",
+    "text": "",
+    "dark": "#EADCD1",
+    "light": "#4E4946"
+   },
+   {
+    "name": "bun.lockb",
+    "text": "",
+    "dark": "#EADCD1",
+    "light": "#4E4946"
+   },
+   {
+    "name": "cantorrc",
+    "text": "",
+    "dark": "#1C99F3",
+    "light": "#1573B6"
+   },
+   {
+    "name": "checkhealth",
+    "text": "󰓙",
+    "dark": "#75B4FB",
+    "light": "#3A5A7E"
+   },
+   {
+    "name": "cmakelists.txt",
+    "text": "",
+    "dark": "#DCE3EB",
+    "light": "#2C2D2F"
+   },
+   {
+    "name": "code_of_conduct",
+    "text": "",
+    "dark": "#E41662",
+    "light": "#AB104A"
+   },
+   {
+    "name": "code_of_conduct.md",
+    "text": "",
+    "dark": "#E41662",
+    "light": "#AB104A"
+   },
+   {
+    "name": "commit_editmsg",
+    "text": "",
+    "dark": "#F54D27",
+    "light": "#B83A1D"
+   },
+   {
+    "name": "commitlint.config.js",
+    "text": "󰜘",
+    "dark": "#2B9689",
+    "light": "#207067"
+   },
+   {
+    "name": "commitlint.config.ts",
+    "text": "󰜘",
+    "dark": "#2B9689",
+    "light": "#207067"
+   },
+   {
+    "name": "compose.yaml",
+    "text": "󰡨",
+    "dark": "#458EE6",
+    "light": "#2E5F99"
+   },
+   {
+    "name": "compose.yml",
+    "text": "󰡨",
+    "dark": "#458EE6",
+    "light": "#2E5F99"
+   },
+   {
+    "name": "config",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "containerfile",
+    "text": "󰡨",
+    "dark": "#458EE6",
+    "light": "#2E5F99"
+   },
+   {
+    "name": "copying",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "copying.lesser",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "Directory.Build.props",
+    "text": "",
+    "dark": "#00A2FF",
+    "light": "#007ABF"
+   },
+   {
+    "name": "Directory.Build.targets",
+    "text": "",
+    "dark": "#00A2FF",
+    "light": "#007ABF"
+   },
+   {
+    "name": "Directory.Packages.props",
+    "text": "",
+    "dark": "#00A2FF",
+    "light": "#007ABF"
+   },
+   {
+    "name": "docker-compose.yaml",
+    "text": "󰡨",
+    "dark": "#458EE6",
+    "light": "#2E5F99"
+   },
+   {
+    "name": "docker-compose.yml",
+    "text": "󰡨",
+    "dark": "#458EE6",
+    "light": "#2E5F99"
+   },
+   {
+    "name": "dockerfile",
+    "text": "󰡨",
+    "dark": "#458EE6",
+    "light": "#2E5F99"
+   },
+   {
+    "name": "eslint.config.cjs",
+    "text": "",
+    "dark": "#4B32C3",
+    "light": "#4B32C3"
+   },
+   {
+    "name": "eslint.config.js",
+    "text": "",
+    "dark": "#4B32C3",
+    "light": "#4B32C3"
+   },
+   {
+    "name": "eslint.config.mjs",
+    "text": "",
+    "dark": "#4B32C3",
+    "light": "#4B32C3"
+   },
+   {
+    "name": "eslint.config.ts",
+    "text": "",
+    "dark": "#4B32C3",
+    "light": "#4B32C3"
+   },
+   {
+    "name": "ext_typoscript_setup.txt",
+    "text": "",
+    "dark": "#FF8700",
+    "light": "#AA5A00"
+   },
+   {
+    "name": "favicon.ico",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "fp-info-cache",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "fp-lib-table",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "FreeCAD.conf",
+    "text": "",
+    "dark": "#CB333B",
+    "light": "#98262C"
+   },
+   {
+    "name": "Gemfile",
+    "text": "",
+    "dark": "#701516",
+    "light": "#701516"
+   },
+   {
+    "name": "gnumakefile",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "go.mod",
+    "text": "",
+    "dark": "#00ADD8",
+    "light": "#0082A2"
+   },
+   {
+    "name": "go.sum",
+    "text": "",
+    "dark": "#00ADD8",
+    "light": "#0082A2"
+   },
+   {
+    "name": "go.work",
+    "text": "",
+    "dark": "#00ADD8",
+    "light": "#0082A2"
+   },
+   {
+    "name": "gradle-wrapper.properties",
+    "text": "",
+    "dark": "#005F87",
+    "light": "#005F87"
+   },
+   {
+    "name": "gradle.properties",
+    "text": "",
+    "dark": "#005F87",
+    "light": "#005F87"
+   },
+   {
+    "name": "gradlew",
+    "text": "",
+    "dark": "#005F87",
+    "light": "#005F87"
+   },
+   {
+    "name": "groovy",
+    "text": "",
+    "dark": "#4A687C",
+    "light": "#384E5D"
+   },
+   {
+    "name": "gruntfile.babel.js",
+    "text": "",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "gruntfile.coffee",
+    "text": "",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "gruntfile.js",
+    "text": "",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "gruntfile.ts",
+    "text": "",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "gtkrc",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "gulpfile.babel.js",
+    "text": "",
+    "dark": "#CC3E44",
+    "light": "#992E33"
+   },
+   {
+    "name": "gulpfile.coffee",
+    "text": "",
+    "dark": "#CC3E44",
+    "light": "#992E33"
+   },
+   {
+    "name": "gulpfile.js",
+    "text": "",
+    "dark": "#CC3E44",
+    "light": "#992E33"
+   },
+   {
+    "name": "gulpfile.ts",
+    "text": "",
+    "dark": "#CC3E44",
+    "light": "#992E33"
+   },
+   {
+    "name": "hypridle.conf",
+    "text": "",
+    "dark": "#00AAAE",
+    "light": "#008082"
+   },
+   {
+    "name": "hyprland.conf",
+    "text": "",
+    "dark": "#00AAAE",
+    "light": "#008082"
+   },
+   {
+    "name": "hyprlandd.conf",
+    "text": "",
+    "dark": "#00AAAE",
+    "light": "#008082"
+   },
+   {
+    "name": "hyprlock.conf",
+    "text": "",
+    "dark": "#00AAAE",
+    "light": "#008082"
+   },
+   {
+    "name": "hyprpaper.conf",
+    "text": "",
+    "dark": "#00AAAE",
+    "light": "#008082"
+   },
+   {
+    "name": "hyprsunset.conf",
+    "text": "",
+    "dark": "#00AAAE",
+    "light": "#008082"
+   },
+   {
+    "name": "i18n.config.js",
+    "text": "󰗊",
+    "dark": "#7986CB",
+    "light": "#515987"
+   },
+   {
+    "name": "i18n.config.ts",
+    "text": "󰗊",
+    "dark": "#7986CB",
+    "light": "#515987"
+   },
+   {
+    "name": "i3blocks.conf",
+    "text": "",
+    "dark": "#E8EBEE",
+    "light": "#2E2F30"
+   },
+   {
+    "name": "i3status.conf",
+    "text": "",
+    "dark": "#E8EBEE",
+    "light": "#2E2F30"
+   },
+   {
+    "name": "index.theme",
+    "text": "",
+    "dark": "#2DB96F",
+    "light": "#1E7B4A"
+   },
+   {
+    "name": "ionic.config.json",
+    "text": "",
+    "dark": "#4F8FF7",
+    "light": "#355FA5"
+   },
+   {
+    "name": "Jenkinsfile",
+    "text": "",
+    "dark": "#D33833",
+    "light": "#9E2A26"
+   },
+   {
+    "name": "justfile",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "kalgebrarc",
+    "text": "",
+    "dark": "#1C99F3",
+    "light": "#1573B6"
+   },
+   {
+    "name": "kdeglobals",
+    "text": "",
+    "dark": "#1C99F3",
+    "light": "#1573B6"
+   },
+   {
+    "name": "kdenlive-layoutsrc",
+    "text": "",
+    "dark": "#83B8F2",
+    "light": "#425C79"
+   },
+   {
+    "name": "kdenliverc",
+    "text": "",
+    "dark": "#83B8F2",
+    "light": "#425C79"
+   },
+   {
+    "name": "kritadisplayrc",
+    "text": "",
+    "dark": "#F245FB",
+    "light": "#A12EA7"
+   },
+   {
+    "name": "kritarc",
+    "text": "",
+    "dark": "#F245FB",
+    "light": "#A12EA7"
+   },
+   {
+    "name": "license",
+    "text": "",
+    "dark": "#D0BF41",
+    "light": "#686020"
+   },
+   {
+    "name": "license.md",
+    "text": "",
+    "dark": "#D0BF41",
+    "light": "#686020"
+   },
+   {
+    "name": "lxde-rc.xml",
+    "text": "",
+    "dark": "#909090",
+    "light": "#606060"
+   },
+   {
+    "name": "lxqt.conf",
+    "text": "",
+    "dark": "#0192D3",
+    "light": "#016E9E"
+   },
+   {
+    "name": "makefile",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "mix.lock",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "mpv.conf",
+    "text": "",
+    "dark": "#3B1342",
+    "light": "#3B1342"
+   },
+   {
+    "name": "next.config.cjs",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "next.config.js",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "next.config.ts",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "node_modules",
+    "text": "",
+    "dark": "#E8274B",
+    "light": "#AE1D38"
+   },
+   {
+    "name": "nuxt.config.cjs",
+    "text": "󱄆",
+    "dark": "#00C58E",
+    "light": "#00835F"
+   },
+   {
+    "name": "nuxt.config.js",
+    "text": "󱄆",
+    "dark": "#00C58E",
+    "light": "#00835F"
+   },
+   {
+    "name": "nuxt.config.mjs",
+    "text": "󱄆",
+    "dark": "#00C58E",
+    "light": "#00835F"
+   },
+   {
+    "name": "nuxt.config.ts",
+    "text": "󱄆",
+    "dark": "#00C58E",
+    "light": "#00835F"
+   },
+   {
+    "name": "package-lock.json",
+    "text": "",
+    "dark": "#7A0D21",
+    "light": "#7A0D21"
+   },
+   {
+    "name": "package.json",
+    "text": "",
+    "dark": "#E8274B",
+    "light": "#AE1D38"
+   },
+   {
+    "name": "PKGBUILD",
+    "text": "",
+    "dark": "#0F94D2",
+    "light": "#0B6F9E"
+   },
+   {
+    "name": "platformio.ini",
+    "text": "",
+    "dark": "#F6822B",
+    "light": "#A4571D"
+   },
+   {
+    "name": "playwright.config.cjs",
+    "text": "",
+    "dark": "#2FAD33",
+    "light": "#238226"
+   },
+   {
+    "name": "playwright.config.cts",
+    "text": "",
+    "dark": "#2FAD33",
+    "light": "#238226"
+   },
+   {
+    "name": "playwright.config.js",
+    "text": "",
+    "dark": "#2FAD33",
+    "light": "#238226"
+   },
+   {
+    "name": "playwright.config.mjs",
+    "text": "",
+    "dark": "#2FAD33",
+    "light": "#238226"
+   },
+   {
+    "name": "playwright.config.mts",
+    "text": "",
+    "dark": "#2FAD33",
+    "light": "#238226"
+   },
+   {
+    "name": "playwright.config.ts",
+    "text": "",
+    "dark": "#2FAD33",
+    "light": "#238226"
+   },
+   {
+    "name": "pnpm-lock.yaml",
+    "text": "",
+    "dark": "#F9AD02",
+    "light": "#7C5601"
+   },
+   {
+    "name": "pnpm-workspace.yaml",
+    "text": "",
+    "dark": "#F9AD02",
+    "light": "#7C5601"
+   },
+   {
+    "name": "pom.xml",
+    "text": "",
+    "dark": "#7A0D21",
+    "light": "#7A0D21"
+   },
+   {
+    "name": "prettier.config.cjs",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": "prettier.config.js",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": "prettier.config.mjs",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": "prettier.config.ts",
+    "text": "",
+    "dark": "#4285F4",
+    "light": "#3264B7"
+   },
+   {
+    "name": "prisma.config.mts",
+    "text": "",
+    "dark": "#5A67D8",
+    "light": "#444DA2"
+   },
+   {
+    "name": "prisma.config.ts",
+    "text": "",
+    "dark": "#5A67D8",
+    "light": "#444DA2"
+   },
+   {
+    "name": "procfile",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "PrusaSlicer.ini",
+    "text": "",
+    "dark": "#EC6B23",
+    "light": "#9D4717"
+   },
+   {
+    "name": "PrusaSlicerGcodeViewer.ini",
+    "text": "",
+    "dark": "#EC6B23",
+    "light": "#9D4717"
+   },
+   {
+    "name": "py.typed",
+    "text": "",
+    "dark": "#FFBC03",
+    "light": "#805E02"
+   },
+   {
+    "name": "QtProject.conf",
+    "text": "",
+    "dark": "#40CD52",
+    "light": "#2B8937"
+   },
+   {
+    "name": "rakefile",
+    "text": "",
+    "dark": "#701516",
+    "light": "#701516"
+   },
+   {
+    "name": "readme",
+    "text": "󰂺",
+    "dark": "#EDEDED",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "readme.md",
+    "text": "󰂺",
+    "dark": "#EDEDED",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "rmd",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "robots.txt",
+    "text": "󰚩",
+    "dark": "#5D7096",
+    "light": "#465470"
+   },
+   {
+    "name": "security",
+    "text": "󰒃",
+    "dark": "#BEC4C9",
+    "light": "#3F4143"
+   },
+   {
+    "name": "security.md",
+    "text": "󰒃",
+    "dark": "#BEC4C9",
+    "light": "#3F4143"
+   },
+   {
+    "name": "settings.gradle",
+    "text": "",
+    "dark": "#005F87",
+    "light": "#005F87"
+   },
+   {
+    "name": "svelte.config.js",
+    "text": "",
+    "dark": "#FF3E00",
+    "light": "#BF2E00"
+   },
+   {
+    "name": "sxhkdrc",
+    "text": "",
+    "dark": "#2F2F2F",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "sym-lib-table",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "tailwind.config.js",
+    "text": "󱏿",
+    "dark": "#20C2E3",
+    "light": "#158197"
+   },
+   {
+    "name": "tailwind.config.mjs",
+    "text": "󱏿",
+    "dark": "#20C2E3",
+    "light": "#158197"
+   },
+   {
+    "name": "tailwind.config.ts",
+    "text": "󱏿",
+    "dark": "#20C2E3",
+    "light": "#158197"
+   },
+   {
+    "name": "tmux.conf",
+    "text": "",
+    "dark": "#14BA19",
+    "light": "#0F8C13"
+   },
+   {
+    "name": "tmux.conf.local",
+    "text": "",
+    "dark": "#14BA19",
+    "light": "#0F8C13"
+   },
+   {
+    "name": "tsconfig.json",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "unlicense",
+    "text": "",
+    "dark": "#D0BF41",
+    "light": "#686020"
+   },
+   {
+    "name": "vagrantfile",
+    "text": "",
+    "dark": "#1563FF",
+    "light": "#104ABF"
+   },
+   {
+    "name": "vercel.json",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "vite.config.cjs",
+    "text": "",
+    "dark": "#FFA800",
+    "light": "#805400"
+   },
+   {
+    "name": "vite.config.cts",
+    "text": "",
+    "dark": "#FFA800",
+    "light": "#805400"
+   },
+   {
+    "name": "vite.config.js",
+    "text": "",
+    "dark": "#FFA800",
+    "light": "#805400"
+   },
+   {
+    "name": "vite.config.mjs",
+    "text": "",
+    "dark": "#FFA800",
+    "light": "#805400"
+   },
+   {
+    "name": "vite.config.mts",
+    "text": "",
+    "dark": "#FFA800",
+    "light": "#805400"
+   },
+   {
+    "name": "vite.config.ts",
+    "text": "",
+    "dark": "#FFA800",
+    "light": "#805400"
+   },
+   {
+    "name": "vitest.config.cjs",
+    "text": "",
+    "dark": "#739B1B",
+    "light": "#4D6712"
+   },
+   {
+    "name": "vitest.config.cts",
+    "text": "",
+    "dark": "#739B1B",
+    "light": "#4D6712"
+   },
+   {
+    "name": "vitest.config.js",
+    "text": "",
+    "dark": "#739B1B",
+    "light": "#4D6712"
+   },
+   {
+    "name": "vitest.config.mjs",
+    "text": "",
+    "dark": "#739B1B",
+    "light": "#4D6712"
+   },
+   {
+    "name": "vitest.config.mts",
+    "text": "",
+    "dark": "#739B1B",
+    "light": "#4D6712"
+   },
+   {
+    "name": "vitest.config.ts",
+    "text": "",
+    "dark": "#739B1B",
+    "light": "#4D6712"
+   },
+   {
+    "name": "vlcrc",
+    "text": "󰕼",
+    "dark": "#EE7A00",
+    "light": "#9F5100"
+   },
+   {
+    "name": "webpack",
+    "text": "󰜫",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "weston.ini",
+    "text": "",
+    "dark": "#FFBB01",
+    "light": "#805E00"
+   },
+   {
+    "name": "workspace",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": "wrangler.jsonc",
+    "text": "",
+    "dark": "#F48120",
+    "light": "#A35615"
+   },
+   {
+    "name": "wrangler.toml",
+    "text": "",
+    "dark": "#F48120",
+    "light": "#A35615"
+   },
+   {
+    "name": "xdph.conf",
+    "text": "",
+    "dark": "#00AAAE",
+    "light": "#008082"
+   },
+   {
+    "name": "xmobarrc",
+    "text": "",
+    "dark": "#FD4D5D",
+    "light": "#A9333E"
+   },
+   {
+    "name": "xmobarrc.hs",
+    "text": "",
+    "dark": "#FD4D5D",
+    "light": "#A9333E"
+   },
+   {
+    "name": "xmonad.hs",
+    "text": "",
+    "dark": "#FD4D5D",
+    "light": "#A9333E"
+   },
+   {
+    "name": "xorg.conf",
+    "text": "",
+    "dark": "#E54D18",
+    "light": "#AC3A12"
+   },
+   {
+    "name": "xsettingsd.conf",
+    "text": "",
+    "dark": "#E54D18",
+    "light": "#AC3A12"
+   }
+  ],
+  "exts": [
+   {
+    "name": "3gp",
+    "text": "",
+    "dark": "#FD971F",
+    "light": "#7E4C10"
+   },
+   {
+    "name": "3mf",
+    "text": "󰆧",
+    "dark": "#888888",
+    "light": "#5B5B5B"
+   },
+   {
+    "name": "7z",
+    "text": "",
+    "dark": "#ECA517",
+    "light": "#76520C"
+   },
+   {
+    "name": "a",
+    "text": "",
+    "dark": "#DCDDD6",
+    "light": "#494A47"
+   },
+   {
+    "name": "aac",
+    "text": "",
+    "dark": "#00AFFF",
+    "light": "#0075AA"
+   },
+   {
+    "name": "ada",
+    "text": "",
+    "dark": "#599EFF",
+    "light": "#3B69AA"
+   },
+   {
+    "name": "adb",
+    "text": "",
+    "dark": "#599EFF",
+    "light": "#3B69AA"
+   },
+   {
+    "name": "ads",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "ai",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "aif",
+    "text": "",
+    "dark": "#00AFFF",
+    "light": "#0075AA"
+   },
+   {
+    "name": "aiff",
+    "text": "",
+    "dark": "#00AFFF",
+    "light": "#0075AA"
+   },
+   {
+    "name": "android",
+    "text": "",
+    "dark": "#34A853",
+    "light": "#277E3E"
+   },
+   {
+    "name": "ape",
+    "text": "",
+    "dark": "#00AFFF",
+    "light": "#0075AA"
+   },
+   {
+    "name": "apk",
+    "text": "",
+    "dark": "#34A853",
+    "light": "#277E3E"
+   },
+   {
+    "name": "apl",
+    "text": "",
+    "dark": "#24A148",
+    "light": "#1B7936"
+   },
+   {
+    "name": "app",
+    "text": "",
+    "dark": "#9F0500",
+    "light": "#9F0500"
+   },
+   {
+    "name": "applescript",
+    "text": "",
+    "dark": "#6D8085",
+    "light": "#526064"
+   },
+   {
+    "name": "asc",
+    "text": "󰦝",
+    "dark": "#576D7F",
+    "light": "#41525F"
+   },
+   {
+    "name": "asm",
+    "text": "",
+    "dark": "#0091BD",
+    "light": "#006D8E"
+   },
+   {
+    "name": "ass",
+    "text": "󰨖",
+    "dark": "#FFB713",
+    "light": "#805C0A"
+   },
+   {
+    "name": "astro",
+    "text": "",
+    "dark": "#E23F67",
+    "light": "#AA2F4D"
+   },
+   {
+    "name": "avif",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "awk",
+    "text": "",
+    "dark": "#4D5A5E",
+    "light": "#3A4446"
+   },
+   {
+    "name": "azcli",
+    "text": "",
+    "dark": "#0078D4",
+    "light": "#005A9F"
+   },
+   {
+    "name": "bak",
+    "text": "󰁯",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "bash",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": "bat",
+    "text": "",
+    "dark": "#C1F12E",
+    "light": "#40500F"
+   },
+   {
+    "name": "bazel",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": "bib",
+    "text": "󱉟",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "bicep",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "bicepparam",
+    "text": "",
+    "dark": "#9F74B3",
+    "light": "#6A4D77"
+   },
+   {
+    "name": "bin",
+    "text": "",
+    "dark": "#9F0500",
+    "light": "#9F0500"
+   },
+   {
+    "name": "blade.php",
+    "text": "",
+    "dark": "#F05340",
+    "light": "#A0372B"
+   },
+   {
+    "name": "blend",
+    "text": "󰂫",
+    "dark": "#EA7600",
+    "light": "#9C4F00"
+   },
+   {
+    "name": "blp",
+    "text": "󰺾",
+    "dark": "#5796E2",
+    "light": "#3A6497"
+   },
+   {
+    "name": "bmp",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "bqn",
+    "text": "",
+    "dark": "#24A148",
+    "light": "#1B7936"
+   },
+   {
+    "name": "brep",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "bz",
+    "text": "",
+    "dark": "#ECA517",
+    "light": "#76520C"
+   },
+   {
+    "name": "bz2",
+    "text": "",
+    "dark": "#ECA517",
+    "light": "#76520C"
+   },
+   {
+    "name": "bz3",
+    "text": "",
+    "dark": "#ECA517",
+    "light": "#76520C"
+   },
+   {
+    "name": "bzl",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": "c",
+    "text": "",
+    "dark": "#599EFF",
+    "light": "#3B69AA"
+   },
+   {
+    "name": "c++",
+    "text": "",
+    "dark": "#F34B7D",
+    "light": "#A23253"
+   },
+   {
+    "name": "cache",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "cast",
+    "text": "",
+    "dark": "#FD971F",
+    "light": "#7E4C10"
+   },
+   {
+    "name": "cbl",
+    "text": "",
+    "dark": "#005CA5",
+    "light": "#005CA5"
+   },
+   {
+    "name": "cc",
+    "text": "",
+    "dark": "#F34B7D",
+    "light": "#A23253"
+   },
+   {
+    "name": "ccm",
+    "text": "",
+    "dark": "#F34B7D",
+    "light": "#A23253"
+   },
+   {
+    "name": "cfc",
+    "text": "",
+    "dark": "#01A4BA",
+    "light": "#017B8C"
+   },
+   {
+    "name": "cfg",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "cfm",
+    "text": "",
+    "dark": "#01A4BA",
+    "light": "#017B8C"
+   },
+   {
+    "name": "cjs",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "clj",
+    "text": "",
+    "dark": "#8DC149",
+    "light": "#466024"
+   },
+   {
+    "name": "cljc",
+    "text": "",
+    "dark": "#8DC149",
+    "light": "#466024"
+   },
+   {
+    "name": "cljd",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "cljs",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "cmake",
+    "text": "",
+    "dark": "#DCE3EB",
+    "light": "#2C2D2F"
+   },
+   {
+    "name": "cob",
+    "text": "",
+    "dark": "#005CA5",
+    "light": "#005CA5"
+   },
+   {
+    "name": "cobol",
+    "text": "",
+    "dark": "#005CA5",
+    "light": "#005CA5"
+   },
+   {
+    "name": "coffee",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "conda",
+    "text": "",
+    "dark": "#43B02A",
+    "light": "#2D751C"
+   },
+   {
+    "name": "conf",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "config.ru",
+    "text": "",
+    "dark": "#701516",
+    "light": "#701516"
+   },
+   {
+    "name": "cow",
+    "text": "󰆚",
+    "dark": "#965824",
+    "light": "#70421B"
+   },
+   {
+    "name": "cp",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "cpp",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "cppm",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "cpy",
+    "text": "",
+    "dark": "#005CA5",
+    "light": "#005CA5"
+   },
+   {
+    "name": "cr",
+    "text": "",
+    "dark": "#C8C8C8",
+    "light": "#434343"
+   },
+   {
+    "name": "crdownload",
+    "text": "",
+    "dark": "#44CDA8",
+    "light": "#226654"
+   },
+   {
+    "name": "cs",
+    "text": "󰌛",
+    "dark": "#596706",
+    "light": "#434D04"
+   },
+   {
+    "name": "csh",
+    "text": "",
+    "dark": "#4D5A5E",
+    "light": "#3A4446"
+   },
+   {
+    "name": "cshtml",
+    "text": "󱦗",
+    "dark": "#512BD4",
+    "light": "#512BD4"
+   },
+   {
+    "name": "cson",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "csproj",
+    "text": "󰪮",
+    "dark": "#512BD4",
+    "light": "#512BD4"
+   },
+   {
+    "name": "css",
+    "text": "",
+    "dark": "#663399",
+    "light": "#663399"
+   },
+   {
+    "name": "csv",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": "cts",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "cu",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": "cue",
+    "text": "󰲹",
+    "dark": "#ED95AE",
+    "light": "#764A57"
+   },
+   {
+    "name": "cuh",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "cxx",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "cxxm",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "d",
+    "text": "",
+    "dark": "#B03931",
+    "light": "#842B25"
+   },
+   {
+    "name": "d.ts",
+    "text": "",
+    "dark": "#D59855",
+    "light": "#6A4C2A"
+   },
+   {
+    "name": "dart",
+    "text": "",
+    "dark": "#03589C",
+    "light": "#03589C"
+   },
+   {
+    "name": "db",
+    "text": "",
+    "dark": "#DAD8D8",
+    "light": "#494848"
+   },
+   {
+    "name": "dconf",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "desktop",
+    "text": "",
+    "dark": "#563D7C",
+    "light": "#563D7C"
+   },
+   {
+    "name": "diff",
+    "text": "",
+    "dark": "#41535B",
+    "light": "#41535B"
+   },
+   {
+    "name": "dll",
+    "text": "",
+    "dark": "#4D2C0B",
+    "light": "#4D2C0B"
+   },
+   {
+    "name": "doc",
+    "text": "󰈬",
+    "dark": "#185ABD",
+    "light": "#185ABD"
+   },
+   {
+    "name": "Dockerfile",
+    "text": "󰡨",
+    "dark": "#458EE6",
+    "light": "#2E5F99"
+   },
+   {
+    "name": "dockerignore",
+    "text": "󰡨",
+    "dark": "#458EE6",
+    "light": "#2E5F99"
+   },
+   {
+    "name": "docx",
+    "text": "󰈬",
+    "dark": "#185ABD",
+    "light": "#185ABD"
+   },
+   {
+    "name": "dot",
+    "text": "󱁉",
+    "dark": "#30638E",
+    "light": "#244A6A"
+   },
+   {
+    "name": "download",
+    "text": "",
+    "dark": "#44CDA8",
+    "light": "#226654"
+   },
+   {
+    "name": "drl",
+    "text": "",
+    "dark": "#FFAFAF",
+    "light": "#553A3A"
+   },
+   {
+    "name": "dropbox",
+    "text": "",
+    "dark": "#0061FE",
+    "light": "#0049BE"
+   },
+   {
+    "name": "dump",
+    "text": "",
+    "dark": "#DAD8D8",
+    "light": "#494848"
+   },
+   {
+    "name": "dwg",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "dxf",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "ebook",
+    "text": "",
+    "dark": "#EAB16D",
+    "light": "#755836"
+   },
+   {
+    "name": "ebuild",
+    "text": "",
+    "dark": "#4C416E",
+    "light": "#4C416E"
+   },
+   {
+    "name": "edn",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "eex",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "ejs",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "el",
+    "text": "",
+    "dark": "#8172BE",
+    "light": "#61568E"
+   },
+   {
+    "name": "elc",
+    "text": "",
+    "dark": "#8172BE",
+    "light": "#61568E"
+   },
+   {
+    "name": "elf",
+    "text": "",
+    "dark": "#9F0500",
+    "light": "#9F0500"
+   },
+   {
+    "name": "elm",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "eln",
+    "text": "",
+    "dark": "#8172BE",
+    "light": "#61568E"
+   },
+   {
+    "name": "env",
+    "text": "",
+    "dark": "#FAF743",
+    "light": "#32310D"
+   },
+   {
+    "name": "eot",
+    "text": "",
+    "dark": "#ECECEC",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "epp",
+    "text": "",
+    "dark": "#FFA61A",
+    "light": "#80530D"
+   },
+   {
+    "name": "epub",
+    "text": "",
+    "dark": "#EAB16D",
+    "light": "#755836"
+   },
+   {
+    "name": "erb",
+    "text": "",
+    "dark": "#701516",
+    "light": "#701516"
+   },
+   {
+    "name": "erl",
+    "text": "",
+    "dark": "#B83998",
+    "light": "#8A2B72"
+   },
+   {
+    "name": "ex",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "exe",
+    "text": "",
+    "dark": "#9F0500",
+    "light": "#9F0500"
+   },
+   {
+    "name": "exs",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "f#",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "f3d",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "f90",
+    "text": "󱈚",
+    "dark": "#734F96",
+    "light": "#563B70"
+   },
+   {
+    "name": "fbx",
+    "text": "󰆧",
+    "dark": "#888888",
+    "light": "#5B5B5B"
+   },
+   {
+    "name": "fcbak",
+    "text": "",
+    "dark": "#CB333B",
+    "light": "#98262C"
+   },
+   {
+    "name": "fcmacro",
+    "text": "",
+    "dark": "#CB333B",
+    "light": "#98262C"
+   },
+   {
+    "name": "fcmat",
+    "text": "",
+    "dark": "#CB333B",
+    "light": "#98262C"
+   },
+   {
+    "name": "fcparam",
+    "text": "",
+    "dark": "#CB333B",
+    "light": "#98262C"
+   },
+   {
+    "name": "fcscript",
+    "text": "",
+    "dark": "#CB333B",
+    "light": "#98262C"
+   },
+   {
+    "name": "fcstd",
+    "text": "",
+    "dark": "#CB333B",
+    "light": "#98262C"
+   },
+   {
+    "name": "fcstd1",
+    "text": "",
+    "dark": "#CB333B",
+    "light": "#98262C"
+   },
+   {
+    "name": "fctb",
+    "text": "",
+    "dark": "#CB333B",
+    "light": "#98262C"
+   },
+   {
+    "name": "fctl",
+    "text": "",
+    "dark": "#CB333B",
+    "light": "#98262C"
+   },
+   {
+    "name": "fdmdownload",
+    "text": "",
+    "dark": "#44CDA8",
+    "light": "#226654"
+   },
+   {
+    "name": "feature",
+    "text": "",
+    "dark": "#00A818",
+    "light": "#007E12"
+   },
+   {
+    "name": "fish",
+    "text": "",
+    "dark": "#4D5A5E",
+    "light": "#3A4446"
+   },
+   {
+    "name": "flac",
+    "text": "",
+    "dark": "#0075AA",
+    "light": "#005880"
+   },
+   {
+    "name": "flc",
+    "text": "",
+    "dark": "#ECECEC",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "flf",
+    "text": "",
+    "dark": "#ECECEC",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "fnl",
+    "text": "",
+    "dark": "#FFF3D7",
+    "light": "#33312B"
+   },
+   {
+    "name": "fodg",
+    "text": "",
+    "dark": "#FFFB57",
+    "light": "#333211"
+   },
+   {
+    "name": "fodp",
+    "text": "",
+    "dark": "#FE9C45",
+    "light": "#7F4E22"
+   },
+   {
+    "name": "fods",
+    "text": "",
+    "dark": "#78FC4E",
+    "light": "#28541A"
+   },
+   {
+    "name": "fodt",
+    "text": "",
+    "dark": "#2DCBFD",
+    "light": "#16667E"
+   },
+   {
+    "name": "frag",
+    "text": "",
+    "dark": "#5586A6",
+    "light": "#40647C"
+   },
+   {
+    "name": "fs",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "fsi",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "fsscript",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "fsx",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "gcode",
+    "text": "󰐫",
+    "dark": "#1471AD",
+    "light": "#0F5582"
+   },
+   {
+    "name": "gd",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "gemspec",
+    "text": "",
+    "dark": "#701516",
+    "light": "#701516"
+   },
+   {
+    "name": "geom",
+    "text": "",
+    "dark": "#5586A6",
+    "light": "#40647C"
+   },
+   {
+    "name": "gif",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "git",
+    "text": "",
+    "dark": "#F14C28",
+    "light": "#B5391E"
+   },
+   {
+    "name": "glb",
+    "text": "",
+    "dark": "#FFB13B",
+    "light": "#80581E"
+   },
+   {
+    "name": "gleam",
+    "text": "",
+    "dark": "#FFAFF3",
+    "light": "#553A51"
+   },
+   {
+    "name": "glsl",
+    "text": "",
+    "dark": "#5586A6",
+    "light": "#40647C"
+   },
+   {
+    "name": "gnumakefile",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "go",
+    "text": "",
+    "dark": "#00ADD8",
+    "light": "#0082A2"
+   },
+   {
+    "name": "godot",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "gpr",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "gql",
+    "text": "",
+    "dark": "#E535AB",
+    "light": "#AC2880"
+   },
+   {
+    "name": "gradle",
+    "text": "",
+    "dark": "#005F87",
+    "light": "#005F87"
+   },
+   {
+    "name": "graphql",
+    "text": "",
+    "dark": "#E535AB",
+    "light": "#AC2880"
+   },
+   {
+    "name": "gresource",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "gv",
+    "text": "󱁉",
+    "dark": "#30638E",
+    "light": "#244A6A"
+   },
+   {
+    "name": "gz",
+    "text": "",
+    "dark": "#ECA517",
+    "light": "#76520C"
+   },
+   {
+    "name": "h",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "haml",
+    "text": "",
+    "dark": "#EAEAE1",
+    "light": "#2F2F2D"
+   },
+   {
+    "name": "hbs",
+    "text": "",
+    "dark": "#F0772B",
+    "light": "#A04F1D"
+   },
+   {
+    "name": "heex",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "hex",
+    "text": "",
+    "dark": "#2E63FF",
+    "light": "#224ABF"
+   },
+   {
+    "name": "hh",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "hpp",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "hrl",
+    "text": "",
+    "dark": "#B83998",
+    "light": "#8A2B72"
+   },
+   {
+    "name": "hs",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "htm",
+    "text": "",
+    "dark": "#E34C26",
+    "light": "#AA391C"
+   },
+   {
+    "name": "html",
+    "text": "",
+    "dark": "#E44D26",
+    "light": "#AB3A1C"
+   },
+   {
+    "name": "http",
+    "text": "",
+    "dark": "#008EC7",
+    "light": "#006A95"
+   },
+   {
+    "name": "huff",
+    "text": "󰡘",
+    "dark": "#4242C7",
+    "light": "#4242C7"
+   },
+   {
+    "name": "hurl",
+    "text": "",
+    "dark": "#FF0288",
+    "light": "#BF0266"
+   },
+   {
+    "name": "hx",
+    "text": "",
+    "dark": "#EA8220",
+    "light": "#9C5715"
+   },
+   {
+    "name": "hxx",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "ical",
+    "text": "",
+    "dark": "#2B2E83",
+    "light": "#2B2E83"
+   },
+   {
+    "name": "icalendar",
+    "text": "",
+    "dark": "#2B2E83",
+    "light": "#2B2E83"
+   },
+   {
+    "name": "ico",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "ics",
+    "text": "",
+    "dark": "#2B2E83",
+    "light": "#2B2E83"
+   },
+   {
+    "name": "ifb",
+    "text": "",
+    "dark": "#2B2E83",
+    "light": "#2B2E83"
+   },
+   {
+    "name": "ifc",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "ige",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "iges",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "igs",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "image",
+    "text": "",
+    "dark": "#D0BEC8",
+    "light": "#453F43"
+   },
+   {
+    "name": "img",
+    "text": "",
+    "dark": "#D0BEC8",
+    "light": "#453F43"
+   },
+   {
+    "name": "import",
+    "text": "",
+    "dark": "#ECECEC",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "info",
+    "text": "",
+    "dark": "#FFFFCD",
+    "light": "#333329"
+   },
+   {
+    "name": "ini",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "ino",
+    "text": "",
+    "dark": "#56B6C2",
+    "light": "#397981"
+   },
+   {
+    "name": "ipynb",
+    "text": "",
+    "dark": "#F57D01",
+    "light": "#A35301"
+   },
+   {
+    "name": "iso",
+    "text": "",
+    "dark": "#D0BEC8",
+    "light": "#453F43"
+   },
+   {
+    "name": "ixx",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "jar",
+    "text": "",
+    "dark": "#FFAF67",
+    "light": "#805834"
+   },
+   {
+    "name": "java",
+    "text": "",
+    "dark": "#CC3E44",
+    "light": "#992E33"
+   },
+   {
+    "name": "jl",
+    "text": "",
+    "dark": "#A270BA",
+    "light": "#6C4B7C"
+   },
+   {
+    "name": "jpeg",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "jpg",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "js",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "json",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "json5",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "jsonc",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "jsx",
+    "text": "",
+    "dark": "#20C2E3",
+    "light": "#158197"
+   },
+   {
+    "name": "jwmrc",
+    "text": "",
+    "dark": "#0078CD",
+    "light": "#005A9A"
+   },
+   {
+    "name": "jxl",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "kbx",
+    "text": "󰯄",
+    "dark": "#737672",
+    "light": "#565856"
+   },
+   {
+    "name": "kdb",
+    "text": "",
+    "dark": "#529B34",
+    "light": "#3E7427"
+   },
+   {
+    "name": "kdbx",
+    "text": "",
+    "dark": "#529B34",
+    "light": "#3E7427"
+   },
+   {
+    "name": "kdenlive",
+    "text": "",
+    "dark": "#83B8F2",
+    "light": "#425C79"
+   },
+   {
+    "name": "kdenlivetitle",
+    "text": "",
+    "dark": "#83B8F2",
+    "light": "#425C79"
+   },
+   {
+    "name": "kicad_dru",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "kicad_mod",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "kicad_pcb",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "kicad_prl",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "kicad_pro",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "kicad_sch",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "kicad_sym",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "kicad_wks",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#333333"
+   },
+   {
+    "name": "ko",
+    "text": "",
+    "dark": "#DCDDD6",
+    "light": "#494A47"
+   },
+   {
+    "name": "kpp",
+    "text": "",
+    "dark": "#F245FB",
+    "light": "#A12EA7"
+   },
+   {
+    "name": "kra",
+    "text": "",
+    "dark": "#F245FB",
+    "light": "#A12EA7"
+   },
+   {
+    "name": "krz",
+    "text": "",
+    "dark": "#F245FB",
+    "light": "#A12EA7"
+   },
+   {
+    "name": "ksh",
+    "text": "",
+    "dark": "#4D5A5E",
+    "light": "#3A4446"
+   },
+   {
+    "name": "kt",
+    "text": "",
+    "dark": "#7F52FF",
+    "light": "#5F3EBF"
+   },
+   {
+    "name": "kts",
+    "text": "",
+    "dark": "#7F52FF",
+    "light": "#5F3EBF"
+   },
+   {
+    "name": "lck",
+    "text": "",
+    "dark": "#BBBBBB",
+    "light": "#5E5E5E"
+   },
+   {
+    "name": "leex",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "less",
+    "text": "",
+    "dark": "#563D7C",
+    "light": "#563D7C"
+   },
+   {
+    "name": "lff",
+    "text": "",
+    "dark": "#ECECEC",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "lhs",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "lib",
+    "text": "",
+    "dark": "#4D2C0B",
+    "light": "#4D2C0B"
+   },
+   {
+    "name": "license",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "liquid",
+    "text": "",
+    "dark": "#95BF47",
+    "light": "#4A6024"
+   },
+   {
+    "name": "lock",
+    "text": "",
+    "dark": "#BBBBBB",
+    "light": "#5E5E5E"
+   },
+   {
+    "name": "log",
+    "text": "󰌱",
+    "dark": "#DDDDDD",
+    "light": "#4A4A4A"
+   },
+   {
+    "name": "lrc",
+    "text": "󰨖",
+    "dark": "#FFB713",
+    "light": "#805C0A"
+   },
+   {
+    "name": "lua",
+    "text": "",
+    "dark": "#51A0CF",
+    "light": "#366B8A"
+   },
+   {
+    "name": "luac",
+    "text": "",
+    "dark": "#51A0CF",
+    "light": "#366B8A"
+   },
+   {
+    "name": "luau",
+    "text": "",
+    "dark": "#00A2FF",
+    "light": "#007ABF"
+   },
+   {
+    "name": "m",
+    "text": "",
+    "dark": "#599EFF",
+    "light": "#3B69AA"
+   },
+   {
+    "name": "m3u",
+    "text": "󰲹",
+    "dark": "#ED95AE",
+    "light": "#764A57"
+   },
+   {
+    "name": "m3u8",
+    "text": "󰲹",
+    "dark": "#ED95AE",
+    "light": "#764A57"
+   },
+   {
+    "name": "m4a",
+    "text": "",
+    "dark": "#00AFFF",
+    "light": "#0075AA"
+   },
+   {
+    "name": "m4v",
+    "text": "",
+    "dark": "#FD971F",
+    "light": "#7E4C10"
+   },
+   {
+    "name": "magnet",
+    "text": "",
+    "dark": "#A51B16",
+    "light": "#A51B16"
+   },
+   {
+    "name": "makefile",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "markdown",
+    "text": "",
+    "dark": "#DDDDDD",
+    "light": "#4A4A4A"
+   },
+   {
+    "name": "material",
+    "text": "",
+    "dark": "#B83998",
+    "light": "#8A2B72"
+   },
+   {
+    "name": "md",
+    "text": "",
+    "dark": "#DDDDDD",
+    "light": "#4A4A4A"
+   },
+   {
+    "name": "md5",
+    "text": "󰕥",
+    "dark": "#8C86AF",
+    "light": "#5D5975"
+   },
+   {
+    "name": "mdx",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "mint",
+    "text": "󰌪",
+    "dark": "#87C095",
+    "light": "#44604A"
+   },
+   {
+    "name": "mjs",
+    "text": "",
+    "dark": "#F1E05A",
+    "light": "#504B1E"
+   },
+   {
+    "name": "mk",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "mkv",
+    "text": "",
+    "dark": "#FD971F",
+    "light": "#7E4C10"
+   },
+   {
+    "name": "ml",
+    "text": "",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "mli",
+    "text": "",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "mm",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "mo",
+    "text": "",
+    "dark": "#9772FB",
+    "light": "#654CA7"
+   },
+   {
+    "name": "mobi",
+    "text": "",
+    "dark": "#EAB16D",
+    "light": "#755836"
+   },
+   {
+    "name": "mojo",
+    "text": "",
+    "dark": "#FF4C1F",
+    "light": "#BF3917"
+   },
+   {
+    "name": "mov",
+    "text": "",
+    "dark": "#FD971F",
+    "light": "#7E4C10"
+   },
+   {
+    "name": "mp3",
+    "text": "",
+    "dark": "#00AFFF",
+    "light": "#0075AA"
+   },
+   {
+    "name": "mp4",
+    "text": "",
+    "dark": "#FD971F",
+    "light": "#7E4C10"
+   },
+   {
+    "name": "mpp",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "msf",
+    "text": "",
+    "dark": "#137BE1",
+    "light": "#0E5CA9"
+   },
+   {
+    "name": "mts",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "mustache",
+    "text": "",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "nfo",
+    "text": "",
+    "dark": "#FFFFCD",
+    "light": "#333329"
+   },
+   {
+    "name": "nim",
+    "text": "",
+    "dark": "#F3D400",
+    "light": "#514700"
+   },
+   {
+    "name": "nix",
+    "text": "",
+    "dark": "#7EBAE4",
+    "light": "#3F5D72"
+   },
+   {
+    "name": "norg",
+    "text": "",
+    "dark": "#4878BE",
+    "light": "#365A8E"
+   },
+   {
+    "name": "nswag",
+    "text": "",
+    "dark": "#85EA2D",
+    "light": "#427516"
+   },
+   {
+    "name": "nu",
+    "text": "",
+    "dark": "#3AA675",
+    "light": "#276F4E"
+   },
+   {
+    "name": "o",
+    "text": "",
+    "dark": "#9F0500",
+    "light": "#9F0500"
+   },
+   {
+    "name": "obj",
+    "text": "󰆧",
+    "dark": "#888888",
+    "light": "#5B5B5B"
+   },
+   {
+    "name": "odf",
+    "text": "",
+    "dark": "#FF5A96",
+    "light": "#AA3C64"
+   },
+   {
+    "name": "odg",
+    "text": "",
+    "dark": "#FFFB57",
+    "light": "#333211"
+   },
+   {
+    "name": "odin",
+    "text": "󰟢",
+    "dark": "#3882D2",
+    "light": "#2A629E"
+   },
+   {
+    "name": "odp",
+    "text": "",
+    "dark": "#FE9C45",
+    "light": "#7F4E22"
+   },
+   {
+    "name": "ods",
+    "text": "",
+    "dark": "#78FC4E",
+    "light": "#28541A"
+   },
+   {
+    "name": "odt",
+    "text": "",
+    "dark": "#2DCBFD",
+    "light": "#16667E"
+   },
+   {
+    "name": "oga",
+    "text": "",
+    "dark": "#0075AA",
+    "light": "#005880"
+   },
+   {
+    "name": "ogg",
+    "text": "",
+    "dark": "#0075AA",
+    "light": "#005880"
+   },
+   {
+    "name": "ogv",
+    "text": "",
+    "dark": "#FD971F",
+    "light": "#7E4C10"
+   },
+   {
+    "name": "ogx",
+    "text": "",
+    "dark": "#FD971F",
+    "light": "#7E4C10"
+   },
+   {
+    "name": "opus",
+    "text": "",
+    "dark": "#0075AA",
+    "light": "#005880"
+   },
+   {
+    "name": "org",
+    "text": "",
+    "dark": "#77AA99",
+    "light": "#4F7166"
+   },
+   {
+    "name": "otf",
+    "text": "",
+    "dark": "#ECECEC",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "out",
+    "text": "",
+    "dark": "#9F0500",
+    "light": "#9F0500"
+   },
+   {
+    "name": "part",
+    "text": "",
+    "dark": "#44CDA8",
+    "light": "#226654"
+   },
+   {
+    "name": "patch",
+    "text": "",
+    "dark": "#41535B",
+    "light": "#41535B"
+   },
+   {
+    "name": "pck",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "pcm",
+    "text": "",
+    "dark": "#0075AA",
+    "light": "#005880"
+   },
+   {
+    "name": "pdf",
+    "text": "",
+    "dark": "#B30B00",
+    "light": "#B30B00"
+   },
+   {
+    "name": "php",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "pl",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "pls",
+    "text": "󰲹",
+    "dark": "#ED95AE",
+    "light": "#764A57"
+   },
+   {
+    "name": "ply",
+    "text": "󰆧",
+    "dark": "#888888",
+    "light": "#5B5B5B"
+   },
+   {
+    "name": "pm",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "png",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "po",
+    "text": "",
+    "dark": "#2596BE",
+    "light": "#1C708E"
+   },
+   {
+    "name": "pot",
+    "text": "",
+    "dark": "#2596BE",
+    "light": "#1C708E"
+   },
+   {
+    "name": "pp",
+    "text": "",
+    "dark": "#FFA61A",
+    "light": "#80530D"
+   },
+   {
+    "name": "ppt",
+    "text": "󰈧",
+    "dark": "#CB4A32",
+    "light": "#983826"
+   },
+   {
+    "name": "pptx",
+    "text": "󰈧",
+    "dark": "#CB4A32",
+    "light": "#983826"
+   },
+   {
+    "name": "prisma",
+    "text": "",
+    "dark": "#5A67D8",
+    "light": "#444DA2"
+   },
+   {
+    "name": "pro",
+    "text": "",
+    "dark": "#E4B854",
+    "light": "#725C2A"
+   },
+   {
+    "name": "ps1",
+    "text": "󰨊",
+    "dark": "#4273CA",
+    "light": "#325698"
+   },
+   {
+    "name": "psb",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "psd",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "psd1",
+    "text": "󰨊",
+    "dark": "#6975C4",
+    "light": "#4F5893"
+   },
+   {
+    "name": "psm1",
+    "text": "󰨊",
+    "dark": "#6975C4",
+    "light": "#4F5893"
+   },
+   {
+    "name": "pub",
+    "text": "󰷖",
+    "dark": "#E3C58E",
+    "light": "#4C422F"
+   },
+   {
+    "name": "pxd",
+    "text": "",
+    "dark": "#5AA7E4",
+    "light": "#3C6F98"
+   },
+   {
+    "name": "pxi",
+    "text": "",
+    "dark": "#5AA7E4",
+    "light": "#3C6F98"
+   },
+   {
+    "name": "py",
+    "text": "",
+    "dark": "#FFBC03",
+    "light": "#805E02"
+   },
+   {
+    "name": "pyc",
+    "text": "",
+    "dark": "#FFE291",
+    "light": "#332D1D"
+   },
+   {
+    "name": "pyd",
+    "text": "",
+    "dark": "#FFE291",
+    "light": "#332D1D"
+   },
+   {
+    "name": "pyi",
+    "text": "",
+    "dark": "#FFBC03",
+    "light": "#805E02"
+   },
+   {
+    "name": "pyo",
+    "text": "",
+    "dark": "#FFE291",
+    "light": "#332D1D"
+   },
+   {
+    "name": "pyw",
+    "text": "",
+    "dark": "#5AA7E4",
+    "light": "#3C6F98"
+   },
+   {
+    "name": "pyx",
+    "text": "",
+    "dark": "#5AA7E4",
+    "light": "#3C6F98"
+   },
+   {
+    "name": "qm",
+    "text": "",
+    "dark": "#2596BE",
+    "light": "#1C708E"
+   },
+   {
+    "name": "qml",
+    "text": "",
+    "dark": "#40CD52",
+    "light": "#2B8937"
+   },
+   {
+    "name": "qrc",
+    "text": "",
+    "dark": "#40CD52",
+    "light": "#2B8937"
+   },
+   {
+    "name": "qss",
+    "text": "",
+    "dark": "#40CD52",
+    "light": "#2B8937"
+   },
+   {
+    "name": "query",
+    "text": "",
+    "dark": "#90A850",
+    "light": "#607035"
+   },
+   {
+    "name": "R",
+    "text": "󰟔",
+    "dark": "#2266BA",
+    "light": "#1A4C8C"
+   },
+   {
+    "name": "r",
+    "text": "󰟔",
+    "dark": "#2266BA",
+    "light": "#1A4C8C"
+   },
+   {
+    "name": "rake",
+    "text": "",
+    "dark": "#701516",
+    "light": "#701516"
+   },
+   {
+    "name": "rar",
+    "text": "",
+    "dark": "#ECA517",
+    "light": "#76520C"
+   },
+   {
+    "name": "rasi",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "razor",
+    "text": "󱦘",
+    "dark": "#512BD4",
+    "light": "#512BD4"
+   },
+   {
+    "name": "rb",
+    "text": "",
+    "dark": "#701516",
+    "light": "#701516"
+   },
+   {
+    "name": "res",
+    "text": "",
+    "dark": "#CC3E44",
+    "light": "#992E33"
+   },
+   {
+    "name": "resi",
+    "text": "",
+    "dark": "#F55385",
+    "light": "#A33759"
+   },
+   {
+    "name": "rlib",
+    "text": "",
+    "dark": "#DEA584",
+    "light": "#6F5242"
+   },
+   {
+    "name": "rmd",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "rproj",
+    "text": "󰗆",
+    "dark": "#358A5B",
+    "light": "#286844"
+   },
+   {
+    "name": "rs",
+    "text": "",
+    "dark": "#DEA584",
+    "light": "#6F5242"
+   },
+   {
+    "name": "rss",
+    "text": "",
+    "dark": "#FB9D3B",
+    "light": "#7E4E1E"
+   },
+   {
+    "name": "s",
+    "text": "",
+    "dark": "#0071C5",
+    "light": "#005594"
+   },
+   {
+    "name": "sass",
+    "text": "",
+    "dark": "#F55385",
+    "light": "#A33759"
+   },
+   {
+    "name": "sbt",
+    "text": "",
+    "dark": "#CC3E44",
+    "light": "#992E33"
+   },
+   {
+    "name": "sc",
+    "text": "",
+    "dark": "#CC3E44",
+    "light": "#992E33"
+   },
+   {
+    "name": "scad",
+    "text": "",
+    "dark": "#F9D72C",
+    "light": "#53480F"
+   },
+   {
+    "name": "scala",
+    "text": "",
+    "dark": "#CC3E44",
+    "light": "#992E33"
+   },
+   {
+    "name": "scm",
+    "text": "󰘧",
+    "dark": "#EEEEEE",
+    "light": "#303030"
+   },
+   {
+    "name": "scss",
+    "text": "",
+    "dark": "#F55385",
+    "light": "#A33759"
+   },
+   {
+    "name": "sh",
+    "text": "",
+    "dark": "#4D5A5E",
+    "light": "#3A4446"
+   },
+   {
+    "name": "sha1",
+    "text": "󰕥",
+    "dark": "#8C86AF",
+    "light": "#5D5975"
+   },
+   {
+    "name": "sha224",
+    "text": "󰕥",
+    "dark": "#8C86AF",
+    "light": "#5D5975"
+   },
+   {
+    "name": "sha256",
+    "text": "󰕥",
+    "dark": "#8C86AF",
+    "light": "#5D5975"
+   },
+   {
+    "name": "sha384",
+    "text": "󰕥",
+    "dark": "#8C86AF",
+    "light": "#5D5975"
+   },
+   {
+    "name": "sha512",
+    "text": "󰕥",
+    "dark": "#8C86AF",
+    "light": "#5D5975"
+   },
+   {
+    "name": "sig",
+    "text": "󰘧",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "signature",
+    "text": "󰘧",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "skp",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "sldasm",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "sldprt",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "slim",
+    "text": "",
+    "dark": "#E34C26",
+    "light": "#AA391C"
+   },
+   {
+    "name": "sln",
+    "text": "",
+    "dark": "#854CC7",
+    "light": "#643995"
+   },
+   {
+    "name": "slnx",
+    "text": "",
+    "dark": "#854CC7",
+    "light": "#643995"
+   },
+   {
+    "name": "slvs",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "sml",
+    "text": "󰘧",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "so",
+    "text": "",
+    "dark": "#DCDDD6",
+    "light": "#494A47"
+   },
+   {
+    "name": "sol",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "spec.js",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "spec.jsx",
+    "text": "",
+    "dark": "#20C2E3",
+    "light": "#158197"
+   },
+   {
+    "name": "spec.ts",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "spec.tsx",
+    "text": "",
+    "dark": "#1354BF",
+    "light": "#1354BF"
+   },
+   {
+    "name": "spx",
+    "text": "",
+    "dark": "#0075AA",
+    "light": "#005880"
+   },
+   {
+    "name": "sql",
+    "text": "",
+    "dark": "#DAD8D8",
+    "light": "#494848"
+   },
+   {
+    "name": "sqlite",
+    "text": "",
+    "dark": "#DAD8D8",
+    "light": "#494848"
+   },
+   {
+    "name": "sqlite3",
+    "text": "",
+    "dark": "#DAD8D8",
+    "light": "#494848"
+   },
+   {
+    "name": "srt",
+    "text": "󰨖",
+    "dark": "#FFB713",
+    "light": "#805C0A"
+   },
+   {
+    "name": "ssa",
+    "text": "󰨖",
+    "dark": "#FFB713",
+    "light": "#805C0A"
+   },
+   {
+    "name": "ste",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "step",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "stl",
+    "text": "󰆧",
+    "dark": "#888888",
+    "light": "#5B5B5B"
+   },
+   {
+    "name": "stories.js",
+    "text": "",
+    "dark": "#FF4785",
+    "light": "#AA2F59"
+   },
+   {
+    "name": "stories.jsx",
+    "text": "",
+    "dark": "#FF4785",
+    "light": "#AA2F59"
+   },
+   {
+    "name": "stories.mjs",
+    "text": "",
+    "dark": "#FF4785",
+    "light": "#AA2F59"
+   },
+   {
+    "name": "stories.svelte",
+    "text": "",
+    "dark": "#FF4785",
+    "light": "#AA2F59"
+   },
+   {
+    "name": "stories.ts",
+    "text": "",
+    "dark": "#FF4785",
+    "light": "#AA2F59"
+   },
+   {
+    "name": "stories.tsx",
+    "text": "",
+    "dark": "#FF4785",
+    "light": "#AA2F59"
+   },
+   {
+    "name": "stories.vue",
+    "text": "",
+    "dark": "#FF4785",
+    "light": "#AA2F59"
+   },
+   {
+    "name": "stp",
+    "text": "󰻫",
+    "dark": "#839463",
+    "light": "#576342"
+   },
+   {
+    "name": "strings",
+    "text": "",
+    "dark": "#2596BE",
+    "light": "#1C708E"
+   },
+   {
+    "name": "styl",
+    "text": "",
+    "dark": "#8DC149",
+    "light": "#466024"
+   },
+   {
+    "name": "sub",
+    "text": "󰨖",
+    "dark": "#FFB713",
+    "light": "#805C0A"
+   },
+   {
+    "name": "sublime",
+    "text": "",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "suo",
+    "text": "",
+    "dark": "#854CC7",
+    "light": "#643995"
+   },
+   {
+    "name": "sv",
+    "text": "󰍛",
+    "dark": "#019833",
+    "light": "#017226"
+   },
+   {
+    "name": "svelte",
+    "text": "",
+    "dark": "#FF3E00",
+    "light": "#BF2E00"
+   },
+   {
+    "name": "svg",
+    "text": "󰜡",
+    "dark": "#FFB13B",
+    "light": "#80581E"
+   },
+   {
+    "name": "svgz",
+    "text": "󰜡",
+    "dark": "#FFB13B",
+    "light": "#80581E"
+   },
+   {
+    "name": "svh",
+    "text": "󰍛",
+    "dark": "#019833",
+    "light": "#017226"
+   },
+   {
+    "name": "swift",
+    "text": "",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "t",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "tbc",
+    "text": "󰛓",
+    "dark": "#1E5CB3",
+    "light": "#1E5CB3"
+   },
+   {
+    "name": "tcl",
+    "text": "󰛓",
+    "dark": "#1E5CB3",
+    "light": "#1E5CB3"
+   },
+   {
+    "name": "templ",
+    "text": "",
+    "dark": "#DBBD30",
+    "light": "#6E5E18"
+   },
+   {
+    "name": "terminal",
+    "text": "",
+    "dark": "#31B53E",
+    "light": "#217929"
+   },
+   {
+    "name": "test.js",
+    "text": "",
+    "dark": "#CBCB41",
+    "light": "#666620"
+   },
+   {
+    "name": "test.jsx",
+    "text": "",
+    "dark": "#20C2E3",
+    "light": "#158197"
+   },
+   {
+    "name": "test.ts",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "test.tsx",
+    "text": "",
+    "dark": "#1354BF",
+    "light": "#1354BF"
+   },
+   {
+    "name": "tex",
+    "text": "",
+    "dark": "#3D6117",
+    "light": "#3D6117"
+   },
+   {
+    "name": "tf",
+    "text": "",
+    "dark": "#5F43E9",
+    "light": "#4732AF"
+   },
+   {
+    "name": "tfvars",
+    "text": "",
+    "dark": "#5F43E9",
+    "light": "#4732AF"
+   },
+   {
+    "name": "tgz",
+    "text": "",
+    "dark": "#ECA517",
+    "light": "#76520C"
+   },
+   {
+    "name": "tmpl",
+    "text": "",
+    "dark": "#DBBD30",
+    "light": "#6E5E18"
+   },
+   {
+    "name": "tmux",
+    "text": "",
+    "dark": "#14BA19",
+    "light": "#0F8C13"
+   },
+   {
+    "name": "toml",
+    "text": "",
+    "dark": "#9C4221",
+    "light": "#753219"
+   },
+   {
+    "name": "torrent",
+    "text": "",
+    "dark": "#44CDA8",
+    "light": "#226654"
+   },
+   {
+    "name": "tres",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "ts",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "tscn",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "tsconfig",
+    "text": "",
+    "dark": "#FF8700",
+    "light": "#AA5A00"
+   },
+   {
+    "name": "tsx",
+    "text": "",
+    "dark": "#1354BF",
+    "light": "#1354BF"
+   },
+   {
+    "name": "ttf",
+    "text": "",
+    "dark": "#ECECEC",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "twig",
+    "text": "",
+    "dark": "#8DC149",
+    "light": "#466024"
+   },
+   {
+    "name": "txt",
+    "text": "󰈙",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": "txz",
+    "text": "",
+    "dark": "#ECA517",
+    "light": "#76520C"
+   },
+   {
+    "name": "typ",
+    "text": "",
+    "dark": "#0DBCC0",
+    "light": "#097D80"
+   },
+   {
+    "name": "typoscript",
+    "text": "",
+    "dark": "#FF8700",
+    "light": "#AA5A00"
+   },
+   {
+    "name": "ui",
+    "text": "",
+    "dark": "#015BF0",
+    "light": "#015BF0"
+   },
+   {
+    "name": "v",
+    "text": "󰍛",
+    "dark": "#019833",
+    "light": "#017226"
+   },
+   {
+    "name": "vala",
+    "text": "",
+    "dark": "#7B3DB9",
+    "light": "#5C2E8B"
+   },
+   {
+    "name": "vert",
+    "text": "",
+    "dark": "#5586A6",
+    "light": "#40647C"
+   },
+   {
+    "name": "vh",
+    "text": "󰍛",
+    "dark": "#019833",
+    "light": "#017226"
+   },
+   {
+    "name": "vhd",
+    "text": "󰍛",
+    "dark": "#019833",
+    "light": "#017226"
+   },
+   {
+    "name": "vhdl",
+    "text": "󰍛",
+    "dark": "#019833",
+    "light": "#017226"
+   },
+   {
+    "name": "vi",
+    "text": "",
+    "dark": "#FEC60A",
+    "light": "#554203"
+   },
+   {
+    "name": "vim",
+    "text": "",
+    "dark": "#019833",
+    "light": "#017226"
+   },
+   {
+    "name": "vsh",
+    "text": "",
+    "dark": "#5D87BF",
+    "light": "#3E5A7F"
+   },
+   {
+    "name": "vsix",
+    "text": "",
+    "dark": "#854CC7",
+    "light": "#643995"
+   },
+   {
+    "name": "vue",
+    "text": "",
+    "dark": "#8DC149",
+    "light": "#466024"
+   },
+   {
+    "name": "wasm",
+    "text": "",
+    "dark": "#5C4CDB",
+    "light": "#4539A4"
+   },
+   {
+    "name": "wav",
+    "text": "",
+    "dark": "#00AFFF",
+    "light": "#0075AA"
+   },
+   {
+    "name": "webm",
+    "text": "",
+    "dark": "#FD971F",
+    "light": "#7E4C10"
+   },
+   {
+    "name": "webmanifest",
+    "text": "",
+    "dark": "#F1E05A",
+    "light": "#504B1E"
+   },
+   {
+    "name": "webp",
+    "text": "",
+    "dark": "#A074C4",
+    "light": "#6B4D83"
+   },
+   {
+    "name": "webpack",
+    "text": "󰜫",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "wma",
+    "text": "",
+    "dark": "#00AFFF",
+    "light": "#0075AA"
+   },
+   {
+    "name": "wmv",
+    "text": "",
+    "dark": "#FD971F",
+    "light": "#7E4C10"
+   },
+   {
+    "name": "woff",
+    "text": "",
+    "dark": "#ECECEC",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "woff2",
+    "text": "",
+    "dark": "#ECECEC",
+    "light": "#2F2F2F"
+   },
+   {
+    "name": "wrl",
+    "text": "󰆧",
+    "dark": "#888888",
+    "light": "#5B5B5B"
+   },
+   {
+    "name": "wrz",
+    "text": "󰆧",
+    "dark": "#888888",
+    "light": "#5B5B5B"
+   },
+   {
+    "name": "wv",
+    "text": "",
+    "dark": "#00AFFF",
+    "light": "#0075AA"
+   },
+   {
+    "name": "wvc",
+    "text": "",
+    "dark": "#00AFFF",
+    "light": "#0075AA"
+   },
+   {
+    "name": "x",
+    "text": "",
+    "dark": "#599EFF",
+    "light": "#3B69AA"
+   },
+   {
+    "name": "xaml",
+    "text": "󰙳",
+    "dark": "#512BD4",
+    "light": "#512BD4"
+   },
+   {
+    "name": "xcf",
+    "text": "",
+    "dark": "#635B46",
+    "light": "#4A4434"
+   },
+   {
+    "name": "xcplayground",
+    "text": "",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "xcstrings",
+    "text": "",
+    "dark": "#2596BE",
+    "light": "#1C708E"
+   },
+   {
+    "name": "xls",
+    "text": "󰈛",
+    "dark": "#207245",
+    "light": "#207245"
+   },
+   {
+    "name": "xlsx",
+    "text": "󰈛",
+    "dark": "#207245",
+    "light": "#207245"
+   },
+   {
+    "name": "xm",
+    "text": "",
+    "dark": "#519ABA",
+    "light": "#36677C"
+   },
+   {
+    "name": "xml",
+    "text": "󰗀",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "xpi",
+    "text": "",
+    "dark": "#FF1B01",
+    "light": "#BF1401"
+   },
+   {
+    "name": "xslt",
+    "text": "󰗀",
+    "dark": "#33A9DC",
+    "light": "#227193"
+   },
+   {
+    "name": "xul",
+    "text": "",
+    "dark": "#E37933",
+    "light": "#975122"
+   },
+   {
+    "name": "xz",
+    "text": "",
+    "dark": "#ECA517",
+    "light": "#76520C"
+   },
+   {
+    "name": "yaml",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "yml",
+    "text": "",
+    "dark": "#6D8086",
+    "light": "#526064"
+   },
+   {
+    "name": "zig",
+    "text": "",
+    "dark": "#F69A1B",
+    "light": "#7B4D0E"
+   },
+   {
+    "name": "zip",
+    "text": "",
+    "dark": "#ECA517",
+    "light": "#76520C"
+   },
+   {
+    "name": "zsh",
+    "text": "",
+    "dark": "#89E051",
+    "light": "#447028"
+   },
+   {
+    "name": "zst",
+    "text": "",
+    "dark": "#ECA517",
+    "light": "#76520C"
+   },
+   {
+    "name": "🔥",
+    "text": "",
+    "dark": "#FF4C1F",
+    "light": "#BF3917"
+   }
+  ],
+  "conds": [
+   {
+    "if": "orphan",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#000000"
+   },
+   {
+    "if": "link",
+    "text": "",
+    "dark": "#9E9E9E",
+    "light": "#9E9E9E"
+   },
+   {
+    "if": "block",
+    "text": "",
+    "dark": "#CDDC39",
+    "light": "#FFC107"
+   },
+   {
+    "if": "char",
+    "text": "",
+    "dark": "#CDDC39",
+    "light": "#FFC107"
+   },
+   {
+    "if": "fifo",
+    "text": "",
+    "dark": "#CDDC39",
+    "light": "#FFC107"
+   },
+   {
+    "if": "sock",
+    "text": "",
+    "dark": "#CDDC39",
+    "light": "#FFC107"
+   },
+   {
+    "if": "sticky",
+    "text": "",
+    "dark": "#CDDC39",
+    "light": "#FFC107"
+   },
+   {
+    "if": "dummy",
+    "text": "",
+    "dark": "#F44336",
+    "light": "#F44336"
+   },
+   {
+    "if": "dir & hovered",
+    "text": "",
+    "dark": "#03A9F4",
+    "light": "#03A9F4"
+   },
+   {
+    "if": "dir",
+    "text": "",
+    "dark": "#03A9F4",
+    "light": "#03A9F4"
+   },
+   {
+    "if": "exec",
+    "text": "",
+    "dark": "#8BC34A",
+    "light": "#8BC34A"
+   },
+   {
+    "if": "!dir",
+    "text": "",
+    "dark": "#FFFFFF",
+    "light": "#000000"
+   }
+  ]
+ }
+}

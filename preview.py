@@ -2,7 +2,7 @@
 
 Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
                           | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --bat | --delta
-                          | --lazygit | --btop | --textadept | --lapce | --qtcreator | --kate | --gnome-text-editor
+                          | --lazygit | --btop | --yazi | --textadept | --lapce | --qtcreator | --kate | --gnome-text-editor
                           | --gedit | --geany | --eclipse | --pulsar | --jupyterlab | --pygments] [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
   --vscode     write the VS Code preview instead of the IntelliJ one; needs Node.js and npm
@@ -24,6 +24,7 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --delta      write the delta preview instead of the IntelliJ one; needs Linux and Podman
   --lazygit    write the lazygit preview instead of the IntelliJ one; needs Linux and Podman
   --btop       write the btop preview instead of the IntelliJ one; needs Linux and Podman
+  --yazi       write the yazi preview instead of the IntelliJ one; needs Linux and Podman
   --textadept  write the Textadept preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --lapce      write the Lapce preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --qtcreator  write the Qt Creator preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
@@ -68,9 +69,9 @@ colours (scripts/terminals/check.py) or a screen shows a colour the theme does n
 minimum (scripts/terminals/cells.py). iTerm2 and Windows Terminal do not run on Linux, so the build's checks of their
 files are all they get. Termux runs in the Android emulator that scripts/termux/setup.sh starts, and
 scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. The Nano, Amp, bat, delta,
-lazygit, btop, Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
+lazygit, btop, yazi, Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
 editor runs in the container image of scripts/editors/Containerfile, with the theme installed and chosen as its README
-says: Nano, Amp, bat, delta, lazygit and btop in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
+says: Nano, Amp, bat, delta, lazygit, btop and yazi in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
 that the theme does not set or text below its contrast minimum, and the others on Xvfb through
 scripts/editors/shoot.py, whose screenshots go to themes/<theme>/build/<editor> and fail when they show a colour that
 is no colour of the theme nor a blend of one
@@ -155,7 +156,7 @@ def font_archive(url=FONT_URL, sha256=FONT_SHA256, name="JetBrains Mono"):
 
 
 def install_fonts(dest, symbols=False):
-    """Copies JetBrains Mono into dest and, with symbols, the Symbols Nerd Font that prompts draw icons with."""
+    """Copies JetBrains Mono into dest and, with symbols, the Symbols Nerd Font that prompts and yazi draw icons with."""
     os.makedirs(dest, exist_ok=True)
     with zipfile.ZipFile(font_archive()) as z:
         for name, _, _ in FONTS:
@@ -564,9 +565,17 @@ SCREEN_EDITORS = {
     "btop": ("btop", lambda themes: [(f"{heritage.btop.name(t)}.theme", heritage.btop.theme(t["palette"], ""))
                                      for t in themes],
              lambda p: {c for steps in heritage.btop.gradients(p).values() for c in steps}, "0:"),
+    # yazi: every row, the three columns with the code preview, the header and the status bar, and its pop-ups
+    "yazi": ("yazi", lambda themes: [(f"{heritage.yazi.name(t)}.yazi/{name}", text) for t in themes
+                                     for name, text in (("flavor.toml", heritage.yazi.flavor(t["palette"], "")),
+                                                        ("tmtheme.xml", heritage.yazi.tmtheme(t["palette"], "")))],
+             lambda p: set(), "0:"),
 }
 # Editor → the views that its screens show, as scripts/editors/screen.py names them, in place of SAMPLES.
-SCREEN_VIEWS = {"lazygit": ("files", "commits", "search"), "btop": ("selected", "followed", "paused")}
+SCREEN_VIEWS = {"lazygit": ("files", "commits", "search"), "btop": ("selected", "followed", "paused"),
+                "yazi": ("preview", "select", "cut", "help", "rename")}
+# Editor → the sample whose code its views' files hold, for the folder that yazi shows.
+SCREEN_VIEW_SAMPLE = {"yazi": "orders.py"}
 # Editor → the colours, besides comments, that the check holds to 3:1 as dimmed text: btop's fading process list.
 SCREEN_DIMMED = {"btop": lambda p: {c for name in ("proc", "proc_color") for c in heritage.btop.gradients(p)[name]}}
 
@@ -588,7 +597,8 @@ def screen_results(family, out, editor):
             os.makedirs(folder)
         write_files(files, theme_files(family.THEMES))
         names = SCREEN_VIEWS.get(editor) or [name for name, *_ in SAMPLES]
-        write_files(samples, [(name, "") for name in SCREEN_VIEWS.get(editor, ())]
+        view_text = next((plain(code) + "\n" for name, *_, code in SAMPLES if name == SCREEN_VIEW_SAMPLE.get(editor)), "")
+        write_files(samples, [(name, view_text) for name in SCREEN_VIEWS.get(editor, ())]
                     or [(name, plain(code) + "\n") for name, *_, code in SAMPLES])
         def screen(t, name):
             stem, p = heritage.nvim.name(t), t["palette"]
@@ -846,7 +856,7 @@ def main():
         raise SystemExit(f"preview: no theme folder named {', '.join(sorted(unknown))}")
     for name in args.themes or families:
         out = os.path.join(heritage.THEMES, name, "build")
-        install_fonts(os.path.join(out, FONT_DIR), symbols=args.terminals)
+        install_fonts(os.path.join(out, FONT_DIR), symbols=args.terminals or args.yazi)
         family = families[name]
         target = next((name for name in ("vscode", "visualstudio", "sublime", "zed", "nvim", "notepadpp", "xcode",
                                           *TERMINAL_THEMES, "terminals", *SCREEN_EDITORS, *GUI_EDITORS, "jupyterlab",

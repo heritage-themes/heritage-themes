@@ -224,6 +224,16 @@ podman run --rm --userns=keep-id -v "$PWD:/repo:Z" localhost/heritage-editors \
 
 `python3 build.py` then fails on a rule or scheme style that names a style the library lacks.
 
+## Check the yazi defaults
+
+A yazi flavor sets every style key of yazi's default themes, keeps their file type rules and recolours their icons, all of which `heritage/yazi.json` lists. Rewrite the file from a yazi release after a yazi update:
+
+```bash
+python3 scripts/yazi/preset.py <version> heritage/yazi.json
+```
+
+`python3 build.py` then fails on a style key that `settings()` in `heritage/yazi.py` lacks or sets beyond yazi's, and on a file type rule that `FILETYPES` does not cover.
+
 ## Check the Geany named styles
 
 A Geany scheme sets every named style of Geany's `filetypes.common`, which `NAMED_STYLES` in `heritage/geany.py` lists. After a Geany update, compare the two in the editors image; the command prints nothing when they match:

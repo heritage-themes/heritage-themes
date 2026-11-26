@@ -1,5 +1,5 @@
-"""Colour measures that the targets share: CIE L*a*b* and the CIE76 distance between two colours. It imports nothing
-from the other modules, so any of them can import it."""
+"""Colour measures that the targets share: CIE L*a*b*, the CIE76 distance and the WCAG contrast ratio of two colours.
+It imports nothing from the other modules, so any of them can import it."""
 
 
 def lab(rgb):
@@ -21,3 +21,16 @@ def distance(a, b):
     def channels(hex_colour):
         return [int(hex_colour[i:i + 2], 16) for i in (0, 2, 4)]
     return sum((x - y) ** 2 for x, y in zip(lab(channels(a)), lab(channels(b)))) ** 0.5
+
+
+def luminance(hex_colour):
+    """The WCAG relative luminance of a six-digit hex colour."""
+    channels = [int(hex_colour[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+    r, g, b = (c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in channels)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def contrast(a, b):
+    """The WCAG contrast ratio of two six-digit hex colours."""
+    x, y = luminance(a), luminance(b)
+    return (max(x, y) + 0.05) / (min(x, y) + 0.05)

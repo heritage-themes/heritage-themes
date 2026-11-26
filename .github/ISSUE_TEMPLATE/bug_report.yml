@@ -42,6 +42,7 @@ body:
         - delta
         - lazygit
         - btop
+        - yazi
         - Eclipse
         - Nova
         - JupyterLab
