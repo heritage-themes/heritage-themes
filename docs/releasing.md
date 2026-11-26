@@ -12,7 +12,8 @@ Neovim plugin, the DrRacket package and the themes for every other app share one
 | Zed extension | `zed/CHANGELOG.md` | Extension repository, listed in Zed's extension registry by a pull request |
 | Neovim plugin | `nvim/CHANGELOG.md` | Plugin repository, which plugin managers install from |
 | DrRacket package | `drracket/CHANGELOG.md` | Package repository, listed in the Racket package catalog as `heritage-themes` |
-| Notepad++, Xcode, Helix, Kakoune, Micro, Vim, GNU Emacs, Nano, Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Pulsar, Amp, bat, delta, lazygit, btop, yazi, Eclipse, Nova, Spyder, IDLE and RStudio themes | `notepadpp/`, `xcode/`, `helix/`, `kakoune/`, `micro/`, `vim/`, `emacs/`, `nano/`, `textadept/`, `lapce/`, `qtcreator/`, `kate/`, `gnome-text-editor/`, `gedit/`, `geany/`, `pulsar/`, `amp/`, `bat/`, `delta/`, `lazygit/`, `btop/`, `yazi/`, `eclipse/`, `nova/`, `spyder/`, `idle/` and `rstudio/` `CHANGELOG.md`, one each | GitHub release only: these apps have no registry that Publish uses, and users install the files from the zip |
+| Notepad++, Xcode, Helix, Kakoune, Micro, Vim, GNU Emacs, Nano, Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Pulsar, Amp, bat, delta, lazygit, btop, Eclipse, Nova, Spyder, IDLE and RStudio themes | `notepadpp/`, `xcode/`, `helix/`, `kakoune/`, `micro/`, `vim/`, `emacs/`, `nano/`, `textadept/`, `lapce/`, `qtcreator/`, `kate/`, `gnome-text-editor/`, `gedit/`, `geany/`, `pulsar/`, `amp/`, `bat/`, `delta/`, `lazygit/`, `btop/`, `eclipse/`, `nova/`, `spyder/`, `idle/` and `rstudio/` `CHANGELOG.md`, one each | GitHub release only: these apps have no registry that Publish uses, and users install the files from the zip |
+| yazi flavors | `yazi/CHANGELOG.md` | Flavor repository, which `ya pkg` installs from; the GitHub release also carries `heritage-themes-yazi-<version>.zip` |
 | JupyterLab extension | `jupyterlab/CHANGELOG.md` | PyPI, as `jupyterlab-heritage-themes` |
 | Pygments styles | `pygments/CHANGELOG.md` | PyPI, as `heritage-themes-pygments` |
 | Thonny themes | `thonny/CHANGELOG.md` | PyPI, as `thonny-heritage-themes` |
@@ -355,6 +356,30 @@ every publish replaces its contents. Neovim has no plugin registry to submit to.
    ```
 
 3. Cut a release that includes the plugin. Publish pushes the files and the tag `v<version>`.
+
+## One-time setup: yazi flavors
+
+yazi's package manager installs a flavor from a public GitHub repository that holds the flavor's folder,
+`<name>.yazi`, at its root, and needs every file it copies, `preview.png` among them. Publish pushes
+`build/yazi-repository` to a separate repository and tags it `v<version>`. That repository contains generated files
+only; every publish replaces its contents.
+
+1. Create the public repository `heritage-themes/yazi-flavors` with a first commit on its default branch, for
+   example a README, which the first publish replaces.
+2. Create a fine-grained personal access token with **Contents: Read and write** on that repository only, and store
+   it as the repository secret `YAZI_REPO_TOKEN`:
+
+   ```bash
+   gh secret set YAZI_REPO_TOKEN -R heritage-themes/heritage-themes
+   ```
+
+3. Cut a release that includes the flavors. Publish pushes the files and the tag `v<version>`.
+4. Open a pull request on [yazi-rs/flavors](https://github.com/yazi-rs/flavors) that lists the repository in its
+   README.
+
+Each flavor's `preview.png` comes from `yazi/previews`, which `python3 preview.py --yazi --png` writes. Render and
+commit the images again after a change to `heritage/yazi.py` or a palette; `python3 build.py` fails when a flavor has
+none.
 
 ## One-time setup: DrRacket package
 

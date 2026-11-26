@@ -87,7 +87,7 @@ installed, in the virtual environment that preview.py creates in scripts/pygment
 requirements.txt; it fails when a style differs from its palette.
 """
 import argparse, concurrent.futures, hashlib, json, os, pathlib, plistlib, re, shutil, subprocess, sys, tempfile
-import urllib.request, zipfile
+import types, urllib.request, zipfile
 
 import heritage
 from build import VERSION
@@ -574,6 +574,9 @@ SCREEN_EDITORS = {
 # Editor → the views that its screens show, as scripts/editors/screen.py names them, in place of SAMPLES.
 SCREEN_VIEWS = {"lazygit": ("files", "commits", "search"), "btop": ("selected", "followed", "paused"),
                 "yazi": ("preview", "select", "cut", "help", "rename")}
+# The yazi view that each flavor's preview.png shows, and the folder of those images, which build.py reads.
+YAZI_FLAVOR_SCREEN = "preview"
+YAZI_PREVIEWS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yazi", "previews")
 # Editor → the sample whose code its views' files hold, for the folder that yazi shows.
 SCREEN_VIEW_SAMPLE = {"yazi": "orders.py"}
 # Editor → the colours, besides comments, that the check holds to 3:1 as dimmed text: btop's fading process list.
@@ -827,6 +830,22 @@ def render_png(page_path, png_path):
                         png_path], check=True)
 
 
+def yazi_flavor_previews(family, results, out):
+    """Renders each flavor's preview screen to YAZI_PREVIEWS/<name>.png, the preview.png that build.py puts in the
+    flavor's folder for yazi's package manager, and returns the paths."""
+    paths = []
+    for t, screens in zip(family.THEMES, results):
+        name = heritage.yazi.name(t)
+        single = types.SimpleNamespace(FAMILY=family.FAMILY, THEMES=[t])
+        page_path = os.path.join(out, f"preview-yazi-{name}.html")
+        with open(page_path, "w", encoding="utf-8") as f:
+            f.write(terminals_page(single, [[screen for screen in screens if screen[0] == YAZI_FLAVOR_SCREEN]], "yazi"))
+        os.makedirs(YAZI_PREVIEWS, exist_ok=True)
+        paths.append(os.path.join(YAZI_PREVIEWS, f"{name}.png"))
+        render_png(page_path, paths[-1])
+    return paths
+
+
 def main():
     parser = argparse.ArgumentParser(description="Write theme previews.")
     kind = parser.add_mutually_exclusive_group()
@@ -868,9 +887,10 @@ def main():
                   **{editor: lambda f, e=editor: terminal_tokens(f, e) for editor in TERMINAL_THEMES},
                   "visualstudio": lambda f: visualstudio_captures(f, out),
                   "xcode": lambda f: xcode_captures(f, out)}.get(target, lambda family: None)(family)
+        results = screen_results(family, out, target) if target in SCREEN_EDITORS else None
         with open(page_path, "w", encoding="utf-8") as f:
             f.write(terminals_page(family, terminals_results(family, out)) if target == "terminals"
-                    else terminals_page(family, screen_results(family, out, target), SCREEN_EDITORS[target][0],
+                    else terminals_page(family, results, SCREEN_EDITORS[target][0],
                                         wide=target in SCREEN_VIEWS) if target in SCREEN_EDITORS
                     else terminals_page(family, gui_results(family, out, target), GUI_EDITORS[target][0])
                     if target in GUI_EDITORS
@@ -882,6 +902,9 @@ def main():
                         else os.path.join(heritage.THEMES, name, "preview.png"))
             render_png(page_path, png_path)
             print(png_path)
+            if target == "yazi":
+                for path in yazi_flavor_previews(family, results, out):
+                    print(path)
 
 
 if __name__ == "__main__":

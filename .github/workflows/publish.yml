@@ -1165,21 +1165,58 @@ jobs:
           path: build/heritage-themes-btop-${{ env.VERSION }}.zip
           if-no-files-found: error
 
-  # yazi's package manager installs flavors from GitHub repositories only: users install the flavors from the zip that
-  # the GitHub release attaches.
   yazi:
     needs: check
     if: needs.check.outputs.yazi == 'true'
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.check.outputs.version }}
+      # yazi's package manager, ya pkg, installs flavors from this repository, which holds them at its root.
+      YAZI_REPOSITORY: heritage-themes/yazi-flavors
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
+      - name: Check release secrets
+        shell: bash
+        env:
+          YAZI_REPO_TOKEN: ${{ secrets.YAZI_REPO_TOKEN }}
+        run: |
+          if [ -z "$YAZI_REPO_TOKEN" ]; then
+            echo "::error::Repository secret YAZI_REPO_TOKEN is empty or not set"
+            exit 1
+          fi
+
       - run: python3 build.py
+
+      - uses: actions/checkout@v7
+        with:
+          repository: ${{ env.YAZI_REPOSITORY }}
+          token: ${{ secrets.YAZI_REPO_TOKEN }}
+          path: yazi-repository
+          fetch-depth: 0
+
+      # ya pkg installs a repository's latest commit and records its hash; the tag marks each release.
+      - name: Publish to the yazi flavor repository
+        shell: bash
+        run: |
+          cd yazi-repository
+          if git rev-parse -q --verify "refs/tags/v$VERSION" > /dev/null; then
+            echo "$YAZI_REPOSITORY is already tagged v$VERSION"
+            exit 0
+          fi
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -r ../build/yazi-repository/. .
+          git add --all
+          if ! git diff --cached --quiet; then
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit --message "Release $VERSION" \
+              --message "Generated from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+          fi
+          git tag "v$VERSION"
+          git push origin HEAD "refs/tags/v$VERSION"
 
       - uses: actions/upload-artifact@v7
         with:

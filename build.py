@@ -4173,9 +4173,10 @@ Linux and macOS:
 
 Each flavor colours file names and icons by kind, the hovered file, the current folder, the markers and counts of \
 yanked, cut and selected files, find matches, the mode and permissions in the status bar, tabs, pop-ups, the help \
-menu, task progress and the code that the preview shows. Folders, executables, images, media, archives and documents \
+menu, task progress and the code that the preview shows. Executables, images, media, archives and documents \
 take the terminal colours of the matching terminal theme, and the icons of other file types the terminal colour \
-nearest their usual one. The icons need a [Nerd Font](https://www.nerdfonts.com), as yazi's own do.
+nearest their usual one. Folders, in bold, the current folder, the mode, tabs and pop-up borders take a colour of \
+the family's own, mostly its keyword colour. The icons need a [Nerd Font](https://www.nerdfonts.com), as yazi's own do.
 
 {readme_footer(families, "yazi", "Flavors", "the flavor, yazi version, terminal")}"""
 
@@ -4201,13 +4202,17 @@ The [family's page]({VENDOR_URL}/tree/master/themes/{heritage.folder(family)}) d
 """
 
 
-# The files of a yazi flavor's folder, which yazi's package manager copies.
-YAZI_FLAVOR_FILES = ("LICENSE", "LICENSE-tmtheme", "README.md", "flavor.toml", "tmtheme.xml")
+# The files of a yazi flavor's folder: those that yazi's package manager copies, each of which it needs.
+YAZI_FLAVOR_FILES = ("LICENSE", "LICENSE-tmtheme", "README.md", "flavor.toml", "preview.png", "tmtheme.xml")
+# The folder of each flavor's preview.png, which preview.py --yazi --png writes.
+YAZI_PREVIEWS = os.path.join(ROOT, "yazi", "previews")
+# The repository that yazi's package manager installs the flavors from, with the flavors' folders at its root.
+YAZI_REPOSITORY = "heritage-themes/yazi-flavors"
 
 
 def build_yazi(families):
     """Writes each theme's flavor to build/yazi/flavors/<name>.yazi, with the README, changelog and licence, and returns
-    build/yazi."""
+    build/yazi. Fails when a flavor has no image in YAZI_PREVIEWS."""
     directory = os.path.join(OUT, "yazi")
     for family in families:
         source = f"{VENDOR_URL}/tree/master/themes/{heritage.folder(family)}"
@@ -4217,6 +4222,11 @@ def build_yazi(families):
             write_text(os.path.join(folder, "flavor.toml"), heritage.yazi.flavor(t["palette"], source))
             write_text(os.path.join(folder, "tmtheme.xml"), heritage.yazi.tmtheme(t["palette"], source))
             write_text(os.path.join(folder, "README.md"), yazi_flavor_readme(family, t))
+            preview = os.path.join(YAZI_PREVIEWS, f"{heritage.yazi.name(t)}.png")
+            if not os.path.isfile(preview):
+                raise SystemExit(f"yazi {heritage.yazi.name(t)}: {os.path.relpath(preview, ROOT)} is missing; "
+                                 f"run python3 preview.py --yazi --png {heritage.folder(family)}")
+            shutil.copy(preview, os.path.join(folder, "preview.png"))
             for name in ("LICENSE", "LICENSE-tmtheme"):
                 shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(folder, name))
     write_text(os.path.join(directory, "README.md"), yazi_readme(families))
@@ -4225,11 +4235,64 @@ def build_yazi(families):
     return directory
 
 
+def yazi_repository_readme(families):
+    """The README of YAZI_REPOSITORY, which yazi's package manager installs the flavors from."""
+    rows = "\n".join(f"| `{heritage.yazi.name(t)}` | {'Dark' if t['palette']['dark'] else 'Light'} | "
+                     f"[{family.FAMILY}]({VENDOR_URL}/tree/master/themes/{heritage.folder(family)}) |"
+                     for family in families for t in family.THEMES)
+    night, day = (heritage.yazi.name(next(t for f in families for t in f.THEMES if t["slug"] == slug))
+                  for slug in ("HoliNight", "HoliDay"))
+    return f"""# Heritage Themes for yazi
+
+{DESCRIPTION} This repository holds the [yazi](https://github.com/sxyazi/yazi) flavors, one folder for each theme, \
+generated from [Heritage Themes]({VENDOR_URL}); report issues and changes there.
+
+## Install
+
+Install a dark and a light flavor with yazi's package manager:
+
+```bash
+ya pkg add {YAZI_REPOSITORY}:{night}
+ya pkg add {YAZI_REPOSITORY}:{day}
+```
+
+Then name them in `theme.toml` in yazi's configuration folder, `~/.config/yazi/theme.toml` on Linux and macOS:
+
+```toml
+[flavor]
+dark = "{night}"
+light = "{day}"
+```
+
+yazi applies the flavor that matches the terminal's background. It draws on the terminal's own background, so run \
+it in a terminal with 24-bit colour that runs the matching theme of the \
+[Heritage Themes for terminals]({VENDOR_URL}/releases/latest). Update installed flavors with `ya pkg upgrade`.
+
+## Flavors
+
+| Flavor | Mode | Family |
+|---|---|---|
+{rows}
+
+Each flavor's folder has a `preview.png`. The flavors are tested with yazi {heritage.yazi.VERSION}.
+"""
+
+
+def build_yazi_repository(directory, families):
+    """Writes build/yazi-repository, the contents of YAZI_REPOSITORY: the flavors' folders of directory at its root,
+    with its README and the licence, and returns it."""
+    repository = os.path.join(OUT, "yazi-repository")
+    shutil.copytree(os.path.join(directory, "flavors"), repository)
+    write_text(os.path.join(repository, "README.md"), yazi_repository_readme(families))
+    shutil.copy(os.path.join(ROOT, "LICENSE"), os.path.join(repository, "LICENSE"))
+    return repository
+
+
 def validate_yazi(directory, families):
     """Fails the build when a flavor's folder lacks a file or holds another, its flavor.toml does not parse or differs
     from heritage.yazi, sets a style key that yazi's default theme does not have or leaves one out, its file type rules
     differ from yazi's in their selectors, or its tmtheme.xml differs from heritage.textmate; or when text, an icon or a
-    marker is unreadable on its background."""
+    marker is unreadable on its background, or its preview.png is not a PNG image."""
     preset = heritage.yazi.PRESET
     expected = set()
     for family in families:
@@ -4242,6 +4305,9 @@ def validate_yazi(directory, families):
                 raise SystemExit(f"{label}: yazi's package manager needs a kebab-case name")
             if sorted(os.listdir(folder)) != sorted(YAZI_FLAVOR_FILES):
                 raise SystemExit(f"{label}: the folder does not hold {', '.join(YAZI_FLAVOR_FILES)}")
+            with open(os.path.join(folder, "preview.png"), "rb") as f:
+                if f.read(8) != b"\x89PNG\r\n\x1a\n":
+                    raise SystemExit(f"{label}: preview.png is not a PNG image")
             with open(os.path.join(folder, "flavor.toml"), "rb") as f:
                 try:
                     found = tomllib.load(f)
@@ -5319,6 +5385,7 @@ def main():
               flush=True)
     yazi = build_yazi(families)
     validate_yazi(yazi, families)
+    build_yazi_repository(yazi, families)
     name = f"{VSCODE_NAME}-yazi"
     print(f"{pack_folder(yazi, os.path.join(OUT, f'{name}-{VERSION}.zip'), name)}: {len(themes)} themes", flush=True)
     godot = build_godot(families)
