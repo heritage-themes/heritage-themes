@@ -43,6 +43,7 @@ body:
         - lazygit
         - btop
         - yazi
+        - fzf
         - Eclipse
         - Nova
         - JupyterLab

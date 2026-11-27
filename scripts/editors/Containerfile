@@ -1,9 +1,9 @@
 # The editors that the previews of Nano, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse, Lapce, Textadept,
-# Pulsar, Amp, bat, delta, lazygit, btop and yazi run their themes in: Nano, lazygit, btop, Qt Creator, Kate (with its
-# plugins and the Breeze style it uses where installed), GNOME Text Editor, gedit and Geany as Fedora 45 packages them,
-# with file, which yazi detects file types with, and pinned upstream releases of the others, each checked against its
-# published checksum. GUI editors draw on Xvfb with Mesa's software OpenGL and Vulkan; Nano, Amp, bat, delta, lazygit,
-# btop and yazi run in a pseudo-terminal. PyGObject with GtkSourceView's introspection data lets
+# Pulsar, Amp, bat, delta, lazygit, btop, yazi and fzf run their themes in: Nano, lazygit, btop, fzf, Qt Creator, Kate
+# (with its plugins and the Breeze style it uses where installed), GNOME Text Editor, gedit and Geany as Fedora 45
+# packages them, with file, which yazi detects file types with, and pinned upstream releases of the others, each checked
+# against its published checksum. GUI editors draw on Xvfb with Mesa's software OpenGL and Vulkan; Nano, Amp, bat,
+# delta, lazygit, btop, yazi and fzf run in a pseudo-terminal. PyGObject with GtkSourceView's introspection data lets
 # scripts/gnome-text-editor/definitions.py read the library; scripts/gedit/definitions.py reads gedit's from
 # libgedit-gtksourceview's data folder.
 FROM registry.fedoraproject.org/fedora:45
@@ -12,7 +12,7 @@ RUN dnf -y install --setopt=install_weak_deps=False \
         xorg-x11-server-Xvfb xdotool xwininfo ImageMagick dbus-x11 dbus-daemon \
         mesa-dri-drivers mesa-vulkan-drivers vulkan-loader mesa-libEGL mesa-libGL libglvnd-glx \
         python3 python3-pyte git findutils procps-ng which jetbrains-mono-fonts-all google-noto-sans-fonts \
-        nano lazygit btop file unzip qt-creator kate kate-plugins plasma-breeze-qt6 qt6-qtbase-gui qt6-qtsvg qt5-qtbase qt5-qtbase-gui \
+        nano lazygit btop fzf file unzip qt-creator kate kate-plugins plasma-breeze-qt6 qt6-qtbase-gui qt6-qtsvg qt5-qtbase qt5-qtbase-gui \
         gnome-text-editor gedit geany python3-gobject gobject-introspection gtksourceview5 adwaita-icon-theme \
         java-25-openjdk gtk3 webkit2gtk4.1 libsecret \
         libxkbcommon-x11 xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm \

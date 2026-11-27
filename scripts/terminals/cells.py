@@ -1,7 +1,7 @@
 """Checks a screen that shells.py read: every colour is one the theme sets, and text reaches its contrast minimum on the
 background it is drawn on.
 
-Usage: python3 cells.py SCREEN.json BG FG ALLOWED DIMMED [ROWS]
+Usage: python3 cells.py SCREEN.json BG FG ALLOWED DIMMED [ROWS [BACKDROPS]]
 
 BG and FG are the theme's background and text colours, which the terminal's default colours stand for when the
 terminal runs the matching Terminals theme. ALLOWED is a comma-separated list of the colours the app's theme sets.
@@ -10,13 +10,18 @@ app dims text to, such as btop's fading process list. ROWS limits the check to t
 negative, for example 0,-1 for a multiplexer's bars, or to a slice of them, as 0:-1 for every row but the last. Other
 text is held to 4.5:1, except characters drawn as decoration rather than text, such as powerline separators and box
 drawing, which are not checked, and characters that draw graphs and meters, which are held to the 3:1 of graphics.
-Whitespace shows only its background, so only that is checked. Prints each problem and exits 1 when there is one.
+Whitespace shows only its background, so only that is checked. BACKDROPS is a comma-separated list of the colours that
+the app fills areas with, such as a selected row: a block element drawn in one of them, as fzf draws its gutter, is part
+of that area rather than a graphic, so only its colours are checked. Prints each problem and exits 1 when there is
+one.
 """
 import json, sys
 
 DECORATION = set("─│╭╮╰╯├┤┬┴┼━┃═║") | {chr(c) for c in range(0xE0A0, 0xE0D8)} | {chr(c) for c in range(0x2500, 0x2580)}
 # braille patterns, block elements and the black square, of which graphs and meters are drawn
 GRAPHICS = {chr(c) for c in range(0x2800, 0x2900)} | {chr(c) for c in range(0x2580, 0x25A1)}
+# block elements, which draw part of a cell's area in the foreground colour
+BLOCKS = {chr(c) for c in range(0x2580, 0x25A0)}
 MINIMUM, LOW = 4.5, 3
 
 
@@ -45,6 +50,7 @@ def main():
         selected = [int(y) % len(rows) for y in sys.argv[6].split(",")]
     allowed = {c.upper() for c in allowed.split(",")} | {bg.upper(), fg.upper()}
     dimmed = {c.upper() for c in dimmed.split(",")}
+    backdrops = {c.upper() for c in sys.argv[7].split(",")} if len(sys.argv) > 7 and sys.argv[7] else set()
     problems = []
     for y in selected:
         for x, (char, cfg, cbg, bold, italic, underline) in enumerate(rows[y]):
@@ -53,7 +59,8 @@ def main():
             for colour in (cfg, cbg) if char.strip() else (cbg,):
                 if colour not in allowed:
                     problems.append(f"row {y} column {x} {char!r}: {colour} is not a colour of the theme")
-            if not char.strip() or char in DECORATION or cfg not in allowed or cbg not in allowed:
+            if (not char.strip() or char in DECORATION or (char in BLOCKS and cfg in backdrops) or cfg not in allowed
+                    or cbg not in allowed):
                 continue
             ratio = contrast(cfg, cbg)
             if ratio < (LOW if cfg in dimmed or char in GRAPHICS else MINIMUM):

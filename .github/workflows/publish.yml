@@ -51,6 +51,7 @@ jobs:
       lazygit: ${{ steps.check.outputs.lazygit }}
       btop: ${{ steps.check.outputs.btop }}
       yazi: ${{ steps.check.outputs.yazi }}
+      fzf: ${{ steps.check.outputs.fzf }}
       eclipse: ${{ steps.check.outputs.eclipse }}
       nova: ${{ steps.check.outputs.nova }}
       jupyterlab: ${{ steps.check.outputs.jupyterlab }}
@@ -81,7 +82,7 @@ jobs:
           fi
           jetbrains=false vscode=false visualstudio=false sublime=false zed=false nvim=false notepadpp=false xcode=false helix=false \
             kakoune=false micro=false vim=false emacs=false terminals=false nano=false textadept=false lapce=false \
-            qtcreator=false kate=false gnome_text_editor=false gedit=false geany=false pulsar=false amp=false bat=false delta=false lazygit=false btop=false yazi=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
+            qtcreator=false kate=false gnome_text_editor=false gedit=false geany=false pulsar=false amp=false bat=false delta=false lazygit=false btop=false yazi=false fzf=false eclipse=false nova=false jupyterlab=false pygments=false spyder=false thonny=false idle=false rstudio=false \
             godot=false netbeans=false drracket=false
           grep -q "^## \[$version\]" CHANGELOG.md && jetbrains=true
           grep -q "^## \[$version\]" vscode/CHANGELOG.md && vscode=true
@@ -112,6 +113,7 @@ jobs:
           grep -q "^## \[$version\]" lazygit/CHANGELOG.md && lazygit=true
           grep -q "^## \[$version\]" btop/CHANGELOG.md && btop=true
           grep -q "^## \[$version\]" yazi/CHANGELOG.md && yazi=true
+          grep -q "^## \[$version\]" fzf/CHANGELOG.md && fzf=true
           grep -q "^## \[$version\]" eclipse/CHANGELOG.md && eclipse=true
           grep -q "^## \[$version\]" nova/CHANGELOG.md && nova=true
           grep -q "^## \[$version\]" jupyterlab/CHANGELOG.md && jupyterlab=true
@@ -129,7 +131,7 @@ jobs:
               && [ "$emacs" = false ] && [ "$terminals" = false ] && [ "$nano" = false ] && [ "$textadept" = false ] \
               && [ "$lapce" = false ] && [ "$qtcreator" = false ] && [ "$kate" = false ] && [ "$gnome_text_editor" = false ] \
               && [ "$gedit" = false ] && [ "$geany" = false ] && [ "$pulsar" = false ] && [ "$amp" = false ] && [ "$bat" = false ] \
-              && [ "$delta" = false ] && [ "$lazygit" = false ] && [ "$btop" = false ] && [ "$yazi" = false ] && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
+              && [ "$delta" = false ] && [ "$lazygit" = false ] && [ "$btop" = false ] && [ "$yazi" = false ] && [ "$fzf" = false ] && [ "$eclipse" = false ] && [ "$nova" = false ] && [ "$jupyterlab" = false ] \
               && [ "$pygments" = false ] && [ "$spyder" = false ] && [ "$thonny" = false ] \
               && [ "$idle" = false ] && [ "$rstudio" = false ] && [ "$godot" = false ] && [ "$netbeans" = false ] \
               && [ "$drracket" = false ]; then
@@ -167,6 +169,7 @@ jobs:
             echo "lazygit=$lazygit"
             echo "btop=$btop"
             echo "yazi=$yazi"
+            echo "fzf=$fzf"
             echo "eclipse=$eclipse"
             echo "nova=$nova"
             echo "jupyterlab=$jupyterlab"
@@ -1165,6 +1168,27 @@ jobs:
           path: build/heritage-themes-btop-${{ env.VERSION }}.zip
           if-no-files-found: error
 
+  # fzf has no theme registry: users install the themes from the zip that the GitHub release attaches.
+  fzf:
+    needs: check
+    if: needs.check.outputs.fzf == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - run: python3 build.py
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fzf
+          path: build/heritage-themes-fzf-${{ env.VERSION }}.zip
+          if-no-files-found: error
+
   yazi:
     needs: check
     if: needs.check.outputs.yazi == 'true'
@@ -1528,7 +1552,7 @@ jobs:
   release:
     needs: [check, jetbrains, vscode, visualstudio, sublime, zed, nvim, notepadpp, xcode, helix, kakoune, micro, vim,
             emacs, terminals, nano, textadept, lapce, qtcreator, kate, gnome_text_editor, gedit, geany, pulsar,
-            amp, bat, delta, lazygit, btop, yazi, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot, netbeans, drracket]
+            amp, bat, delta, lazygit, btop, yazi, fzf, eclipse, nova, jupyterlab, pygments, spyder, thonny, idle, rstudio, godot, netbeans, drracket]
     # Runs once each product has either published or been left out of the release.
     if: >-
       ${{ !cancelled() && needs.check.result == 'success'
@@ -1561,6 +1585,7 @@ jobs:
       && contains(fromJSON('["success", "skipped"]'), needs.lazygit.result)
       && contains(fromJSON('["success", "skipped"]'), needs.btop.result)
       && contains(fromJSON('["success", "skipped"]'), needs.yazi.result)
+      && contains(fromJSON('["success", "skipped"]'), needs.fzf.result)
       && contains(fromJSON('["success", "skipped"]'), needs.eclipse.result)
       && contains(fromJSON('["success", "skipped"]'), needs.nova.result)
       && contains(fromJSON('["success", "skipped"]'), needs.jupyterlab.result)
@@ -1606,6 +1631,7 @@ jobs:
       LAZYGIT: ${{ needs.check.outputs.lazygit }}
       BTOP: ${{ needs.check.outputs.btop }}
       YAZI: ${{ needs.check.outputs.yazi }}
+      FZF: ${{ needs.check.outputs.fzf }}
       ECLIPSE: ${{ needs.check.outputs.eclipse }}
       NOVA: ${{ needs.check.outputs.nova }}
       JUPYTERLAB: ${{ needs.check.outputs.jupyterlab }}
@@ -1700,6 +1726,7 @@ jobs:
           notes "lazygit themes" "$LAZYGIT" lazygit/CHANGELOG.md "heritage-themes-lazygit-<version>.zip"
           notes "btop themes" "$BTOP" btop/CHANGELOG.md "heritage-themes-btop-<version>.zip"
           notes "yazi flavors" "$YAZI" yazi/CHANGELOG.md "heritage-themes-yazi-<version>.zip"
+          notes "fzf themes" "$FZF" fzf/CHANGELOG.md "heritage-themes-fzf-<version>.zip"
           notes "Eclipse plugin" "$ECLIPSE" eclipse/CHANGELOG.md "heritage-themes-eclipse-<version>.zip"
           notes "Nova themes" "$NOVA" nova/CHANGELOG.md "heritage-themes-nova-<version>.zip"
           notes "JupyterLab themes" "$JUPYTERLAB" jupyterlab/CHANGELOG.md "heritage-themes-jupyterlab-<version>.zip"

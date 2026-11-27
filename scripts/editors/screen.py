@@ -2,10 +2,10 @@
 
 Usage: python3 screen.py EDITOR THEME FILES SAMPLE BACKGROUND FOREGROUND OUT.json
 
-EDITOR is nano, amp, bat, delta, lazygit, btop or yazi, THEME the theme's file name stem, FILES the folder of the
-editor's generated files, SAMPLE the file to open, or for lazygit, btop and yazi a file whose name is the view to show
-(for lazygit files, commits or search, for btop selected, followed or paused, for yazi preview, select, cut, help or
-rename), which for yazi holds the code sample that its folder shows, and
+EDITOR is nano, amp, bat, delta, lazygit, btop, yazi or fzf, THEME the theme's file name stem, FILES the folder of the
+editor's generated files, SAMPLE the file to open, or for lazygit, btop, yazi and fzf a file whose name is the view to
+show (for lazygit files, commits or search, for btop selected, followed or paused, for yazi preview, select, cut, help
+or rename, for fzf search or preview), which for yazi and fzf holds the code sample that its folder shows, and
 BACKGROUND and FOREGROUND the terminal's default colours as #RRGGBB, those of the matching Terminals theme. The editor
 starts in a pseudo-terminal of 256 colours that reports 24-bit colour and answers queries for its default colours, in a
 fresh HOME with the theme installed as its README says, and the screen is read through the pyte terminal emulator once
@@ -27,6 +27,8 @@ LAZYGIT_COLUMNS, LAZYGIT_ROWS = 120, 30
 BTOP_COLUMNS, BTOP_ROWS = 120, 36
 # yazi's three columns need room for the preview of the code sample
 YAZI_COLUMNS, YAZI_ROWS = 120, 30
+# fzf's preview view shows the list beside the preview of the code sample
+FZF_COLUMNS, FZF_ROWS = 120, 30
 QUIET, TIMEOUT = 1.5, 30
 # btop updates every BTOP_UPDATE milliseconds and gets BTOP_PACE seconds before each key and before the screen is read,
 # so its graphs hold several samples
@@ -270,7 +272,38 @@ def yazi(home, stem, files, sample, background, foreground):
     return ["/usr/local/bin/yazi", folder], YAZI_KEYS[os.path.basename(sample)]
 
 
-EDITORS = dict(nano=nano, amp=amp, bat=bat, delta=delta, lazygit=lazygit, btop=btop, yazi=yazi)
+# fzf's view → its options and the keys that show it: a search with a header and two lines marked with Shift-Tab,
+# which marks the current line and moves up the list that fzf's default layout grows upwards, so the current line is
+# the third; and a search with every section framed, as --style full draws it, the list and the preview of the current
+# file labelled
+FZF_VIEWS = {"search": (["--multi", "--header", "Dyes and threads"], ["o", "r", "\x1b[Z", "\x1b[Z"]),
+             "preview": (["--style", "full", "--list-label", " Weaving ", "--preview", "cat {}",
+                          "--preview-label", " Preview "], [*"ord"])}
+# The folders and file names of the list that fzf searches, so that the search matches more lines than fit and fzf
+# draws its scroll bar
+FZF_FOLDERS = ("colours", "dyes", "looms", "patterns", "threads", "tiles")
+FZF_NAMES = ("cochineal", "cobalt", "indigo", "lac", "madder", "ochre", "saffron", "walnut", "weld", "woad")
+
+
+def fzf(home, stem, files, sample, background, foreground):
+    # the theme in a themes folder of fzf's configuration folder and named in FZF_DEFAULT_OPTS_FILE, as the README
+    # says. fzf searches the files of a folder that holds the code sample as orders.py, which the preview view shows.
+    themes = f"{home}/.config/fzf/themes"
+    os.makedirs(themes)
+    shutil.copy(f"{files}/{stem}.fzfrc", themes)
+    folder = f"{home}/weaving"
+    for directory in FZF_FOLDERS:
+        for name in FZF_NAMES:
+            write(f"{folder}/{directory}/{name}.txt", f"{name.capitalize()} for the {directory}.\n")
+    view = os.path.basename(sample)
+    shutil.move(sample, f"{folder}/orders.py")
+    options, keys = FZF_VIEWS[view]
+    command = "find . -type f | sort"
+    return ["/usr/bin/env", f"FZF_DEFAULT_OPTS_FILE={themes}/{stem}.fzfrc", f"FZF_DEFAULT_COMMAND={command}",
+            "/usr/bin/fzf", *options], keys, folder
+
+
+EDITORS = dict(nano=nano, amp=amp, bat=bat, delta=delta, lazygit=lazygit, btop=btop, yazi=yazi, fzf=fzf)
 
 
 def colour_reply(code, colour):
@@ -278,7 +311,7 @@ def colour_reply(code, colour):
     return f"\x1b]{code};rgb:" + "/".join(colour[i:i + 2].lower() * 2 for i in (1, 3, 5)) + "\x1b\\"
 
 
-def run(argv, env, background, foreground, rows, columns=COLUMNS, keys=(), pace=None):
+def run(argv, env, background, foreground, rows, columns=COLUMNS, keys=(), pace=None, cwd=None):
     """The screen once the program has been quiet for QUIET seconds after each of keys, sent in turn, or with pace,
     for a program that never goes quiet, the screen pace seconds after the last key, each key sent pace seconds after
     the one before, and the first pace seconds after the start; the screen is read once no output has arrived for a
@@ -288,7 +321,7 @@ def run(argv, env, background, foreground, rows, columns=COLUMNS, keys=(), pace=
     stream = pyte.ByteStream(screen)
     pid, fd = pty.fork()
     if pid == 0:
-        os.chdir(env["HOME"])
+        os.chdir(cwd or env["HOME"])
         os.execve(argv[0], argv, env)
     fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", rows, columns, 0, 0))
     screen.write_process_input = lambda data: os.write(fd, data.encode())
@@ -350,6 +383,9 @@ def main():
     elif editor == "yazi":
         argv, keys = argv
         rows = run(argv, env, background, foreground, YAZI_ROWS, YAZI_COLUMNS, keys)
+    elif editor == "fzf":
+        argv, keys, folder = argv
+        rows = run(argv, env, background, foreground, FZF_ROWS, FZF_COLUMNS, keys, cwd=folder)
     else:
         rows = run(argv, env, background, foreground, DELTA_ROWS if editor == "delta" else ROWS)
     if editor == "delta":

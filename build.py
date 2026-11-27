@@ -102,7 +102,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate",
-           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "delta", "lazygit", "btop", "yazi", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny",
+           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "delta", "lazygit", "btop", "yazi", "fzf", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny",
            "IDLE", "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
@@ -4132,6 +4132,126 @@ def validate_btop(directory, families):
     check_files("btop themes", directory, "themes", expected)
 
 
+def fzf_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    night, day = (heritage.fzf.name(next(t for f in families for t in f.THEMES if t["slug"] == slug))
+                  for slug in ("HoliNight", "HoliDay"))
+    return f"""# Heritage Themes for fzf
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+The themes need [fzf](https://github.com/junegunn/fzf) {heritage.fzf.MINIMUM_VERSION} or later, tested with \
+{heritage.fzf.TESTED_VERSION}, in a terminal with 24-bit colour, which runs the matching theme of the \
+[Heritage Themes for terminals]({VENDOR_URL}/releases/latest). fzf draws on the terminal's own background and text \
+colour, so switch the terminal's theme with the fzf theme.
+
+1. Copy the files in `themes` into `~/.config/fzf/themes`. In a terminal, from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.config/fzf/themes
+   cp themes/* ~/.config/fzf/themes/
+   ```
+
+2. Name the theme in the `FZF_DEFAULT_OPTS_FILE` environment variable, for example in `~/.bashrc` or `~/.zshrc`:
+
+   ```bash
+   export FZF_DEFAULT_OPTS_FILE="$HOME/.config/fzf/themes/{night}.fzfrc"
+   ```
+
+   In fish, put this line in `~/.config/fish/config.fish`:
+
+   ```fish
+   set -gx FZF_DEFAULT_OPTS_FILE ~/.config/fzf/themes/{night}.fzfrc
+   ```
+
+   fzf does not ask the terminal for its background, so name a Night theme with a dark terminal theme and a Day \
+theme, such as `{day}`, with a light one. fzf reads the file before `FZF_DEFAULT_OPTS` and the command line, so \
+options of your own there still apply, and so does the theme in the shell's key bindings and in other programs that \
+start fzf. If `FZF_DEFAULT_OPTS_FILE` already names a file of your own, add the theme's `--color` lines to that file \
+instead.
+
+If the matched characters keep fzf's default colours, fzf has not read the theme: run `echo $FZF_DEFAULT_OPTS_FILE` \
+in the shell that starts fzf, which must name the theme's file, and open a new terminal after editing the shell's \
+configuration.
+
+## What is coloured
+
+Each theme colours the matched characters, the current line and the gutter beside the list, the prompt, the pointer \
+and the spinner, the marker of selected lines, the match counters, the header, borders, the separator and the scroll \
+bar. The matched characters take one of the family's syntax colours and the prompt and the pointer another, so each \
+tradition shows in the list. fzf draws text, the query and the preview on the terminal's own background and text \
+colour, which the matching terminal theme takes from the same palette.
+
+{readme_footer(families, "fzf", "Themes", "the theme, fzf version, terminal")}"""
+
+
+def read_fzf(text):
+    """The base scheme and colour name → value of an fzf theme file, read as fzf reads FZF_DEFAULT_OPTS_FILE: shell
+    words split at whitespace, where a # that starts a word starts a comment to the end of the line, as in
+    go-shellwords with ParseComment. Each word must be a --color option that names a base scheme or one colour. Fails
+    on quotes, escapes and expansions, which the reader does not interpret, on any other word, a value that is neither
+    #RRGGBB nor -1, or a colour named twice, so the comparison with heritage.fzf.colours stands for what fzf reads."""
+    words = []
+    for line in text.splitlines():
+        for word in line.split():
+            if word.startswith("#"):
+                break
+            words.append(word)
+    base, result = None, {}
+    for word in words:
+        if re.search(r"[\\'\"`$]", word):
+            raise ValueError(f"unexpected quoting or expansion in {word!r}")
+        if not word.startswith("--color="):
+            raise ValueError(f"unexpected word {word!r}")
+        spec = word.removeprefix("--color=")
+        if spec in heritage.fzf.BASE_SCHEMES:
+            if base or result:
+                raise ValueError("the base scheme must come first, once")
+            base = spec
+            continue
+        match = re.fullmatch(r"([a-z+-]+):(#[0-9A-F]{6}|-1)((?::[a-z]+)*)", spec)
+        if not match:
+            raise ValueError(f"unexpected colour {spec!r}")
+        if match[1] in result:
+            raise ValueError(f"{match[1]} repeats")
+        if any(a not in heritage.fzf.ATTRIBUTES for a in match[3].split(":")[1:]):
+            raise ValueError(f"{spec!r} has an attribute that fzf {heritage.fzf.MINIMUM_VERSION} does not know")
+        result[match[1]] = match[2]
+    return base, result
+
+
+def validate_fzf(directory, families):
+    """Fails the build when a theme file is missing, does not read as heritage.fzf's base scheme and colours, names a
+    colour that fzf's oldest supported release does not know, or when text or graphics it colours are unreadable on
+    their background."""
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.fzf.name(t), t["palette"]
+            expected.add(f"{name}.fzfrc")
+            label = f"fzf {name}"
+            with open(os.path.join(directory, "themes", f"{name}.fzfrc"), encoding="utf-8") as f:
+                try:
+                    base, found = read_fzf(f.read())
+                except ValueError as error:
+                    raise SystemExit(f"{label}: {error}")
+            if base != heritage.fzf.base(p) or found != heritage.fzf.colours(p):
+                raise SystemExit(f"{label}: the theme differs from heritage.fzf's base scheme and colours")
+            unknown = set(found) - set(heritage.fzf.COLOUR_NAMES)
+            if unknown:
+                raise SystemExit(f"{label}: fzf {heritage.fzf.MINIMUM_VERSION} has no colour "
+                                 f"{', '.join(sorted(unknown))}")
+            for element, fg, bg, minimum in heritage.fzf.styles(p):
+                ratio = contrast(fg[1:], bg[1:])
+                if ratio < minimum:
+                    raise SystemExit(f"{label}: {element} is {ratio:.2f}:1 on {bg}, needs {minimum}:1")
+    check_files("fzf themes", directory, "themes", expected)
+
+
 def yazi_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -5026,6 +5146,7 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "Geany": lambda t: t["palette"]["name"], "Pulsar": heritage.pulsar.name,
                   "Amp": heritage.amp.name, "bat": heritage.bat.name, "delta": heritage.delta.name,
                   "lazygit": heritage.lazygit.name, "btop": heritage.btop.name, "yazi": heritage.yazi.name,
+                  "fzf": heritage.fzf.name,
                   "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
@@ -5033,7 +5154,7 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "bat": bat_readme, "delta": delta_readme, "lazygit": lazygit_readme, "btop": btop_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "bat": bat_readme, "delta": delta_readme, "lazygit": lazygit_readme, "btop": btop_readme, "fzf": fzf_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
 
 
 def terminals_readme(families):
@@ -5364,6 +5485,9 @@ def main():
             ("btop", "themes", lambda t, source: (f"{heritage.btop.name(t)}.theme",
                                                    heritage.btop.theme(t["palette"], source)),
              validate_btop),
+            ("fzf", "themes", lambda t, source: (f"{heritage.fzf.name(t)}.fzfrc",
+                                                  heritage.fzf.theme(t["palette"], source)),
+             validate_fzf),
             ("Spyder", "themes", lambda t, source: (f"{heritage.spyder.name(t)}.ini",
                                                      heritage.spyder.theme(t["palette"], heritage.spyder.name(t),
                                                                            source)),
