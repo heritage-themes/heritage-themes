@@ -563,12 +563,24 @@ jobs:
               f.write(text)
           PY
           git add extensions.toml
-          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+          # The registry's CLA check rejects commits by github-actions[bot]; the commit is authored by the
+          # account that owns ZED_REGISTRY_TOKEN, which has signed Zed's CLA.
+          identity=$(gh api user --jq '"\(.id) \(.login)"')
+          read -r user_id login <<< "$identity"
+          git -c user.name="$login" -c user.email="$user_id+$login@users.noreply.github.com" \
             commit --message "Update $ID to $VERSION"
-          git push origin "$branch"
-          gh pr create --repo "$ZED_REGISTRY" --head "${ZED_REGISTRY_FORK%%/*}:$branch" \
+          git push --force origin "$branch"
+          url=$(gh pr create --repo "$ZED_REGISTRY" --head "${ZED_REGISTRY_FORK%%/*}:$branch" \
             --title "Update $ID to $VERSION" \
-            --body "Updates Heritage Themes to $VERSION: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/v$VERSION"
+            --body "Updates Heritage Themes to $VERSION: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/v$VERSION")
+          # This pull request contains every earlier release, so older ones still open are superseded.
+          gh pr list --repo "$ZED_REGISTRY" --author "$login" --state open --limit 100 \
+              --json number,headRefName,headRepositoryOwner \
+              --jq ".[] | select(.headRepositoryOwner.login == \"${ZED_REGISTRY_FORK%%/*}\")
+                  | select(.headRefName | startswith(\"$ID-\")) | select(.headRefName != \"$branch\") | .number" \
+            | while read -r number; do
+                gh pr close "$number" --repo "$ZED_REGISTRY" --delete-branch --comment "Superseded by $url."
+              done
 
       - uses: actions/upload-artifact@v7
         with:

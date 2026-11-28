@@ -293,6 +293,7 @@ Zed's extension registry, the repository `zed-industries/extensions`, pins each 
 submodule at a commit of a public repository that holds the extension at its root, with the version in
 `extensions.toml`. Publish pushes the generated extension to a separate repository, tags it
 `v<version>`, and opens a pull request against the registry that moves the submodule and the version.
+It closes the extension's earlier registry pull requests that are still open, since the new one supersedes them.
 That repository contains generated files only; every publish replaces its contents.
 
 1. Create the public repository `heritage-themes/heritage-themes-zed` with a first commit on its
@@ -310,7 +311,8 @@ That repository contains generated files only; every publish replaces its conten
    the repository secret `ZED_REGISTRY_TOKEN`. `public_repo` lets it push to the fork and open pull
    requests against the registry. `workflow` lets it sync the fork when the registry has changed its
    workflow files; without it the Publish job for Zed fails. A fine-grained token cannot open a pull
-   request in a repository of another owner.
+   request in a repository of another owner. The registry commit is authored by the token's account,
+   which must have signed [Zed's CLA](https://zed.dev/cla); the registry's CLA check fails otherwise.
 
    ```bash
    gh secret set ZED_REGISTRY_TOKEN -R heritage-themes/heritage-themes
