@@ -102,7 +102,7 @@ VISUALSTUDIO_ICON = os.path.join(ROOT, "assets", "pluginIcon_dark.png")
 # The editors the themes ship to, as the READMEs name them.
 EDITORS = ("JetBrains IDEs", "VS Code", "Visual Studio", "Sublime Text", "Zed", "Neovim", "Notepad++", "Xcode",
            "Helix", "Kakoune", "Micro", "Vim", "Emacs", "Nano", "Textadept", "Lapce", "Qt Creator", "Kate",
-           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "delta", "lazygit", "btop", "yazi", "fzf", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny",
+           "GNOME Text Editor", "gedit", "Geany", "Pulsar", "Amp", "bat", "delta", "lazygit", "btop", "yazi", "fzf", "eza", "Eclipse", "Nova", "JupyterLab", "Pygments", "Spyder", "Thonny",
            "IDLE", "RStudio", "Godot", "NetBeans", "DrRacket", "terminals")
 # Islands guidance: the main window is lighter than the islands in dark themes, darker in light ones, by this ratio.
 FRAME_CONTRAST = 1.20
@@ -4252,6 +4252,143 @@ def validate_fzf(directory, families):
     check_files("fzf themes", directory, "themes", expected)
 
 
+def eza_readme(families):
+    """The README in the zip. Links are absolute, as the zip holds the build only."""
+    count = sum(len(f.THEMES) for f in families)
+    night, day = (heritage.eza.name(next(t for f in families for t in f.THEMES if t["slug"] == slug))
+                  for slug in ("HoliNight", "HoliDay"))
+    return f"""# Heritage Themes for eza
+
+{DESCRIPTION} {count} dark and light themes in {len(families)} families; each family maps the named colours of one \
+tradition to syntax roles.
+
+## Install
+
+The themes need [eza](https://github.com/eza-community/eza) {heritage.eza.MINIMUM_VERSION} or later, tested with \
+{heritage.eza.TESTED_VERSION}, in a terminal with 24-bit colour, which runs the matching theme of the \
+[Heritage Themes for terminals]({VENDOR_URL}/releases/latest). eza draws on the terminal's own background and text \
+colour, so switch the terminal's theme with the eza theme.
+
+1. Copy the files in `themes` into `~/.config/eza/themes`, and link the theme you want as eza's `theme.yml`. In a \
+terminal, from the unzipped folder:
+
+   ```bash
+   mkdir -p ~/.config/eza/themes
+   cp themes/* ~/.config/eza/themes/
+   ln -sf ~/.config/eza/themes/{night}.yml ~/.config/eza/theme.yml
+   ```
+
+   eza does not ask the terminal for its background, so link a Night theme with a dark terminal theme and a Day \
+theme, such as `{day}`, with a light one. On macOS and Windows, eza looks for `theme.yml` in \
+`~/Library/Application Support/eza` and `%APPDATA%\\eza` instead: set `EZA_CONFIG_DIR` to `~/.config/eza` in the \
+shell's configuration, or put the theme in that folder as `theme.yml`.
+
+2. eza applies the `LS_COLORS` and `EZA_COLORS` environment variables over its theme, and many systems set \
+`LS_COLORS` for `ls`. Give eza empty ones with an alias in `~/.bashrc` or `~/.zshrc`, which leaves `ls` as it is:
+
+   ```bash
+   alias eza='LS_COLORS= EZA_COLORS= eza'
+   ```
+
+   In fish, put this line in `~/.config/fish/config.fish`:
+
+   ```fish
+   alias eza 'LS_COLORS= EZA_COLORS= command eza'
+   ```
+
+If folders stay blue, `LS_COLORS` still applies: run `alias eza` in the shell that starts eza, and open a new \
+terminal after editing the shell's configuration. If every colour is eza's default, eza has not read the theme: \
+`ls -L ~/.config/eza/theme.yml` must name the file, and eza ignores a file that is not valid YAML.
+
+## What is coloured
+
+Each theme keeps the look of eza's default theme in the colours of its palette: file names by kind and type, \
+permissions, sizes, users and groups, links, dates, inodes, blocks, Git status and repositories, security contexts, \
+the header, punctuation and the paths of symbolic links. Folders take one of the family's syntax colours and dates \
+another, so each tradition shows in the listing. Folder names are the only bold file names, so a folder stands apart \
+from a file of a similar colour. Plain files keep the terminal's own text colour, which the matching \
+terminal theme takes from the same palette, and icons take the colour of their file's name.
+
+{readme_footer(families, "eza", "Themes", "the theme, eza version, terminal")}"""
+
+
+def read_eza(text):
+    """The keys and styles of an eza theme file, read as YAML for the layout that heritage.eza writes: comments, blank
+    lines, colourful: true, then mappings indented by two spaces whose leaves are flow mappings of double-quoted
+    #RRGGBB colours and booleans. Fails on any other line, a key that repeats or a field that is not a colour or an
+    attribute of heritage.eza, so the comparison with heritage.eza.settings stands for what eza reads."""
+    lines = [line for line in text.splitlines() if line and not line.startswith("#")]
+    if lines[:1] != ["colourful: true"]:
+        raise ValueError("the file does not start with colourful: true")
+    fields = ("foreground", "background", *(f"is_{a}" for a in heritage.eza.ATTRIBUTES))
+    result, path = {}, []
+    for line in lines[1:]:
+        match = re.fullmatch(r"((?:  )*)([a-z_]+):(?: \{ (.*) \})?", line)
+        if not match or len(match[1]) // 2 > len(path):
+            raise ValueError(f"unexpected line {line!r}")
+        path = path[:len(match[1]) // 2]
+        parent = result
+        for key in path:
+            parent = parent[key]
+        if match[2] in parent:
+            raise ValueError(f"{'.'.join([*path, match[2]])} repeats")
+        if match[3] is None:
+            parent[match[2]] = {}
+            path.append(match[2])
+            continue
+        style = {}
+        for item in match[3].split(", "):
+            pair = re.fullmatch(r'([a-z_]+): (?:"(#[0-9A-F]{6})"|(true|false))', item)
+            if not pair or pair[1] not in fields or pair[1] in style:
+                raise ValueError(f"unexpected style {match[3]!r}")
+            if pair[1].startswith("is_") != bool(pair[3]):
+                raise ValueError(f"{pair[1]} has the wrong type in {match[3]!r}")
+            style[pair[1]] = pair[2] or pair[3] == "true"
+        parent[match[2]] = style
+    return result
+
+
+def validate_eza(directory, families):
+    """Fails the build when a theme file is missing, does not read as heritage.eza's styles, leaves out or adds a key
+    of eza's theme file, or when text it colours is unreadable on its background."""
+    def key_paths(keys, path=()):
+        """The paths of the styles of heritage.eza.KEYS."""
+        if isinstance(keys, tuple):
+            return {(*path, key) for key in keys}
+        return set().union(*(key_paths(inner, (*path, key)) if inner else {(*path, key)}
+                             for key, inner in keys.items()))
+    def style_paths(found, path=()):
+        """The paths of the styles in a file read by read_eza: a style is a mapping that holds no mapping."""
+        return set().union(*(style_paths(inner, (*path, key)) if any(isinstance(v, dict) for v in inner.values())
+                             else {(*path, key)} for key, inner in found.items()))
+    expected = set()
+    for family in families:
+        for t in family.THEMES:
+            name, p = heritage.eza.name(t), t["palette"]
+            expected.add(f"{name}.yml")
+            label = f"eza {name}"
+            with open(os.path.join(directory, "themes", f"{name}.yml"), encoding="utf-8") as f:
+                try:
+                    found = read_eza(f.read())
+                except ValueError as error:
+                    raise SystemExit(f"{label}: {error}")
+            styles = {}
+            for path, style in heritage.eza.entries(p):
+                parent = styles
+                for key in path[:-1]:
+                    parent = parent.setdefault(key, {})
+                parent[path[-1]] = heritage.eza.resolve(p, style)
+            if found != styles:
+                raise SystemExit(f"{label}: the theme differs from heritage.eza's styles")
+            if style_paths(found) != key_paths(heritage.eza.KEYS):
+                raise SystemExit(f"{label}: the keys differ from those of eza's theme file")
+            for element, fg, bg, minimum in heritage.eza.styles(p):
+                ratio = contrast(fg[1:], bg[1:])
+                if ratio < minimum:
+                    raise SystemExit(f"{label}: {element} is {ratio:.2f}:1 on {bg}, needs {minimum}:1")
+    check_files("eza themes", directory, "themes", expected)
+
+
 def yazi_readme(families):
     """The README in the zip. Links are absolute, as the zip holds the build only."""
     count = sum(len(f.THEMES) for f in families)
@@ -5146,7 +5283,7 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "Geany": lambda t: t["palette"]["name"], "Pulsar": heritage.pulsar.name,
                   "Amp": heritage.amp.name, "bat": heritage.bat.name, "delta": heritage.delta.name,
                   "lazygit": heritage.lazygit.name, "btop": heritage.btop.name, "yazi": heritage.yazi.name,
-                  "fzf": heritage.fzf.name,
+                  "fzf": heritage.fzf.name, "eza": heritage.eza.name,
                   "Eclipse": heritage.eclipse.name,
                   "Nova": lambda t: t["palette"]["name"], "JupyterLab": lambda t: t["palette"]["name"],
                   "Pygments": heritage.pygments.name, "Spyder": heritage.spyder.name, "Thonny": heritage.thonny.name, "IDLE": heritage.idle.name,
@@ -5154,7 +5291,7 @@ TERMINAL_NAMES = {"terminals": heritage.terminals.name, "Nano": heritage.nano.na
                   "Textadept": heritage.textadept.name, "Kakoune": heritage.kakoune.name, "Micro": heritage.micro.name,
                   "Vim": heritage.vim.name,
                   "Emacs": heritage.emacs.name}
-TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "bat": bat_readme, "delta": delta_readme, "lazygit": lazygit_readme, "btop": btop_readme, "fzf": fzf_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
+TERMINAL_READMES = {"Geany": geany_readme, "Pulsar": pulsar_readme, "Spyder": spyder_readme, "IDLE": idle_readme, "RStudio": rstudio_readme, "Nano": nano_readme, "Textadept": textadept_readme, "Amp": amp_readme, "bat": bat_readme, "delta": delta_readme, "lazygit": lazygit_readme, "btop": btop_readme, "fzf": fzf_readme, "eza": eza_readme, "Kakoune": kakoune_readme, "Micro": micro_readme, "Vim": vim_readme, "Emacs": emacs_readme}
 
 
 def terminals_readme(families):
@@ -5488,6 +5625,9 @@ def main():
             ("fzf", "themes", lambda t, source: (f"{heritage.fzf.name(t)}.fzfrc",
                                                   heritage.fzf.theme(t["palette"], source)),
              validate_fzf),
+            ("eza", "themes", lambda t, source: (f"{heritage.eza.name(t)}.yml",
+                                                  heritage.eza.theme(t["palette"], source)),
+             validate_eza),
             ("Spyder", "themes", lambda t, source: (f"{heritage.spyder.name(t)}.ini",
                                                      heritage.spyder.theme(t["palette"], heritage.spyder.name(t),
                                                                            source)),

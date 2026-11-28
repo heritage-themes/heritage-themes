@@ -2,7 +2,7 @@
 
 Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvim | --notepadpp | --xcode | --helix
                           | --kakoune | --micro | --vim | --emacs | --terminals | --nano | --amp | --bat | --delta
-                          | --lazygit | --btop | --yazi | --fzf | --textadept | --lapce | --qtcreator | --kate
+                          | --lazygit | --btop | --yazi | --fzf | --eza | --textadept | --lapce | --qtcreator | --kate
                           | --gnome-text-editor | --gedit | --geany | --eclipse | --pulsar | --jupyterlab | --pygments]
                           [--png] [THEME ...]
   THEME        a theme folder, for example shuimo; default: every theme folder
@@ -27,6 +27,7 @@ Usage: python3 preview.py [--vscode | --visualstudio | --sublime | --zed | --nvi
   --btop       write the btop preview instead of the IntelliJ one; needs Linux and Podman
   --yazi       write the yazi preview instead of the IntelliJ one; needs Linux and Podman
   --fzf        write the fzf preview instead of the IntelliJ one; needs Linux and Podman
+  --eza        write the eza preview instead of the IntelliJ one; needs Linux and Podman
   --textadept  write the Textadept preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --lapce      write the Lapce preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
   --qtcreator  write the Qt Creator preview instead of the IntelliJ one; needs Linux, Podman and ImageMagick
@@ -71,9 +72,9 @@ colours (scripts/terminals/check.py) or a screen shows a colour the theme does n
 minimum (scripts/terminals/cells.py). iTerm2 and Windows Terminal do not run on Linux, so the build's checks of their
 files are all they get. Termux runs in the Android emulator that scripts/termux/setup.sh starts, and
 scripts/termux/shoot.py screenshots its themes there and checks the pixels in the same way. The Nano, Amp, bat, delta,
-lazygit, btop, yazi, fzf, Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
+lazygit, btop, yazi, fzf, eza, Textadept, Lapce, Qt Creator, Kate, GNOME Text Editor, gedit, Geany, Eclipse and Pulsar pages go to themes/<theme>/build/preview-<editor>.html. Each
 editor runs in the container image of scripts/editors/Containerfile, with the theme installed and chosen as its README
-says: Nano, Amp, bat, delta, lazygit, btop, yazi and fzf in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
+says: Nano, Amp, bat, delta, lazygit, btop, yazi, fzf and eza in a pseudo-terminal through scripts/editors/screen.py, which fails when a screen shows a colour
 that the theme does not set or text below its contrast minimum, and the others on Xvfb through
 scripts/editors/shoot.py, whose screenshots go to themes/<theme>/build/<editor> and fail when they show a colour that
 is no colour of the theme nor a blend of one
@@ -576,15 +577,19 @@ SCREEN_EDITORS = {
     # with the preview
     "fzf": ("fzf", lambda themes: [(f"{heritage.fzf.name(t)}.fzfrc", heritage.fzf.theme(t["palette"], ""))
                                    for t in themes], lambda p: set(), "0:"),
+    # eza: every row of its long listing with every column, its grid and its tree
+    "eza": ("eza", lambda themes: [(f"{heritage.eza.name(t)}.yml", heritage.eza.theme(t["palette"], ""))
+                                   for t in themes], lambda p: set(), "0:"),
 }
 # Editor → the views that its screens show, as scripts/editors/screen.py names them, in place of SAMPLES.
 SCREEN_VIEWS = {"lazygit": ("files", "commits", "search"), "btop": ("selected", "followed", "paused"),
-                "yazi": ("preview", "select", "cut", "help", "rename"), "fzf": ("search", "preview")}
+                "yazi": ("preview", "select", "cut", "help", "rename"), "fzf": ("search", "preview"),
+                "eza": ("long", "grid", "tree")}
 # The yazi view that each flavor's preview.png shows, and the folder of those images, which build.py reads.
 YAZI_FLAVOR_SCREEN = "preview"
 YAZI_PREVIEWS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yazi", "previews")
-# Editor → the sample whose code its views' files hold, for the folder that yazi and fzf show.
-SCREEN_VIEW_SAMPLE = {"yazi": "orders.py", "fzf": "orders.py"}
+# Editor → the sample whose code its views' files hold, for the folder that yazi, fzf and eza show.
+SCREEN_VIEW_SAMPLE = {"yazi": "orders.py", "fzf": "orders.py", "eza": "orders.py"}
 # Editor → the colours, besides comments, that the check holds to 3:1 as dimmed text: btop's fading process list.
 SCREEN_DIMMED = {"btop": lambda p: {c for name in ("proc", "proc_color") for c in heritage.btop.gradients(p)[name]}}
 # Editor → the colours that it fills areas with, which a block element drawn in them is part of: fzf's gutter, which

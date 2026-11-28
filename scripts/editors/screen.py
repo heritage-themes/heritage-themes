@@ -2,10 +2,11 @@
 
 Usage: python3 screen.py EDITOR THEME FILES SAMPLE BACKGROUND FOREGROUND OUT.json
 
-EDITOR is nano, amp, bat, delta, lazygit, btop, yazi or fzf, THEME the theme's file name stem, FILES the folder of the
-editor's generated files, SAMPLE the file to open, or for lazygit, btop, yazi and fzf a file whose name is the view to
-show (for lazygit files, commits or search, for btop selected, followed or paused, for yazi preview, select, cut, help
-or rename, for fzf search or preview), which for yazi and fzf holds the code sample that its folder shows, and
+EDITOR is nano, amp, bat, delta, lazygit, btop, yazi, fzf or eza, THEME the theme's file name stem, FILES the folder of
+the editor's generated files, SAMPLE the file to open, or for lazygit, btop, yazi, fzf and eza a file whose name is the
+view to show (for lazygit files, commits or search, for btop selected, followed or paused, for yazi preview, select,
+cut, help or rename, for fzf search or preview, for eza long, grid or tree), which for yazi, fzf and eza holds the code
+sample that its folder shows, and
 BACKGROUND and FOREGROUND the terminal's default colours as #RRGGBB, those of the matching Terminals theme. The editor
 starts in a pseudo-terminal of 256 colours that reports 24-bit colour and answers queries for its default colours, in a
 fresh HOME with the theme installed as its README says, and the screen is read through the pyte terminal emulator once
@@ -29,6 +30,8 @@ BTOP_COLUMNS, BTOP_ROWS = 120, 36
 YAZI_COLUMNS, YAZI_ROWS = 120, 30
 # fzf's preview view shows the list beside the preview of the code sample
 FZF_COLUMNS, FZF_ROWS = 120, 30
+# eza prints a listing and exits: the long listing's columns need the width, and the rows below its output are dropped
+EZA_COLUMNS, EZA_ROWS = 140, 30
 QUIET, TIMEOUT = 1.5, 30
 # btop updates every BTOP_UPDATE milliseconds and gets BTOP_PACE seconds before each key and before the screen is read,
 # so its graphs hold several samples
@@ -303,7 +306,69 @@ def fzf(home, stem, files, sample, background, foreground):
             "/usr/bin/fzf", *options], keys, folder
 
 
-EDITORS = dict(nano=nano, amp=amp, bat=bat, delta=delta, lazygit=lazygit, btop=btop, yazi=yazi, fzf=fzf)
+# eza's view → its options: a long listing with every column that the theme colours, a grid of the files' names and a
+# tree of the folders
+EZA_VIEWS = {"long": ["--long", "--header", "--inode", "--links", "--blocksize", "--group", "--git", "--git-repos",
+                      "--octal-permissions", "--time-style=long-iso", ".", "/dev/null"],
+             "grid": ["--grid", "--classify=always"], "tree": ["--tree", "--level=2"]}
+# The time that every file of eza's folder was last changed, so the dates stay the same from one preview to the next
+EZA_TIME = 1795000000
+
+
+def eza(home, stem, files, sample, background, foreground):
+    # the theme in a themes folder of eza's configuration folder and linked as its theme.yml, as the README says, with
+    # LS_COLORS and EZA_COLORS empty, as the README's alias gives them. The folder is a Git repository of the code
+    # sample as orders.py, with a file of each type that eza colours: a modified, a staged, an untracked and an
+    # ignored file, a file that became a link, a hard link, an executable, a pipe and a broken link, and files whose
+    # sparse sizes reach each unit; two of its folders are repositories of their own, one clean on main and one with changes on
+    # another branch.
+    os.makedirs(f"{home}/.config/eza/themes")
+    shutil.copy(f"{files}/{stem}.yml", f"{home}/.config/eza/themes")
+    os.symlink(f"{home}/.config/eza/themes/{stem}.yml", f"{home}/.config/eza/theme.yml")
+    folder = f"{home}/weaving"
+    os.makedirs(folder)
+    def git(cwd, *args):
+        subprocess.run(["/usr/bin/git", "-c", "user.name=Weaver", "-c", "user.email=weaver@example.com",
+                        "-c", "init.defaultBranch=main", *args], cwd=cwd, check=True, capture_output=True)
+    git(folder, "init", "-q")
+    view = os.path.basename(sample)
+    shutil.move(sample, f"{folder}/orders.py")
+    write(f"{folder}/.gitignore", "*.tmp\n")
+    write(f"{folder}/loom.sh", "#!/bin/sh\n# weave the next row\necho \"warp $1\"\n")
+    os.chmod(f"{folder}/loom.sh", 0o755)
+    write(f"{folder}/draft.txt", "Fire at 1200 degrees.\n")
+    write(f"{folder}/latest.py", "")
+    git(folder, "add", ".")
+    git(folder, "commit", "-q", "-m", "Warp")
+    with open(f"{folder}/orders.py", "a", encoding="utf-8") as f:
+        f.write("# reviewed\n")
+    git(folder, "mv", "draft.txt", "notes.txt")
+    os.remove(f"{folder}/latest.py")
+    os.symlink("orders.py", f"{folder}/latest.py")
+    for name, size in (("Makefile", 120), ("motif.png", 4096), ("catalogue.pdf", 3 << 20), ("song.flac", 5 << 30),
+                       ("archive.zip", 2 << 40), ("weave.key", 64), ("cache.tmp", 10)):
+        with open(f"{folder}/{name}", "wb") as f:
+            f.truncate(size)
+    os.link(f"{folder}/orders.py", f"{folder}/orders-copy.py")
+    os.mkfifo(f"{folder}/shuttle")
+    os.symlink("missing.txt", f"{folder}/lost.txt")
+    for name, branch, dirty in (("patterns", "main", False), ("dyes", "indigo", True)):
+        repository = f"{folder}/{name}"
+        os.makedirs(repository)
+        git(repository, "init", "-q", "-b", branch)
+        write(f"{repository}/README.md", f"# {name.capitalize()}\n")
+        git(repository, "add", ".")
+        git(repository, "commit", "-q", "-m", "Start")
+        if dirty:
+            write(f"{repository}/madder.txt", "Madder for the reds.\n")
+    for directory, names, filenames in os.walk(folder):
+        if ".git" not in directory.split(os.sep):
+            for name in [*names, *filenames]:
+                os.utime(os.path.join(directory, name), (EZA_TIME, EZA_TIME), follow_symlinks=False)
+    return ["/usr/bin/env", "LS_COLORS=", "EZA_COLORS=", "/usr/bin/eza", *EZA_VIEWS[view]], folder
+
+
+EDITORS = dict(nano=nano, amp=amp, bat=bat, delta=delta, lazygit=lazygit, btop=btop, yazi=yazi, fzf=fzf, eza=eza)
 
 
 def colour_reply(code, colour):
@@ -386,14 +451,18 @@ def main():
     elif editor == "fzf":
         argv, keys, folder = argv
         rows = run(argv, env, background, foreground, FZF_ROWS, FZF_COLUMNS, keys, cwd=folder)
+    elif editor == "eza":
+        argv, folder = argv
+        rows = run(argv, env, background, foreground, EZA_ROWS, EZA_COLUMNS, cwd=folder)
     else:
         rows = run(argv, env, background, foreground, DELTA_ROWS if editor == "delta" else ROWS)
-    if editor == "delta":
+    if editor in ("delta", "eza"):
         while rows and all(char == " " and bg == "default" for char, fg, bg, *_ in rows[-1]):
             rows.pop()
         # the output and the row the cursor ends on must fit, or the screen has scrolled the first rows away
-        if len(rows) >= DELTA_ROWS - 1:
-            raise SystemExit(f"delta: the diff of {os.path.basename(sample)} needs more than {DELTA_ROWS} rows")
+        limit = DELTA_ROWS if editor == "delta" else EZA_ROWS
+        if len(rows) >= limit - 1:
+            raise SystemExit(f"{editor}: the output for {os.path.basename(sample)} needs more than {limit} rows")
     with open(out, "w", encoding="utf-8") as f:
         json.dump(rows, f)
 
